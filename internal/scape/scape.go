@@ -15,6 +15,11 @@ type Activity struct {
 	// what you get if nobody sets it -- means a fresh session, not an
 	// exhausted one.
 	ContextUsed float64
+
+	// TimeOfDay runs 0 at midnight, .25 dawn, .5 noon, .75 dusk. Midnight is
+	// the zero value on purpose: it is the look the scape was designed around,
+	// so forgetting to set this yields the good palette rather than a broken one.
+	TimeOfDay float64
 }
 
 type Scape interface {

@@ -35,7 +35,7 @@ func termSize() (w, h int) {
 // runLive paints the scape to this terminal until interrupted. This is the
 // only view that proves anything: the HTML harness models glyph advances, a
 // terminal paints a fixed cell grid, and they disagree about non-ASCII glyphs.
-func runLive(seed int64, fps float64, wIn, hIn int, ctxUsed float64, ascii bool) {
+func runLive(seed int64, fps float64, wIn, hIn int, ctxUsed, tod float64, ascii bool) {
 	w, h := wIn, hIn
 	if w <= 0 || h <= 0 {
 		w, h = termSize()
@@ -63,10 +63,10 @@ func runLive(seed int64, fps float64, wIn, hIn int, ctxUsed float64, ascii bool)
 	for range tick.C {
 		t := time.Since(start).Seconds()
 		// Swing through the states so every behaviour is visible in one sitting.
-		st, act := companion.Working, scape.Activity{Working: true, Level: 0.65, ContextUsed: ctxUsed}
+		st, act := companion.Working, scape.Activity{Working: true, Level: 0.65, ContextUsed: ctxUsed, TimeOfDay: tod}
 		switch phase := int(t/8) % 3; phase {
 		case 1:
-			st, act = companion.Resting, scape.Activity{ContextUsed: ctxUsed}
+			st, act = companion.Resting, scape.Activity{ContextUsed: ctxUsed, TimeOfDay: tod}
 		case 2:
 			st = companion.NeedsYou
 		}

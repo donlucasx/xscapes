@@ -33,6 +33,8 @@ func main() {
 		strip   = flag.String("strip", "", "write a frame strip (for GIF assembly) to an HTML file")
 		layout  = flag.String("layout", "", "write the layout mockups to an HTML file")
 		ctxdemo = flag.String("context", "", "write the context-moon demo to an HTML file")
+		dayHTML = flag.String("day", "", "write the day-cycle demo to an HTML file")
+		tod     = flag.Float64("tod", 0, "time of day: 0 midnight, .25 dawn, .5 noon, .75 dusk")
 		live    = flag.Bool("live", false, "paint the scape in THIS terminal until Ctrl-C")
 		ctxUsed = flag.Float64("ctx", 0, "context used, 0..1 (moon phase and altitude)")
 		mode    = flag.String("mode", "working", "strip mode: resting|working|needsyou|walk")
@@ -45,7 +47,7 @@ func main() {
 		return
 	}
 
-	act := scape.Activity{Working: *working}
+	act := scape.Activity{Working: *working, TimeOfDay: *tod, ContextUsed: *ctxUsed}
 	switch {
 	case *level >= 0:
 		act.Level = *level
@@ -65,7 +67,16 @@ func main() {
 		if isSet("h") {
 			hl = *height
 		}
-		runLive(*seed, *fps, wl, hl, *ctxUsed, *asciiG)
+		runLive(*seed, *fps, wl, hl, *ctxUsed, *tod, *asciiG)
+		return
+	}
+
+	if *dayHTML != "" {
+		if err := os.WriteFile(*dayHTML, []byte(dayPage(*seed)), 0o644); err != nil {
+			fmt.Fprintln(os.Stderr, "asciiscapes:", err)
+			os.Exit(1)
+		}
+		fmt.Println(*dayHTML)
 		return
 	}
 

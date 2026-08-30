@@ -7,20 +7,6 @@ import (
 	"github.com/donlucasx/asciiscapes/internal/term"
 )
 
-var (
-	skyTop     = term.RGB{R: 6, G: 8, B: 22}
-	skyHorizon = term.RGB{R: 40, G: 46, B: 78}
-	starCol    = term.RGB{R: 206, G: 216, B: 240}
-	moonCol    = term.RGB{R: 242, G: 238, B: 214}
-	seaFar     = term.RGB{R: 16, G: 24, B: 46}
-	seaNear    = term.RGB{R: 30, G: 52, B: 84}
-	foamCol    = term.RGB{R: 214, G: 232, B: 238}
-	wetSand    = term.RGB{R: 58, G: 51, B: 45}
-	sandNear   = term.RGB{R: 76, G: 65, B: 54}
-	grainCol   = term.RGB{R: 116, G: 101, B: 84}
-	glitterCol = term.RGB{R: 236, G: 232, B: 200}
-)
-
 // Shore: night beach. Stars and moon far, open water mid, foam and sand near.
 type Shore struct {
 	Seed  int64
@@ -29,6 +15,8 @@ type Shore struct {
 	// Where the moon landed this frame, so callers can anchor a label to it
 	// without recomputing the position and drifting out of sync.
 	moonX, moonY int
+
+	pal Palette // this frame's colours, from the time of day
 }
 
 // MoonPos is the moon's centre cell from the last Update.
@@ -40,6 +28,7 @@ func (s *Shore) Name() string { return "shore" }
 
 func (s *Shore) Update(c *canvas.Canvas, t float64, act Activity) {
 	c.Clear()
+	s.pal = PaletteAt(act.TimeOfDay)
 	if c.W < 8 || c.H < 6 {
 		return
 	}
@@ -63,7 +52,7 @@ func (s *Shore) Update(c *canvas.Canvas, t float64, act Activity) {
 
 	s.paintBG(c, hy, edge)
 	s.stars(c, hy, t)
-	s.moon(c, hy, scale, 1-clamp01(act.ContextUsed))
+	s.moon(c, hy, scale, 1-clamp01(act.ContextUsed), s.pal.MoonVis)
 	s.sea(c, hy, edge, tt, act)
 	s.sand(c, edge)
 	s.foam(c, edge, scale)
@@ -96,16 +85,16 @@ func (s *Shore) paintBG(c *canvas.Canvas, hy int, edge []float64) {
 			var col term.RGB
 			switch {
 			case y <= hy:
-				col = term.Lerp(skyTop, skyHorizon, fy/fh)
+				col = term.Lerp(s.pal.SkyTop, s.pal.SkyHorizon, fy/fh)
 			case fy < ex-0.5:
-				col = term.Lerp(seaFar, seaNear, (fy-float64(hy))/math.Max(1, ex-float64(hy)))
+				col = term.Lerp(s.pal.SeaFar, s.pal.SeaNear, (fy-float64(hy))/math.Max(1, ex-float64(hy)))
 			case fy < ex+0.5:
 				// The waterline cell straddles sea and sand. Mix by how much of
 				// the cell the water actually covers.
-				col = term.Lerp(wetSand, seaNear, ex-fy+0.5)
+				col = term.Lerp(s.pal.WetSand, s.pal.SeaNear, ex-fy+0.5)
 			default:
 				f := (fy - ex) / math.Max(1, float64(c.H-1)-ex)
-				col = term.Lerp(wetSand, sandNear, math.Min(1, f*1.3))
+				col = term.Lerp(s.pal.WetSand, s.pal.SandNear, math.Min(1, f*1.3))
 			}
 			c.SetBG(x, y, col)
 		}
@@ -123,9 +112,12 @@ func (s *Shore) stars(c *canvas.Canvas, hy int, t float64) {
 				continue
 			}
 			ph := HashF(x, y, s.Seed+7) * 2 * math.Pi
-			twinkle := 0.55 + 0.45*math.Sin(t*0.9+ph)
+			twinkle := (0.55 + 0.45*math.Sin(t*0.9+ph)) * s.pal.StarVis
+			if twinkle <= 0.02 {
+				continue
+			}
 			g := glyphs[int(HashF(x, y, s.Seed+3)*float64(len(glyphs)))%len(glyphs)]
-			far.Plot(x, y, g, starCol, twinkle)
+			far.Plot(x, y, g, s.pal.Star, twinkle)
 		}
 	}
 }
@@ -153,7 +145,7 @@ func clamp01(v float64) float64 {
 // a fresh session is a full moon, and the light goes out as the window fills.
 // The unlit face is still painted, faintly, so the moon never disappears --
 // a missing moon reads as a bug, a dark moon reads as a warning.
-func (s *Shore) moon(c *canvas.Canvas, hy int, scale, lit float64) {
+func (s *Shore) moon(c *canvas.Canvas, hy int, scale, lit, vis float64) {
 	mx := int(float64(c.W) * 0.72)
 	// Altitude carries context too, alongside phase. Shape alone is hard to
 	// judge on a five-cell disc; height above the horizon is easy, because the
@@ -180,14 +172,14 @@ func (s *Shore) moon(c *canvas.Canvas, hy int, scale, lit float64) {
 			if d > rr+rim {
 				continue
 			}
-			a := 0.92
+			a := 0.92 * vis
 			if d > rr-rim {
 				a *= (rr + rim - d) / (2 * rim)
 			}
 			if a <= 0 {
 				continue
 			}
-			col := moonCol
+			col := s.pal.Moon
 			if math.Hypot(fx-shadow, float64(dy)) <= rr {
 				col, a = dark, a*0.45 // earthshine on the unlit face
 			}
@@ -223,7 +215,7 @@ func (s *Shore) sea(c *canvas.Canvas, hy int, edge []float64, tt float64, act Ac
 			if idx >= len(ramp) {
 				idx = len(ramp) - 1
 			}
-			col := term.Lerp(seaNear, foamCol, 0.25+depth*0.45)
+			col := term.Lerp(s.pal.SeaNear, s.pal.Foam, 0.25+depth*0.45)
 			if depth > 0.55 {
 				near.Plot(x, y, ramp[idx], col, 0.55+depth*0.45)
 			} else {
@@ -251,7 +243,7 @@ func (s *Shore) glitter(c *canvas.Canvas, hy int, edge []float64, tt float64) {
 			}
 			a := 0.45 + 0.5*math.Abs(math.Sin(tt*1.3+float64(y)*0.9+float64(k)*1.7))
 			a *= 1 - math.Abs(float64(k))/float64(n+1)*0.6
-			mid.Plot(x, y, g, glitterCol, a)
+			mid.Plot(x, y, g, s.pal.Glitter, a)
 		}
 	}
 }
@@ -267,7 +259,7 @@ func (s *Shore) sand(c *canvas.Canvas, edge []float64) {
 			if HashF(x, y, s.Seed+11) > 0.035 {
 				continue
 			}
-			near.Plot(x, y, g, grainCol, 0.35)
+			near.Plot(x, y, g, s.pal.Grain, 0.35)
 		}
 	}
 }
@@ -294,13 +286,7 @@ func (s *Shore) foam(c *canvas.Canvas, edge []float64, scale float64) {
 				continue
 			}
 			g := glyphs[int(h*37)%len(glyphs)]
-			near.Plot(x, yy, g, foamCol, 0.5+0.45*(1-h/cut))
+			near.Plot(x, yy, g, s.pal.Foam, 0.5+0.45*(1-h/cut))
 		}
 	}
-}
-
-// MoonOnly exposes the moon for the context demo, so the phases can be shown
-// enlarged without reproducing the drawing logic somewhere it could drift.
-func (s *Shore) MoonOnly(c *canvas.Canvas, hy int, scale, lit float64) {
-	s.moon(c, hy, scale, lit)
 }
