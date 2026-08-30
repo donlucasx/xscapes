@@ -79,8 +79,17 @@ subpixel = half a character cell, the smallest vertical step the medium has.
 Eyes are two characters plotted over the quadrant body -- `-` dozing, `o` open,
 `O` alert, plus a blink. Two cells carry the whole expression.
 
-Look at it: `go run . -anim=assets/frames/companion-anim.html` then serve the
-dir (Playwright and the page's JS both need http, not file://).
+**To actually see it move, use the GIFs** -- `assets/frames/cat-sitting.gif` and
+`cat-walking.gif`. Open them directly; no server needed. The HTML preview
+(`-anim`) also animates but requires `python3 -m http.server` in that directory.
+
+How the GIFs are made: `-strip` stacks every frame vertically with the line
+height pinned in px, so ONE full-page screenshot slices into exact frames.
+Capturing frames one at a time would be dozens of browser round trips.
+Then PIL crops to the content bbox and writes the GIF at 12fps.
+
+**Lucas prefers the SITTING cat (2026-08-30).** The side-view walking pose is a
+worse drawing. Keep `CatBody` as the design; do not make the walk the default.
 
 The sitting cat and the walking cat are **separate bitmaps and separate methods**
 (`CatBody`/`Draw` and `CatWalk`/`DrawWalk`) -- adding the walk did not touch the

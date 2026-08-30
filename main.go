@@ -30,6 +30,8 @@ func main() {
 		sheet   = flag.String("sheet", "", "write the companion contact sheet to an HTML file")
 		compare = flag.String("compare", "", "write the rendering comparison to an HTML file")
 		anim    = flag.String("anim", "", "write an animated companion preview to an HTML file")
+		strip   = flag.String("strip", "", "write a frame strip (for GIF assembly) to an HTML file")
+		mode    = flag.String("mode", "working", "strip mode: resting|working|needsyou|walk")
 	)
 	flag.Parse()
 
@@ -50,6 +52,15 @@ func main() {
 	c := canvas.New(*width, *height, canvas.AlphaFar, canvas.AlphaMid, canvas.AlphaNear)
 	sc := scape.NewShore(*seed, *asciiG)
 	profile := term.DetectProfile()
+
+	if *strip != "" {
+		if err := os.WriteFile(*strip, []byte(stripPage(*seed, *frames, *fps, *mode)), 0o644); err != nil {
+			fmt.Fprintln(os.Stderr, "asciiscapes:", err)
+			os.Exit(1)
+		}
+		fmt.Println(*strip)
+		return
+	}
 
 	if *anim != "" {
 		if err := os.WriteFile(*anim, []byte(animPage(*seed, 36, 12)), 0o644); err != nil {
