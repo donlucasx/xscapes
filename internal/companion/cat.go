@@ -50,6 +50,7 @@ type Cat struct {
 	walk    *Bitmap
 	worried *Bitmap
 	kittens []*Bitmap
+	kitFar  *Bitmap
 }
 
 func NewCat() *Cat {
@@ -229,6 +230,11 @@ func (c *Cat) KittenSize() (w, h int) {
 	return b.W / 2, b.H / 4
 }
 
+// nearKittens is how many get the front row before the rest are pushed up the
+// beach. Beyond this they stop being individuals you can read and start being a
+// crowd, which is a different drawing problem.
+const nearKittens = 5
+
 // DrawKittens places n kittens beside the parent, one per running subagent.
 //
 // They must not look stamped, and they must not need n drawings. Every kitten
@@ -236,7 +242,12 @@ func (c *Cat) KittenSize() (w, h int) {
 // phase, and by sitting a little forward or back on the sand. All of it comes
 // from a hash of the kitten's index, so a given subagent keeps the same kitten
 // for as long as it runs instead of flickering between looks every frame.
-func (c *Cat) DrawKittens(l *canvas.Layer, px, py, n int, t float64, seed int64) {
+//
+// Past nearKittens they move to a second row further up the beach: smaller,
+// faceless, and on the mid layer so the existing alpha model makes them recede.
+// That is what distance actually does to detail, so a fan-out of fifteen reads
+// as depth rather than as clutter.
+func (c *Cat) DrawKittens(l *canvas.Layer, far *canvas.Layer, px, py, n int, t float64, seed int64) {
 	if n <= 0 {
 		return
 	}
@@ -244,13 +255,16 @@ func (c *Cat) DrawKittens(l *canvas.Layer, px, py, n int, t float64, seed int64)
 	pw, ph := c.Size()
 	kw, kh := c.KittenSize()
 
-	for i := 0; i < n; i++ {
+	front := n
+	if front > nearKittens {
+		front = nearKittens
+	}
+	for i := 0; i < front; i++ {
 		pick := poses[int(HashF(i, 1, seed)*float64(len(poses)))%len(poses)]
 		mirror := HashF(i, 2, seed) > 0.5
 		ph2 := HashF(i, 3, seed) * 6.283
 
 		f := pick.Blank()
-		// Kittens breathe faster than the parent, and out of step with it.
 		lift := 0
 		if math.Sin(t*2.6+ph2) > 0 {
 			lift = 2
@@ -267,17 +281,15 @@ func (c *Cat) DrawKittens(l *canvas.Layer, px, py, n int, t float64, seed int64)
 			f = f.Mirrored()
 		}
 
-		// Spread to the parent's right, staggered so they do not form a rank.
 		kx := px + pw + 1 + i*(kw+1)
 		ky := py + ph - kh
 		if HashF(i, 4, seed) > 0.55 {
-			ky-- // a couple sit further up the sand
+			ky--
 		}
-
 		(&Sprite{Rows: f.ToQuadrant(), Body: furCol}).Draw(l, kx, ky)
 
-		// Eye gaps sit at source cols 3-4 and 7-8, cell columns 1 and 3 --
-		// the same cell row as the parent's, which is most of the resemblance.
+		// Sockets sit at source rows 4-5, cell row 1, and stay there under the
+		// breathing lift -- see TestEyeSocketsSurviveBreathing.
 		e1, e2 := kx+1, kx+3
 		if mirror {
 			e1, e2 = kx+kw-2, kx+kw-4
@@ -285,6 +297,44 @@ func (c *Cat) DrawKittens(l *canvas.Layer, px, py, n int, t float64, seed int64)
 		l.Plot(e1, ky+1, 'o', kittenEye, 1)
 		l.Plot(e2, ky+1, 'o', kittenEye, 1)
 	}
+
+	if n <= nearKittens || far == nil {
+		return
+	}
+	fb := c.kittenFar()
+	fw, fh := fb.W/2, fb.H/4
+	for i := nearKittens; i < n; i++ {
+		k := i - nearKittens
+		ph2 := HashF(i, 3, seed) * 6.283
+		f := fb.Blank()
+		lift := 0
+		if math.Sin(t*2.9+ph2) > 0 {
+			lift = 2
+		}
+		for sy := 0; sy < f.H; sy++ {
+			for sx := 0; sx < f.W; sx++ {
+				if fb.at(sx, sy-lift) {
+					f.Set(sx, sy)
+				}
+			}
+		}
+		if HashF(i, 2, seed) > 0.5 {
+			f = f.Mirrored()
+		}
+		kx := px + pw + 2 + k*(fw+1)
+		ky := py + ph - kh - fh + 1 // further up the beach, so further away
+		if HashF(i, 4, seed) > 0.6 {
+			ky--
+		}
+		(&Sprite{Rows: f.ToQuadrant(), Body: furCol}).Draw(far, kx, ky)
+	}
+}
+
+func (c *Cat) kittenFar() *Bitmap {
+	if c.kitFar == nil {
+		c.kitFar = ParseBitmap(KittenFar)
+	}
+	return c.kitFar
 }
 
 func (c *Cat) kittenTail(b *Bitmap, wag float64, lift int) {

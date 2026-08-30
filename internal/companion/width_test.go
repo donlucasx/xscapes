@@ -92,3 +92,23 @@ func TestReportsAmbiguousReliance(t *testing.T) {
 		t.Logf("%-9s ambiguous-width runes used: %q", tc.name, string(list))
 	}
 }
+
+// Eyes are plotted at a fixed cell row while the body shifts by two source
+// pixels to breathe. If a socket straddles a cell boundary under that shift,
+// the eyes end up outside the head.
+func TestEyeSocketsSurviveBreathing(t *testing.T) {
+	for name, er := range eyeRows {
+		for _, lift := range []int{0, 2} {
+			top, bot := (er[0]+lift)/4, (er[1]+lift)/4
+			if top != bot {
+				t.Errorf("%s: eye socket rows %d-%d straddle cell rows %d and %d at lift %d",
+					name, er[0]+lift, er[1]+lift, top, bot, lift)
+			}
+		}
+	}
+	// The check has to be able to fail, or it proves nothing. Rows 5-6 are what
+	// the kittens actually had: fine at rest, straddling once they breathe.
+	if (5+2)/4 == (6+2)/4 {
+		t.Error("guard cannot detect the straddle it was written for")
+	}
+}

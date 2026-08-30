@@ -70,7 +70,7 @@ var CatBody = []string{
 // Bitmaps is what the uniform-width test walks.
 var Bitmaps = map[string][]string{"cat": PixelCat, "catBody": CatBody,
 	"catWalk": CatWalk, "catWorried": CatWorried,
-	"kittenSit": KittenSit, "kittenCurl": KittenCurl}
+	"kittenSit": KittenSit, "kittenCurl": KittenCurl, "kittenFar": KittenFar}
 
 // CatWalk is the side view: torso and head only, facing right. Legs and tail
 // are drawn per frame, so the gait needs no art. Mirror the composed frame
@@ -149,7 +149,6 @@ var KittenSit = []string{
 	".###....###.",
 	"..########..",
 	".##########.",
-	".##########.",
 	".##..##..##.",
 	".##..##..##.",
 	".##########.",
@@ -160,12 +159,11 @@ var KittenSit = []string{
 	"..########..",
 	".##########.",
 	".##########.",
+	".##########.",
 	"..##...##...",
 }
 
 var KittenCurl = []string{
-	"............",
-	"............",
 	"............",
 	".##......##.",
 	".###....###.",
@@ -173,11 +171,42 @@ var KittenCurl = []string{
 	".##..##..##.",
 	".##..##..##.",
 	".##########.",
+	".####..####.",
 	".##########.",
 	"..########..",
+	".##########.",
 	".##########.",
 	".##########.",
 	"..########..",
 	"............",
 	"............",
+}
+
+// KittenFar is a kitten seen from further up the beach: half again
+// smaller and faceless. Detail is the first thing distance takes, so this
+// is what a crowd looks like rather than a compromise.
+var KittenFar = []string{
+	".#....#.",
+	".######.",
+	"######..",
+	"######..",
+	"######..",
+	"######..",
+	"######..",
+	".#####..",
+	"######..",
+	"######..",
+	"######..",
+	".#..#...",
+}
+
+// eyeRows records where each sprite's eye sockets live so the test can
+// prove they stay inside ONE character cell while the body breathes.
+// Getting this wrong puts the eyes outside the head, which is exactly what
+// happened to the kittens on 2026-08-30.
+var eyeRows = map[string][2]int{
+	"catBody":    {8, 9},
+	"catWorried": {8, 9},
+	"kittenSit":  {4, 5},
+	"kittenCurl": {4, 5},
 }
