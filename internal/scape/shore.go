@@ -148,7 +148,11 @@ func clamp01(v float64) float64 {
 // a missing moon reads as a bug, a dark moon reads as a warning.
 func (s *Shore) moon(c *canvas.Canvas, hy int, scale, lit float64) {
 	mx := int(float64(c.W) * 0.72)
-	my := int(float64(hy) * 0.34)
+	// Altitude carries context too, alongside phase. Shape alone is hard to
+	// judge on a five-cell disc; height above the horizon is easy, because the
+	// horizon is a reference line right there. Two cues for one variable is
+	// what makes it readable at a glance rather than on inspection.
+	my := int(float64(hy) * (0.22 + 0.62*(1-lit)))
 	if my < 1 {
 		my = 1
 	}

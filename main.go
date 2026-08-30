@@ -33,6 +33,8 @@ func main() {
 		strip   = flag.String("strip", "", "write a frame strip (for GIF assembly) to an HTML file")
 		layout  = flag.String("layout", "", "write the layout mockups to an HTML file")
 		ctxdemo = flag.String("context", "", "write the context-moon demo to an HTML file")
+		live    = flag.Bool("live", false, "paint the scape in THIS terminal until Ctrl-C")
+		ctxUsed = flag.Float64("ctx", 0, "context used, 0..1 (moon phase and altitude)")
 		mode    = flag.String("mode", "working", "strip mode: resting|working|needsyou|walk")
 	)
 	flag.Parse()
@@ -54,6 +56,18 @@ func main() {
 	c := canvas.New(*width, *height, canvas.AlphaFar, canvas.AlphaMid, canvas.AlphaNear)
 	sc := scape.NewShore(*seed, *asciiG)
 	profile := term.DetectProfile()
+
+	if *live {
+		wl, hl := 0, 0
+		if isSet("w") {
+			wl = *width
+		}
+		if isSet("h") {
+			hl = *height
+		}
+		runLive(*seed, *fps, wl, hl, *ctxUsed, *asciiG)
+		return
+	}
 
 	if *ctxdemo != "" {
 		if err := os.WriteFile(*ctxdemo, []byte(contextPage(*seed)), 0o644); err != nil {
@@ -130,4 +144,16 @@ func main() {
 			fmt.Println()
 		}
 	}
+}
+
+// isSet reports whether a flag was given explicitly, so -live can size itself
+// to the real terminal unless told otherwise.
+func isSet(name string) bool {
+	found := false
+	flag.Visit(func(f *flag.Flag) {
+		if f.Name == name {
+			found = true
+		}
+	})
+	return found
 }
