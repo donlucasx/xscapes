@@ -55,7 +55,7 @@ only if nothing else needs it.
 | something is broken | **the companion**, not the weather: ears back, hunched, tail flat, amber eyes; persists until it clears | done |
 | context remaining | **moon** phase *and* altitude; numeric readout silent until 65%, brightens at 85% | done |
 | time of day | **sky colour**, real wall clock | done |
-| weather | **discarded entirely** &mdash; no rain, clouds, fog or real-weather sync | cut 2026-08-30 |
+| weather | **deferred, not rejected** &mdash; no rain, clouds, fog or sync in v1; the thinking is parked in `ideas.md` | deferred 2026-08-30 |
 | needs you | **bubble**, rare: needs_input, error, done. Nothing else | done |
 | what it is doing now | **text written in the sand**, newest brightest, older fading as the tide takes them | mocked |
 | todos completed | **star count** | not built |
@@ -112,8 +112,9 @@ see what the agent is doing.
 - Which survive is TBD after seeing them rendered.
 
 **Activity mapping** *(supersedes the per-tool weather taxonomy, discarded 2026-08-30)*
-- **Weather is discarded entirely.** No rain, no clouds, no fog, no storms, no
-  real-weather sync. The sky is time of day, stars and the moon; nothing else.
+- **Weather is deferred, not rejected.** No rain, clouds, fog, storms or
+  real-weather sync in v1; the ideas are parked in `ideas.md` for after the
+  vocabulary settles. The sky is time of day, stars and the moon; nothing else.
   This removes a network dependency, a location permission, and the risk of
   atmospheric motion being misread as agent activity.
 - **Tool events do not each get their own visual.** There is no read=rain,

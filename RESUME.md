@@ -112,7 +112,7 @@ one. A channel may be bound to the real world only if nothing else needs it.
 | what it is doing now | text **in the sand** + driftwood | mocked, not wired |
 | needs you | **bubble**, rare | done |
 
-⛔ **Weather is DISCARDED entirely** (2026-08-30) -- no rain, clouds, fog, storms
+⛔ **Weather is DEFERRED, not rejected** (2026-08-30; ideas parked in `ideas.md`) -- no rain, clouds, fog, storms
 or real-weather sync. The rule that replaced it: **the water is the work, the sky
 is the world.** Swells carry busy-ness, the companion carries broken, the sky is
 only time of day. The per-tool weather taxonomy in the old brief died with it:

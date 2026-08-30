@@ -2,6 +2,28 @@
 
 Not in v1. Kept so they're not lost. Nothing here should influence Milestone 1.
 
+## Weather, clouds, storms (deferred 2026-08-30, NOT rejected)
+Cut from v1 to keep the encoding clean, not because the ideas are bad. The rule
+that pushed them out: **the water is the work, the sky is the world.** Swells
+carry activity and the companion carries breakage, so weather had no job left --
+and atmospheric motion risked being misread as agent activity.
+
+Worth bringing back once the vocabulary is settled and taught:
+- **Clouds** as a pure mood layer, drifting on the far layer at low alpha. Safe
+  because they are slow and horizontal, unlike anything the sea does.
+- **Storms** as an event punctuation rather than a state: a single lightning
+  flash on a hard failure, gone in two frames. The persistent state stays with
+  the companion; the flash is just the exclamation mark.
+- **Fog on compaction.** The one per-event weather mapping worth keeping -- fog
+  reads as "losing detail", which is exactly what compaction does.
+- **Rain** as an ambient mode the user chooses, never event-driven.
+- **Real weather synced from the user's location**, which is safe only while
+  weather carries no information. Needs a network call and a location
+  permission, so it must be opt-in with clear-sky as the default.
+- **Real weather picking the SCAPE** rather than the weather within it: raining
+  outside gives you the rainy-window scape, clear night the shore. The world
+  sets the stage, the agent drives the drama, and they never touch.
+
 ## Scenes and rendering
 - Pre-rendered footage loops: shoot or AI-generate 20–30s cozy loops (real surf, fireplace, rain on window), convert with `chafa` to text frames, pack into the binary, composite procedural overlays on top. Pipeline:
   ```
