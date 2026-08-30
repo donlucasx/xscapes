@@ -15,6 +15,11 @@ const (
 	Resting State = iota
 	Working
 	NeedsYou
+	// Worried persists while something is broken, unlike the other states,
+	// which track what the agent is doing right now. It is the companion's
+	// job rather than the weather's: a storm cannot say whether the sea is
+	// rough because the agent is busy or because the tests are red.
+	Worried
 )
 
 func (s State) String() string {
@@ -23,6 +28,8 @@ func (s State) String() string {
 		return "working"
 	case NeedsYou:
 		return "needs you"
+	case Worried:
+		return "something is broken"
 	}
 	return "resting"
 }
@@ -31,16 +38,22 @@ var (
 	furCol   = term.RGB{R: 236, G: 228, B: 210}
 	eyeCol   = term.RGB{R: 168, G: 236, B: 176} // moonlit shine, not a highlight
 	eyeAlert = term.RGB{R: 232, G: 252, B: 226}
+	// Amber, against the moonlit green of every other state. Colour does the
+	// work that a five-cell face cannot.
+	eyeWorried = term.RGB{R: 244, G: 176, B: 96}
 )
 
 // Cat is the companion. The body is a bitmap; the tail is a curve evaluated per
 // frame, which is why wagging costs no extra authoring.
 type Cat struct {
-	body *Bitmap
-	walk *Bitmap
+	body    *Bitmap
+	walk    *Bitmap
+	worried *Bitmap
 }
 
-func NewCat() *Cat { return &Cat{body: ParseBitmap(CatBody)} }
+func NewCat() *Cat {
+	return &Cat{body: ParseBitmap(CatBody), worried: ParseBitmap(CatWorried)}
+}
 
 // Size is the character footprint, not the pixel size.
 func (c *Cat) Size() (w, h int) { return c.body.W / 2, c.body.H / 4 }
@@ -48,17 +61,25 @@ func (c *Cat) Size() (w, h int) { return c.body.W / 2, c.body.H / 4 }
 // Draw composes this frame and plots it. Everything that moves is computed
 // here; nothing is stored between frames.
 func (c *Cat) Draw(l *canvas.Layer, x, y int, t float64, st State) {
-	f := c.body.Blank()
+	src := c.body
+	if st == Worried {
+		src = c.worried
+	}
+	f := src.Blank()
 
 	// Breathing. One quadrant subpixel is two source rows, so shifting by two
 	// moves the whole body by exactly half a character cell -- the smallest
 	// vertical step this medium has, and slow enough to read as breath.
-	period, wag := 3.6, math.Sin(t*0.6)*0.3
+	period, wag, tailLen := 3.6, math.Sin(t*0.6)*0.3, 1.0
 	switch st {
 	case Working:
 		period, wag = 2.2, math.Sin(t*2.4)
 	case NeedsYou:
 		period, wag = 1.6, math.Sin(t*5.0)
+	case Worried:
+		// Shallow, quick breathing and a tail tucked flat: distress reads as
+		// stillness where the other states read as motion.
+		period, wag, tailLen = 1.9, 0, 0.35
 	}
 	lift := 0
 	if math.Sin(2*math.Pi*t/period) > 0 {
@@ -66,12 +87,12 @@ func (c *Cat) Draw(l *canvas.Layer, x, y int, t float64, st State) {
 	}
 	for sy := 0; sy < f.H; sy++ {
 		for sx := 0; sx < f.W; sx++ {
-			if c.body.at(sx, sy-lift) {
+			if src.at(sx, sy-lift) {
 				f.Set(sx, sy)
 			}
 		}
 	}
-	c.tail(f, wag, lift)
+	c.tail(f, wag, lift, tailLen)
 
 	(&Sprite{Rows: f.ToQuadrant(), Body: furCol}).Draw(l, x, y)
 	c.eyes(l, x, y, t, st)
@@ -79,8 +100,9 @@ func (c *Cat) Draw(l *canvas.Layer, x, y int, t float64, st State) {
 
 // tail sweeps a curve up from the right hip. Two pixels thick so it survives
 // the halving that ToQuadrant does.
-func (c *Cat) tail(b *Bitmap, wag float64, lift int) {
-	for i := 0; i <= 13; i++ {
+func (c *Cat) tail(b *Bitmap, wag float64, lift int, length float64) {
+	n := int(13 * length)
+	for i := 0; i <= n; i++ {
 		f := float64(i) / 13
 		x := 17 + int(5*f+2.2*math.Sin(wag*1.6+f*2.6)+0.5)
 		y := 24 - int(13*f+0.5) + lift
@@ -100,8 +122,10 @@ func (c *Cat) eyes(l *canvas.Layer, x, y int, t float64, st State) {
 		glyph = '-' // dozing between turns
 	case NeedsYou:
 		glyph, col = 'O', eyeAlert
+	case Worried:
+		glyph, col = 'o', eyeWorried
 	}
-	if st != Resting && math.Mod(t, 5.3) < 0.16 {
+	if st != Resting && st != Worried && math.Mod(t, 5.3) < 0.16 {
 		glyph = '-' // blink
 	}
 	l.Plot(x+2, y+2, glyph, col, 1)

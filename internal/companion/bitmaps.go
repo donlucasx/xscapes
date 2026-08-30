@@ -68,7 +68,8 @@ var CatBody = []string{
 }
 
 // Bitmaps is what the uniform-width test walks.
-var Bitmaps = map[string][]string{"cat": PixelCat, "catBody": CatBody, "catWalk": CatWalk}
+var Bitmaps = map[string][]string{"cat": PixelCat, "catBody": CatBody,
+	"catWalk": CatWalk, "catWorried": CatWorried}
 
 // CatWalk is the side view: torso and head only, facing right. Legs and tail
 // are drawn per frame, so the gait needs no art. Mirror the composed frame
@@ -102,4 +103,38 @@ var CatWalk = []string{
 	"................................",
 	"................................",
 	"................................",
+}
+
+// CatWorried is the same cat with its ears folded back and its shoulders
+// hunched: no tall ears, a shallower waist, the head pulled down. This is the
+// state that says something is wrong and has not been fixed yet.
+var CatWorried = []string{
+	"........................",
+	"........................",
+	".##.............##......",
+	".####.........####......",
+	"..###############.......",
+	".#################......",
+	".#################......",
+	".#################......",
+	".###...#####...###......",
+	".###...#####...###......",
+	".#################......",
+	".#######...#######......",
+	".#################......",
+	"..###############.......",
+	"...#############........",
+	"....###########.........",
+	"...#############........",
+	"..###############.......",
+	"..###############.......",
+	".#################......",
+	".#################......",
+	".#################......",
+	".#################......",
+	".#################......",
+	".#################......",
+	".#################......",
+	"..###..#####..###.......",
+	"..###..#####..###.......",
 }

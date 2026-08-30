@@ -51,11 +51,31 @@ func stripPage(seed int64, frames int, fps float64, mode string) string {
 				st, act = companion.Resting, scape.Activity{}
 			case "needsyou":
 				st = companion.NeedsYou
+			case "worried":
+				st, act = companion.Worried, scape.Activity{Working: true, Level: 0.35}
+			case "tour":
+				// One loop through every state, so a single GIF carries the
+				// whole vocabulary.
+				switch (i * 4) / frames {
+				case 0:
+					st, act = companion.Working, scape.Activity{Working: true, Level: 0.9}
+				case 1:
+					st, act = companion.Worried, scape.Activity{Working: true, Level: 0.3}
+				case 2:
+					st, act = companion.Resting, scape.Activity{}
+				default:
+					st = companion.NeedsYou
+				}
 			}
 			scape.NewShore(seed, false).Update(c, t, act)
 			cw, chh := cat.Size()
 			top := c.H - 2 - chh
 			cat.Draw(c.Near(), 6, top, t, st)
+			if st == companion.Worried {
+				rows := companion.Bubble("tests failing")
+				(&companion.Sprite{Rows: rows, Body: term.RGB{R: 240, G: 200, B: 150}}).
+					Draw(c.Near(), 6+cw-2, top-len(rows))
+			}
 			if st == companion.NeedsYou {
 				rows := companion.Bubble("tests passed")
 				(&companion.Sprite{Rows: rows, Body: term.RGB{R: 226, G: 230, B: 240}}).

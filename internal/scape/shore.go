@@ -213,7 +213,7 @@ func (s *Shore) sea(c *canvas.Canvas, hy int, edge []float64, tt float64, act Ac
 			// glance -- and a glance is the only budget this has -- so a busier
 			// sea has to mean MORE of the sea in motion, not the same marks
 			// moving faster.
-			thr := (1.15 - depth*0.55) - act.Level*0.62
+			thr := (1.30 - depth*0.50) - act.Level*0.45
 			if wv < thr {
 				continue
 			}
@@ -239,7 +239,60 @@ func (s *Shore) sea(c *canvas.Canvas, hy int, edge []float64, tt float64, act Ac
 			}
 		}
 	}
+	s.swells(c, hy, edge, tt, act)
 	s.glitter(c, hy, edge, tt)
+}
+
+// swells are the actual waves: discrete crests that travel from the horizon to
+// the shore, steepening as they arrive. Activity drives HOW MANY are in flight
+// and HOW TALL they get -- both countable at a glance, unlike wave speed.
+//
+// A field of noise that thickens reads as static. Lines that move as objects
+// read as an ocean, and you can count them.
+func (s *Shore) swells(c *canvas.Canvas, hy int, edge []float64, tt float64, act Activity) {
+	mid, near := c.Mid(), c.Near()
+	n := 2 + int(act.Level*5.4) // 2 at rest, 7 flat out
+
+	body := []rune{'-', '~', '≈'}
+	cap := '≋'
+	if s.ASCII {
+		body, cap = []rune{'-', '~', '~'}, '='
+	}
+
+	for i := 0; i < n; i++ {
+		// Each swell walks from horizon to shore and wraps; offsetting by
+		// i/n keeps them evenly spaced instead of bunching.
+		prog := math.Mod(tt*0.13+float64(i)/float64(n), 1)
+		ph := float64(i) * 2.4
+		// Crests steepen as they come in, and a busier sea sends bigger ones.
+		amp := (0.35 + act.Level*1.25) * (0.25 + prog)
+
+		for x := 0; x < c.W; x++ {
+			top := float64(hy) + 1
+			bot := edge[x] - 0.6
+			if bot <= top {
+				continue
+			}
+			y := top + prog*(bot-top) + amp*math.Sin(float64(x)*0.15+ph)
+			yy := int(y + 0.5)
+			if float64(yy) < top || float64(yy) > bot {
+				continue
+			}
+			g := body[int(prog*float64(len(body)))%len(body)]
+			a := 0.35 + prog*0.6
+			col := term.Lerp(s.pal.SeaNear, s.pal.Foam, 0.3+prog*0.55)
+			// The nearest crests break.
+			if prog > 0.78 && act.Level > 0.4 {
+				g, col = cap, s.pal.Foam
+				a = math.Min(1, a+0.25)
+			}
+			if prog > 0.5 {
+				near.Plot(x, yy, g, col, a)
+			} else {
+				mid.Plot(x, yy, g, col, a)
+			}
+		}
+	}
 }
 
 // glitter is the moon's reflection, widening as it comes toward shore.
