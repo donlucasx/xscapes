@@ -82,7 +82,7 @@ func writeInSand(c *canvas.Canvas, lines []string, sandTop int) {
 		}
 		age := float64(n-1-i) / float64(den)
 		col := term.Lerp(ink, sand, age*0.70)
-		(&companion.Sprite{Rows: []string{ln}, Body: col, Alpha: 1}).Draw(c.Near(), 3, row)
+		(&companion.Sprite{Rows: []string{ln}, Body: col, Alpha: 1, Opaque: true}).Draw(c.Near(), 3, row)
 	}
 }
 

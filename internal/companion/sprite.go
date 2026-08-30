@@ -32,6 +32,11 @@ type Sprite struct {
 	Alpha    float64
 	Say      string // if set, a speech bubble is drawn above
 	Source   string // which reference this was translated from
+
+	// Opaque makes spaces paint rather than pass through. Creature sprites want
+	// transparent spaces so the scene shows between the ears; TEXT does not --
+	// a transparent space lets scenery bleed into the middle of a word.
+	Opaque bool
 }
 
 // Bubble builds a speech balloon. All three rows are the same width so the box
@@ -68,7 +73,7 @@ func (s *Sprite) Draw(l *canvas.Layer, x, y int) {
 	}
 	for dy, row := range s.Rows {
 		for dx, r := range []rune(row) {
-			if r == ' ' {
+			if r == ' ' && !s.Opaque {
 				continue
 			}
 			col := s.Body

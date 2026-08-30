@@ -25,7 +25,14 @@ var (
 type Shore struct {
 	Seed  int64
 	ASCII bool
+
+	// Where the moon landed this frame, so callers can anchor a label to it
+	// without recomputing the position and drifting out of sync.
+	moonX, moonY int
 }
+
+// MoonPos is the moon's centre cell from the last Update.
+func (s *Shore) MoonPos() (x, y int) { return s.moonX, s.moonY }
 
 func NewShore(seed int64, asciiOnly bool) *Shore { return &Shore{Seed: seed, ASCII: asciiOnly} }
 
@@ -163,6 +170,7 @@ func (s *Shore) moon(c *canvas.Canvas, hy int, scale, lit float64) {
 	shadow := 2 * rr * lit
 	dark := term.RGB{R: 62, G: 62, B: 74}
 
+	s.moonX, s.moonY = mx, my
 	ry := int(rr+rim) + 1
 	rx := int((rr+rim)*2) + 1
 	for dy := -ry; dy <= ry; dy++ {

@@ -10,59 +10,87 @@ import (
 	"github.com/donlucasx/asciiscapes/internal/term"
 )
 
-// contextPage shows the moon carrying context remaining. Rendered as one wide
-// scape per level rather than cropped moons, because the question is whether it
-// reads in situ -- a moon shown on its own always reads.
-func contextPage(seed int64) string {
+type meterStyle int
+
+const (
+	meterNone meterStyle = iota
+	meterAlways
+	meterThreshold
+	meterInSand
+)
+
+var (
+	moonLabelDim  = term.RGB{R: 150, G: 150, B: 166}
+	moonLabelWarn = term.RGB{R: 244, G: 226, B: 176}
+	sandLabel     = term.RGB{R: 168, G: 152, B: 128}
+)
+
+// contextScene renders one shore at a given context level with one treatment of
+// the numeric readout, so the treatments can be compared rather than described.
+func contextScene(seed int64, used float64, style meterStyle) *canvas.Canvas {
+	c := canvas.New(56, 20, canvas.AlphaFar, canvas.AlphaMid, canvas.AlphaNear)
+	sh := scape.NewShore(seed, false)
+	sh.Update(c, 3.0, scape.Activity{Working: true, Level: 0.55, ContextUsed: used})
+
 	cat := companion.NewCat()
 	_, chh := cat.Size()
+	cat.Draw(c.Near(), 4, c.H-2-chh-3, 3.0, companion.Working)
+	writeInSand(c, activity[2:], 17)
 
-	steps := []struct {
-		used  float64
-		label string
+	pct := fmt.Sprintf("%.0f%%", (1-used)*100)
+	mx, my := sh.MoonPos()
+
+	switch style {
+	case meterAlways:
+		label(c, mx-len(pct)/2, my+3, pct, moonLabelDim)
+	case meterThreshold:
+		// Silent while there is nothing to think about; appears quietly at 65%,
+		// brightens at 85%. The reveal also teaches what the moon means.
+		if used >= 0.85 {
+			label(c, mx-len(pct)/2, my+3, pct+" left", moonLabelWarn)
+		} else if used >= 0.65 {
+			label(c, mx-len(pct)/2, my+3, pct, moonLabelDim)
+		}
+	case meterInSand:
+		txt := "ctx " + pct
+		label(c, c.W-len(txt)-2, c.H-2, txt, sandLabel)
+	}
+	return c
+}
+
+func label(c *canvas.Canvas, x, y int, s string, col term.RGB) {
+	(&companion.Sprite{Rows: []string{s}, Body: col, Alpha: 1, Opaque: true}).Draw(c.Near(), x, y)
+}
+
+func contextPage(seed int64) string {
+	levels := []float64{0.30, 0.70, 0.92}
+	variants := []struct {
+		style meterStyle
+		name  string
 		note  string
 	}{
-		{0.00, "fresh session", "full moon &mdash; the whole window ahead of you"},
-		{0.35, "35% used", "just off full; nothing to think about yet"},
-		{0.60, "60% used", "visibly waning &mdash; the first glanceable warning"},
-		{0.85, "85% used", "thin crescent &mdash; compaction is close"},
-		{0.97, "97% used", "almost dark, but never absent: a missing moon reads as a bug"},
+		{meterNone, "A &middot; moon only", "Purest. The phase and altitude carry it alone. Beautiful, and it has to be learned once before it means anything."},
+		{meterAlways, "B &middot; always beside the moon", "Anchored to the thing it describes, so the number teaches the moon every time you glance. But it is noise for the 60% of a session when you do not care."},
+		{meterThreshold, "C &middot; appears at 65%, brightens at 85%", "Silent while there is nothing to think about. The reveal is itself the warning, and it teaches the metaphor at the moment you need it."},
+		{meterInSand, "D &middot; in the sand with the activity", "Grouped with the other facts rather than floating in the sky. Consistent, but it reads as a status line and pulls the eye down."},
 	}
 
 	var b strings.Builder
-	b.WriteString(`<style>.win{border:1px solid #2a2a32;border-radius:6px;` +
-		`overflow:hidden;display:inline-block}</style>`)
-	b.WriteString(`<h1>asciiscapes &mdash; the moon is the context gauge</h1>`)
+	b.WriteString(`<style>.win{border:1px solid #2a2a32;border-radius:6px;overflow:hidden}` +
+		`.row{display:flex;gap:14px}.row>div{text-align:center}` +
+		`.lv{font-size:10px;color:#55555f;letter-spacing:.1em;margin-bottom:5px}</style>`)
+	b.WriteString(`<h1>asciiscapes &mdash; context: how much number is too much?</h1>`)
 
-	for _, st := range steps {
-		c := canvas.New(72, 20, canvas.AlphaFar, canvas.AlphaMid, canvas.AlphaNear)
-		act := scape.Activity{Working: true, Level: 0.55, ContextUsed: st.used}
-		scape.NewShore(seed, false).Update(c, 3.0, act)
-		cat.Draw(c.Near(), 5, c.H-2-chh-3, 3.0, companion.Working)
-		writeInSand(c, activity[1:], 17)
-
-		fmt.Fprintf(&b, `<div class="card"><div class="meta"><div class="nm">%s</div>`+
-			`<div class="rg">ContextUsed %.2f</div><div class="nt">%s</div></div>`+
-			`<div><div class="win">%s</div></div></div>`,
-			st.label, st.used, st.note, c.HTMLFragment(13))
-	}
-
-	// A zoom on just the moons, since a 5-cell disc is small in the wide shot.
-	b.WriteString(`<div class="card"><div class="meta"><div class="nm">the moons alone</div>` +
-		`<div class="rg">same discs, enlarged</div>` +
-		`<div class="nt">Fresh to nearly spent, left to right.</div></div><div style="display:flex;gap:18px">`)
-	for _, st := range steps {
-		m := canvas.New(11, 7, canvas.AlphaFar, canvas.AlphaMid, canvas.AlphaNear)
-		for y := 0; y < m.H; y++ {
-			for x := 0; x < m.W; x++ {
-				m.SetBG(x, y, term.RGB{R: 12, G: 14, B: 30})
-			}
+	for _, v := range variants {
+		var row strings.Builder
+		for _, lv := range levels {
+			c := contextScene(seed, lv, v.style)
+			fmt.Fprintf(&row, `<div><div class="lv">%.0f%% USED</div><div class="win">%s</div></div>`,
+				lv*100, c.HTMLFragment(12))
 		}
-		sh := scape.NewShore(seed, false)
-		sh.MoonOnly(m, 6, 1.0, 1-st.used)
-		fmt.Fprintf(&b, `<div><div class="lbl">%.0f%% used</div>%s</div>`, st.used*100, m.HTMLFragment(24))
+		fmt.Fprintf(&b, `<div class="card"><div class="meta"><div class="nm">%s</div>`+
+			`<div class="nt">%s</div></div><div class="row">%s</div></div>`,
+			v.name, v.note, row.String())
 	}
-	b.WriteString(`</div></div>`)
-
-	return canvas.HTMLPage("asciiscapes — context moon", b.String())
+	return canvas.HTMLPage("asciiscapes — context meter", b.String())
 }
