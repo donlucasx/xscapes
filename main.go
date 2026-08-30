@@ -27,6 +27,7 @@ func main() {
 		fps     = flag.Float64("fps", 20, "time step between rendered frames")
 		info    = flag.Bool("info", false, "print the detected colour profile and exit")
 		html    = flag.String("html", "", "write the frame to an HTML file instead (for looking at colour)")
+		sheet   = flag.String("sheet", "", "write the companion contact sheet to an HTML file")
 	)
 	flag.Parse()
 
@@ -47,6 +48,15 @@ func main() {
 	c := canvas.New(*width, *height, canvas.AlphaFar, canvas.AlphaMid, canvas.AlphaNear)
 	sc := scape.NewShore(*seed, *asciiG)
 	profile := term.DetectProfile()
+
+	if *sheet != "" {
+		if err := os.WriteFile(*sheet, []byte(contactSheet(*seed)), 0o644); err != nil {
+			fmt.Fprintln(os.Stderr, "asciiscapes:", err)
+			os.Exit(1)
+		}
+		fmt.Println(*sheet)
+		return
+	}
 
 	if *html != "" {
 		sc.Update(c, float64(*frames-1)/(*fps), act)

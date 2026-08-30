@@ -4,6 +4,7 @@
 package canvas
 
 import (
+	"strconv"
 	"strings"
 
 	"github.com/donlucasx/asciiscapes/internal/term"
@@ -170,13 +171,17 @@ func (c *Canvas) RenderPlain() string {
 // The charset meta is load-bearing: a file:// page without it decodes the
 // block and braille glyphs as mojibake.
 func (c *Canvas) RenderHTML(title string) string {
+	return HTMLPage(title, c.HTMLFragment(18))
+}
+
+// HTMLFragment is the frame as a bare <pre>. Font size is a parameter so the
+// same glyph data can be shown large enough to judge the drawing AND at the
+// size it will really appear — without asking anyone to mentally rescale.
+func (c *Canvas) HTMLFragment(fontPx int) string {
 	var b strings.Builder
-	b.WriteString(`<!doctype html><html><head><meta charset="utf-8"><title>`)
-	b.WriteString(title)
-	b.WriteString(`</title><style>`)
-	b.WriteString(`body{margin:0;background:#111;display:flex;justify-content:center;padding:24px 0}`)
-	b.WriteString(`pre{margin:0;font-family:Menlo,"SF Mono",monospace;font-size:18px;line-height:1.0;letter-spacing:0}`)
-	b.WriteString(`</style></head><body><pre>`)
+	b.WriteString(`<pre style="font-size:`)
+	b.WriteString(strconv.Itoa(fontPx))
+	b.WriteString(`px">`)
 	for y := 0; y < c.H; y++ {
 		for x := 0; x < c.W; x++ {
 			i := y*c.W + x
@@ -201,7 +206,32 @@ func (c *Canvas) RenderHTML(title string) string {
 		}
 		b.WriteByte('\n')
 	}
-	b.WriteString(`</pre></body></html>`)
+	b.WriteString(`</pre>`)
+	return b.String()
+}
+
+// HTMLPage wraps fragments in a document. The charset meta is load-bearing: a
+// page without it decodes block and braille glyphs as mojibake.
+func HTMLPage(title, body string) string {
+	var b strings.Builder
+	b.WriteString(`<!doctype html><html><head><meta charset="utf-8"><title>`)
+	b.WriteString(title)
+	b.WriteString(`</title><style>`)
+	b.WriteString(`body{margin:0;background:#0d0d0f;color:#8a8a94;padding:28px 32px;` +
+		`font-family:Menlo,"SF Mono",monospace}`)
+	b.WriteString(`pre{margin:0;font-family:Menlo,"Apple Symbols",monospace;line-height:1.0;letter-spacing:0}`)
+	b.WriteString(`h1{font-size:15px;font-weight:600;color:#d8d8e0;margin:0 0 22px;letter-spacing:.08em;text-transform:uppercase}`)
+	b.WriteString(`.card{display:flex;gap:28px;align-items:center;padding:16px 18px;margin-bottom:14px;` +
+		`background:#141419;border:1px solid #222229;border-radius:8px}`)
+	b.WriteString(`.meta{width:190px;flex:none}`)
+	b.WriteString(`.nm{font-size:17px;color:#f0f0f4;font-weight:600}`)
+	b.WriteString(`.rg{font-size:12px;color:#7d7d8a;margin-top:3px}`)
+	b.WriteString(`.nt{font-size:12px;color:#5f5f6b;margin-top:8px;line-height:1.45}`)
+	b.WriteString(`.big{flex:none;padding:10px 14px;background:#1b1b21;border-radius:6px}`)
+	b.WriteString(`.lbl{font-size:10px;color:#55555f;letter-spacing:.1em;margin-bottom:6px;text-transform:uppercase}`)
+	b.WriteString(`</style></head><body>`)
+	b.WriteString(body)
+	b.WriteString(`</body></html>`)
 	return b.String()
 }
 
