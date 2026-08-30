@@ -35,7 +35,10 @@ var (
 
 // Cat is the companion. The body is a bitmap; the tail is a curve evaluated per
 // frame, which is why wagging costs no extra authoring.
-type Cat struct{ body *Bitmap }
+type Cat struct {
+	body *Bitmap
+	walk *Bitmap
+}
 
 func NewCat() *Cat { return &Cat{body: ParseBitmap(CatBody)} }
 
@@ -103,4 +106,85 @@ func (c *Cat) eyes(l *canvas.Layer, x, y int, t float64, st State) {
 	}
 	l.Plot(x+2, y+2, glyph, col, 1)
 	l.Plot(x+6, y+2, glyph, col, 1)
+}
+
+// walkBody is loaded lazily so NewCat stays cheap for scapes that never walk.
+func (c *Cat) walkBitmap() *Bitmap {
+	if c.walk == nil {
+		c.walk = ParseBitmap(CatWalk)
+	}
+	return c.walk
+}
+
+// WalkSize is the side view's character footprint.
+func (c *Cat) WalkSize() (w, h int) {
+	b := c.walkBitmap()
+	return b.W / 2, b.H / 4
+}
+
+// DrawWalk plots the side view mid-stride. dir is +1 walking right, -1 left.
+//
+// phase advances with DISTANCE rather than with time, so the legs stay locked
+// to the ground however fast the cat crosses. Driving a gait off a clock is
+// what makes animated characters look like they are skating.
+func (c *Cat) DrawWalk(l *canvas.Layer, x, y int, phase float64, dir int) {
+	body := c.walkBitmap()
+	f := body.Blank()
+
+	bob := 0
+	if math.Sin(phase*2) > 0.5 {
+		bob = 1 // the whole body rises slightly at mid-stride
+	}
+	for sy := 0; sy < f.H; sy++ {
+		for sx := 0; sx < f.W; sx++ {
+			if body.at(sx, sy-bob) {
+				f.Set(sx, sy)
+			}
+		}
+	}
+	c.legs(f, phase, bob)
+	c.walkTail(f, math.Sin(phase*0.7), bob)
+
+	if dir < 0 {
+		f = f.Mirrored()
+	}
+	(&Sprite{Rows: f.ToQuadrant(), Body: furCol}).Draw(l, x, y)
+
+	// The eye gap sits at source cols 25-26, cell column 12; mirrored it lands
+	// at the far side of the sprite instead.
+	ex := x + 12
+	if dir < 0 {
+		w, _ := c.WalkSize()
+		ex = x + w - 1 - 12
+	}
+	l.Plot(ex, y+1, 'o', eyeCol, 1)
+}
+
+// legs: four bars swinging fore and aft, lifting off at the top of the swing.
+// Diagonal pairs share a phase, which is what a real quadruped walk does.
+func (c *Cat) legs(b *Bitmap, phase float64, bob int) {
+	bases := [4]int{9, 13, 21, 25}
+	offs := [4]float64{0, math.Pi, math.Pi, 0}
+	for i, bx := range bases {
+		ph := phase + offs[i]
+		swing := int(2.5*math.Sin(ph) + 0.5)
+		lift := 0
+		if math.Sin(ph) > 0.3 {
+			lift = 2
+		}
+		for yy := 19 + bob; yy <= 27-lift; yy++ {
+			b.Set(bx+swing, yy)
+			b.Set(bx+swing+1, yy)
+		}
+	}
+}
+
+func (c *Cat) walkTail(b *Bitmap, wag float64, bob int) {
+	for i := 0; i <= 12; i++ {
+		f := float64(i) / 12
+		x := 6 - int(4*f+0.5)
+		y := 14 - int(9*f+2.0*math.Sin(wag+f*2.0)+0.5) + bob
+		b.Set(x, y)
+		b.Set(x, y+1)
+	}
 }

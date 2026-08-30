@@ -60,6 +60,36 @@ func animPage(seed int64, frames int, fps float64) string {
 			s.st, frames, fps, s.note, st.String())
 	}
 
+	// Walking: there and back, so the loop is seamless and both facings show.
+	{
+		ww, wh := cat.WalkSize()
+		const steps = 48
+		x0, x1 := 4, 72-ww-4
+		var st strings.Builder
+		for i := 0; i < steps; i++ {
+			half := steps / 2
+			var px int
+			var dir int
+			if i < half {
+				px, dir = x0+(x1-x0)*i/half, 1
+			} else {
+				px, dir = x1-(x1-x0)*(i-half)/half, -1
+			}
+			c := canvas.New(72, 24, canvas.AlphaFar, canvas.AlphaMid, canvas.AlphaNear)
+			scape.NewShore(seed, false).Update(c, float64(i)/fps,
+				scape.Activity{Working: true, Level: 0.5})
+			// Phase tracks distance walked, not the clock, so the feet do not skate.
+			cat.DrawWalk(c.Near(), px, c.H-2-wh, float64(px)*0.8*float64(dir), dir)
+			fmt.Fprintf(&st, `<div class="fr">%s</div>`, c.HTMLFragment(13))
+		}
+		fmt.Fprintf(&b,
+			`<div class="card"><div class="meta"><div class="nm">walking</div>`+
+				`<div class="rg">%d frames &middot; %.0f fps</div>`+
+				`<div class="nt">side view, four legs on diagonal pairs, body bobs at mid-stride; `+
+				`turns around at each end</div></div>`+
+				`<div class="stage">%s</div></div>`, steps, fps, st.String())
+	}
+
 	fmt.Fprintf(&b, `<script>
 document.querySelectorAll('.stage').forEach(function(st){
   var fr = Array.prototype.slice.call(st.children), i = 0;

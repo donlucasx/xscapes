@@ -50,6 +50,20 @@ func (b *Bitmap) Set(x, y int) {
 	b.On[y*b.W+x] = true
 }
 
+// Mirrored flips horizontally. Compose a frame facing right and mirror the
+// whole thing -- mirroring the body alone would leave the legs walking backwards.
+func (b *Bitmap) Mirrored() *Bitmap {
+	m := b.Blank()
+	for y := 0; y < b.H; y++ {
+		for x := 0; x < b.W; x++ {
+			if b.at(x, y) {
+				m.Set(b.W-1-x, y)
+			}
+		}
+	}
+	return m
+}
+
 // Blank returns an empty bitmap of the same size.
 func (b *Bitmap) Blank() *Bitmap {
 	return &Bitmap{W: b.W, H: b.H, On: make([]bool, b.W*b.H)}

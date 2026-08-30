@@ -82,8 +82,14 @@ Eyes are two characters plotted over the quadrant body -- `-` dozing, `o` open,
 Look at it: `go run . -anim=assets/frames/companion-anim.html` then serve the
 dir (Playwright and the page's JS both need http, not file://).
 
+The sitting cat and the walking cat are **separate bitmaps and separate methods**
+(`CatBody`/`Draw` and `CatWalk`/`DrawWalk`) -- adding the walk did not touch the
+sitting pose. Walk phase advances with DISTANCE, not the clock, so the feet do
+not skate; diagonal leg pairs share a phase, as a real quadruped does; the whole
+composed frame is mirrored to turn around, rather than the body alone.
+
 ## Immediate next move
-1. Better cat art -- the current one reads, but it is still chunky.
+1. Better cat art -- both poses read, but they are still chunky.
 2. Event protocol: Unix socket + JSON-lines file fallback, `asciiscapes emit <event>`.
 3. Claude Code hook adapter **with the 60s-nag suppression** — see the measured finding above.
 4. bubbletea TUI wrapper + tmux launcher. Renderer is deliberately stdlib-only so far; bubbletea
