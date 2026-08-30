@@ -24,6 +24,26 @@ func isNarrow(r rune) bool {
 		return true
 	case r >= 0x2800 && r <= 0x28FF: // braille
 		return true
+	case r == 0x2590: // RIGHT HALF BLOCK -- Narrow, unlike the other three halves
+		return true
+	case r >= 0x2596 && r <= 0x259F: // quadrants -- all Narrow, unlike the halves
+		return true
+	}
+	return false
+}
+
+// isBlockSafe covers the four block characters quadrant rendering cannot do
+// without: top half, bottom half, left half and full.
+//
+// These are AMBIGUOUS width, not Narrow: one cell in a Western terminal, two
+// where the terminal is configured for East Asian ambiguous-width. That is a
+// deliberate, documented exception rather than an oversight -- there is no
+// narrow substitute for a full block. Any sprite relying on these is reported
+// by TestReportsAmbiguousReliance so the exposure stays visible.
+func isBlockSafe(r rune) bool {
+	switch r {
+	case '\u2580', '\u2584', '\u258C', '\u2588': // top, bottom, left, full
+		return true
 	}
 	return false
 }

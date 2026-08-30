@@ -28,6 +28,7 @@ func main() {
 		info    = flag.Bool("info", false, "print the detected colour profile and exit")
 		html    = flag.String("html", "", "write the frame to an HTML file instead (for looking at colour)")
 		sheet   = flag.String("sheet", "", "write the companion contact sheet to an HTML file")
+		compare = flag.String("compare", "", "write the rendering comparison to an HTML file")
 	)
 	flag.Parse()
 
@@ -48,6 +49,15 @@ func main() {
 	c := canvas.New(*width, *height, canvas.AlphaFar, canvas.AlphaMid, canvas.AlphaNear)
 	sc := scape.NewShore(*seed, *asciiG)
 	profile := term.DetectProfile()
+
+	if *compare != "" {
+		if err := os.WriteFile(*compare, []byte(compareSheet(*seed)), 0o644); err != nil {
+			fmt.Fprintln(os.Stderr, "asciiscapes:", err)
+			os.Exit(1)
+		}
+		fmt.Println(*compare)
+		return
+	}
 
 	if *sheet != "" {
 		if err := os.WriteFile(*sheet, []byte(contactSheet(*seed)), 0o644); err != nil {

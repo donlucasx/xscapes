@@ -36,3 +36,59 @@ func TestBubbleRowsAlign(t *testing.T) {
 		}
 	}
 }
+
+func TestBitmapRowsUniform(t *testing.T) {
+	for name, rows := range Bitmaps {
+		w := len([]rune(rows[0]))
+		for i, r := range rows {
+			if got := len([]rune(r)); got != w {
+				t.Errorf("%s row %d is %d wide, want %d: %q", name, i, got, w, r)
+			}
+		}
+	}
+}
+
+// The generated renderings must also be safe to put in a terminal.
+func TestGeneratedRenderingsAreSafe(t *testing.T) {
+	b := ParseBitmap(PixelCat)
+	for _, tc := range []struct {
+		name string
+		rows []string
+	}{
+		{"braille", b.ToBraille()},
+		{"quadrant", b.ToQuadrant()},
+		{"chars", b.ToChars()},
+	} {
+		for _, row := range tc.rows {
+			for _, r := range row {
+				if !isNarrow(r) && !isBlockSafe(r) {
+					t.Errorf("%s: rune %q (U+%04X) is neither narrow nor a documented block", tc.name, r, r)
+				}
+			}
+		}
+	}
+}
+
+// Which renderings lean on ambiguous-width blocks. Not a failure — a report,
+// so the exposure is never invisible.
+func TestReportsAmbiguousReliance(t *testing.T) {
+	b := ParseBitmap(PixelCat)
+	for _, tc := range []struct {
+		name string
+		rows []string
+	}{{"braille", b.ToBraille()}, {"quadrant", b.ToQuadrant()}, {"chars", b.ToChars()}} {
+		seen := map[rune]bool{}
+		for _, row := range tc.rows {
+			for _, r := range row {
+				if isBlockSafe(r) {
+					seen[r] = true
+				}
+			}
+		}
+		var list []rune
+		for r := range seen {
+			list = append(list, r)
+		}
+		t.Logf("%-9s ambiguous-width runes used: %q", tc.name, string(list))
+	}
+}
