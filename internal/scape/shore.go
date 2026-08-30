@@ -56,7 +56,7 @@ func (s *Shore) Update(c *canvas.Canvas, t float64, act Activity) {
 
 	s.paintBG(c, hy, edge)
 	s.stars(c, hy, t)
-	s.moon(c, hy, scale)
+	s.moon(c, hy, scale, 1-clamp01(act.ContextUsed))
 	s.sea(c, hy, edge, tt, act)
 	s.sand(c, edge)
 	s.foam(c, edge, scale)
@@ -127,7 +127,26 @@ func (s *Shore) stars(c *canvas.Canvas, hy int, t float64) {
 // A full-block glyph depends on the font filling its cell exactly; where it
 // does not, a disc comes out as horizontal bands. Background colour has no
 // such dependency, so this renders the same in every terminal.
-func (s *Shore) moon(c *canvas.Canvas, hy int, scale float64) {
+func clamp01(v float64) float64 {
+	if v < 0 {
+		return 0
+	}
+	if v > 1 {
+		return 1
+	}
+	return v
+}
+
+// moon is painted into the BACKGROUND rather than drawn as a block glyph.
+// A full-block glyph depends on the font filling its cell exactly; where it
+// does not, a disc comes out as horizontal bands. Background colour has no
+// such dependency, so this renders the same in every terminal.
+//
+// lit is the illuminated fraction, and it carries how much context is left:
+// a fresh session is a full moon, and the light goes out as the window fills.
+// The unlit face is still painted, faintly, so the moon never disappears --
+// a missing moon reads as a bug, a dark moon reads as a warning.
+func (s *Shore) moon(c *canvas.Canvas, hy int, scale, lit float64) {
 	mx := int(float64(c.W) * 0.72)
 	my := int(float64(hy) * 0.34)
 	if my < 1 {
@@ -135,13 +154,17 @@ func (s *Shore) moon(c *canvas.Canvas, hy int, scale float64) {
 	}
 	rr := 2.0 * scale
 	rim := 0.6 * scale
-	// Bound the sweep by the actual radius; x is doubled because cells are
-	// about twice as tall as they are wide.
+	// The terminator is approximated by a second disc sliding across the face:
+	// fully clear of it at full, concentric at new.
+	shadow := 2 * rr * lit
+	dark := term.RGB{R: 62, G: 62, B: 74}
+
 	ry := int(rr+rim) + 1
 	rx := int((rr+rim)*2) + 1
 	for dy := -ry; dy <= ry; dy++ {
 		for dx := -rx; dx <= rx; dx++ {
-			d := math.Hypot(float64(dx)/2.0, float64(dy))
+			fx := float64(dx) / 2.0
+			d := math.Hypot(fx, float64(dy))
 			if d > rr+rim {
 				continue
 			}
@@ -152,8 +175,12 @@ func (s *Shore) moon(c *canvas.Canvas, hy int, scale float64) {
 			if a <= 0 {
 				continue
 			}
+			col := moonCol
+			if math.Hypot(fx-shadow, float64(dy)) <= rr {
+				col, a = dark, a*0.45 // earthshine on the unlit face
+			}
 			x, y := mx+dx, my+dy
-			c.SetBG(x, y, c.BGAt(x, y).Blend(moonCol, a))
+			c.SetBG(x, y, c.BGAt(x, y).Blend(col, a))
 		}
 	}
 }
@@ -258,4 +285,10 @@ func (s *Shore) foam(c *canvas.Canvas, edge []float64, scale float64) {
 			near.Plot(x, yy, g, foamCol, 0.5+0.45*(1-h/cut))
 		}
 	}
+}
+
+// MoonOnly exposes the moon for the context demo, so the phases can be shown
+// enlarged without reproducing the drawing logic somewhere it could drift.
+func (s *Shore) MoonOnly(c *canvas.Canvas, hy int, scale, lit float64) {
+	s.moon(c, hy, scale, lit)
 }

@@ -32,6 +32,7 @@ func main() {
 		anim    = flag.String("anim", "", "write an animated companion preview to an HTML file")
 		strip   = flag.String("strip", "", "write a frame strip (for GIF assembly) to an HTML file")
 		layout  = flag.String("layout", "", "write the layout mockups to an HTML file")
+		ctxdemo = flag.String("context", "", "write the context-moon demo to an HTML file")
 		mode    = flag.String("mode", "working", "strip mode: resting|working|needsyou|walk")
 	)
 	flag.Parse()
@@ -53,6 +54,15 @@ func main() {
 	c := canvas.New(*width, *height, canvas.AlphaFar, canvas.AlphaMid, canvas.AlphaNear)
 	sc := scape.NewShore(*seed, *asciiG)
 	profile := term.DetectProfile()
+
+	if *ctxdemo != "" {
+		if err := os.WriteFile(*ctxdemo, []byte(contextPage(*seed)), 0o644); err != nil {
+			fmt.Fprintln(os.Stderr, "asciiscapes:", err)
+			os.Exit(1)
+		}
+		fmt.Println(*ctxdemo)
+		return
+	}
 
 	if *layout != "" {
 		if err := os.WriteFile(*layout, []byte(layoutPage(*seed)), 0o644); err != nil {

@@ -9,6 +9,12 @@ import "github.com/donlucasx/asciiscapes/internal/canvas"
 type Activity struct {
 	Working bool
 	Level   float64
+
+	// ContextUsed is 0 for a fresh session and 1 when the window is full.
+	// Deliberately phrased as "used" rather than "left" so the zero value --
+	// what you get if nobody sets it -- means a fresh session, not an
+	// exhausted one.
+	ContextUsed float64
 }
 
 type Scape interface {
