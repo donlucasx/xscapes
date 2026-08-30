@@ -53,7 +53,8 @@ Go 1.27 module. `go build ./...` and `go vet ./...` clean.
 - `internal/scape` — `Scape` interface, `Activity{Working, Level}`, deterministic hash.
 - `internal/scape/shore.go` — night shore: sky gradient, twinkling stars, moon, swell lines,
   moon-glitter path on the water, sub-cell waterline, foam speckle, sand grain. Working vs resting
-  changes wave speed, amplitude and how far the water runs up the sand.
+  changes wave speed, amplitude and how far the water runs up the sand. Moon size, wave reach
+  and foam density scale with the canvas, so 40x12 composes rather than just fitting.
 
 Reference frames: `assets/frames/shore-{resting,working}.{html,png}`.
 
@@ -75,8 +76,11 @@ cd assets/frames && python3 -m http.server 8731     # Playwright blocks file://
 4. bubbletea TUI wrapper + tmux launcher. Renderer is deliberately stdlib-only so far; bubbletea
    only wraps it.
 
+## Git
+Repo initialised 2026-08-30, branch `main`, one commit (`5cdf62c`). No remote yet, nothing pushed.
+`.gitignore` covers the built binary, generated `assets/frames/*.html`, and `.DS_Store`; the
+reference **PNGs are tracked deliberately** as the visual record.
+
 ## Open questions for Lucas
-- `git init` now? There is code worth versioning.
-- 40x12 renders correctly but the composition is untuned at that size. Worth time, or ignore?
 - Expand Commons' `BALANCES`/`USAGE`/`MODELS` — per-model credit rates still unknown.
 - Move `CLAUDE.md`/`ideas.md`/`origin-chat.md` into `docs/` as origin-chat §9 intended?
