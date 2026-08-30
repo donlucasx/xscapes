@@ -49,6 +49,7 @@ type Cat struct {
 	body    *Bitmap
 	walk    *Bitmap
 	worried *Bitmap
+	kittens []*Bitmap
 }
 
 func NewCat() *Cat {
@@ -210,5 +211,87 @@ func (c *Cat) walkTail(b *Bitmap, wag float64, bob int) {
 		y := 14 - int(9*f+2.0*math.Sin(wag+f*2.0)+0.5) + bob
 		b.Set(x, y)
 		b.Set(x, y+1)
+	}
+}
+
+var kittenEye = term.RGB{R: 150, G: 214, B: 158} // dimmer than the parent's
+
+func (c *Cat) kittenPoses() []*Bitmap {
+	if c.kittens == nil {
+		c.kittens = []*Bitmap{ParseBitmap(KittenSit), ParseBitmap(KittenCurl)}
+	}
+	return c.kittens
+}
+
+// KittenSize is one kitten's character footprint.
+func (c *Cat) KittenSize() (w, h int) {
+	b := c.kittenPoses()[0]
+	return b.W / 2, b.H / 4
+}
+
+// DrawKittens places n kittens beside the parent, one per running subagent.
+//
+// They must not look stamped, and they must not need n drawings. Every kitten
+// is one of two poses, then varied by mirroring, by its own breathing and tail
+// phase, and by sitting a little forward or back on the sand. All of it comes
+// from a hash of the kitten's index, so a given subagent keeps the same kitten
+// for as long as it runs instead of flickering between looks every frame.
+func (c *Cat) DrawKittens(l *canvas.Layer, px, py, n int, t float64, seed int64) {
+	if n <= 0 {
+		return
+	}
+	poses := c.kittenPoses()
+	pw, ph := c.Size()
+	kw, kh := c.KittenSize()
+
+	for i := 0; i < n; i++ {
+		pick := poses[int(HashF(i, 1, seed)*float64(len(poses)))%len(poses)]
+		mirror := HashF(i, 2, seed) > 0.5
+		ph2 := HashF(i, 3, seed) * 6.283
+
+		f := pick.Blank()
+		// Kittens breathe faster than the parent, and out of step with it.
+		lift := 0
+		if math.Sin(t*2.6+ph2) > 0 {
+			lift = 2
+		}
+		for sy := 0; sy < f.H; sy++ {
+			for sx := 0; sx < f.W; sx++ {
+				if pick.at(sx, sy-lift) {
+					f.Set(sx, sy)
+				}
+			}
+		}
+		c.kittenTail(f, math.Sin(t*1.9+ph2), lift)
+		if mirror {
+			f = f.Mirrored()
+		}
+
+		// Spread to the parent's right, staggered so they do not form a rank.
+		kx := px + pw + 1 + i*(kw+1)
+		ky := py + ph - kh
+		if HashF(i, 4, seed) > 0.55 {
+			ky-- // a couple sit further up the sand
+		}
+
+		(&Sprite{Rows: f.ToQuadrant(), Body: furCol}).Draw(l, kx, ky)
+
+		// Eye gaps sit at source cols 3-4 and 7-8, cell columns 1 and 3 --
+		// the same cell row as the parent's, which is most of the resemblance.
+		e1, e2 := kx+1, kx+3
+		if mirror {
+			e1, e2 = kx+kw-2, kx+kw-4
+		}
+		l.Plot(e1, ky+1, 'o', kittenEye, 1)
+		l.Plot(e2, ky+1, 'o', kittenEye, 1)
+	}
+}
+
+func (c *Cat) kittenTail(b *Bitmap, wag float64, lift int) {
+	for i := 0; i <= 5; i++ {
+		f := float64(i) / 5
+		x := 9 + int(2.2*f+1.1*math.Sin(wag*1.5+f*2.2)+0.5)
+		y := 13 - int(5*f+0.5) + lift
+		b.Set(x, y)
 	}
 }

@@ -69,7 +69,8 @@ var CatBody = []string{
 
 // Bitmaps is what the uniform-width test walks.
 var Bitmaps = map[string][]string{"cat": PixelCat, "catBody": CatBody,
-	"catWalk": CatWalk, "catWorried": CatWorried}
+	"catWalk": CatWalk, "catWorried": CatWorried,
+	"kittenSit": KittenSit, "kittenCurl": KittenCurl}
 
 // CatWalk is the side view: torso and head only, facing right. Legs and tail
 // are drawn per frame, so the gait needs no art. Mirror the composed frame
@@ -137,4 +138,46 @@ var CatWorried = []string{
 	".#################......",
 	"..###..#####..###.......",
 	"..###..#####..###.......",
+}
+
+// Kittens are the same animal at half scale: same ear notch, same eye gaps in
+// the same cell row, same blocky silhouette. Family resemblance comes from
+// reusing the parent's proportions, and variety from how they are posed at
+// draw time rather than from drawing more of them.
+var KittenSit = []string{
+	".##......##.",
+	".###....###.",
+	"..########..",
+	".##########.",
+	".##########.",
+	".##..##..##.",
+	".##..##..##.",
+	".##########.",
+	".####..####.",
+	".##########.",
+	"..########..",
+	"...######...",
+	"..########..",
+	".##########.",
+	".##########.",
+	"..##...##...",
+}
+
+var KittenCurl = []string{
+	"............",
+	"............",
+	"............",
+	".##......##.",
+	".###....###.",
+	"..########..",
+	".##..##..##.",
+	".##..##..##.",
+	".##########.",
+	".##########.",
+	"..########..",
+	".##########.",
+	".##########.",
+	"..########..",
+	"............",
+	"............",
 }

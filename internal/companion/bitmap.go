@@ -166,3 +166,17 @@ func (b *Bitmap) ToChars() []string {
 	}
 	return out
 }
+
+// hash2 / HashF are a local deterministic hash. Duplicated rather than imported
+// from scape so that companion stays independent of any particular scene: the
+// same kitten belongs to the same subagent whichever scape it is standing in.
+func hash2(x, y int, seed int64) uint32 {
+	h := uint32(int64(x)*374761393 + int64(y)*668265263 + seed*2654435761)
+	h ^= h >> 13
+	h *= 1274126177
+	return h ^ (h >> 16)
+}
+
+func HashF(x, y int, seed int64) float64 {
+	return float64(hash2(x, y, seed)) / 4294967296.0
+}

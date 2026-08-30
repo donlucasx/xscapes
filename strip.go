@@ -51,6 +51,8 @@ func stripPage(seed int64, frames int, fps float64, mode string) string {
 				st, act = companion.Resting, scape.Activity{}
 			case "needsyou":
 				st = companion.NeedsYou
+			case "kittens":
+				st, act = companion.Working, scape.Activity{Working: true, Level: 0.7}
 			case "worried":
 				st, act = companion.Worried, scape.Activity{Working: true, Level: 0.35}
 			case "tour":
@@ -71,6 +73,9 @@ func stripPage(seed int64, frames int, fps float64, mode string) string {
 			cw, chh := cat.Size()
 			top := c.H - 2 - chh
 			cat.Draw(c.Near(), 6, top, t, st)
+			if mode == "kittens" {
+				cat.DrawKittens(c.Near(), 6, top, 4, t, seed)
+			}
 			if st == companion.Worried {
 				rows := companion.Bubble("tests failing")
 				(&companion.Sprite{Rows: rows, Body: term.RGB{R: 240, G: 200, B: 150}}).
