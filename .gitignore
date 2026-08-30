@@ -1,0 +1,9 @@
+# built binary
+/asciiscapes
+
+# generated frames — regenerable with `go run . -html=...`
+# the PNG references are kept deliberately as a visual record
+/assets/frames/*.html
+
+# macOS
+.DS_Store
