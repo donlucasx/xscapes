@@ -69,8 +69,21 @@ cd assets/frames && python3 -m http.server 8731     # Playwright blocks file://
 ```
 ⚠ `-plain` is blind to the moon and the shoreline — both are painted into the background colour now.
 
+## Companion (2026-08-30)
+Quadrant rendering chosen: best legibility at 1:1 and exact ASCII glyph metrics.
+`internal/companion` = Sprite, narrow-safety allow-list + tests, Bitmap with
+braille/quadrant/char converters, `Bubble()`, and `Cat` with three states.
+The cat is a 24x28 bitmap; the tail is a curve evaluated per frame, so wagging
+costs no extra art. Breathing shifts the body by 2 source pixels = one quadrant
+subpixel = half a character cell, the smallest vertical step the medium has.
+Eyes are two characters plotted over the quadrant body -- `-` dozing, `o` open,
+`O` alert, plus a blink. Two cells carry the whole expression.
+
+Look at it: `go run . -anim=assets/frames/companion-anim.html` then serve the
+dir (Playwright and the page's JS both need http, not file://).
+
 ## Immediate next move
-1. Companion (cat), three states, near layer.
+1. Better cat art -- the current one reads, but it is still chunky.
 2. Event protocol: Unix socket + JSON-lines file fallback, `asciiscapes emit <event>`.
 3. Claude Code hook adapter **with the 60s-nag suppression** — see the measured finding above.
 4. bubbletea TUI wrapper + tmux launcher. Renderer is deliberately stdlib-only so far; bubbletea

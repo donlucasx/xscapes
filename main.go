@@ -29,6 +29,7 @@ func main() {
 		html    = flag.String("html", "", "write the frame to an HTML file instead (for looking at colour)")
 		sheet   = flag.String("sheet", "", "write the companion contact sheet to an HTML file")
 		compare = flag.String("compare", "", "write the rendering comparison to an HTML file")
+		anim    = flag.String("anim", "", "write an animated companion preview to an HTML file")
 	)
 	flag.Parse()
 
@@ -49,6 +50,15 @@ func main() {
 	c := canvas.New(*width, *height, canvas.AlphaFar, canvas.AlphaMid, canvas.AlphaNear)
 	sc := scape.NewShore(*seed, *asciiG)
 	profile := term.DetectProfile()
+
+	if *anim != "" {
+		if err := os.WriteFile(*anim, []byte(animPage(*seed, 36, 12)), 0o644); err != nil {
+			fmt.Fprintln(os.Stderr, "asciiscapes:", err)
+			os.Exit(1)
+		}
+		fmt.Println(*anim)
+		return
+	}
 
 	if *compare != "" {
 		if err := os.WriteFile(*compare, []byte(compareSheet(*seed)), 0o644); err != nil {

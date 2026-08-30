@@ -41,6 +41,20 @@ func itoa(n int) string {
 	return string(d)
 }
 
+// Set turns a pixel on, ignoring out-of-bounds so callers can draw curves
+// without clipping arithmetic at every step.
+func (b *Bitmap) Set(x, y int) {
+	if x < 0 || y < 0 || x >= b.W || y >= b.H {
+		return
+	}
+	b.On[y*b.W+x] = true
+}
+
+// Blank returns an empty bitmap of the same size.
+func (b *Bitmap) Blank() *Bitmap {
+	return &Bitmap{W: b.W, H: b.H, On: make([]bool, b.W*b.H)}
+}
+
 func (b *Bitmap) at(x, y int) bool {
 	if x < 0 || y < 0 || x >= b.W || y >= b.H {
 		return false

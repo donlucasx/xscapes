@@ -182,28 +182,45 @@ func (c *Canvas) HTMLFragment(fontPx int) string {
 	b.WriteString(`<pre style="font-size:`)
 	b.WriteString(strconv.Itoa(fontPx))
 	b.WriteString(`px">`)
+	// Runs of identical colour share one span. Sky rows are a single colour
+	// across their whole width, so this is the difference between a readable
+	// animation and a 15MB page.
+	var run strings.Builder
+	var rFG, rBG term.RGB
+	flush := func() {
+		if run.Len() == 0 {
+			return
+		}
+		b.WriteString(`<span style="color:`)
+		writeHex(&b, rFG)
+		b.WriteString(`;background:`)
+		writeHex(&b, rBG)
+		b.WriteString(`">`)
+		b.WriteString(run.String())
+		b.WriteString(`</span>`)
+		run.Reset()
+	}
 	for y := 0; y < c.H; y++ {
 		for x := 0; x < c.W; x++ {
 			i := y*c.W + x
 			ch, fg := c.composite(i)
 			bg := c.BG[i]
-			b.WriteString(`<span style="color:`)
-			writeHex(&b, fg)
-			b.WriteString(`;background:`)
-			writeHex(&b, bg)
-			b.WriteString(`">`)
+			if run.Len() > 0 && (fg != rFG || bg != rBG) {
+				flush()
+			}
+			rFG, rBG = fg, bg
 			switch ch {
 			case '<':
-				b.WriteString("&lt;")
+				run.WriteString("&lt;")
 			case '>':
-				b.WriteString("&gt;")
+				run.WriteString("&gt;")
 			case '&':
-				b.WriteString("&amp;")
+				run.WriteString("&amp;")
 			default:
-				b.WriteRune(ch)
+				run.WriteRune(ch)
 			}
-			b.WriteString(`</span>`)
 		}
+		flush()
 		b.WriteByte('\n')
 	}
 	b.WriteString(`</pre>`)
