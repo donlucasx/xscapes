@@ -55,7 +55,7 @@ only if nothing else needs it.
 | something is broken | **the companion**, not the weather: ears back, hunched, tail flat, amber eyes; persists until it clears | done |
 | context remaining | **moon** phase *and* altitude; numeric readout silent until 65%, brightens at 85% | done |
 | time of day | **sky colour**, real wall clock | done |
-| weather | **experiential only** &mdash; may be synced to real weather precisely because it carries no information | not built |
+| weather | **discarded entirely** &mdash; no rain, clouds, fog or real-weather sync | cut 2026-08-30 |
 | needs you | **bubble**, rare: needs_input, error, done. Nothing else | done |
 | what it is doing now | **text written in the sand**, newest brightest, older fading as the tide takes them | mocked |
 | todos completed | **star count** | not built |
@@ -73,7 +73,7 @@ mapped to wave *speed* and idle was indistinguishable from flat-out, because a
 glance is the entire budget and a screenshot has no motion at all.
 
 ### Six slots every scape must fill
-light, sky, motion, surface, accumulator, companion. Any scape providing all six
+light, sky, motion (the WATER, not the air), surface, accumulator, companion. Any scape providing all six
 works with the whole encoding system for free. The rainy window currently fails
 on companion &mdash; fix by putting the cat on the inside sill.
 
@@ -111,11 +111,21 @@ see what the agent is doing.
 - Rainy window: rain streaks, blurred city lights, lightning. Companion-less scape — weather delivers the notification. Toy: wipe fog off the glass.
 - Which survive is TBD after seeing them rendered.
 
-**Weather / activity mapping**
-- Coding: read=rain, edit=wind, write=new growth, shell=thunder, error=lightning, tests pass=clearing/rainbow, subagents=birds flocking, compaction=fog.
-- Research: web search=stars appearing, fetch=lantern on horizon, long tool-less reasoning=tide/dusk deepening, todo=path stones laid. Research sessions favor sky scapes; coding favors ground scapes.
-- Universal: elapsed time drives day cycle; needs_input=companion knocks / thunder; done=dawn.
-- Growth: files touched → trees/objects, placed deterministically by path hash.
+**Activity mapping** *(supersedes the per-tool weather taxonomy, discarded 2026-08-30)*
+- **Weather is discarded entirely.** No rain, no clouds, no fog, no storms, no
+  real-weather sync. The sky is time of day, stars and the moon; nothing else.
+  This removes a network dependency, a location permission, and the risk of
+  atmospheric motion being misread as agent activity.
+- **Tool events do not each get their own visual.** There is no read=rain,
+  shell=thunder taxonomy to memorise. Every tool event feeds ONE aggregate
+  activity level, which drives the swells: how many are travelling and how tall.
+- **Identity lives in the sand, not in the scene.** The activity tail names the
+  tool and the file. The sea says how much; the sand says what. That split is
+  why no per-tool vocabulary is needed.
+- `error` / `test_fail` put the companion into its worried pose, which persists
+  until it clears. `needs_input` and `done` raise the bubble.
+- Growth: files touched leave driftwood on the sand, placed by path hash.
+  Completed todos light stars. Subagents appear as kittens.
 
 **Companion**
 - 3–4 lines tall, resident not subject. States: resting, working (small idle motion), needs-you (walks to the edge nearest the agent pane, shows `!`).

@@ -106,14 +106,17 @@ one. A channel may be bound to the real world only if nothing else needs it.
 | context remaining | moon **shape + altitude** | done. Readout treatment **C**: silent, appears at 65%, brightens at 85% |
 | session elapsed | *dropped* | sky colour is now the REAL wall clock; elapsed is covered by moon + accumulation |
 | agent busy, how hard | sea **coverage + whitecaps** | done. Speed alone did NOT read; coverage carries it |
-| something is broken | weather **state**, persistent | not built |
+| something is broken | **the companion**: ears back, hunched, amber eyes | done |
 | todos completed | star **count** | not built |
 | subagents | **kittens** | not built |
 | what it is doing now | text **in the sand** + driftwood | mocked, not wired |
 | needs you | **bubble**, rare | done |
 
-⛔ **Do NOT sync real weather.** Weather already carries busy-ness AND broken-ness;
-a second master destroys both. Real weather could later pick the SCAPE (parked).
+⛔ **Weather is DISCARDED entirely** (2026-08-30) -- no rain, clouds, fog, storms
+or real-weather sync. The rule that replaced it: **the water is the work, the sky
+is the world.** Swells carry busy-ness, the companion carries broken, the sky is
+only time of day. The per-tool weather taxonomy in the old brief died with it:
+tool events aggregate into ONE activity level, and identity lives in the sand text.
 
 Every scape must fill six slots: light, sky, motion, surface, accumulator,
 companion. The rainy window fails on companion -- fix by putting the cat on the
