@@ -97,6 +97,32 @@ sitting pose. Walk phase advances with DISTANCE, not the clock, so the feet do
 not skate; diagonal leg pairs share a phase, as a real quadruped does; the whole
 composed frame is mirrored to turn around, rather than the body alone.
 
+## Encoding decisions locked (2026-08-30)
+Every variable gets its OWN perceptual channel, so two things never compete for
+one. A channel may be bound to the real world only if nothing else needs it.
+
+| variable | channel | status |
+|---|---|---|
+| context remaining | moon **shape + altitude** | done. Readout treatment **C**: silent, appears at 65%, brightens at 85% |
+| session elapsed | *dropped* | sky colour is now the REAL wall clock; elapsed is covered by moon + accumulation |
+| agent busy, how hard | sea **coverage + whitecaps** | done. Speed alone did NOT read; coverage carries it |
+| something is broken | weather **state**, persistent | not built |
+| todos completed | star **count** | not built |
+| subagents | **kittens** | not built |
+| what it is doing now | text **in the sand** + driftwood | mocked, not wired |
+| needs you | **bubble**, rare | done |
+
+⛔ **Do NOT sync real weather.** Weather already carries busy-ness AND broken-ness;
+a second master destroys both. Real weather could later pick the SCAPE (parked).
+
+Every scape must fill six slots: light, sky, motion, surface, accumulator,
+companion. The rainy window fails on companion -- fix by putting the cat on the
+inside sill.
+
+Layout: **B/C** -- the scape is the pane, the activity tail is written into the
+sand, newest brightest, older fading as the tide takes them. Overturns the
+popup-by-default decision still written in `CLAUDE.md`.
+
 ## Immediate next move
 1. Better cat art -- both poses read, but they are still chunky.
 2. Event protocol: Unix socket + JSON-lines file fallback, `asciiscapes emit <event>`.

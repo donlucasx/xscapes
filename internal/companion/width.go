@@ -22,6 +22,8 @@ func isNarrow(r rune) bool {
 		return true
 	case r == 0x2591: // ░ LIGHT SHADE (medium/dark/full are Ambiguous)
 		return true
+	case r == 0x224B: // triple tilde, the whitecap
+		return true
 	case r >= 0x2800 && r <= 0x28FF: // braille
 		return true
 	case r == 0x2590: // RIGHT HALF BLOCK -- Narrow, unlike the other three halves

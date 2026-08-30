@@ -63,7 +63,7 @@ func (s *Shore) Update(c *canvas.Canvas, t float64, act Activity) {
 // colour at sub-cell precision, so a two-row swing reads as one smooth curve
 // instead of the staircase you get from rounding to a row.
 func (s *Shore) waterline(w, sy int, tt float64, act Activity, scale float64) []float64 {
-	reach := (0.9 + act.Level*1.4) * scale
+	reach := (0.8 + act.Level*2.1) * scale
 	e := make([]float64, w)
 	for x := 0; x < w; x++ {
 		fx := float64(x)
@@ -192,10 +192,12 @@ func (s *Shore) moon(c *canvas.Canvas, hy int, scale, lit, vis float64) {
 func (s *Shore) sea(c *canvas.Canvas, hy int, edge []float64, tt float64, act Activity) {
 	mid, near := c.Mid(), c.Near()
 	ramp := []rune{'·', '-', '~', '≈'}
+	cap := '≋'
 	if s.ASCII {
 		ramp = []rune{'.', '-', '~', '~'}
+		cap = '='
 	}
-	amp := 0.9 + act.Level*0.9
+	amp := 0.9 + act.Level*1.3
 
 	for x := 0; x < c.W; x++ {
 		ex := edge[x]
@@ -207,19 +209,33 @@ func (s *Shore) sea(c *canvas.Canvas, hy int, edge []float64, tt float64, act Ac
 			// instead of swell lines.
 			ph := float64(x)*0.30 + float64(y)*0.9 + tt*(0.5+depth*1.5)
 			wv := (math.Sin(ph) + 0.5*math.Sin(ph*0.47+tt*0.5)) * amp
-			thr := 1.15 - depth*0.55
+			// Coverage carries the load, not speed. Speed is invisible in a
+			// glance -- and a glance is the only budget this has -- so a busier
+			// sea has to mean MORE of the sea in motion, not the same marks
+			// moving faster.
+			thr := (1.15 - depth*0.55) - act.Level*0.62
 			if wv < thr {
 				continue
 			}
-			idx := int((wv - thr) * 2.2)
+			strength := (wv - thr) / 1.3
+			idx := int(strength * float64(len(ramp)))
 			if idx >= len(ramp) {
 				idx = len(ramp) - 1
 			}
-			col := term.Lerp(s.pal.SeaNear, s.pal.Foam, 0.25+depth*0.45)
+			g := ramp[idx]
+			col := term.Lerp(s.pal.SeaNear, s.pal.Foam,
+				math.Min(1, 0.25+depth*0.35+strength*0.45))
+			a := 0.5 + depth*0.5
+			// Whitecaps: the tallest crests break. This is the cue that makes
+			// flat-out unmistakable against merely busy.
+			if strength > 0.72 && act.Level > 0.45 {
+				g, col = cap, s.pal.Foam
+				a = math.Min(1, a+0.35)
+			}
 			if depth > 0.55 {
-				near.Plot(x, y, ramp[idx], col, 0.55+depth*0.45)
+				near.Plot(x, y, g, col, a)
 			} else {
-				mid.Plot(x, y, ramp[idx], col, 0.5+depth*0.5)
+				mid.Plot(x, y, g, col, a*0.9)
 			}
 		}
 	}

@@ -34,6 +34,7 @@ func main() {
 		layout  = flag.String("layout", "", "write the layout mockups to an HTML file")
 		ctxdemo = flag.String("context", "", "write the context-moon demo to an HTML file")
 		dayHTML = flag.String("day", "", "write the day-cycle demo to an HTML file")
+		busy    = flag.String("busy", "", "write the activity-level sweep to an HTML file")
 		tod     = flag.Float64("tod", 0, "time of day: 0 midnight, .25 dawn, .5 noon, .75 dusk")
 		live    = flag.Bool("live", false, "paint the scape in THIS terminal until Ctrl-C")
 		ctxUsed = flag.Float64("ctx", 0, "context used, 0..1 (moon phase and altitude)")
@@ -68,6 +69,15 @@ func main() {
 			hl = *height
 		}
 		runLive(*seed, *fps, wl, hl, *ctxUsed, *tod, *asciiG)
+		return
+	}
+
+	if *busy != "" {
+		if err := os.WriteFile(*busy, []byte(busyPage(*seed)), 0o644); err != nil {
+			fmt.Fprintln(os.Stderr, "asciiscapes:", err)
+			os.Exit(1)
+		}
+		fmt.Println(*busy)
 		return
 	}
 
