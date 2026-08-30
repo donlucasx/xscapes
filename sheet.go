@@ -10,18 +10,19 @@ import (
 	"github.com/donlucasx/asciiscapes/internal/term"
 )
 
+var bubbleCol = term.RGB{R: 224, G: 228, B: 238}
+
 // contactSheet renders every candidate twice: enlarged so the drawing can be
-// judged, and composited into the shore at 1:1 so it can be judged in the only
-// place that matters. Showing one without the other misleads.
+// judged, and composited into a real 80x24 shore so the proportion is honest.
+// A companion shown only enlarged always looks better than it is.
 func contactSheet(seed int64) string {
 	var b strings.Builder
-	b.WriteString(`<h1>asciiscapes &mdash; companion candidates</h1>`)
+	b.WriteString(`<h1>asciiscapes &mdash; references translated onto the canvas</h1>`)
 
 	for i := range companion.Candidates {
 		s := &companion.Candidates[i]
 		sw, sh := s.Size()
 
-		// Enlarged, on a neutral ground.
 		big := canvas.New(sw+2, sh+2, canvas.AlphaFar, canvas.AlphaMid, canvas.AlphaNear)
 		for y := 0; y < big.H; y++ {
 			for x := 0; x < big.W; x++ {
@@ -30,19 +31,24 @@ func contactSheet(seed int64) string {
 		}
 		s.Draw(big.Near(), 1, 1)
 
-		// 1:1 on the shore, standing on the sand just back from the waterline.
-		live := canvas.New(46, 18, canvas.AlphaFar, canvas.AlphaMid, canvas.AlphaNear)
-		sc := scape.NewShore(seed, false)
-		sc.Update(live, 2.0, scape.Activity{})
-		s.Draw(live.Near(), 6, live.H-sh-1)
+		// Real target size, so the height cost is visible rather than argued.
+		live := canvas.New(80, 24, canvas.AlphaFar, canvas.AlphaMid, canvas.AlphaNear)
+		scape.NewShore(seed, false).Update(live, 2.0, scape.Activity{})
+		top := live.H - 2 - sh
+		s.Draw(live.Near(), 8, top)
+		if s.Say != "" {
+			rows := companion.Bubble(s.Say)
+			bub := companion.Sprite{Rows: rows, Body: bubbleCol}
+			bub.Draw(live.Near(), 8+sw-2, top-len(rows))
+		}
 
 		fmt.Fprintf(&b,
 			`<div class="card"><div class="meta"><div class="nm">%s</div>`+
-				`<div class="rg">%s</div><div class="nt">%s</div></div>`+
+				`<div class="rg">%d rows &middot; %s</div><div class="nt">%s</div></div>`+
 				`<div class="big"><div class="lbl">enlarged</div>%s</div>`+
-				`<div><div class="lbl">1:1 on the shore</div>%s</div></div>`,
-			s.Name, s.Register, s.Note,
-			big.HTMLFragment(30), live.HTMLFragment(13))
+				`<div><div class="lbl">on an 80&times;24 shore, 1:1</div>%s</div></div>`,
+			s.Name, sh, s.Source, s.Note,
+			big.HTMLFragment(26), live.HTMLFragment(10))
 	}
-	return canvas.HTMLPage("asciiscapes — companion candidates", b.String())
+	return canvas.HTMLPage("asciiscapes — translated references", b.String())
 }

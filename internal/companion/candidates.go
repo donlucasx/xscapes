@@ -3,89 +3,162 @@ package companion
 import "github.com/donlucasx/asciiscapes/internal/term"
 
 var (
-	warm  = term.RGB{R: 232, G: 224, B: 206} // moonlit fur
-	rust  = term.RGB{R: 226, G: 150, B: 96}  // fox
-	shell = term.RGB{R: 232, G: 132, B: 110} // crab
-	dusty = term.RGB{R: 206, G: 200, B: 214} // moth
-	green = term.RGB{R: 150, G: 208, B: 150} // frog
-	glow  = term.RGB{R: 216, G: 236, B: 255} // wisp
+	warm  = term.RGB{R: 232, G: 224, B: 206}
+	rust  = term.RGB{R: 226, G: 150, B: 96}
+	green = term.RGB{R: 150, G: 208, B: 150}
+	slate = term.RGB{R: 186, G: 194, B: 208}
 	eye   = term.RGB{R: 40, G: 44, B: 56}
-	spark = term.RGB{R: 255, G: 250, B: 226}
 )
 
-// Candidates is the breadth sheet. Each creature is drawn in whichever register
-// flatters it — forcing all of them into one style would bias the choice of
-// animal, which is the thing this sheet is meant to decide.
+// Candidates are Lucas's references translated onto our canvas. Every CJK and
+// Ambiguous-width glyph in the originals has been swapped for its narrow
+// equivalent -- kaomoji descend from ASCII emoticons, so this mostly means
+// putting them back: (.w.) for (・ω・), ('^') for ('人'), ~ for the arcs,
+// o for the circles. TestCandidatesAreNarrowSafe enforces it.
+//
+// Tall and short cuts of the same creature sit next to each other so the cost
+// of compression is visible rather than argued about.
 var Candidates = []Sprite{
 	{
-		Name: "cat", Register: Line, Note: "tail flick, slow blink",
-		Rows:   []string{` /\_/\`, `( o.o )`, ` > ^ <`},
-		Body:   warm,
-		Accent: eye, AccentOf: "o^",
+		Name: "alpaca", Register: Line, Source: "ref 1", Note: "7 rows -- full fluff, stacked-paren neck",
+		Rows: []string{
+			` /\  __  /\`,
+			`((o)('^')(o))`,
+			`   (  ~  )`,
+			`   (     )`,
+			`   (     )   /\`,
+			`  (       )~(  )`,
+			`   \_/ \_/  \_/`,
+		},
+		Body: warm, Accent: eye, AccentOf: "o",
 	},
 	{
-		Name: "bird", Register: Line, Note: "hop, head tilt, takes off",
-		Rows:   []string{`  __`, ` (o )>`, `  ||`},
-		Body:   warm,
-		Accent: eye, AccentOf: "o",
+		Name: "alpaca", Register: Line, Source: "ref 1", Note: "4 rows -- neck sacrificed, face survives",
+		Rows: []string{
+			` /\ __ /\`,
+			`((o)('^')(o))`,
+			`   (     )`,
+			`   \_/ \_/`,
+		},
+		Body: warm, Accent: eye, AccentOf: "o",
 	},
 	{
-		Name: "fox", Register: Line, Note: "curls up, ears prick, tail sweeps",
-		Rows:   []string{` /\_/\   _`, `( o.o )_/ )`, ` > ^ <___/`},
-		Body:   rust,
-		Accent: eye, AccentOf: "o",
+		Name: "cat, detailed", Register: Line, Source: "ref 2", Note: "8 rows -- original was already pure ASCII",
+		Rows: []string{
+			`(_\`,
+			` ) )`,
+			`( (   .-""-.   A.-.A`,
+			` \ \/      \/  , , \`,
+			`  \  \     =;  t  /=`,
+			`   \ |""".    ',--'`,
+			`    / //   | ||`,
+			`   /_,))   |_,))`,
+		},
+		Body: warm, Accent: eye, AccentOf: "=;",
 	},
 	{
-		Name: "wisp", Register: Braille, Note: "drifts, pulses; no body at all",
-		Rows:   []string{`  ⡀ `, ` ⢰⣿⡆`, `  ⠉ `},
-		Body:   glow,
-		Accent: spark, AccentOf: "⣿",
+		Name: "cat, meow", Register: Line, Source: "ref 4", Note: "7 rows + bubble -- the dialogue idea",
+		Rows: []string{
+			`  |\__/|`,
+			` (_ ^-^)`,
+			`   )   (`,
+			`_  )   (`,
+			`(( /    \`,
+			` (  ) || ||`,
+			` '--'  '--'`,
+		},
+		Body: warm, Accent: eye, AccentOf: "^",
+		Say: "meow!",
 	},
 	{
-		Name: "crab", Register: Line, Note: "sideways scuttle, claw raise = !",
-		Rows:   []string{` \(oo)/`, ` /~~~~\`, `  ^  ^`},
-		Body:   shell,
-		Accent: eye, AccentOf: "o",
+		Name: "cat, meow", Register: Line, Source: "ref 4", Note: "4 rows + bubble -- compressed",
+		Rows: []string{
+			` |\__/|`,
+			`(_ ^-^)`,
+			`  )   (`,
+			` '--' '--'`,
+		},
+		Body: warm, Accent: eye, AccentOf: "^",
+		Say: "tests passed",
 	},
 	{
-		Name: "moth", Register: Line, Note: "flies to light — notification built in",
-		Rows:   []string{` \\|//`, `  (o)`, ` //|\\`},
-		Body:   dusty,
-		Accent: eye, AccentOf: "o",
+		Name: "goat", Register: Line, Source: "ref 5", Note: "7 rows -- the shi/kana legs became (_/",
+		Rows: []string{
+			`      ,,`,
+			`     //`,
+			` (\,'"~-,`,
+			`~=/  . -)`,
+			`  <'"~>  \`,
+			`  ) )_, ;\`,
+			` (_/(_/ |_)`,
+		},
+		Body: slate, Accent: eye, AccentOf: ".",
+		Say: "meh meh",
 	},
 	{
-		Name: "otter", Register: Line, Note: "floats on its back; hard to animate",
-		Rows:   []string{` (o.o)`, `/|   |\`, ` ^^^^^`},
-		Body:   warm,
-		Accent: eye, AccentOf: "o",
+		Name: "goat", Register: Line, Source: "ref 5", Note: "4 rows -- horns and beard only",
+		Rows: []string{
+			`   ,,`,
+			`(\,'"~-,`,
+			`~=/ . -)`,
+			` (_/(_/`,
+		},
+		Body: slate, Accent: eye, AccentOf: ".",
 	},
 	{
-		Name: "frog", Register: Line, Note: "stillness, then one hop",
-		Rows:   []string{` @..@`, `(----)`, ` (\/)`},
-		Body:   green,
-		Accent: eye, AccentOf: "@",
+		Name: "koala", Register: Line, Source: "ref 3", Note: "4 rows -- clinging to a trunk; Omega nose became w",
+		Rows: []string{
+			` (\  /)`,
+			` ( .w. )`,
+			` (  )) |:|`,
+			`  \__/ |:|`,
+		},
+		Body: slate, Accent: eye, AccentOf: ".",
 	},
 	{
-		Name: "owl", Register: Line, Note: "head swivel, blink; nocturnal fits the shore",
-		Rows:   []string{` ,___,`, ` (o,o)`, ` /)_)`},
-		Body:   warm,
-		Accent: eye, AccentOf: "o",
+		Name: "bunny", Register: Line, Source: "ref 6 grid", Note: "3 rows -- ((.w.)) from ((kana))",
+		Rows: []string{
+			` /\_/\`,
+			`((.w.))`,
+			` (   )`,
+		},
+		Body: warm, Accent: eye, AccentOf: ".",
 	},
 	{
-		Name: "cat", Register: Block, Note: "silhouette variant, for comparison",
-		Rows:  []string{` ▟▌▐▙`, `▐███▌`, ` ▘ ▝`},
-		Body:  term.RGB{R: 24, G: 22, B: 30},
-		Alpha: 1,
+		Name: "cat, wand", Register: Line, Source: "ref 6 grid", Note: "3 rows -- the arm-and-star kaomoji",
+		Rows: []string{
+			` /\_/\`,
+			`(.w.)~~--*`,
+			` (  )`,
+		},
+		Body: warm, Accent: eye, AccentOf: ".",
 	},
 	{
-		Name: "fox", Register: Block, Note: "silhouette variant — the tail is the signature",
-		Rows:  []string{` ▟▙▟▙   ▄`, `▐████▙▄▟█▘`, ` ▘▘  ▝▀▀`},
-		Body:  term.RGB{R: 26, G: 20, B: 24},
-		Alpha: 1,
+		Name: "cat, classic", Register: Line, Source: "ref 6 grid", Note: "4 rows -- the /l, cat, kana legs redrawn",
+		Rows: []string{
+			` /l,`,
+			`( ., 7`,
+			` l  ~\`,
+			` U_,)J`,
+		},
+		Body: warm, Accent: eye, AccentOf: ".",
 	},
 	{
-		Name: "bird", Register: Braille, Note: "braille variant, finest detail",
-		Rows: []string{` ⢀⣀`, `⢰⡿⠋⠓`, ` ⠈⠙`},
-		Body: warm,
+		Name: "bear", Register: Line, Source: "ref 6 grid", Note: "3 rows -- smallest thing that still has a face",
+		Rows: []string{
+			` (\_/)`,
+			`('.w.')`,
+			` (   )`,
+		},
+		Body: rust, Accent: eye, AccentOf: ".",
+	},
+	{
+		Name: "frog", Register: Line, Source: "ours, kept", Note: "3 rows -- from the first sheet, for comparison",
+		Rows: []string{
+			` @..@`,
+			`(----)`,
+			` (\/)`,
+		},
+		Body: green, Accent: eye, AccentOf: "@",
 	},
 }

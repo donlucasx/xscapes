@@ -30,6 +30,25 @@ type Sprite struct {
 	Accent   term.RGB // eyes and highlights
 	AccentOf string   // runes drawn in Accent instead of Body
 	Alpha    float64
+	Say      string // if set, a speech bubble is drawn above
+	Source   string // which reference this was translated from
+}
+
+// Bubble builds a speech balloon. All three rows are the same width so the box
+// cannot shear; the tail sits under the left shoulder, pointing at the creature.
+func Bubble(text string) []string {
+	inner := " " + text + " "
+	n := len([]rune(inner))
+	if n < 4 {
+		inner += strings.Repeat(" ", 4-n)
+		n = 4
+	}
+	bar := strings.Repeat("-", n)
+	return []string{
+		"." + bar + ".",
+		"|" + inner + "|",
+		"'--v" + strings.Repeat("-", n-3) + "'",
+	}
 }
 
 func (s *Sprite) Size() (w, h int) {
