@@ -42,6 +42,47 @@ Highest-leverage deliverable: 45–60s real screen recording, no narration — p
 
 ## Locked decisions
 
+### The encoding rule (decided 2026-08-30)
+
+**The water is the work. The sky is the world.** Sea state always means the
+agent; sky, light and time always mean reality. Nothing crosses. Every variable
+gets its own perceptual channel, and a channel may be bound to the real world
+only if nothing else needs it.
+
+| variable | channel | state |
+|---|---|---|
+| agent busy, how hard | **swells**: how many are travelling, how tall, whitecaps above half | done |
+| something is broken | **the companion**, not the weather: ears back, hunched, tail flat, amber eyes; persists until it clears | done |
+| context remaining | **moon** phase *and* altitude; numeric readout silent until 65%, brightens at 85% | done |
+| time of day | **sky colour**, real wall clock | done |
+| weather | **experiential only** &mdash; may be synced to real weather precisely because it carries no information | not built |
+| needs you | **bubble**, rare: needs_input, error, done. Nothing else | done |
+| what it is doing now | **text written in the sand**, newest brightest, older fading as the tide takes them | mocked |
+| todos completed | **star count** | not built |
+| subagents | **kittens** | not built |
+
+Rejected and why: session-elapsed as its own variable (the real clock covers it,
+and a session-relative sky lies about the world); weather carrying activity (it
+was carrying two masters, which is the collision this rule exists to prevent);
+tide-as-time-since-input, horizon-glow, driftwood-count (all fine, none
+load-bearing &mdash; eight variables is already at the edge of what reads without
+a legend).
+
+**Encode in coverage, count or position &mdash; never in rate.** Activity was first
+mapped to wave *speed* and idle was indistinguishable from flat-out, because a
+glance is the entire budget and a screenshot has no motion at all.
+
+### Six slots every scape must fill
+light, sky, motion, surface, accumulator, companion. Any scape providing all six
+works with the whole encoding system for free. The rainy window currently fails
+on companion &mdash; fix by putting the cat on the inside sill.
+
+### Layout &mdash; supersedes the popup default below
+The scape is a full pane and carries the activity tail written into the sand.
+Not a popup: a popup covers the session, and the user should always be able to
+see what the agent is doing.
+
+
 **Lifecycle**
 - Session-long, not task-long: launch once when the agent session starts, exit when it ends. Tasks modulate the scene (weather rises while working, settles to a resting state while waiting on the user). Day/night cycle spans the session.
 - Persistence is tiny: companion identity/memory + a per-repo seed (keyed by git root) so the same repo always gets the same landscape shape. Nothing else accumulates. No decay.
