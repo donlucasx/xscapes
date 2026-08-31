@@ -177,6 +177,30 @@ func (c *Canvas) RenderHTML(title string) string {
 // HTMLFragment is the frame as a bare <pre>. Font size is a parameter so the
 // same glyph data can be shown large enough to judge the drawing AND at the
 // size it will really appear — without asking anyone to mentally rescale.
+// HTMLFragmentAs renders as a given profile would actually show it, so a
+// preview of a 256-colour terminal is honest rather than flattering.
+func (c *Canvas) HTMLFragmentAs(fontPx int, p term.Profile) string {
+	saveBG := append([]term.RGB(nil), c.BG...)
+	saveLayers := make([][]Cell, len(c.Layers))
+	for i, l := range c.Layers {
+		saveLayers[i] = append([]Cell(nil), l.Cells...)
+		for j := range l.Cells {
+			if l.Cells[j].Set {
+				l.Cells[j].FG = p.Quantise(l.Cells[j].FG)
+			}
+		}
+	}
+	for i := range c.BG {
+		c.BG[i] = p.Quantise(c.BG[i])
+	}
+	out := c.HTMLFragment(fontPx)
+	c.BG = saveBG
+	for i, l := range c.Layers {
+		l.Cells = saveLayers[i]
+	}
+	return out
+}
+
 func (c *Canvas) HTMLFragment(fontPx int) string {
 	var b strings.Builder
 	b.WriteString(`<pre style="font-size:`)

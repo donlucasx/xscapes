@@ -123,6 +123,31 @@ func (c RGB) Index256() int {
 	return cubeIdx
 }
 
+// FromIndex256 is the inverse of Index256: the colour a terminal actually
+// paints for an index. Needed to SHOW what a 256-colour terminal will do with
+// a palette, rather than describing it -- the HTML harness renders true RGB,
+// so without this a preview flatters the design by showing colours the target
+// terminal cannot produce.
+func FromIndex256(i int) RGB {
+	switch {
+	case i >= 232 && i <= 255:
+		v := uint8(8 + (i-232)*10)
+		return RGB{v, v, v}
+	case i >= 16 && i <= 231:
+		n := i - 16
+		return RGB{cubeLevels[n/36], cubeLevels[(n/6)%6], cubeLevels[n%6]}
+	}
+	return RGB{}
+}
+
+// Quantise returns the colour as the given profile would actually show it.
+func (p Profile) Quantise(c RGB) RGB {
+	if p == ProfileTrueColor {
+		return c
+	}
+	return FromIndex256(c.Index256())
+}
+
 // AppendFG / AppendBG write an SGR sequence without allocating a string.
 func (p Profile) AppendFG(dst []byte, c RGB) []byte { return p.appendSGR(dst, c, true) }
 func (p Profile) AppendBG(dst []byte, c RGB) []byte { return p.appendSGR(dst, c, false) }

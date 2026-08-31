@@ -19,6 +19,26 @@ type Shore struct {
 	pal     Palette // this frame's colours, from the time of day
 	ctxUsed float64 // this frame's context reading, for the moon and its shine
 
+	// BlueSky pushes the sky into the pure-blue cube column. REJECTED as a
+	// shipping option, kept only so the colour study can render the panel that
+	// shows why.
+	//
+	// The reasoning was sound and the result is not. Only 7 of the 216 cube
+	// colours are both genuinely dark (luma < 40) and genuinely coloured
+	// (chroma >= 20), and five of those are one column -- #00005f through
+	// #0000ff, pure blue with no red or green at all. So a dark blue sky IS
+	// available on a 256-colour terminal. Rendered, it is an electric royal
+	// blue that swallows the moon, and the moon is load-bearing: it carries
+	// context remaining. See assets/frames/color-study.png, panel C.
+	//
+	// The conclusion is that 256 should not try to be a colour night. It is
+	// already a decent monochrome one, and the signals that MUST read -- the
+	// worried amber, the alert yellow, the calm cyan -- all survive
+	// quantisation onto the cube with their hues intact. A black-and-white
+	// night where the only colour on screen is the colour that means something
+	// is a better answer than a garish blue one.
+	BlueSky bool
+
 	// MoonX is where the moon sits, as a fraction of the width. It moves with
 	// the composition: the moon and the companion are the two things a glance
 	// goes looking for, and stacking them in one column leaves half the frame
@@ -70,6 +90,21 @@ func (s *Shore) SandTop() int {
 	return int(math.Ceil(sum/float64(len(s.lastEdge)))) + 1
 }
 
+// pureBlue moves a colour onto the cube's pure-blue column, keeping roughly
+// its brightness. Red and green go to zero, because any red or green at all
+// pulls the result back into the grey basin where the whole problem started.
+func pureBlue(c term.RGB) term.RGB {
+	l := 0.30*float64(c.R) + 0.59*float64(c.G) + 0.11*float64(c.B)
+	// Blue contributes 0.11 of luma, so matching brightness needs b = l/0.11,
+	// which saturates fast -- clamp, and accept that a bright sky cannot be
+	// pure blue.
+	b := l / 0.11
+	if b > 255 {
+		b = 255
+	}
+	return term.RGB{R: 0, G: 0, B: uint8(b)}
+}
+
 // SandColor is the beach's colour this frame.
 //
 // The activity tail fades toward it as the tide takes each line, and that
@@ -90,6 +125,10 @@ func (s *Shore) Update(c *canvas.Canvas, t float64, act Activity) {
 	c.Clear()
 	s.pal = PaletteAt(act.TimeOfDay)
 	s.ctxUsed = act.ContextUsed
+	if s.BlueSky {
+		s.pal.SkyTop = pureBlue(s.pal.SkyTop)
+		s.pal.SkyHorizon = pureBlue(s.pal.SkyHorizon)
+	}
 	if c.W < 8 || c.H < 6 {
 		return
 	}

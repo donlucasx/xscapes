@@ -46,6 +46,7 @@ func main() {
 		kits    = flag.String("kittens", "", "write the subagent-kitten demo to an HTML file")
 		wired   = flag.String("wired", "", "write a simulated session, folded by the real reducer, to an HTML file")
 		reel    = flag.String("reel", "", "write a frame strip of one simulated turn (for GIF assembly)")
+		colors  = flag.String("colors", "", "write the 256-vs-truecolor study to an HTML file")
 		reelAt  = flag.Int("reel-from", 0, "first frame of the reel strip")
 		reelN   = flag.Int("reel-count", 40, "how many frames of the reel strip")
 		tod     = flag.Float64("tod", 0, "time of day: 0 midnight, .25 dawn, .5 noon, .75 dusk")
@@ -96,6 +97,15 @@ func main() {
 			os.Exit(1)
 		}
 		fmt.Println(*mockup)
+		return
+	}
+
+	if *colors != "" {
+		if err := os.WriteFile(*colors, []byte(colorPage(*seed)), 0o644); err != nil {
+			fmt.Fprintln(os.Stderr, "asciiscapes:", err)
+			os.Exit(1)
+		}
+		fmt.Println(*colors)
 		return
 	}
 
