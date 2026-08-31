@@ -112,3 +112,26 @@ func TestEyeSocketsSurviveBreathing(t *testing.T) {
 		t.Error("guard cannot detect the straddle it was written for")
 	}
 }
+
+// The declared eye cell columns must actually land on socket gaps. Deriving
+// them from sprite width was right for two scales and wrong for the third.
+func TestEyeColumnsLandOnSockets(t *testing.T) {
+	for _, tr := range kitTiers {
+		b := ParseBitmap(tr.rows)
+		er := eyeRows[tr.name]
+		for _, cell := range tr.eyes {
+			hit := false
+			for sx := cell * 2; sx < cell*2+2 && sx < b.W; sx++ {
+				for sy := er[0]; sy <= er[1]; sy++ {
+					if !b.at(sx, sy) {
+						hit = true
+					}
+				}
+			}
+			if !hit {
+				t.Errorf("%s: eye cell column %d has no socket gap at rows %d-%d",
+					tr.name, cell, er[0], er[1])
+			}
+		}
+	}
+}

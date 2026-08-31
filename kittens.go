@@ -14,45 +14,43 @@ func kittenPage(seed int64) string {
 	cat := companion.NewCat()
 	_, chh := cat.Size()
 
-	rows := []struct {
-		scale companion.KittenScale
-		name  string
-		want  int
-		note  string
+	counts := []struct {
+		n    int
+		note string
 	}{
-		{companion.KitLarge, "large &middot; 6&times;4 cells", 8, "two poses and a tail. Reads best, fits fewest."},
-		{companion.KitSmall, "small &middot; 5&times;3 cells", 8, "ears, sockets and legs kept; pose and tail dropped."},
-		{companion.KitTiny, "tiny &middot; 4&times;3 cells", 8, "the smallest thing that still has a face."},
-		{companion.KitSmall, "small &middot; 5&times;3 cells", 14, "how many actually fit."},
-		{companion.KitTiny, "tiny &middot; 4&times;3 cells", 14, "how many actually fit."},
-		{companion.KitTiny, "tiny &middot; 4&times;3 cells", 22, "past the point where counting them means anything."},
+		{1, "one subagent: large, front row"},
+		{3, "still all large"},
+		{5, "the last of the large tier"},
+		{7, "sixth and seventh arrive small and a step further back &mdash; the five already there do not change"},
+		{10, "the tiny tier joins behind them"},
+		{16, "a crowd: large in front, small behind, tiny further still"},
 	}
 
 	var b strings.Builder
 	b.WriteString(`<style>.win{border:1px solid #2a2a32;border-radius:6px;overflow:hidden}</style>`)
-	b.WriteString(`<h1>asciiscapes &mdash; how small can a kitten get?</h1>`)
+	b.WriteString(`<h1>asciiscapes &mdash; the kitten ladder</h1>`)
 
-	for _, r := range rows {
+	for _, cc := range counts {
 		var row strings.Builder
 		fit := 0
-		for _, t := range []float64{3.0, 3.6} {
-			c := canvas.New(72, 18, canvas.AlphaFar, canvas.AlphaMid, canvas.AlphaNear)
+		for _, t := range []float64{3.0, 4.1} {
+			c := canvas.New(76, 18, canvas.AlphaFar, canvas.AlphaMid, canvas.AlphaNear)
 			scape.NewShore(seed, false).Update(c, t, scape.Activity{
-				Working: true, Level: math.Min(1, 0.3+float64(r.want)*0.06), ContextUsed: 0.3,
+				Working: true, Level: math.Min(1, 0.3+float64(cc.n)*0.05), ContextUsed: 0.3,
 			})
 			top := c.H - 2 - chh
 			cat.Draw(c.Near(), 3, top, t, companion.Working)
-			fit = cat.DrawKittensAt(c.Near(), 3, top, r.want, c.W-1, t, seed, r.scale)
+			fit = cat.DrawKittens(c.Near(), c.Mid(), 3, top, cc.n, c.W-1, t, seed)
 			fmt.Fprintf(&row, `<div class="win">%s</div>`, c.HTMLFragment(12))
 		}
 		short := ""
-		if fit < r.want {
-			short = fmt.Sprintf(" &mdash; <b>only %d of %d fit</b>", fit, r.want)
+		if fit < cc.n {
+			short = fmt.Sprintf(" &mdash; <b>%d of %d fit</b>", fit, cc.n)
 		}
-		fmt.Fprintf(&b, `<div class="card"><div class="meta"><div class="nm">%s</div>`+
-			`<div class="rg">%d wanted &middot; %d drawn</div><div class="nt">%s%s</div></div>`+
+		fmt.Fprintf(&b, `<div class="card"><div class="meta"><div class="nm">%d subagents</div>`+
+			`<div class="rg">%d drawn</div><div class="nt">%s%s</div></div>`+
 			`<div style="display:flex;gap:12px">%s</div></div>`,
-			r.name, r.want, fit, r.note, short, row.String())
+			cc.n, fit, cc.note, short, row.String())
 	}
-	return canvas.HTMLPage("asciiscapes — kitten scales", b.String())
+	return canvas.HTMLPage("asciiscapes — kitten ladder", b.String())
 }
