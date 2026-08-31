@@ -21,11 +21,9 @@ var eyeCols = map[string][2]int{
 
 // kitTier is one rung of the size ladder.
 //
-// A kitten's tier comes from its INDEX, never from how many there are. If tier
-// followed the count, spawning a sixth subagent would visibly shrink the five
-// already sitting there -- a global relayout caused by a local event. Keyed on
-// index instead, kitten #1 is large for its whole life and #9 is tiny for its
-// whole life, and a new sibling changes nothing that already exists.
+// Every kitten on screen is the SAME tier: mixing sizes read as a jumble, and
+// the smaller ones sat up the beach where they looked like they were floating
+// in the sea. One size, chosen by how many there are.
 type kitTier struct {
 	name    string
 	rows    []string
@@ -37,19 +35,26 @@ type kitTier struct {
 
 var kitTiers = []kitTier{
 	{"kittenSit", KittenSit, eyeCols["kittenSit"], 0, 1.00, 6},
-	{"kittenSmall", KittenSmall, eyeCols["kittenSmall"], 1, 0.86, 4},
-	{"kittenTiny", KittenTiny, eyeCols["kittenTiny"], 2, 0.70, 2},
+	{"kittenSmall", KittenSmall, eyeCols["kittenSmall"], 0, 1.00, 4},
+	{"kittenTiny", KittenTiny, eyeCols["kittenTiny"], 0, 1.00, 2},
 }
 
-// tierFor: the first five are large, the next three small, the rest tiny.
-func tierFor(i int) int {
-	switch {
-	case i < 5:
-		return 0
-	case i < 8:
-		return 1
+// TierFor picks one size for the whole litter from how many there are.
+//
+// The thresholds have HYSTERESIS: it takes six to shrink but only four to grow
+// back. Without the gap, a count oscillating around a boundary would flip every
+// kitten between sizes on alternate frames.
+func TierFor(n, prev int) int {
+	up := []int{6, 10}  // grow the litter -> shrink the kittens at these counts
+	down := []int{4, 8} // shrink the litter -> grow them back only here
+	tier := prev
+	for tier < 2 && n >= up[tier] {
+		tier++
 	}
-	return 2
+	for tier > 0 && n <= down[tier-1] {
+		tier--
+	}
+	return tier
 }
 
 func (c *Cat) kitBitmap(t int) *Bitmap {
@@ -76,6 +81,7 @@ func (c *Cat) KittenSize() (w, h int) {
 // of its index -- periods, not just phases, so they never fall into step and
 // some coincidentally align, which is what a litter actually looks like.
 func (c *Cat) DrawKittens(near, mid *canvas.Layer, px, py, n, w int, t float64, seed int64) int {
+	_ = mid // every kitten is on the near layer now; kept for call-site stability
 	if n <= 0 {
 		return 0
 	}
@@ -83,9 +89,11 @@ func (c *Cat) DrawKittens(near, mid *canvas.Layer, px, py, n, w int, t float64, 
 	x := px + pw + 1
 	drawn := 0
 
+	ti := TierFor(n, c.kitTier)
+	c.kitTier = ti
+	spec := kitTiers[ti]
+
 	for i := 0; i < n; i++ {
-		ti := tierFor(i)
-		spec := kitTiers[ti]
 		bm := c.kitBitmap(ti)
 		kw, kh := bm.W/2, bm.H/4
 		if x+kw > w {
@@ -116,16 +124,12 @@ func (c *Cat) DrawKittens(near, mid *canvas.Layer, px, py, n, w int, t float64, 
 			f = f.Mirrored()
 		}
 
-		// Smaller tiers sit further up the beach and on the mid layer, so the
-		// alpha model already in the renderer makes them recede.
+		// Every kitten stands on the sand with the parent, on the near layer at
+		// full alpha. Pushing the small ones up the beach on the mid layer made
+		// them look like they were floating in the water, and washed them out
+		// until they read as grey blocks rather than cats.
 		layer := near
-		if ti > 0 {
-			layer = mid
-		}
-		ky := py + ph - kh - spec.depth
-		if HashF(i, 6, seed) > 0.6 {
-			ky--
-		}
+		ky := py + ph - kh
 		(&Sprite{Rows: f.ToQuadrant(), Body: furCol, Alpha: spec.alpha}).Draw(layer, x, ky)
 
 		e1, e2 := x+spec.eyes[0], x+spec.eyes[1]

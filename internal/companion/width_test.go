@@ -135,3 +135,18 @@ func TestEyeColumnsLandOnSockets(t *testing.T) {
 		}
 	}
 }
+
+// One size for the whole litter, with a gap between growing and shrinking so a
+// count hovering on a boundary does not flip every kitten each frame.
+func TestTierHysteresis(t *testing.T) {
+	tier := 0
+	for _, step := range []struct{ n, want int }{
+		{5, 0}, {6, 1}, {5, 1}, {4, 0}, // 5 does not grow them back; 4 does
+		{10, 2}, {9, 2}, {8, 1}, // same gap at the second boundary
+	} {
+		tier = TierFor(step.n, tier)
+		if tier != step.want {
+			t.Errorf("n=%d: tier %d, want %d", step.n, tier, step.want)
+		}
+	}
+}

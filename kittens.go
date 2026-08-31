@@ -18,12 +18,12 @@ func kittenPage(seed int64) string {
 		n    int
 		note string
 	}{
-		{1, "one subagent: large, front row"},
-		{3, "still all large"},
-		{5, "the last of the large tier"},
-		{7, "sixth and seventh arrive small and a step further back &mdash; the five already there do not change"},
-		{10, "the tiny tier joins behind them"},
-		{16, "a crowd: large in front, small behind, tiny further still"},
+		{1, "large"},
+		{3, "large"},
+		{5, "large &mdash; the last count that keeps them big"},
+		{7, "the whole litter drops to small together"},
+		{9, "still small"},
+		{12, "the whole litter drops to tiny together"},
 	}
 
 	var b strings.Builder
@@ -39,8 +39,9 @@ func kittenPage(seed int64) string {
 				Working: true, Level: math.Min(1, 0.3+float64(cc.n)*0.05), ContextUsed: 0.3,
 			})
 			top := c.H - 2 - chh
-			cat.Draw(c.Near(), 3, top, t, companion.Working)
-			fit = cat.DrawKittens(c.Near(), c.Mid(), 3, top, cc.n, c.W-1, t, seed)
+			kc := companion.NewCat()
+			kc.Draw(c.Near(), 3, top, t, companion.Working)
+			fit = kc.DrawKittens(c.Near(), c.Mid(), 3, top, cc.n, c.W-1, t, seed)
 			fmt.Fprintf(&row, `<div class="win">%s</div>`, c.HTMLFragment(12))
 		}
 		short := ""
