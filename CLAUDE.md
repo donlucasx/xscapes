@@ -1,13 +1,16 @@
 # asciiscapes — project brief for Claude Code
 
-> **Where we left off — 2026-08-31, commit `44be1c4`.**
-> The **visual vocabulary is complete**: renderer, shore with day cycle and
-> activity-driven swells, a quadrant cat with four states, subagent kittens that
-> sit and swim, context moon, speech bubble, live terminal mode. `go build`,
-> `go vet` and `go test` all clean; 28 commits on `main`; no remote.
-> **Nothing is wired to a real session** — every frame so far is driven by
-> hardcoded numbers. ▶ NEXT is the event protocol and the Claude Code hook
-> adapter. See `RESUME.md`.
+> **Where we left off — 2026-08-31, commit `419ceee`.**
+> **The scene is wired to a real session.** Hook events go in one end and the sea,
+> the companion, the kittens and the sand come out the other; before this every
+> frame was hardcoded. New: `internal/event` (the protocol), `internal/reduce`
+> (the fold), `hook.go` (the Claude Code adapter), `install.go` (a plan-first,
+> byte-splicing merge into `~/.claude/settings.json`), and `emit`/`replay`/
+> `statusline`. `go build`, `go vet` and `go test` clean; 30 commits on `main`;
+> no remote. **`notes/claude-hooks-verified.md` is the hook payload schema, read
+> out of the Claude Code binary itself — trust it, do not re-derive it.**
+> ▶ NEXT is three layout/notification defects and then a day of real use.
+> See `RESUME.md`.
 
 Working name: **asciiscapes** (not final; see open questions). A cozy ASCII "thinking screen" for terminal AI agents. While Claude Code (or any agent) works, a small living scene runs beside it — a shoreline whose sea rises with the work, and a companion animal — and nudges the user, visually and with a sound, when the agent finishes or needs input.
 
@@ -65,10 +68,10 @@ only if nothing else needs it.
 | context remaining | **moon** phase *and* altitude; numeric readout silent until 65%, brightens at 85% | done |
 | time of day | **sky colour**, real wall clock | done |
 | weather | **deferred, not rejected** &mdash; no rain, clouds, fog or sync in v1; the thinking is parked in `ideas.md` | deferred 2026-08-30 |
-| needs you | **bubble**, rare: needs_input, error, done. Nothing else | done |
-| what it is doing now | **text written in the sand**, newest brightest, older fading as the tide takes them | mocked |
+| needs you | **bubble**, rare: needs_input, error, done. Nothing else | wired; ⚠ done and needs_input still look identical |
+| what it is doing now | **text written in the sand**, newest brightest, older fading as the tide takes them | wired; ⚠ currently drawn over the water |
 | todos completed | **star count** | not built |
-| subagents | **kittens** | not built |
+| subagents | **kittens** | done — `agent_id`/`agent_type`, counted live |
 
 Rejected and why: session-elapsed as its own variable (the real clock covers it,
 and a session-relative sky lies about the world); weather carrying activity (it

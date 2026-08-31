@@ -71,3 +71,22 @@ Never paraphrase. Read the relevant section before editing anything it covers.
 
 **Naming**
 - *"considering calling the project iixscapes, or xscapes"* — still undecided; name comes late.
+
+## 2026-08-31 — session 5, verbatim
+
+- *"resume work on asciiscapes"*
+  ⇒ Whole session ran off the ▶ NEXT list with no further steer. Nothing new from
+    Lucas to log. Recording it so the next session knows the session's direction
+    was inferred from RESUME.md, not given — and that the three defects now at the
+    top of ▶ NEXT (sand on the water, tail colliding with the cat, done vs
+    needs_input identical) are MY findings from `assets/frames/wired.png`, not his.
+    He has not seen the wired scene yet. Show it to him before building on it.
+
+- *"looking at the wired.png example. Maybe we should have our companion on the right side of the
+  frame, so the code doesnt cover him, and align sub agents from right to left. What do you think?
+  and populate them intentionally in areas where the code wont touch- unless its too many agents,
+  then its ok for some to be covered by the code. Assess this- would it present other issues if
+  placed opposite on the screen?"*
+  ⇒ Companion moves RIGHT; kittens fill RIGHT-TO-LEFT; placement is intentional around the sand
+    text, and overlap is ACCEPTABLE once the litter is large. Asked for an assessment first, not
+    an implementation.
