@@ -19,7 +19,7 @@ func TestWhiskersTouchTheFur(t *testing.T) {
 		n string
 	}{
 		{WhiskerLowerLong, "lower long"}, {WhiskerUpperLong, "upper long"},
-		{WhiskerEven, "even"}, {WhiskerShort, "short"}, {WhiskerSweep, "sweep"},
+		{WhiskerEven, "even"}, {WhiskerShort, "short"},
 	}
 	for _, mirror := range []bool{false, true} {
 		for _, st := range []State{Resting, Working, NeedsYou, Worried} {
@@ -55,8 +55,10 @@ func TestWhiskersTouchTheFur(t *testing.T) {
 	}
 }
 
-// touchesFur walks in direction d from x until it hits solid fur (connected) or
-// an empty cell (a gap, so not connected).
+// touchesFur walks in direction d from x over the whisker run. The run is
+// connected if it ends against solid fur on its own row, or hangs off a fur
+// corner one row away -- the lower pair anchors to the muzzle ABOVE it, which
+// is a diagonal connection, not a horizontal one.
 func touchesFur(l *canvas.Layer, x, y, d int) bool {
 	for cx := x + d; cx >= 0 && cx < l.W; cx += d {
 		cell := l.Cells[y*l.W+cx]
@@ -66,10 +68,51 @@ func touchesFur(l *canvas.Layer, x, y, d int) bool {
 		case cell.Set && cell.R == '─':
 			continue // another whisker cell in the same run
 		default:
-			return false
+			return furAt(l, cx, y-1) || furAt(l, cx, y+1)
 		}
 	}
 	return false
+}
+
+func furAt(l *canvas.Layer, x, y int) bool {
+	if x < 0 || x >= l.W || y < 0 || y >= l.H {
+		return false
+	}
+	c := l.Cells[y*l.W+x]
+	return c.Set && c.R == '█'
+}
+
+// The spec is four whiskers, two a side, connected to the HEAD -- and the way
+// that failed before was the right pair growing out of the raised tail, which
+// is solid at nose height. The tail's columns are sprite cells 10 and beyond;
+// no whisker may reach them.
+func TestWhiskersNeverTouchTheTail(t *testing.T) {
+	const x, w = 3, 12
+	for _, mirror := range []bool{false, true} {
+		for _, st := range []State{Resting, Working, NeedsYou, Worried} {
+			c := canvas.New(20, 10, canvas.AlphaFar, canvas.AlphaMid, canvas.AlphaNear)
+			cat := NewCat()
+			cat.FaceLeft(mirror)
+			cat.SetFace(Face{Nose: true, Toes: true, Whiskers: WhiskerEven, Ears: EarInnerDark})
+			cat.Draw(c.Near(), x, 1, 3.1, st)
+
+			l := c.Near()
+			for y := 0; y < l.H; y++ {
+				for cx := 0; cx < l.W; cx++ {
+					if cell := l.Cells[y*l.W+cx]; !cell.Set || cell.R != '─' {
+						continue
+					}
+					sx := cx - x
+					if mirror {
+						sx = (w - 1) - sx
+					}
+					if sx >= 10 {
+						t.Errorf("mirror=%v state=%v: whisker at (%d,%d) is in the tail's columns", mirror, st, cx, y)
+					}
+				}
+			}
+		}
+	}
 }
 
 // The eye row must stay clear: a stroke beside the eyes reads as a brow.

@@ -15,7 +15,7 @@ import (
 func facePage(seed int64) string {
 	// A patch of the real scene behind each portrait, because a companion is
 	// only ever seen against sand and never against a swatch.
-	portrait := func(f companion.Face, coat term.RGB, st companion.State, prof term.Profile, t float64) string {
+	portraitPx := func(f companion.Face, coat term.RGB, st companion.State, prof term.Profile, t float64, px int) string {
 		c := canvas.New(16, 10, canvas.AlphaFar, canvas.AlphaMid, canvas.AlphaNear)
 		sh := scape.NewShore(seed, false)
 		for i := 0; i < 12; i++ {
@@ -26,7 +26,10 @@ func facePage(seed int64) string {
 		cat.SetCoat(coat)
 		_, chh := cat.Size()
 		cat.Draw(c.Near(), 2, c.H-1-chh, t, st)
-		return c.HTMLFragmentAs(15, prof)
+		return c.HTMLFragmentAs(px, prof)
+	}
+	portrait := func(f companion.Face, coat term.RGB, st companion.State, prof term.Profile, t float64) string {
+		return portraitPx(f, coat, st, prof, t, 15)
 	}
 
 	var b strings.Builder
@@ -41,14 +44,15 @@ func facePage(seed int64) string {
 	   text-transform:uppercase;margin:14px 0 6px}
 	h2+p{margin-top:4px}
 	</style>`)
-	b.WriteString(`<h1>asciiscapes &mdash; whiskers, connected to the fur</h1>`)
-	b.WriteString(`<p class="nt">Ears are settled: inner shadow. The whiskers are now drawn from the FUR ` +
-		`OUTWARD &mdash; found by looking at what the body actually painted on each row, not from ` +
-		`cell numbers worked out by hand. The head is not centred in its sprite, so at the chin row ` +
-		`the left edge lands on a half-filled cell while the right edge is solid; a stroke at a ` +
-		`fixed offset touches the fur on one side and leaves half a cell of daylight on the other. ` +
-		`That was the disconnection. All rows are on the snout &mdash; the chin row the nose sits ` +
-		`on and below &mdash; and the eyes at y+2 are deliberately never used.</p>`)
+	b.WriteString(`<h1>asciiscapes &mdash; whiskers, four, on the muzzle</h1>`)
+	b.WriteString(`<p class="nt">The spec: FOUR whiskers, two a side, connected to the head, ` +
+		`levelled around the nose. The last round failed it both ways at once &mdash; the raised tail ` +
+		`is solid at nose height, so the row scan grew the right pair out of the TAIL; and the lower ` +
+		`pair anchored to the torso a row down, reading as chest hairs at chin level. Both pairs now ` +
+		`hang off the muzzle corners, measured once on the nose row and bounded to the head's own ` +
+		`cells. A whisker stops at anything solid, which keeps it off the tail &mdash; the ` +
+		`muzzle-to-tail gap is a single cell, so the tail-side pair runs shorter by nature. ` +
+		`Ear shadows and toes are on in every portrait. Zoomed row first; pick from either.</p>`)
 
 	cell := func(label, note, body string) {
 		fmt.Fprintf(&b, `<div class="col"><div class="lbl"><b>%s</b>%s</div><div class="win">%s</div></div>`,
@@ -58,21 +62,22 @@ func facePage(seed int64) string {
 		return companion.Face{Nose: true, Toes: toes, Whiskers: w, Ears: companion.EarInnerDark}
 	}
 
+	b.WriteString(`<h2>slate, zoomed &mdash; where they sit</h2><div class="row">`)
+	for _, w := range companion.WhiskerStyles {
+		cell(w.Name, " &middot; "+w.Note,
+			portraitPx(face(w.Style, true), companion.Coats["slate"], companion.Working,
+				term.ProfileTrueColor, 3.1, 30))
+	}
+	b.WriteString(`</div>`)
+
 	for _, coat := range []string{"slate", "cream", "charcoal"} {
-		fmt.Fprintf(&b, `<h2>%s</h2>`, coat)
-		for _, toes := range []bool{true, false} {
-			label := "with toes"
-			if !toes {
-				label = "without toes"
-			}
-			fmt.Fprintf(&b, `<h3>%s</h3><div class="row">`, label)
-			for _, w := range companion.WhiskerStyles {
-				cell(w.Name, " &middot; "+w.Note,
-					portrait(face(w.Style, toes), companion.Coats[coat], companion.Working,
-						term.ProfileTrueColor, 3.1))
-			}
-			b.WriteString(`</div>`)
+		fmt.Fprintf(&b, `<h2>%s</h2><div class="row">`, coat)
+		for _, w := range companion.WhiskerStyles {
+			cell(w.Name, " &middot; "+w.Note,
+				portrait(face(w.Style, true), companion.Coats[coat], companion.Working,
+					term.ProfileTrueColor, 3.1))
 		}
+		b.WriteString(`</div>`)
 	}
 
 	b.WriteString(`<h2>"lower long" across all five coats</h2><div class="row">`)

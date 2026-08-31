@@ -38,9 +38,6 @@ const (
 	WhiskerEven
 	// WhiskerShort: one cell a side on each row.
 	WhiskerShort
-	// WhiskerSweep: three rows, longest in the middle, so the set reads as a
-	// spray rather than a pair of lines.
-	WhiskerSweep
 )
 
 // EarStyle is how the inside of the ear is treated. Every style below sits
@@ -103,7 +100,6 @@ var WhiskerStyles = []struct {
 	{WhiskerUpperLong, "upper long", "top pair reaches further"},
 	{WhiskerEven, "even", "both pairs the same"},
 	{WhiskerShort, "short", "one cell a side, both rows"},
-	{WhiskerSweep, "sweep", "three rows, longest in the middle"},
 	{NoWhiskers, "none", "for comparison"},
 }
 
@@ -140,13 +136,15 @@ var (
 	innerEar = term.RGB{R: 198, G: 130, B: 132}
 )
 
-// furSpan finds the solid fur on one row of an already-drawn body, in absolute
-// canvas cells. Absolute rather than sprite-relative on purpose: the body is
-// mirrored before this runs, so asking the pixels where the cat is avoids
-// having to mirror a second time and get it wrong.
-func furSpan(l *canvas.Layer, row, x, w int) (lo, hi int, ok bool) {
+// furSpan finds the solid fur on one row of an already-drawn body, scanning
+// only the absolute canvas cells [from, to]. Absolute rather than
+// sprite-relative on purpose: the body is mirrored before this runs, so asking
+// the pixels where the cat is avoids having to mirror a second time and get it
+// wrong. The window matters as much as the row: the tail is SOLID at nose
+// height, so an unbounded scan of the nose row finds the tail, not the head.
+func furSpan(l *canvas.Layer, row, from, to int) (lo, hi int, ok bool) {
 	lo, hi = -1, -1
-	for cx := x - 1; cx < x+w+1; cx++ {
+	for cx := from; cx <= to; cx++ {
 		if cx < 0 || cx >= l.W || row < 0 || row >= l.H {
 			continue
 		}
@@ -232,61 +230,70 @@ func (c *Cat) drawFace(l *canvas.Layer, x, y int, f Face, st State) {
 		l.Plot(at(4), y+3, '▾', noseCol, 1)
 	}
 
-	// Whiskers.
+	// Whiskers. The spec is locked (2026-08-31): exactly FOUR, two a side,
+	// connected to the HEAD, levelled around the nose.
 	//
-	// They are drawn from the FUR OUTWARD, found by looking at what the body
-	// actually painted on each row, rather than from cell numbers worked out
-	// by hand. That is not fussiness: the head is not centred in its sprite,
-	// so at the chin row the left edge lands on a half-filled cell while the
-	// right edge is solid. A stroke placed at a fixed offset therefore touches
-	// the fur on one side and leaves half a cell of daylight on the other,
-	// which is exactly the disconnection that kept showing up.
+	// The muzzle is measured ONCE, on the nose row, bounded to the head's own
+	// cells 0-8. The per-row unbounded scan this replaces failed his spec both
+	// ways at once: the tail is SOLID at nose height, so the right whiskers
+	// grew out of the tail; and the lower pair, anchored to the torso a row
+	// down, sat wider and lower than the head and read as chest hairs at chin
+	// level. Both pairs now hang off the muzzle corners.
 	//
-	// Row y+3 is the chin row the nose sits on and y+4 is just under it, so
-	// both are on the snout. The eyes are at y+2 and are deliberately not used.
+	// A whisker grows outward cell by cell and stops at anything solid, which
+	// is what keeps it off the tail: the gap between muzzle and raised tail is
+	// a single cell, so the tail-side pair simply runs shorter. It may paint
+	// over a non-solid cell -- the head's own half-filled edge is one, and
+	// skipping it would hang half a cell of daylight between fur and whisker
+	// (the head is not centred in its sprite).
+	//
+	// Row y+3 is the row the nose sits on and y+4 is just under it. The eyes
+	// at y+2 are deliberately never used.
 	if f.Whiskers != NoWhiskers {
-		rows := []int{y + 3, y + 4}
+		noseRow := y + 3
+		rows := [2]int{y + 3, y + 4}
 		if st == Worried {
-			rows = []int{y + 4, y + 5} // drooping
+			rows = [2]int{y + 4, y + 5} // drooping
 		}
 		near, far := 1.0, 0.7
 		if st == Resting {
 			near, far = 0.8, 0.5
 		}
 
-		// lengths[i] is how many cells the whiskers on rows[i] reach.
-		var lengths []int
-		alphas := []float64{near, far}
+		// lengths[i] is how many cells the whiskers on rows[i] reach for.
+		var lengths [2]int
+		alphas := [2]float64{near, far}
 		switch f.Whiskers {
 		case WhiskerLowerLong:
-			lengths = []int{1, 2}
-			alphas = []float64{far, near}
+			lengths = [2]int{1, 2}
+			alphas = [2]float64{far, near}
 		case WhiskerUpperLong:
-			lengths = []int{2, 1}
+			lengths = [2]int{2, 1}
 		case WhiskerEven:
-			lengths = []int{2, 2}
+			lengths = [2]int{2, 2}
 		case WhiskerShort:
-			lengths = []int{1, 1}
-		case WhiskerSweep:
-			rows = append(rows, rows[len(rows)-1]+1)
-			if st == Worried {
-				rows = []int{y + 4, y + 5, y + 6}
-			}
-			lengths = []int{1, 2, 1}
-			alphas = []float64{far, near, far * 0.8}
+			lengths = [2]int{1, 1}
 		}
 
-		for i, row := range rows {
-			if i >= len(lengths) {
-				break
+		from, to := at(0), at(8)
+		if from > to {
+			from, to = to, from
+		}
+		if lo, hi, ok := furSpan(l, noseRow, from, to); ok {
+			solid := func(cx, row int) bool {
+				if cx < 0 || cx >= l.W || row < 0 || row >= l.H {
+					return true // the frame edge stops a whisker like fur does
+				}
+				c := l.Cells[row*l.W+cx]
+				return c.Set && c.R == '█'
 			}
-			lo, hi, ok := furSpan(l, row, x, w)
-			if !ok {
-				continue
-			}
-			for n := 1; n <= lengths[i]; n++ {
-				l.Plot(lo-n, row, '─', light, alphas[i])
-				l.Plot(hi+n, row, '─', light, alphas[i])
+			for i, row := range rows {
+				for n := 1; n <= lengths[i] && !solid(lo-n, row); n++ {
+					l.Plot(lo-n, row, '─', light, alphas[i])
+				}
+				for n := 1; n <= lengths[i] && !solid(hi+n, row); n++ {
+					l.Plot(hi+n, row, '─', light, alphas[i])
+				}
 			}
 		}
 	}

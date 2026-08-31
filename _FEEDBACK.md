@@ -174,3 +174,15 @@ Never paraphrase. Read the relevant section before editing anything it covers.
   ⇒ Companion stays PAUSED, still nothing defaulted. He wants the CURRENT study in front of him
     (it already renders with/without toes), expects another whisker revision round after he
     looks, and meanwhile the build continues on the locked-brief gap.
+
+- *"is this the file we are both looking at? I can give you feedback based on this, or lmk if
+  theres a more recent"* ⇒ confirmed same file (the full-length recapture).
+
+- *"whiskers aint working- there should be a total of 4, 2 on each side, and they should be
+  connected to the head (not the tail), leveled around the nose (not the eyes, not the chin).
+  We love the ear shadows and toes. Lets lock in the whiskers and then decide wether we are
+  adding all 3 details or a combination"*
+  ⇒ The whisker SPEC, crisp: exactly 4, 2 per side, attached to the HEAD's fur, vertically
+    on the nose line. Right-side whiskers must not touch/read as the tail. Ear shadows and
+    toes are LOVED (not yet locked as included). Order of decisions: whiskers first, then
+    which of the 3 details ship together.
