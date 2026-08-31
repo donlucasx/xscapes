@@ -45,6 +45,9 @@ func main() {
 		busy    = flag.String("busy", "", "write the activity-level sweep to an HTML file")
 		kits    = flag.String("kittens", "", "write the subagent-kitten demo to an HTML file")
 		wired   = flag.String("wired", "", "write a simulated session, folded by the real reducer, to an HTML file")
+		reel    = flag.String("reel", "", "write a frame strip of one simulated turn (for GIF assembly)")
+		reelAt  = flag.Int("reel-from", 0, "first frame of the reel strip")
+		reelN   = flag.Int("reel-count", 40, "how many frames of the reel strip")
 		tod     = flag.Float64("tod", 0, "time of day: 0 midnight, .25 dawn, .5 noon, .75 dusk")
 		live    = flag.Bool("live", false, "paint the scape in THIS terminal until Ctrl-C")
 		ctxUsed = flag.Float64("ctx", 0, "context used, 0..1 (moon phase and altitude)")
@@ -91,6 +94,15 @@ func main() {
 			os.Exit(1)
 		}
 		fmt.Println(*mockup)
+		return
+	}
+
+	if *reel != "" {
+		if err := os.WriteFile(*reel, []byte(reelPage(*seed, *reelAt, *reelN, *fps)), 0o644); err != nil {
+			fmt.Fprintln(os.Stderr, "asciiscapes:", err)
+			os.Exit(1)
+		}
+		fmt.Println(*reel)
 		return
 	}
 
