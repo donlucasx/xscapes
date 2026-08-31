@@ -1,6 +1,15 @@
 # asciiscapes — project brief for Claude Code
 
-Working name: **asciiscapes** (not final; see open questions). A cozy ASCII "thinking screen" for terminal AI agents. While Claude Code (or any agent) works, a small living scene runs beside it — landscape, reactive weather, and a companion animal — and nudges the user, visually and with a sound, when the agent finishes or needs input.
+> **Where we left off — 2026-08-31, commit `44be1c4`.**
+> The **visual vocabulary is complete**: renderer, shore with day cycle and
+> activity-driven swells, a quadrant cat with four states, subagent kittens that
+> sit and swim, context moon, speech bubble, live terminal mode. `go build`,
+> `go vet` and `go test` all clean; 28 commits on `main`; no remote.
+> **Nothing is wired to a real session** — every frame so far is driven by
+> hardcoded numbers. ▶ NEXT is the event protocol and the Claude Code hook
+> adapter. See `RESUME.md`.
+
+Working name: **asciiscapes** (not final; see open questions). A cozy ASCII "thinking screen" for terminal AI agents. While Claude Code (or any agent) works, a small living scene runs beside it — a shoreline whose sea rises with the work, and a companion animal — and nudges the user, visually and with a sound, when the agent finishes or needs input.
 
 Owner: Lucas (cinematographer + solo dev, LA). Solo build, AI-assisted. Start from this file; do not re-derive decisions already made here.
 
