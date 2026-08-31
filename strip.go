@@ -74,7 +74,7 @@ func stripPage(seed int64, frames int, fps float64, mode string) string {
 			top := c.H - 2 - chh
 			cat.Draw(c.Near(), 6, top, t, st)
 			if mode == "kittens" {
-				cat.DrawKittens(c.Near(), c.Mid(), 6, top, 8, c.W-1, int(float64(c.H)*0.42)+1, t, seed)
+				cat.DrawKittens(c.Near(), c.Mid(), 6, top, 10, c.W-1, int(float64(c.H)*0.42)+1, t, seed)
 			}
 			if st == companion.Worried {
 				rows := companion.Bubble("tests failing")

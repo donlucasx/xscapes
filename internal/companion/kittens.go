@@ -153,7 +153,9 @@ func (c *Cat) DrawKittens(near, mid *canvas.Layer, px, py, n, w, seaTop int, t f
 		// until they read as grey blocks rather than cats.
 		layer := near
 		ky := py + ph - kh
-		(&Sprite{Rows: f.ToQuadrant(), Body: furCol, Alpha: spec.alpha}).Draw(layer, x, ky)
+		rows := f.ToQuadrant()
+		plotRim(layer, rows, x, ky)
+		(&Sprite{Rows: rows, Body: furCol, Alpha: spec.alpha}).Draw(layer, x, ky)
 
 		e1, e2 := x+spec.eyes[0], x+spec.eyes[1]
 		if mirror {
@@ -274,7 +276,9 @@ func (c *Cat) drawSwimmers(l *canvas.Layer, idx []int, px, py, w, seaTop int, t 
 			if HashF(i, 15, seed) > 0.5 {
 				f = f.Mirrored()
 			}
-			(&Sprite{Rows: f.ToQuadrant(), Body: furCol, Alpha: 1}).Draw(l, x, y)
+			rows := f.ToQuadrant()
+			plotRim(l, rows, x, y)
+			(&Sprite{Rows: rows, Body: furCol, Alpha: 1}).Draw(l, x, y)
 
 			e := eyeCols["kittenSwim"]
 			glyph := 'o'
@@ -289,6 +293,49 @@ func (c *Cat) drawSwimmers(l *canvas.Layer, idx []int, px, py, w, seaTop int, t 
 		}
 	}
 	return drawn
+}
+
+// plotRim clears a one-cell ring around a sprite's silhouette before it is
+// drawn, so whatever is behind it is visibly cut rather than merging into it.
+//
+// Two cream sprites at the same alpha overlapping on the same layer read as one
+// malformed shape, not as depth. Painter order alone does not fix that -- the
+// front sprite has to leave a seam. The ring also parts the water slightly
+// around each swimmer, which is the right thing for something floating in it.
+func plotRim(l *canvas.Layer, rows []string, x, y int) {
+	h := len(rows)
+	w := 0
+	for _, r := range rows {
+		if n := len([]rune(r)); n > w {
+			w = n
+		}
+	}
+	filled := func(cx, cy int) bool {
+		if cy < 0 || cy >= h {
+			return false
+		}
+		r := []rune(rows[cy])
+		return cx >= 0 && cx < len(r) && r[cx] != ' '
+	}
+	for cy := -1; cy <= h; cy++ {
+		for cx := -1; cx <= w; cx++ {
+			if filled(cx, cy) {
+				continue
+			}
+			adj := false
+			for dy := -1; dy <= 1 && !adj; dy++ {
+				for dx := -1; dx <= 1; dx++ {
+					if filled(cx+dx, cy+dy) {
+						adj = true
+						break
+					}
+				}
+			}
+			if adj {
+				l.Plot(x+cx, y+cy, ' ', term.RGB{}, 1)
+			}
+		}
+	}
 }
 
 func max(a, b int) int {
