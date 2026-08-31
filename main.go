@@ -15,6 +15,14 @@ import (
 )
 
 func main() {
+	// Subcommands are checked before the flag set is parsed. The renderer has
+	// twenty demo flags and the adapters have their own; keeping them in
+	// separate flag sets is what stops `emit -tool` from colliding with a
+	// future `-t` on the renderer.
+	if dispatch(os.Args[1:]) {
+		return
+	}
+
 	var (
 		width   = flag.Int("w", 80, "canvas width")
 		height  = flag.Int("h", 24, "canvas height")
@@ -40,6 +48,7 @@ func main() {
 		live    = flag.Bool("live", false, "paint the scape in THIS terminal until Ctrl-C")
 		ctxUsed = flag.Float64("ctx", 0, "context used, 0..1 (moon phase and altitude)")
 		mode    = flag.String("mode", "working", "strip mode: resting|working|needsyou|walk")
+		session = flag.String("session", "", "session to follow in -live (default: $CLAUDE_CODE_SESSION_ID, else the newest)")
 	)
 	flag.Parse()
 
@@ -69,7 +78,7 @@ func main() {
 		if isSet("h") {
 			hl = *height
 		}
-		runLive(*seed, *fps, wl, hl, *ctxUsed, *tod, *asciiG)
+		runLive(*seed, *fps, wl, hl, *ctxUsed, *tod, *asciiG, *session)
 		return
 	}
 

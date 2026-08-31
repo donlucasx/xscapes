@@ -17,6 +17,25 @@ type Shore struct {
 	moonX, moonY int
 
 	pal Palette // this frame's colours, from the time of day
+
+	// lastEdge is the waterline Update most recently computed. Kept for the
+	// same reason as moonX/moonY: it is the scene's real geometry, and a
+	// caller (or a test) that recomputed it would drift out of sync with
+	// what was actually painted.
+	lastEdge []float64
+
+	// phase is wave time, integrated rather than derived.
+	//
+	// This has to be state, and the reason only shows up once activity stops
+	// being a constant. The obvious form -- tt := t * speed(Level) -- scales
+	// the whole elapsed time, so raising Level does not speed the waves up,
+	// it teleports them: at t=600s a 0.05 change in Level moved 447 of 1920
+	// cells, against 44 cells at t=5s. The error grows with session age,
+	// which is exactly backwards for a scene meant to run all day. Carrying
+	// phase forward and adding dt*speed each frame keeps the wave field
+	// continuous through any change in activity.
+	phase float64
+	lastT float64
 }
 
 // MoonPos is the moon's centre cell from the last Update.
@@ -46,9 +65,20 @@ func (s *Shore) Update(c *canvas.Canvas, t float64, act Activity) {
 	scale := math.Min(float64(c.W)/80.0, float64(c.H)/24.0)
 	scale = math.Max(0.45, math.Min(1.35, scale))
 
-	// Working raises the sea; resting lets it settle.
-	tt := t * (0.55 + act.Level*1.45)
+	// Working raises the sea; resting lets it settle. Integrate, do not scale:
+	// see the note on Shore.phase.
+	dt := t - s.lastT
+	if dt < 0 || dt > 1 {
+		// A jump backwards, or a gap longer than a frame -- a resized
+		// terminal, a suspended process, or the first frame. Advance by one
+		// nominal step rather than lurching the sea by the whole gap.
+		dt = 0.05
+	}
+	s.lastT = t
+	s.phase += dt * (0.55 + act.Level*1.45)
+	tt := s.phase
 	edge := s.waterline(c.W, sy, tt, act, scale)
+	s.lastEdge = edge
 
 	s.paintBG(c, hy, edge)
 	s.stars(c, hy, t)
