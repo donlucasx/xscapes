@@ -297,6 +297,12 @@ func timeOfDay(now time.Time) float64 {
 	return float64(h*3600+m*60+s) / 86400
 }
 
+// luma is the perceived brightness of a colour, for deciding whether to write
+// light on dark or dark on light.
+func luma(c term.RGB) float64 {
+	return 0.30*float64(c.R) + 0.59*float64(c.G) + 0.11*float64(c.B)
+}
+
 // drawScene paints one composed frame: the companion, its litter, the bubble
 // and the sand. The live loop and the mockup both go through here, so a change
 // to the composition cannot land in one and miss the other.
@@ -319,7 +325,7 @@ func drawScene(c *canvas.Canvas, sh *scape.Shore, cat *companion.Cat, lay layout
 		}
 		(&companion.Sprite{Rows: rows, Body: bubbleCol}).Draw(c.Near(), x, top-len(rows))
 	}
-	drawSand(c, st.Tail, sh.SandTop(), lay.SandFrom, lay.SandTo)
+	drawSand(c, st.Tail, sh.SandColor(), sh.SandTop(), lay.SandFrom, lay.SandTo)
 }
 
 func bubbleWidth(rows []string) int {
@@ -342,13 +348,22 @@ func bubbleWidth(rows []string) int {
 // The block hangs off the WATERLINE, not off the bottom of the canvas. Anchored
 // to the canvas it drifts upward as lines accumulate and ends up written across
 // open water, which is the opposite of what "written in the sand" means.
-func drawSand(c *canvas.Canvas, lines []reduce.Line, sandTop, xFrom, xTo int) {
+func drawSand(c *canvas.Canvas, lines []reduce.Line, sand term.RGB, sandTop, xFrom, xTo int) {
 	if len(lines) == 0 || xTo-xFrom < 12 {
 		return
 	}
-	sand := term.RGB{R: 76, G: 65, B: 54}
-	ink := term.RGB{R: 240, G: 230, B: 210}
+	// The ink is derived from the beach, not fixed.
+	//
+	// Writing in sand is only legible by contrast with the sand, and the beach
+	// changes colour all day. A pale ink is right at midnight and invisible at
+	// noon, when the sand is brighter than the ink is. So pick the direction
+	// from the beach -- light on a dark beach, dark on a bright one -- and let
+	// age close the gap without ever closing it completely.
 	bad := term.RGB{R: 244, G: 176, B: 96}
+	toward := term.RGB{R: 244, G: 236, B: 220}
+	if luma(sand) > 140 {
+		toward = term.RGB{R: 34, G: 26, B: 20}
+	}
 
 	// However many rows the beach actually has. A short pane -- a wide bottom
 	// split is the obvious case -- has almost no beach, and writing six lines
@@ -369,14 +384,15 @@ func drawSand(c *canvas.Canvas, lines []reduce.Line, sandTop, xFrom, xTo int) {
 		if row < 0 || row >= c.H {
 			continue
 		}
-		base := ink
+		base := toward
 		if ln.Bad {
 			base = bad
 		}
 		// Fade on the line's own age rather than on its position, so a line
 		// that has sat there two minutes looks it even when nothing newer has
-		// arrived to push it down.
-		col := term.Lerp(base, sand, 0.15+0.7*ln.Age)
+		// arrived to push it down. It stops at 0.72 rather than 1: the tide
+		// takes a line by TTL, not by fading it into unreadability first.
+		col := term.Lerp(base, sand, 0.10+0.62*ln.Age)
 		x := xFrom
 		for _, r := range []rune(companion.NarrowOnly(ln.Text)) {
 			if x >= xTo {

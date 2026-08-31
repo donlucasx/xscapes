@@ -70,6 +70,15 @@ func (s *Shore) SandTop() int {
 	return int(math.Ceil(sum/float64(len(s.lastEdge)))) + 1
 }
 
+// SandColor is the beach's colour this frame.
+//
+// The activity tail fades toward it as the tide takes each line, and that
+// target has to come from the palette rather than a constant: pinned to one
+// hour's sand it is exact at that hour and wrong at every other. It was pinned
+// to midnight, so by mid-evening the oldest line sat 2.7 luma from the beach
+// it was written on -- there, but unreadable.
+func (s *Shore) SandColor() term.RGB { return s.pal.SandNear }
+
 // MoonPos is the moon's centre cell from the last Update.
 func (s *Shore) MoonPos() (x, y int) { return s.moonX, s.moonY }
 
