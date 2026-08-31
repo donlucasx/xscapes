@@ -30,18 +30,21 @@ type WhiskerStyle int
 
 const (
 	NoWhiskers WhiskerStyle = iota
-	// WhiskerFlush sits ON the fur edge, cells 0 and 8, so it grows out of the
-	// face instead of hovering beside it.
-	WhiskerFlush
-	// WhiskerCheek is further in still, on solid fur at cells 1 and 7.
-	WhiskerCheek
-	// WhiskerLong runs from the fur edge out past it -- flush plus a second
-	// cell beyond.
-	WhiskerLong
-	// WhiskerFlushOne is a single stroke a side, on the fur edge.
-	WhiskerFlushOne
-	// WhiskerGap is the old placement, kept so the difference is visible.
-	WhiskerGap
+	// WhiskerMuzzle: four strokes, all on the muzzle rows, mixing a flush
+	// stroke with a longer one so they fan instead of stacking.
+	WhiskerMuzzle
+	// WhiskerMuzzleWide: the same idea with the long stroke on top.
+	WhiskerMuzzleWide
+	// WhiskerMuzzleTight: both rows flush, no reach.
+	WhiskerMuzzleTight
+	// WhiskerMuzzleLong: both rows reaching out.
+	WhiskerMuzzleLong
+	// WhiskerSingleRow: two strokes a side on the nose row alone, flush then
+	// long, so each side reads as one whisker leaving the face.
+	WhiskerSingleRow
+	// WhiskerEyeRow is the previous version, kept for comparison: one stroke
+	// up at the eyes, which is what Lucas objected to.
+	WhiskerEyeRow
 )
 
 // EarStyle is how the inside of the ear is treated. Every style below sits
@@ -100,12 +103,13 @@ var WhiskerStyles = []struct {
 	Name  string
 	Note  string
 }{
-	{NoWhiskers, "none", "the base cat"},
-	{WhiskerFlush, "flush", "on the fur edge, cells 0 and 8"},
-	{WhiskerCheek, "cheek", "further in, on solid fur"},
-	{WhiskerLong, "long", "from the edge, reaching out one more"},
-	{WhiskerFlushOne, "flush single", "one stroke a side, on the edge"},
-	{WhiskerGap, "gap (before)", "the old placement, for comparison"},
+	{WhiskerMuzzle, "muzzle", "flush on the nose row, long below"},
+	{WhiskerMuzzleWide, "muzzle wide", "long on the nose row, flush below"},
+	{WhiskerMuzzleTight, "muzzle tight", "both flush, no reach"},
+	{WhiskerMuzzleLong, "muzzle long", "both reaching past the fur"},
+	{WhiskerSingleRow, "single row", "two strokes, nose row only"},
+	{WhiskerEyeRow, "eye row (before)", "one stroke up at the eyes"},
+	{NoWhiskers, "none", "for comparison"},
 }
 
 var EarStyles = []struct {
@@ -213,42 +217,53 @@ func (c *Cat) drawFace(l *canvas.Layer, x, y int, f Face, st State) {
 		l.Plot(at(4), y+3, '▾', noseCol, 1)
 	}
 
-	// Whiskers. The question these variants answer is where a whisker STARTS:
-	// the earlier version began a cell past the head's bounding box, which put
-	// it two cells from solid fur because the edge cell is only half filled --
-	// so it read as a mark near the cat rather than a mark on it.
+	// Whiskers.
+	//
+	// All four land around the MUZZLE. The earlier version put one stroke a
+	// side up on the eye row, which reads as a brow or a squint rather than a
+	// whisker -- a cat's whiskers come out of the snout, and at this size the
+	// eye is only two rows above it, so the difference is the whole effect.
+	//
+	// The rows available are y+3, the chin row the nose sits on, and y+4 just
+	// under it. Cell 0 and 8 are the fur edge; -1 and 9 reach past it. Mixing a
+	// flush stroke with a longer one is what makes them fan rather than stack.
 	if f.Whiskers != NoWhiskers {
-		top, bot := y+2, y+3
+		hi, lo := y+3, y+4
 		if st == Worried {
-			top, bot = y+3, y+4 // drooping
+			hi, lo = y+4, y+5 // drooping
 		}
-		near, far := 1.0, 0.6
+		near, far := 1.0, 0.65
 		if st == Resting {
-			near, far = 0.75, 0.4
+			near, far = 0.8, 0.45
 		}
-		pair := func(a, b int, rows ...int) {
-			for i, r := range rows {
-				alpha := near
-				if i > 0 {
-					alpha = far
-				}
-				l.Plot(at(a), r, '─', light, alpha)
-				l.Plot(at(b), r, '─', light, alpha)
+		stroke := func(row int, cells []int, a float64) {
+			for _, cell := range cells {
+				l.Plot(at(cell), row, '─', light, a)
 			}
 		}
+		var (
+			flush = []int{0, 8}
+			long  = []int{-1, 9}
+		)
 		switch f.Whiskers {
-		case WhiskerFlush:
-			pair(0, 8, bot, top)
-		case WhiskerCheek:
-			pair(1, 7, bot, top)
-		case WhiskerLong:
-			pair(0, 8, bot, top)
-			l.Plot(at(-1), bot, '─', light, far)
-			l.Plot(at(9), bot, '─', light, far)
-		case WhiskerFlushOne:
-			pair(0, 8, bot)
-		case WhiskerGap:
-			pair(-1, 9, bot, top)
+		case WhiskerMuzzle:
+			stroke(hi, flush, near)
+			stroke(lo, long, far)
+		case WhiskerMuzzleWide:
+			stroke(hi, long, far)
+			stroke(lo, flush, near)
+		case WhiskerMuzzleTight:
+			stroke(hi, flush, near)
+			stroke(lo, flush, far)
+		case WhiskerMuzzleLong:
+			stroke(hi, long, near)
+			stroke(lo, long, far)
+		case WhiskerSingleRow:
+			stroke(hi, flush, near)
+			stroke(hi, long, far)
+		case WhiskerEyeRow:
+			stroke(y+3, flush, near)
+			stroke(y+2, flush, far)
 		}
 	}
 
