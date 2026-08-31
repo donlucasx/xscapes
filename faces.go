@@ -41,59 +41,50 @@ func facePage(seed int64) string {
 	b.WriteString(`<p class="nt">The head is four character rows: ears, forehead, eyes, chin. ` +
 		`The eyes already own their row, and the bitmap ORs its rows in pairs before quadranting, ` +
 		`so detail drawn INTO the bitmap on one row is erased by the row above it. Everything ` +
-		`below is therefore a character overlay, plotted after the body at cell precision.</p>`)
+		`below is a character overlay, plotted after the body at cell precision, in a colour ` +
+		`derived from the coat so a new coat needs no new colours.</p>`)
 
-	faces := []struct {
-		key  string
-		note string
-	}{
-		{"plain", "what ships today"},
-		{"nose", "one rose cell below the eyes"},
-		{"whiskers", "+ whiskers, in the empty cells beside the head"},
-		{"full", "+ inner ears and cheek tufts"},
+	notes := map[string]string{
+		"plain":   "what ships today",
+		"nose":    "+ a rose nose below the eyes",
+		"classic": "+ whiskers and inner ears",
+		"tabby":   "+ the tabby M and ear tufts",
+		"tuxedo":  "+ pale muzzle, chest bib, toe tips",
+		"full":    "everything at once",
 	}
 
-	b.WriteString(`<h2>Face detail &mdash; cream, truecolor</h2><div class="row">`)
-	for _, f := range faces {
-		fmt.Fprintf(&b, `<div class="col"><div class="lbl">%s &middot; %s</div><div class="win">%s</div></div>`,
-			f.key, f.note, portrait(companion.Faces[f.key], companion.Coats["cream"], companion.Working, term.ProfileTrueColor, 3.1))
+	for _, coat := range companion.CoatOrder {
+		fmt.Fprintf(&b, `<h2>%s</h2><div class="row">`, coat)
+		for _, k := range companion.FaceOrder {
+			fmt.Fprintf(&b, `<div class="col"><div class="lbl">%s &middot; %s</div><div class="win">%s</div></div>`,
+				k, notes[k],
+				portrait(companion.Faces[k], companion.Coats[coat], companion.Working, term.ProfileTrueColor, 3.1))
+		}
+		b.WriteString(`</div>`)
 	}
-	b.WriteString(`</div>`)
 
-	coats := []string{"cream", "terracotta", "ginger", "slate", "charcoal"}
-
-	b.WriteString(`<h2>Coats &mdash; full face, truecolor</h2>`)
-	b.WriteString(`<p class="nt">Terracotta is Claude's own colour, which is the reference. ` +
-		`The eyes stay bright in every coat on purpose: they carry the companion's state, and ` +
-		`state is the one thing that must read before anything else does.</p><div class="row">`)
-	for _, k := range coats {
-		fmt.Fprintf(&b, `<div class="col"><div class="lbl">%s</div><div class="win">%s</div></div>`,
-			k, portrait(companion.Faces["full"], companion.Coats[k], companion.Working, term.ProfileTrueColor, 3.1))
-	}
-	b.WriteString(`</div>`)
-
-	b.WriteString(`<h2>The same coats as Terminal.app will paint them</h2>`)
-	b.WriteString(`<p class="nt">256 colours, glyph chroma 2.6&times;. A solid coat has far more ` +
-		`chroma than cream does, so it survives quantisation where cream lands in the greys &mdash; ` +
-		`which is an argument for a coloured coat that has nothing to do with taste.</p><div class="row">`)
-	for _, k := range coats {
+	b.WriteString(`<h2>Terminal.app, 256 colours &mdash; the full face</h2>`)
+	b.WriteString(`<p class="nt">Markings derived from the coat move with it through quantisation, ` +
+		`so a coat that survives keeps its face.</p><div class="row">`)
+	for _, coat := range companion.CoatOrder {
 		fmt.Fprintf(&b, `<div class="col"><div class="lbl">%s &middot; 256</div><div class="win">%s</div></div>`,
-			k, portrait(companion.Faces["full"], companion.Coats[k], companion.Working, term.Profile256, 3.1))
+			coat, portrait(companion.Faces["full"], companion.Coats[coat], companion.Working, term.Profile256, 3.1))
 	}
 	b.WriteString(`</div>`)
 
-	b.WriteString(`<h2>Every state, in the two leading coats</h2>`)
-	b.WriteString(`<p class="nt">The whiskers droop when something is broken &mdash; expression ` +
-		`from geometry that is already on screen.</p>`)
-	for _, coat := range []string{"cream", "terracotta"} {
-		fmt.Fprintf(&b, `<div class="row">`)
+	b.WriteString(`<h2>Every state, in the three coats Lucas is leaning toward</h2>`)
+	b.WriteString(`<p class="nt">The whiskers droop and the eyes go amber when something is ` +
+		`broken; they splay and the eyes widen when the agent needs you.</p>`)
+	for _, coat := range []string{"cream", "slate", "charcoal"} {
+		b.WriteString(`<div class="row">`)
 		for _, st := range []struct {
 			s companion.State
 			n string
 		}{{companion.Resting, "resting"}, {companion.Working, "working"},
 			{companion.NeedsYou, "needs you"}, {companion.Worried, "something is broken"}} {
 			fmt.Fprintf(&b, `<div class="col"><div class="lbl">%s &middot; %s</div><div class="win">%s</div></div>`,
-				coat, st.n, portrait(companion.Faces["full"], companion.Coats[coat], st.s, term.ProfileTrueColor, 3.1))
+				coat, st.n,
+				portrait(companion.Faces["full"], companion.Coats[coat], st.s, term.ProfileTrueColor, 3.1))
 		}
 		b.WriteString(`</div>`)
 	}
