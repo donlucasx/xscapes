@@ -210,7 +210,10 @@ func (c *Cat) drawSwimmers(l *canvas.Layer, idx []int, px, py, w, seaTop int, t 
 	_, ph := c.Size()
 	top := seaTop + 1
 	bot := py + ph - 4
-	lanes := bot - top
+	// Lanes must be at least a swimmer tall. At one row apart, any two
+	// swimmers in neighbouring lanes shared a row, and if their columns
+	// crossed they interleaved into one broken shape.
+	lanes := (bot - top) / kh
 	if lanes < 1 {
 		return 0
 	}
@@ -256,19 +259,23 @@ func (c *Cat) drawSwimmers(l *canvas.Layer, idx []int, px, py, w, seaTop int, t 
 				slack = 0
 			}
 			x := x0 + k*slot + (slot-kw)/2 + int(float64(slack)*math.Sin(t*0.32+phase))
-			y := top + ln
-			// Ride the swell rather than bobbing on a private clock.
-			if math.Sin(t*0.9+float64(x)*0.16+phase) > 0.35 {
-				y--
-			}
+			y := top + ln*kh
 			if x < 1 || x+kw >= w || y < top || y+kh > bot {
 				continue
 			}
 
+			// The bob happens INSIDE the sprite box, not by moving it: two
+			// source rows is half a character cell, and the chin clipping off
+			// the bottom reads as the cat settling into the water. Moving the
+			// whole sprite up a row would put it in the lane above.
+			sink := 0
+			if math.Sin(t*0.9+float64(x)*0.16+phase) > 0.35 {
+				sink = 2
+			}
 			f := c.swim.Blank()
 			for sy := 0; sy < f.H; sy++ {
 				for sx := 0; sx < f.W; sx++ {
-					if c.swim.at(sx, sy) {
+					if c.swim.at(sx, sy-sink) {
 						f.Set(sx, sy)
 					}
 				}
