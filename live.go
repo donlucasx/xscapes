@@ -3,12 +3,10 @@ package main
 import (
 	"fmt"
 	"os"
-	"os/exec"
 	"os/signal"
-	"strconv"
-	"strings"
 	"syscall"
 	"time"
+	"unsafe"
 
 	"github.com/donlucasx/asciiscapes/internal/canvas"
 	"github.com/donlucasx/asciiscapes/internal/companion"
@@ -18,20 +16,56 @@ import (
 	"github.com/donlucasx/asciiscapes/internal/term"
 )
 
-// termSize asks stty rather than pulling in a dependency for one ioctl.
-// Falls back to the design target when it cannot tell.
+// termSize asks the kernel how big the window is, via the TIOCGWINSZ ioctl.
+//
+// It used to shell out to `stty size`, which is where this went wrong: stty
+// reads the size from its STDIN, and a child started by exec.Command inherits
+// /dev/null unless told otherwise, so it printed "stdin isn't a terminal" and
+// termSize silently returned the 80x24 fallback -- every time, on every
+// machine. The scene has therefore always been 80x24 no matter how big the
+// window was, which is one bug wearing three costumes: a scene that does not
+// fill the frame, a scene that garbles when the window is shrunk below 80
+// columns (the over-long lines wrap), and a scene that never repaints on a
+// resize (the "new" size always compared equal to the old one).
+//
+// The ioctl has no such problem, needs no subprocess, and costs microseconds
+// rather than milliseconds. Ask the controlling terminal directly rather than
+// any particular stream, so a redirected stdout does not blind us.
 func termSize() (w, h int) {
-	out, err := exec.Command("stty", "size").Output()
-	if err == nil {
-		if f := strings.Fields(string(out)); len(f) == 2 {
-			if r, err1 := strconv.Atoi(f[0]); err1 == nil {
-				if c, err2 := strconv.Atoi(f[1]); err2 == nil && r > 4 && c > 8 {
-					return c, r
-				}
-			}
+	for _, fd := range ttyFDs() {
+		if c, r, ok := winSize(fd); ok {
+			return c, r
 		}
 	}
 	return 80, 24
+}
+
+// ttyFDs lists the descriptors worth asking, most authoritative first. If all
+// three standard streams are redirected, /dev/tty still reaches the terminal
+// this process is attached to.
+func ttyFDs() []uintptr {
+	fds := []uintptr{os.Stdout.Fd(), os.Stderr.Fd(), os.Stdin.Fd()}
+	if f, err := os.OpenFile("/dev/tty", os.O_RDONLY, 0); err == nil {
+		defer f.Close()
+		fds = append(fds, f.Fd())
+	}
+	return fds
+}
+
+// winsize mirrors struct winsize from <sys/ioctl.h>: rows, cols, then the
+// pixel dimensions, which nothing reports reliably and we do not use.
+type winsize struct {
+	rows, cols, xpixel, ypixel uint16
+}
+
+func winSize(fd uintptr) (cols, rows int, ok bool) {
+	var ws winsize
+	_, _, errno := syscall.Syscall(syscall.SYS_IOCTL, fd,
+		uintptr(syscall.TIOCGWINSZ), uintptr(unsafe.Pointer(&ws)))
+	if errno != 0 || ws.cols < 8 || ws.rows < 4 {
+		return 0, 0, false
+	}
+	return int(ws.cols), int(ws.rows), true
 }
 
 // runLive paints the scape to this terminal until interrupted. This is the

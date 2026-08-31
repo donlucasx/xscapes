@@ -59,8 +59,10 @@ func main() {
 	flag.Parse()
 
 	if *info {
-		fmt.Printf("profile=%s  TERM=%q COLORTERM=%q TERM_PROGRAM=%q\n",
-			term.DetectProfile(), os.Getenv("TERM"), os.Getenv("COLORTERM"), os.Getenv("TERM_PROGRAM"))
+		tw, th := termSize()
+		fmt.Printf("profile=%s  size=%dx%d  TERM=%q COLORTERM=%q TERM_PROGRAM=%q\n",
+			term.DetectProfile(), tw, th,
+			os.Getenv("TERM"), os.Getenv("COLORTERM"), os.Getenv("TERM_PROGRAM"))
 		return
 	}
 
