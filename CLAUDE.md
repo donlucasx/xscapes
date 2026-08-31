@@ -1,6 +1,6 @@
 # asciiscapes — project brief for Claude Code
 
-> **Where we left off — 2026-08-31, commit `7b67126`.**
+> **Where we left off — 2026-08-31, last code change `6f6d5cd`, 51 commits.**
 > **It runs in a real terminal and Lucas has run it.** The event plumbing, the
 > Claude Code adapter and the installer all shipped; then he ran it and found
 > that the scene had never been the size of its window (`stty size` reads from

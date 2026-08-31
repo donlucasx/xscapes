@@ -10,7 +10,7 @@ the why; ignore ideas.md — it is parked. Tell me where we left off, then pick 
 from ▶ NEXT.
 ```
 
-## Where we left off (2026-08-31, commit `7b67126`, 49 commits, branch `main`)
+## Where we left off (2026-08-31, last code change `6f6d5cd`, 51 commits, branch `main`)
 
 **It runs in a real terminal now, and Lucas has run it.** Most of this session
 was his findings from doing that, plus a companion design study that is PAUSED
