@@ -52,10 +52,13 @@ session 6.
   to Claude's own mark. (Told this session: slate is the safe pick while
   Terminal.app is the daily driver; charcoal is a truecolor bet.)
 - **Settled**: the nose, the toe tips, and inner ears = **inner shadow**.
-- **Whiskers: he wants ANOTHER revision round** -- said only *"need to revise
-  this one"*, no specifics. He had possibly only seen the truncated study;
-  wait for his steer off the full one before building variants.
-- **Toes: tbd** -- the study already shows every variant with and without.
+- **Whiskers: REBUILT TO HIS SPEC, awaiting his pick of four variants**
+  (`4d513a0`). Spec verbatim: 4 total, 2 a side, connected to the head (not
+  the tail), levelled around the nose. Cause found and fixed: the unbounded
+  fur scan grabbed the TAIL (solid at nose height) and the torso. Variants
+  left: lower long / upper long / even / short; Sweep deleted. Study resent.
+- **Ear shadows and toes: he LOVES them** -- but whether all 3 details ship
+  together is a separate decision he wants AFTER the whisker lock.
 
 ## How to look at things
 
