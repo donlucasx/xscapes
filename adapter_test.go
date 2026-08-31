@@ -2,6 +2,7 @@ package main
 
 import (
 	"encoding/json"
+	"strings"
 	"os"
 	"testing"
 	"time"
@@ -216,4 +217,91 @@ func contains(hay, needle string) bool {
 		}
 	}
 	return false
+}
+
+// --- regressions from the 2026-08-31 review ---
+
+// The single most common way a secret appears literally in a shell line is the
+// leading assignment form. Taking token zero published it verbatim.
+func TestShellRedactionSurvivesLeadingAssignments(t *testing.T) {
+	cases := []struct{ cmd, want string }{
+		{"PGPASSWORD=hunter2 psql -h db -c 'select 1'", "psql"},
+		{"VERCEL_TOKEN=abc123 vercel deploy --prod", "vercel"},
+		{"sudo PGPASSWORD=hunter2 /usr/bin/psql -c x", "psql"},
+		{"env AWS_SECRET_ACCESS_KEY=wJalr aws s3 ls", "aws"},
+		{"GITHUB_TOKEN=ghp_x nohup gh pr list", "gh"},
+		{"API_KEY=sk-live-9911", "env"},
+		{"go test ./...", "go"},
+		{"/opt/homebrew/bin/rg --json pattern", "rg"},
+	}
+	for _, c := range cases {
+		got := program(c.cmd)
+		if got != c.want {
+			t.Errorf("program(%q) = %q, want %q", c.cmd, got, c.want)
+		}
+		// Whatever it returns must not carry any part of a secret.
+		for _, leak := range []string{"hunter2", "abc123", "wJalr", "ghp_", "sk-live"} {
+			if contains(got, leak) {
+				t.Errorf("program(%q) = %q leaks %q", c.cmd, got, leak)
+			}
+		}
+	}
+}
+
+// A URL's query string is where access tokens live.
+func TestWebTargetsDropCredentials(t *testing.T) {
+	cases := []struct{ raw, want string }{
+		{"https://api.example.com/v1/me?access_token=ghp_16C7e42F292c", "api.example.com/v1"},
+		{"https://user:hunter2@intranet.example.com/secret", "intranet.example.com/secret"},
+		{"https://example.com/a/b/c#frag", "example.com/a"},
+	}
+	for _, c := range cases {
+		if got := safeURL(c.raw); got != c.want {
+			t.Errorf("safeURL(%q) = %q, want %q", c.raw, got, c.want)
+		}
+	}
+	got := translate(payload(t, `{"hook_event_name":"PreToolUse","session_id":"s","tool_name":"WebFetch",
+		"tool_use_id":"t","tool_input":{"url":"https://api.example.com/v1/me?access_token=ghp_16C7e42F292c"}}`))
+	if len(got) != 1 {
+		t.Fatalf("got %+v", got)
+	}
+	if line := string(event.Encode(got[0])); contains(line, "ghp_") || contains(line, "access_token") {
+		t.Errorf("the encoded event leaked the token: %s", line)
+	}
+}
+
+// A PostToolUse carrying a huge tool_response used to be discarded whole --
+// taking tool_use_id with it, so the matching tool_start never closed and the
+// sea stayed up forever.
+func TestOversizePayloadStillClosesItsTool(t *testing.T) {
+	huge := strings.Repeat("x", (1<<20)+4096)
+	raw := `{"hook_event_name":"PostToolUse","session_id":"sess-9","tool_name":"Bash",` +
+		`"tool_use_id":"tu-42","duration_ms":8123,"tool_response":"` + huge + `"}`
+
+	var p hookPayload
+	if json.Unmarshal([]byte(raw[:1<<20]), &p) == nil {
+		t.Fatal("expected the truncated payload not to parse")
+	}
+	salvage([]byte(raw[:1<<20]), &p)
+
+	if p.Event != "PostToolUse" || p.ToolUseID != "tu-42" {
+		t.Fatalf("salvage lost the identity: %+v", p)
+	}
+	if p.Session != "sess-9" || p.DurationM != 8123 {
+		t.Errorf("salvage lost fields: session=%q ms=%d", p.Session, p.DurationM)
+	}
+	got := translate(p)
+	if len(got) != 1 || got[0].Kind != event.ToolEnd || got[0].ID != "tu-42" {
+		t.Errorf("an oversize PostToolUse must still close its tool, got %+v", got)
+	}
+}
+
+// Auto-compaction re-announces the session; the source has to reach the reducer.
+func TestSessionStartCarriesItsSource(t *testing.T) {
+	for _, src := range []string{"startup", "compact", "resume", "fork", "clear"} {
+		got := translate(payload(t, `{"hook_event_name":"SessionStart","session_id":"s","source":"`+src+`"}`))
+		if len(got) != 1 || got[0].Text != src {
+			t.Errorf("source %q did not reach the event: %+v", src, got)
+		}
+	}
 }

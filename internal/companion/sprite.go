@@ -42,7 +42,9 @@ type Sprite struct {
 // Bubble builds a speech balloon. All three rows are the same width so the box
 // cannot shear; the tail sits under the left shoulder, pointing at the creature.
 func Bubble(text string) []string {
-	inner := " " + text + " "
+	// The box is sized in runes, so a wide rune would make the drawn box
+	// narrower than the border it is measured against.
+	inner := " " + NarrowOnly(text) + " "
 	n := len([]rune(inner))
 	if n < 4 {
 		inner += strings.Repeat(" ", 4-n)

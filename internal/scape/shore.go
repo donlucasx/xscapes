@@ -18,6 +18,12 @@ type Shore struct {
 
 	pal Palette // this frame's colours, from the time of day
 
+	// MoonX is where the moon sits, as a fraction of the width. It moves with
+	// the composition: the moon and the companion are the two things a glance
+	// goes looking for, and stacking them in one column leaves half the frame
+	// carrying nothing. Zero means the default.
+	MoonX float64
+
 	// lastEdge is the waterline Update most recently computed. Kept for the
 	// same reason as moonX/moonY: it is the scene's real geometry, and a
 	// caller (or a test) that recomputed it would drift out of sync with
@@ -38,6 +44,31 @@ type Shore struct {
 	lastT float64
 }
 
+// SandTop is the first row that is dry sand in every column.
+//
+// The activity tail has to hang off this rather than off the bottom of the
+// canvas: anchored to the canvas it drifts upward as lines accumulate and ends
+// up written across the water, which is both wrong and the exact opposite of
+// what "written in the sand" means. The waterline moves with activity, so this
+// moves too -- a busy sea reaches further up the beach and leaves less room to
+// write, which is the right behaviour and not a bug.
+func (s *Shore) SandTop() int {
+	if len(s.lastEdge) == 0 {
+		return 0
+	}
+	// The MEAN waterline, not the deepest. Taking the deepest means one wave
+	// crest in one column pushes the whole block of text down the beach, and
+	// at 80x24 with a busy sea that leaves zero rows to write in -- measured.
+	// The mean is the brown band you actually see, and a crest washing over
+	// the end of the oldest line is not a defect: it is the tide taking it,
+	// which is what the brief asks the sand to show.
+	var sum float64
+	for _, v := range s.lastEdge {
+		sum += v
+	}
+	return int(math.Ceil(sum/float64(len(s.lastEdge)))) + 1
+}
+
 // MoonPos is the moon's centre cell from the last Update.
 func (s *Shore) MoonPos() (x, y int) { return s.moonX, s.moonY }
 
@@ -52,7 +83,16 @@ func (s *Shore) Update(c *canvas.Canvas, t float64, act Activity) {
 		return
 	}
 	hy := int(float64(c.H) * 0.42) // horizon
-	sy := int(float64(c.H) * 0.80) // mean waterline
+	// Mean waterline. Eight tenths down is right in a tall window and
+	// collapses the beach in a short one -- at fourteen rows it left a single
+	// row of sand, so three of the four lines of writing had nowhere to go.
+	// Keep it proportional, but never let fewer than five rows of beach
+	// survive. At 24 rows and above this computes exactly the number it always
+	// did; it only bites on a short pane.
+	sy := c.H - 5
+	if p := c.H / 5; p > 5 {
+		sy = c.H - p
+	}
 	if sy <= hy+1 {
 		sy = hy + 2
 	}
@@ -176,7 +216,11 @@ func clamp01(v float64) float64 {
 // The unlit face is still painted, faintly, so the moon never disappears --
 // a missing moon reads as a bug, a dark moon reads as a warning.
 func (s *Shore) moon(c *canvas.Canvas, hy int, scale, lit, vis float64) {
-	mx := int(float64(c.W) * 0.72)
+	frac := s.MoonX
+	if frac <= 0 {
+		frac = 0.72
+	}
+	mx := int(float64(c.W) * frac)
 	// Altitude carries context too, alongside phase. Shape alone is hard to
 	// judge on a five-cell disc; height above the horizon is easy, because the
 	// horizon is a reference line right there. Two cues for one variable is

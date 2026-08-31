@@ -98,7 +98,6 @@ func (c *Cat) DrawKittens(near, mid *canvas.Layer, px, py, n, w, seaTop int, t f
 		return 0
 	}
 	pw, ph := c.Size()
-	x := px + pw + 1
 	drawn := 0
 
 	// Split first: the beach tier is chosen by how many are actually ON it.
@@ -116,10 +115,22 @@ func (c *Cat) DrawKittens(near, mid *canvas.Layer, px, py, n, w, seaTop int, t f
 
 	drawn += c.drawSwimmers(near, swimmers, px, py, w, seaTop, t, seed)
 
+	// Sitters walk AWAY from the parent: rightward when the companion is on
+	// the left, leftward when it is on the right. Either way the litter grows
+	// into the open beach rather than into the frame edge.
+	x := px + pw + 1
+	if c.mirror {
+		x = px - 1
+	}
 	for _, i := range sitters {
 		bm := c.kitBitmap(ti)
 		kw, kh := bm.W/2, bm.H/4
-		if x+kw > w {
+		if c.mirror {
+			x -= kw
+			if x < 0 {
+				break
+			}
+		} else if x+kw > w {
 			break
 		}
 
@@ -168,7 +179,11 @@ func (c *Cat) DrawKittens(near, mid *canvas.Layer, px, py, n, w, seaTop int, t f
 		layer.Plot(e1, ky+1, glyph, kittenEye, spec.alpha)
 		layer.Plot(e2, ky+1, glyph, kittenEye, spec.alpha)
 
-		x += kw + 1
+		if c.mirror {
+			x -= 1 // the width was already taken off before drawing
+		} else {
+			x += kw + 1
+		}
 		drawn++
 	}
 	return drawn
@@ -233,6 +248,11 @@ func (c *Cat) drawSwimmers(l *canvas.Layer, idx []int, px, py, w, seaTop int, t 
 	pw, _ := c.Size()
 	x0 := px + pw + 1
 	span := w - x0 - 1
+	if c.mirror {
+		// Open water is everything to the LEFT of the companion.
+		x0 = 1
+		span = px - 2
+	}
 	if span < kw+2 {
 		return 0
 	}

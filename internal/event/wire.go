@@ -53,9 +53,16 @@ func Encode(e Event) []byte {
 			return b
 		}
 	}
-	// Nothing variable left; keep the skeleton so the event still counts.
-	b, _ = json.Marshal(Event{V: e.V, TS: e.TS, Session: e.Session, Kind: e.Kind,
-		Op: e.Op, ID: e.ID, Src: e.Src})
+	// Nothing variable left. The identity fields are short by construction but
+	// nothing enforces it -- an adapter is free to send a kilobyte of session
+	// id -- and a skeleton over MaxLine cannot be sent at all, so bound them.
+	b, _ = json.Marshal(Event{
+		V: e.V, TS: e.TS, Session: trunc(e.Session, 64), Kind: Kind(trunc(string(e.Kind), 32)),
+		Op: Op(trunc(string(e.Op), 32)), ID: trunc(e.ID, 64), Src: trunc(e.Src, 32),
+	})
+	if len(b) > MaxLine {
+		b, _ = json.Marshal(Event{V: 1, Kind: e.Kind})
+	}
 	return b
 }
 
@@ -92,7 +99,12 @@ func clean(s string) string {
 	if s == "" {
 		return s
 	}
-	if !strings.ContainsFunc(s, badRune) && !strings.Contains(s, "  ") {
+	// The guard has to cover everything the slow path would change, or the
+	// fast path becomes a hole: newline, carriage return and tab are exactly
+	// the characters that break a frame, and they were being waved through.
+	if !strings.ContainsFunc(s, func(r rune) bool {
+		return badRune(r) || r == '\n' || r == '\r' || r == '\t'
+	}) && !strings.Contains(s, "  ") {
 		return s
 	}
 	var b strings.Builder

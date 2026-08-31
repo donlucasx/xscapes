@@ -18,6 +18,36 @@ import (
 // reading their own settings.json should be able to see who put it there.
 const marker = "# asciiscapes:v1"
 
+// ours reports whether a matcher-group is an entry this program wrote.
+//
+// NOT a substring search over the raw JSON, which is what this used to be and
+// which had a hole big enough to lose the user's own hooks through: any entry
+// that merely MENTIONED the marker -- a guard that greps for it, say -- was
+// classified as ours, deleted by uninstall, and waved through by the safety
+// check, because the check was written in terms of the same predicate it was
+// meant to police. Decode instead, and require the shape we actually emit: one
+// command hook, no matcher, and the marker at the END of the command line.
+func ours(raw json.RawMessage) (cmd string, yes bool) {
+	var g struct {
+		Matcher string `json:"matcher"`
+		Hooks   []struct {
+			Type    string `json:"type"`
+			Command string `json:"command"`
+		} `json:"hooks"`
+	}
+	if json.Unmarshal(raw, &g) != nil {
+		return "", false
+	}
+	if g.Matcher != "" || len(g.Hooks) != 1 || g.Hooks[0].Type != "command" {
+		return "", false
+	}
+	c := strings.TrimSpace(g.Hooks[0].Command)
+	if !strings.HasSuffix(c, marker) {
+		return "", false
+	}
+	return g.Hooks[0].Command, true
+}
+
 // hookEvents are the Claude Code events we register, each mapped to the
 // protocol. The list is short on purpose: every entry is one more process
 // exec per turn, and an event we do not use is pure cost.
@@ -239,12 +269,22 @@ func addHooks(src []byte, bin string) ([]byte, []string, error) {
 	out := append([]byte(nil), src...)
 
 	for _, ev := range hookEvents {
-		has, err := hasOurEntry(out, ev)
+		cur, span, err := ourEntry(out, ev)
 		if err != nil {
 			return nil, nil, err
 		}
-		if has {
-			actions = append(actions, "skip    "+ev+"  (already installed)")
+		if span != nil {
+			want := command(bin, ev)
+			if cur == want {
+				actions = append(actions, "skip    "+ev+"  (already installed)")
+				continue
+			}
+			// The recorded path is stale -- a moved binary, a dev build, a
+			// reinstall from a different directory. Every hook is quietly
+			// firing `|| true` on a path that no longer exists, and the old
+			// code called that "already installed".
+			out = splice(cutSpan(out, *span), span.start, entry(bin, ev, "      "))
+			actions = append(actions, "update  "+ev+"  (re-pointed at "+bin+")")
 			continue
 		}
 		next, where, err := insertEntry(out, ev, bin)
@@ -409,6 +449,36 @@ func splice(src []byte, at int, ins string) []byte {
 	return append(out, src[at:]...)
 }
 
+// ourEntry finds this event's asciiscapes entry, if any, returning the command
+// it currently records and the byte span of the whole matcher-group.
+func ourEntry(src []byte, ev string) (string, *span, error) {
+	hooksSpan, err := valueSpan(src, nil, "hooks")
+	if err != nil || hooksSpan == nil {
+		return "", nil, err
+	}
+	evSpan, err := valueSpan(src, hooksSpan, ev)
+	if err != nil || evSpan == nil {
+		return "", nil, err
+	}
+	elems, err := elementSpans(src, *evSpan)
+	if err != nil {
+		return "", nil, err
+	}
+	for _, e := range elems {
+		if cmd, yes := ours(json.RawMessage(src[e.start:e.end])); yes {
+			sp := e
+			return cmd, &sp, nil
+		}
+	}
+	return "", nil, nil
+}
+
+func cutSpan(src []byte, sp span) []byte {
+	out := make([]byte, 0, len(src))
+	out = append(out, src[:sp.start]...)
+	return append(out, src[sp.end:]...)
+}
+
 // hasOurEntry reports whether an asciiscapes entry is already registered for
 // this event, so a second install is a no-op instead of a duplicate.
 func hasOurEntry(src []byte, ev string) (bool, error) {
@@ -420,7 +490,16 @@ func hasOurEntry(src []byte, ev string) (bool, error) {
 	if err != nil || evSpan == nil {
 		return false, err
 	}
-	return bytes.Contains(src[evSpan.start:evSpan.end], []byte(marker)), nil
+	elems, err := elementSpans(src, *evSpan)
+	if err != nil {
+		return false, err
+	}
+	for _, e := range elems {
+		if _, yes := ours(json.RawMessage(src[e.start:e.end])); yes {
+			return true, nil
+		}
+	}
+	return false, nil
 }
 
 // removeHooks strips our entries by splicing them out.
@@ -464,7 +543,7 @@ func removeHooks(src []byte) ([]byte, int, error) {
 		}
 		mine := 0
 		for _, e := range elems {
-			if bytes.Contains(src[e.start:e.end], []byte(marker)) {
+			if _, yes := ours(json.RawMessage(src[e.start:e.end])); yes {
 				mine++
 			}
 		}
@@ -481,7 +560,7 @@ func removeHooks(src []byte) ([]byte, int, error) {
 			continue
 		}
 		for _, e := range elems {
-			if bytes.Contains(src[e.start:e.end], []byte(marker)) {
+			if _, yes := ours(json.RawMessage(src[e.start:e.end])); yes {
 				s, e2 := withComma(src, e.start, e.end)
 				dels = append(dels, del{s, e2})
 			}
@@ -499,9 +578,23 @@ func removeHooks(src []byte) ([]byte, int, error) {
 		dels = []del{{s, e}}
 	}
 
-	sort.Slice(dels, func(i, j int) bool { return dels[i].start > dels[j].start })
-	out := append([]byte(nil), src...)
+	// Merge before splicing. Two adjacent entries can both claim the comma
+	// between them, and applying the spans separately then deletes one byte
+	// past their union -- which lands on a brace and produces invalid JSON.
+	sort.Slice(dels, func(i, j int) bool { return dels[i].start < dels[j].start })
+	merged := dels[:0]
 	for _, d := range dels {
+		if n := len(merged); n > 0 && d.start <= merged[n-1].end {
+			if d.end > merged[n-1].end {
+				merged[n-1].end = d.end
+			}
+			continue
+		}
+		merged = append(merged, d)
+	}
+	out := append([]byte(nil), src...)
+	for i := len(merged) - 1; i >= 0; i-- {
+		d := merged[i]
 		if d.start < 0 || d.end > len(out) || d.start >= d.end {
 			continue
 		}
@@ -638,6 +731,20 @@ func writeSettings(path string, orig, out []byte) error {
 		return err
 	}
 
+	// Follow a symlink to its target before writing. ~/.claude/settings.json
+	// is commonly a link into a dotfiles repo; renaming onto the link replaces
+	// it with a regular file, so the tracked copy and the live one silently
+	// diverge and the next `stow -R` reverts the install.
+	if resolved, err := filepath.EvalSymlinks(path); err == nil {
+		path = resolved
+	}
+	// Keep whatever mode the file already had, rather than tightening it to
+	// 0600 as a side effect of writing through a temp file.
+	mode := os.FileMode(0o600)
+	if st, err := os.Stat(path); err == nil {
+		mode = st.Mode().Perm()
+	}
+
 	home, err := os.UserHomeDir()
 	if err != nil {
 		return err
@@ -661,7 +768,7 @@ func writeSettings(path string, orig, out []byte) error {
 		return err
 	}
 	defer os.Remove(tmp.Name())
-	if err := tmp.Chmod(0o600); err != nil {
+	if err := tmp.Chmod(mode); err != nil {
 		return err
 	}
 	if _, err := tmp.Write(out); err != nil {
@@ -738,7 +845,7 @@ func verifyPreserved(orig, out []byte) error {
 		now := bh[ev]
 		i := 0
 		for _, w := range was {
-			if bytes.Contains(w, []byte(marker)) {
+			if _, yes := ours(w); yes {
 				continue // ours; may legitimately disappear
 			}
 			found := false
@@ -757,7 +864,7 @@ func verifyPreserved(orig, out []byte) error {
 	// And nothing arrived that is not ours.
 	for ev, now := range bh {
 		for _, e := range now {
-			if bytes.Contains(e, []byte(marker)) {
+			if _, yes := ours(e); yes {
 				continue
 			}
 			if !containsEqual(ah[ev], e) {

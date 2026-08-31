@@ -52,6 +52,10 @@ type Cat struct {
 	kitCache map[int]*Bitmap
 	kitTier  int // last chosen litter size, for hysteresis
 	swim     *Bitmap
+
+	// mirror flips the companion and reverses the litter's layout, for a
+	// composition anchored to the right edge instead of the left.
+	mirror bool
 }
 
 func NewCat() *Cat {
@@ -60,6 +64,16 @@ func NewCat() *Cat {
 
 // Size is the character footprint, not the pixel size.
 func (c *Cat) Size() (w, h int) { return c.body.W / 2, c.body.H / 4 }
+
+// FaceLeft mirrors the whole companion.
+//
+// The sprite is not symmetric: the body sits in the left nine of its twelve
+// columns and the right three are clearance for the tail, which sweeps up from
+// the right hip. Placed against the right edge of the frame the tail is pinned
+// to the wall, so a companion on the right has to be flipped -- then the tail
+// sweeps INTO the scene, which is also the direction the eye is travelling
+// after reading the sand.
+func (c *Cat) FaceLeft(v bool) { c.mirror = v }
 
 // Draw composes this frame and plots it. Everything that moves is computed
 // here; nothing is stored between frames.
@@ -96,6 +110,9 @@ func (c *Cat) Draw(l *canvas.Layer, x, y int, t float64, st State) {
 		}
 	}
 	c.tail(f, wag, lift, tailLen)
+	if c.mirror {
+		f = f.Mirrored()
+	}
 
 	(&Sprite{Rows: f.ToQuadrant(), Body: furCol}).Draw(l, x, y)
 	c.eyes(l, x, y, t, st)
@@ -131,8 +148,15 @@ func (c *Cat) eyes(l *canvas.Layer, x, y int, t float64, st State) {
 	if st != Resting && st != Worried && math.Mod(t, 5.3) < 0.16 {
 		glyph = '-' // blink
 	}
-	l.Plot(x+2, y+2, glyph, col, 1)
-	l.Plot(x+6, y+2, glyph, col, 1)
+	// The eyes are plotted as characters on top of the quadrant body, so they
+	// have to be mirrored by hand: the flip happens to the bitmap, not here.
+	a, b := 2, 6
+	if c.mirror {
+		w, _ := c.Size()
+		a, b = w-1-a, w-1-b
+	}
+	l.Plot(x+a, y+2, glyph, col, 1)
+	l.Plot(x+b, y+2, glyph, col, 1)
 }
 
 // walkBody is loaded lazily so NewCat stays cheap for scapes that never walk.
