@@ -46,11 +46,13 @@ var (
 // Cat is the companion. The body is a bitmap; the tail is a curve evaluated per
 // frame, which is why wagging costs no extra authoring.
 type Cat struct {
-	body    *Bitmap
-	walk    *Bitmap
-	worried *Bitmap
-	kittens []*Bitmap
-	kitFar  *Bitmap
+	body     *Bitmap
+	walk     *Bitmap
+	worried  *Bitmap
+	kittens  []*Bitmap
+	kitFar   *Bitmap
+	kitSmall []*Bitmap
+	kitTiny  []*Bitmap
 }
 
 func NewCat() *Cat {
@@ -344,4 +346,92 @@ func (c *Cat) kittenTail(b *Bitmap, wag float64, lift int) {
 		y := 13 - int(5*f+0.5) + lift
 		b.Set(x, y)
 	}
+}
+
+// KittenScale trades legibility for how many fit. Large keeps two poses and a
+// tail; the smaller ones drop both, because at five cells wide a pose change is
+// invisible and a tail is noise.
+type KittenScale int
+
+const (
+	KitLarge KittenScale = iota
+	KitSmall
+	KitTiny
+)
+
+func (c *Cat) scaleBitmaps(k KittenScale) []*Bitmap {
+	switch k {
+	case KitSmall:
+		if c.kitSmall == nil {
+			c.kitSmall = []*Bitmap{ParseBitmap(KittenSmall)}
+		}
+		return c.kitSmall
+	case KitTiny:
+		if c.kitTiny == nil {
+			c.kitTiny = []*Bitmap{ParseBitmap(KittenTiny)}
+		}
+		return c.kitTiny
+	}
+	return c.kittenPoses()
+}
+
+// DrawKittensAt draws n kittens at a chosen scale, all in one row, and returns
+// how many actually fit inside w columns. Everything past that is dropped
+// rather than drawn off the edge.
+func (c *Cat) DrawKittensAt(l *canvas.Layer, px, py, n, w int, t float64, seed int64, k KittenScale) int {
+	if n <= 0 {
+		return 0
+	}
+	poses := c.scaleBitmaps(k)
+	pw, ph := c.Size()
+	kb := poses[0]
+	kw, kh := kb.W/2, kb.H/4
+
+	x0 := px + pw + 1
+	drawn := 0
+	for i := 0; i < n; i++ {
+		kx := x0 + i*(kw+1)
+		if kx+kw > w {
+			break
+		}
+		pick := poses[int(HashF(i, 1, seed)*float64(len(poses)))%len(poses)]
+		mirror := HashF(i, 2, seed) > 0.5
+		ph2 := HashF(i, 3, seed) * 6.283
+
+		f := pick.Blank()
+		lift := 0
+		if math.Sin(t*2.6+ph2) > 0 {
+			lift = 2
+		}
+		for sy := 0; sy < f.H; sy++ {
+			for sx := 0; sx < f.W; sx++ {
+				if pick.at(sx, sy-lift) {
+					f.Set(sx, sy)
+				}
+			}
+		}
+		if k == KitLarge {
+			c.kittenTail(f, math.Sin(t*1.9+ph2), lift)
+		}
+		if mirror {
+			f = f.Mirrored()
+		}
+
+		ky := py + ph - kh
+		if HashF(i, 4, seed) > 0.55 {
+			ky--
+		}
+		(&Sprite{Rows: f.ToQuadrant(), Body: furCol}).Draw(l, kx, ky)
+
+		// Sockets are at rows 4-5 at every scale, so the eye cell row is the
+		// same; only the horizontal spacing changes with width.
+		e1, e2 := kx+1, kx+kw-2
+		if kw <= 4 {
+			e1, e2 = kx+1, kx+2
+		}
+		l.Plot(e1, ky+1, 'o', kittenEye, 1)
+		l.Plot(e2, ky+1, 'o', kittenEye, 1)
+		drawn++
+	}
+	return drawn
 }

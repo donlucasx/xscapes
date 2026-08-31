@@ -70,7 +70,8 @@ var CatBody = []string{
 // Bitmaps is what the uniform-width test walks.
 var Bitmaps = map[string][]string{"cat": PixelCat, "catBody": CatBody,
 	"catWalk": CatWalk, "catWorried": CatWorried,
-	"kittenSit": KittenSit, "kittenCurl": KittenCurl, "kittenFar": KittenFar}
+	"kittenSit": KittenSit, "kittenCurl": KittenCurl, "kittenFar": KittenFar,
+	"kittenSmall": KittenSmall, "kittenTiny": KittenTiny}
 
 // CatWalk is the side view: torso and head only, facing right. Legs and tail
 // are drawn per frame, so the gait needs no art. Mirror the composed frame
@@ -205,8 +206,44 @@ var KittenFar = []string{
 // Getting this wrong puts the eyes outside the head, which is exactly what
 // happened to the kittens on 2026-08-30.
 var eyeRows = map[string][2]int{
-	"catBody":    {8, 9},
-	"catWorried": {8, 9},
-	"kittenSit":  {4, 5},
-	"kittenCurl": {4, 5},
+	"catBody":     {8, 9},
+	"catWorried":  {8, 9},
+	"kittenSit":   {4, 5},
+	"kittenCurl":  {4, 5},
+	"kittenSmall": {4, 5},
+	"kittenTiny":  {4, 5},
+}
+
+// KittenSmall and KittenTiny are the same animal compressed further, both
+// keeping ears, eye sockets and legs -- the three things that make it read as
+// a cat rather than a lump. Sockets stay at rows 4-5 in every size so the
+// breathing lift never pushes them out of their cell.
+var KittenSmall = []string{
+	".##....##.",
+	".##....##.",
+	".########.",
+	".########.",
+	".##.##.##.",
+	".##.##.##.",
+	".########.",
+	".########.",
+	".########.",
+	".########.",
+	".########.",
+	".#.#..#.#.",
+}
+
+var KittenTiny = []string{
+	".#....#.",
+	".#....#.",
+	".######.",
+	".######.",
+	".#.##.#.",
+	".#.##.#.",
+	".######.",
+	".######.",
+	".######.",
+	".######.",
+	".######.",
+	".#.##.#.",
 }
