@@ -39,85 +39,96 @@ func facePage(seed int64) string {
 	h2{font:600 13px ui-monospace,monospace;color:#d8d8e0;margin:32px 0 4px}
 	h2+p{margin-top:4px}
 	</style>`)
-	b.WriteString(`<h1>asciiscapes &mdash; the companion, one mark at a time</h1>`)
-	b.WriteString(`<p class="nt">Every feature is a character overlay drawn after the body, in a ` +
-		`colour derived from the coat. The head is four rows and the eyes own one of them, so ` +
-		`there is room for very little &mdash; which is the argument for adding almost nothing.</p>`)
+	b.WriteString(`<h1>asciiscapes &mdash; whiskers and ears, other ways round</h1>`)
+	b.WriteString(`<p class="nt">Every cat below has the nose and the toe tips, which are settled. ` +
+		`What changes is the whiskers and the inside of the ear &mdash; and these are different ` +
+		`ideas rather than different amounts, because at nine cells wide the question is not how ` +
+		`many strokes to draw but whether a whisker is a line, a pair of tips, or a shadow in the fur.</p>`)
 
 	cell := func(label, note, body string) {
 		fmt.Fprintf(&b, `<div class="col"><div class="lbl"><b>%s</b>%s</div><div class="win">%s</div></div>`,
 			label, note, body)
 	}
-
-	// Each feature alone, so it can be judged without anything else competing.
-	b.WriteString(`<h2>One feature at a time &mdash; cream</h2>`)
-	b.WriteString(`<p class="nt">The plain cat first, then each mark on its own.</p><div class="row">`)
-	for _, s := range companion.Singles {
-		cell(s.Key, " &middot; "+s.Note,
-			portrait(s.Face, companion.Coats["cream"], companion.Working, term.ProfileTrueColor, 3.1))
-	}
-	b.WriteString(`</div>`)
-
-	b.WriteString(`<h2>The same, on charcoal &mdash; where pale marks actually show</h2>`)
-	b.WriteString(`<div class="row">`)
-	for _, s := range companion.Singles {
-		cell(s.Key, "",
-			portrait(s.Face, companion.Coats["charcoal"], companion.Working, term.ProfileTrueColor, 3.1))
-	}
-	b.WriteString(`</div>`)
-
-	notes := map[string]string{
-		"plain":   "ships today",
-		"nose":    "last session's pick",
-		"hint":    "nose + chin",
-		"soft":    "+ muzzle",
-		"cat":     "nose + whiskers + muzzle",
-		"mitten":  "muzzle, bib, toes, tail tip",
-		"classic": "most of it",
-		"full":    "everything",
+	shot := func(f companion.Face, coat string, st companion.State, p term.Profile) string {
+		return portrait(f, companion.Coats[coat], st, p, 3.1)
 	}
 
-	b.WriteString(`<h2>Combinations, quietest first</h2><div class="row">`)
-	for _, k := range companion.FaceOrder {
-		cell(k, " &middot; "+notes[k],
-			portrait(companion.Faces[k], companion.Coats["cream"], companion.Working, term.ProfileTrueColor, 3.1))
-	}
-	b.WriteString(`</div>`)
-
-	b.WriteString(`<h2>Coats &mdash; the three you liked, and six more</h2>`)
-	b.WriteString(`<p class="nt">Shown on "cat": nose, whiskers, muzzle.</p><div class="row">`)
-	for _, coat := range companion.CoatOrder {
-		cell(coat, "", portrait(companion.Faces["cat"], companion.Coats[coat], companion.Working, term.ProfileTrueColor, 3.1))
-	}
-	b.WriteString(`</div>`)
-
-	b.WriteString(`<h2>The same coats, plain &mdash; so the colour is the only variable</h2><div class="row">`)
-	for _, coat := range companion.CoatOrder {
-		cell(coat, "", portrait(companion.Faces["plain"], companion.Coats[coat], companion.Working, term.ProfileTrueColor, 3.1))
-	}
-	b.WriteString(`</div>`)
-
-	b.WriteString(`<h2>As Terminal.app paints them &mdash; 256 colours</h2><div class="row">`)
-	for _, coat := range companion.CoatOrder {
-		cell(coat, " &middot; 256", portrait(companion.Faces["cat"], companion.Coats[coat], companion.Working, term.Profile256, 3.1))
-	}
-	b.WriteString(`</div>`)
-
-	b.WriteString(`<h2>Every state</h2>`)
-	b.WriteString(`<p class="nt">Whiskers droop when something is broken and splay when the agent ` +
-		`needs you; the eyes carry the state itself.</p>`)
-	for _, coat := range []string{"cream", "slate", "charcoal"} {
-		b.WriteString(`<div class="row">`)
-		for _, st := range []struct {
-			s companion.State
-			n string
-		}{{companion.Resting, "resting"}, {companion.Working, "working"},
-			{companion.NeedsYou, "needs you"}, {companion.Worried, "broken"}} {
-			cell(coat+" · "+st.n, "",
-				portrait(companion.Faces["cat"], companion.Coats[coat], st.s, term.ProfileTrueColor, 3.1))
+	// Whiskers alone, on a dark coat where a pale mark reads, then on cream.
+	for _, coat := range []string{"charcoal", "cream"} {
+		fmt.Fprintf(&b, `<h2>Whiskers &mdash; %s</h2><div class="row">`, coat)
+		for _, w := range companion.WhiskerStyles {
+			f := companion.Base
+			f.Whiskers = w.Style
+			cell(w.Name, " &middot; "+w.Note, shot(f, coat, companion.Working, term.ProfileTrueColor))
 		}
 		b.WriteString(`</div>`)
 	}
+
+	for _, coat := range []string{"charcoal", "cream"} {
+		fmt.Fprintf(&b, `<h2>Inner ears &mdash; %s</h2><div class="row">`, coat)
+		for _, e := range companion.EarStyles {
+			f := companion.Base
+			f.Ears = e.Style
+			cell(e.Name, " &middot; "+e.Note, shot(f, coat, companion.Working, term.ProfileTrueColor))
+		}
+		b.WriteString(`</div>`)
+	}
+
+	// The two together, so the pairing can be judged rather than each half.
+	b.WriteString(`<h2>Paired &mdash; slate</h2>`)
+	b.WriteString(`<p class="nt">Each whisker style with the ear treatment that suits it.</p><div class="row">`)
+	for _, pr := range []struct {
+		w companion.WhiskerStyle
+		e companion.EarStyle
+		n string
+	}{
+		{companion.NoWhiskers, companion.EarDot, "none + dot"},
+		{companion.WhiskerDots, companion.EarDot, "tips + dot"},
+		{companion.WhiskerTicks, companion.EarRim, "ticks + rim"},
+		{companion.WhiskerCarved, companion.EarDark, "carved + shadow"},
+		{companion.WhiskerFan, companion.EarTuft, "fan + tuft"},
+		{companion.WhiskerStrokes, companion.EarRose, "strokes + rose"},
+		{companion.WhiskerLow, companion.EarRose, "low + rose"},
+	} {
+		f := companion.Base
+		f.Whiskers, f.Ears = pr.w, pr.e
+		cell(pr.n, "", shot(f, "slate", companion.Working, term.ProfileTrueColor))
+	}
+	b.WriteString(`</div>`)
+
+	// One promising pairing across every coat that survived.
+	b.WriteString(`<h2>"tips + dot" across your six coats</h2>`)
+	b.WriteString(`<p class="nt">The quietest pairing: whisker ends only, and a single cell in ` +
+		`the ear.</p><div class="row">`)
+	quiet := companion.Base
+	quiet.Whiskers, quiet.Ears = companion.WhiskerDots, companion.EarDot
+	for _, coat := range companion.CoatOrder {
+		cell(coat, "", shot(quiet, coat, companion.Working, term.ProfileTrueColor))
+	}
+	b.WriteString(`</div>`)
+
+	b.WriteString(`<h2>The same, as Terminal.app paints it</h2><div class="row">`)
+	for _, coat := range companion.CoatOrder {
+		cell(coat, " &middot; 256", shot(quiet, coat, companion.Working, term.Profile256))
+	}
+	b.WriteString(`</div>`)
+
+	b.WriteString(`<h2>Base only &mdash; nose and toes, no whiskers or ears</h2>`)
+	b.WriteString(`<p class="nt">For comparison: the cat you already like, in all six.</p><div class="row">`)
+	for _, coat := range companion.CoatOrder {
+		cell(coat, "", shot(companion.Base, coat, companion.Working, term.ProfileTrueColor))
+	}
+	b.WriteString(`</div>`)
+
+	b.WriteString(`<h2>Every state &mdash; slate, tips + dot</h2><div class="row">`)
+	for _, st := range []struct {
+		s companion.State
+		n string
+	}{{companion.Resting, "resting"}, {companion.Working, "working"},
+		{companion.NeedsYou, "needs you"}, {companion.Worried, "broken"}} {
+		cell(st.n, "", shot(quiet, "slate", st.s, term.ProfileTrueColor))
+	}
+	b.WriteString(`</div>`)
 
 	return canvas.HTMLPage("asciiscapes — companion study", b.String())
 }

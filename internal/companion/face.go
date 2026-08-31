@@ -15,10 +15,49 @@ import (
 // muzzle gap since it was drawn and it has never once reached the screen.
 //
 // Overlays are plotted after the body, at cell precision, in their own colour.
+// WhiskerStyle is how the whiskers are drawn. They are different approaches,
+// not different amounts: a dotted whisker and a stroked one are trying
+// different things at this size.
+type WhiskerStyle int
+
+const (
+	NoWhiskers WhiskerStyle = iota
+	// WhiskerStrokes: two horizontal lines a side, outside the head.
+	WhiskerStrokes
+	// WhiskerDots: only the tips, so the eye infers the line between them.
+	WhiskerDots
+	// WhiskerFan: diagonals, splaying up and down from the muzzle.
+	WhiskerFan
+	// WhiskerTicks: short marks pressed against the cheek, not reaching out.
+	WhiskerTicks
+	// WhiskerCarved: drawn INTO the fur as darker cells rather than beside it,
+	// so the silhouette stays clean.
+	WhiskerCarved
+	// WhiskerLow: strokes below the muzzle line, where a cat's actually sit.
+	WhiskerLow
+)
+
+// EarStyle is how the inside of the ear is treated.
+type EarStyle int
+
+const (
+	NoEars EarStyle = iota
+	// EarRose: a tinted cell, the pink inside of an ear.
+	EarRose
+	// EarDark: the same shape in a darker coat tone -- shadow, not skin.
+	EarDark
+	// EarTuft: a wisp of fur inside the ear instead of a colour.
+	EarTuft
+	// EarDot: the smallest possible mark.
+	EarDot
+	// EarRim: the ear edge lightened rather than the inside filled.
+	EarRim
+)
+
 type Face struct {
-	Nose      bool
-	Whiskers  bool
-	InnerEars bool
+	Nose     bool
+	Whiskers WhiskerStyle
+	Ears     EarStyle
 	// EarTufts are the lynx-like points a cat carries at the ear tip.
 	EarTufts bool
 	// Brow is the tabby M, the marking almost every tabby wears on its
@@ -42,43 +81,37 @@ type Face struct {
 	Brows bool
 }
 
-// Singles are one feature at a time, on the plain cat, so each can be judged
-// on its own before anything is combined.
-var Singles = []struct {
-	Key  string
-	Face Face
-	Note string
+// Base is what Lucas has settled on: a nose and pale toe tips.
+var Base = Face{Nose: true, Toes: true}
+
+// WhiskerStyles and EarStyles are the alternatives to compare, in the order
+// the sheet shows them.
+var WhiskerStyles = []struct {
+	Style WhiskerStyle
+	Name  string
+	Note  string
 }{
-	{"plain", Face{}, "what ships today"},
-	{"nose", Face{Nose: true}, "one rose cell below the eyes"},
-	{"whiskers", Face{Whiskers: true}, "two strokes a side, off the muzzle"},
-	{"inner ears", Face{InnerEars: true}, "a tinted cell inside each ear"},
-	{"muzzle", Face{Muzzle: true}, "pale snout either side of the nose"},
-	{"chin", Face{Chin: true}, "one pale cell under the mouth"},
-	{"bib", Face{Bib: true}, "pale chest patch"},
-	{"toes", Face{Toes: true}, "pale front paw tips"},
-	{"tail tip", Face{TailTip: true}, "the last of the tail, paled"},
-	{"brows", Face{Brows: true}, "two faint dots above the eyes"},
-	{"ear tufts", Face{EarTufts: true}, "lynx points at the ear tip"},
-	{"tabby M", Face{Brow: true}, "the forehead marking"},
+	{NoWhiskers, "none", "the base cat"},
+	{WhiskerStrokes, "strokes", "two lines a side, outside the head"},
+	{WhiskerDots, "tips", "only the ends; the eye fills in the line"},
+	{WhiskerFan, "fan", "diagonals splaying from the muzzle"},
+	{WhiskerTicks, "ticks", "short marks against the cheek"},
+	{WhiskerCarved, "carved", "darker cells INSIDE the fur"},
+	{WhiskerLow, "low", "strokes below the muzzle line"},
 }
 
-// Faces are combinations, quietest first.
-var Faces = map[string]Face{
-	"plain":  {},
-	"nose":   {Nose: true},
-	"hint":   {Nose: true, Chin: true},
-	"soft":   {Nose: true, Muzzle: true, Chin: true},
-	"cat":    {Nose: true, Whiskers: true, Muzzle: true},
-	"mitten": {Nose: true, Muzzle: true, Bib: true, Toes: true, TailTip: true},
-	"classic": {Nose: true, Whiskers: true, InnerEars: true, Muzzle: true, Chin: true,
-		Bib: true, Toes: true, TailTip: true},
-	"full": {Nose: true, Whiskers: true, InnerEars: true, EarTufts: true, Brows: true,
-		Brow: true, Muzzle: true, Chin: true, Bib: true, Toes: true, TailTip: true},
+var EarStyles = []struct {
+	Style EarStyle
+	Name  string
+	Note  string
+}{
+	{NoEars, "none", "the base cat"},
+	{EarRose, "rose", "a tinted cell -- skin"},
+	{EarDark, "shadow", "the same shape in a darker coat tone"},
+	{EarTuft, "tuft", "a wisp of fur instead of a colour"},
+	{EarDot, "dot", "the smallest possible mark"},
+	{EarRim, "rim", "the ear EDGE lightened, not the inside filled"},
 }
-
-// FaceOrder is the reading order: a build-up from almost nothing.
-var FaceOrder = []string{"plain", "nose", "hint", "soft", "cat", "mitten", "classic", "full"}
 
 // Coats are the body colours.
 var Coats = map[string]term.RGB{
@@ -93,7 +126,7 @@ var Coats = map[string]term.RGB{
 	"charcoal": {R: 92, G: 96, B: 108},
 }
 
-var CoatOrder = []string{"cream", "snow", "fog", "slate", "ink", "taupe", "sage", "mauve", "charcoal"}
+var CoatOrder = []string{"cream", "fog", "slate", "sage", "mauve", "charcoal"}
 
 var (
 	noseCol  = term.RGB{R: 226, G: 138, B: 148} // muted rose
@@ -131,9 +164,23 @@ func (c *Cat) drawFace(l *canvas.Layer, x, y int, f Face, st State) {
 		l.Plot(at(1), y-1, '\'', light, 0.7)
 		l.Plot(at(6), y-1, '\'', light, 0.7)
 	}
-	if f.InnerEars {
+
+	switch f.Ears {
+	case EarRose:
 		l.Plot(at(1), y, '▖', innerEar, 0.85)
 		l.Plot(at(6), y, '▗', innerEar, 0.85)
+	case EarDark:
+		l.Plot(at(1), y, '▖', dark, 0.9)
+		l.Plot(at(6), y, '▗', dark, 0.9)
+	case EarTuft:
+		l.Plot(at(1), y, '\'', pale, 0.8)
+		l.Plot(at(6), y, '\'', pale, 0.8)
+	case EarDot:
+		l.Plot(at(1), y, '·', innerEar, 0.9)
+		l.Plot(at(6), y, '·', innerEar, 0.9)
+	case EarRim:
+		l.Plot(at(1), y, '▘', light, 0.75)
+		l.Plot(at(6), y, '▝', light, 0.75)
 	}
 
 	// The tabby M, between the ears on the forehead row.
@@ -156,13 +203,11 @@ func (c *Cat) drawFace(l *canvas.Layer, x, y int, f Face, st State) {
 		l.Plot(at(4), y+3, '▾', noseCol, 1)
 	}
 
-	// Whiskers use the empty cells beside the head, so they cost no face area.
-	//
-	// Two horizontal strokes a side, not one. A single mark reads as
-	// punctuation -- a bracket sitting next to the cat -- while a pair reads as
-	// a fan coming off the muzzle. That was judged from rendered text rather
-	// than reasoned about; the bracket version looked fine in the source.
-	if f.Whiskers {
+	// Whiskers. Every style below is a different idea rather than a different
+	// amount, because at nine cells wide the choice is not how many strokes to
+	// draw but whether a whisker is a line, a pair of tips, or a shadow in the
+	// fur -- and those read completely differently.
+	if f.Whiskers != NoWhiskers {
 		top, bot := y+2, y+3
 		if st == Worried {
 			top, bot = y+3, y+4 // drooping
@@ -171,14 +216,34 @@ func (c *Cat) drawFace(l *canvas.Layer, x, y int, f Face, st State) {
 		if st == Resting {
 			near, far = 0.75, 0.4
 		}
-		for _, cell := range []int{-1, 9} {
-			l.Plot(at(cell), bot, '─', light, near)
-			l.Plot(at(cell), top, '─', light, far)
-		}
-		// Splayed when the agent wants something: one more stroke, further out.
-		if st == NeedsYou {
-			l.Plot(at(-2), bot, '─', light, 0.55)
-			l.Plot(at(10), bot, '─', light, 0.55)
+		switch f.Whiskers {
+		case WhiskerStrokes:
+			for _, cell := range []int{-1, 9} {
+				l.Plot(at(cell), bot, '─', light, near)
+				l.Plot(at(cell), top, '─', light, far)
+			}
+		case WhiskerDots:
+			for _, cell := range []int{-1, 9} {
+				l.Plot(at(cell), bot, '·', light, near)
+				l.Plot(at(cell), top, '·', light, far*0.9)
+			}
+		case WhiskerFan:
+			l.Plot(at(-1), top, '╱', light, far)
+			l.Plot(at(-1), bot, '╲', light, near)
+			l.Plot(at(9), top, '╲', light, far)
+			l.Plot(at(9), bot, '╱', light, near)
+		case WhiskerTicks:
+			l.Plot(at(-1), bot, '╴', light, near)
+			l.Plot(at(9), bot, '╶', light, near)
+		case WhiskerCarved:
+			// Inside the silhouette, so the outline stays clean.
+			l.Plot(at(1), bot, '╌', dark, 0.85)
+			l.Plot(at(7), bot, '╌', dark, 0.85)
+		case WhiskerLow:
+			for _, cell := range []int{-1, 9} {
+				l.Plot(at(cell), bot+1, '─', light, near)
+				l.Plot(at(cell), bot, '─', light, far)
+			}
 		}
 	}
 
