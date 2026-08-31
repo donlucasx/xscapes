@@ -50,7 +50,7 @@ func main() {
 		ctxUsed = flag.Float64("ctx", 0, "context used, 0..1 (moon phase and altitude)")
 		mode    = flag.String("mode", "working", "strip mode: resting|working|needsyou|walk")
 		session = flag.String("session", "", "session to follow in -live (default: $CLAUDE_CODE_SESSION_ID, else the newest)")
-		mirror  = flag.Bool("mirror", false, "companion on the right, litter growing leftward")
+		mirror  = flag.Bool("mirror", true, "companion on the right, litter growing leftward (-mirror=false for the old left-anchored layout)")
 		mockup  = flag.String("mockup", "", "write the left-vs-mirrored composition study to an HTML file")
 	)
 	flag.Parse()

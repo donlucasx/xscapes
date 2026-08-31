@@ -83,7 +83,8 @@ func wiredPage(seed int64) string {
 	// just fixed.
 	sh := scape.NewShore(seed, false)
 	cat := companion.NewCat()
-	_, chh := cat.Size()
+	cat.FaceLeft(true)
+	ccw, chh := cat.Size()
 
 	var b strings.Builder
 	b.WriteString(`<style>.win{border:1px solid #2a2a32;border-radius:6px;overflow:hidden}
@@ -104,17 +105,11 @@ func wiredPage(seed int64) string {
 			c := canvas.New(80, 24, canvas.AlphaFar, canvas.AlphaMid, canvas.AlphaNear)
 			t := bt.at + dt
 			top := c.H - 2 - chh
+			lay := compose(c.W, ccw, true)
+			sh.MoonX = lay.MoonX
 			sh.Update(c, t, st.Act)
-			cat.Draw(c.Near(), 5, top, t, st.Pose)
-			if st.Kittens > 0 {
-				cat.DrawKittens(c.Near(), c.Mid(), 5, top, st.Kittens, c.W-1,
-					int(float64(c.H)*0.42)+1, t, seed)
-			}
-			if st.Bubble != "" {
-				rows := companion.Bubble(st.Bubble)
-				(&companion.Sprite{Rows: rows, Body: bubbleCol}).Draw(c.Near(), 12, top-len(rows))
-			}
-			drawSand(c, st.Tail)
+			st.Tail = st.FitTail(now, lay.SandTo-lay.SandFrom)
+			drawScene(c, sh, cat, lay, st, t, seed, top)
 			fmt.Fprintf(&row, `<div class="win">%s</div>`, c.HTMLFragment(11))
 		}
 

@@ -8,3 +8,6 @@
 # macOS
 .DS_Store
 asciiscapes
+
+# scratch build from the mirror branch
+/as

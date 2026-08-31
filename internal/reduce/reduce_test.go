@@ -283,8 +283,8 @@ func TestCompactDoesNotResetTheScene(t *testing.T) {
 	r.Apply(event.Event{Kind: event.Prompt}, at(0))
 	for i := 0; i < 5; i++ {
 		id := string(rune('a' + i))
-		r.Apply(event.Event{Kind: event.ToolStart, ID: id}, at(float64(i) * 0.2))
-		r.Apply(event.Event{Kind: event.ToolEnd, ID: id, Op: event.OpRead, Target: "x.go"}, at(float64(i)*0.2 + 0.1))
+		r.Apply(event.Event{Kind: event.ToolStart, ID: id}, at(float64(i)*0.2))
+		r.Apply(event.Event{Kind: event.ToolEnd, ID: id, Op: event.OpRead, Target: "x.go"}, at(float64(i)*0.2+0.1))
 	}
 	r.Apply(event.Event{Kind: event.SubStart, Agent: "a1"}, at(2))
 	before := r.State(at(2))

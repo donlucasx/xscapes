@@ -72,9 +72,9 @@ func Listen(session string) (*Bus, error) {
 	_ = conn.SetReadBuffer(readBuffer)
 
 	b := &Bus{
-		C:       make(chan Event, 256),
-		session: session,
-		sock:    p,
+		C:         make(chan Event, 256),
+		session:   session,
+		sock:      p,
 		conn:      conn,
 		stop:      make(chan struct{}),
 		spoolDone: make(chan struct{}),
