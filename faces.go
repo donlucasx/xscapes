@@ -32,59 +32,89 @@ func facePage(seed int64) string {
 	var b strings.Builder
 	b.WriteString(`<style>
 	.win{border:1px solid #2a2a32;border-radius:5px;overflow:hidden}
-	.row{display:flex;gap:12px;flex-wrap:wrap;align-items:flex-start;margin-bottom:6px}
+	.row{display:flex;gap:11px;flex-wrap:wrap;align-items:flex-start;margin-bottom:8px}
 	.col{display:flex;flex-direction:column;gap:4px}
 	.lbl{font:11px ui-monospace,monospace;color:#8a8a99}
-	h2{font:600 13px ui-monospace,monospace;color:#d8d8e0;margin:30px 0 10px}
+	.lbl b{color:#d8d8e0;font-weight:500}
+	h2{font:600 13px ui-monospace,monospace;color:#d8d8e0;margin:32px 0 4px}
+	h2+p{margin-top:4px}
 	</style>`)
-	b.WriteString(`<h1>asciiscapes &mdash; how much cat fits in nine cells</h1>`)
-	b.WriteString(`<p class="nt">The head is four character rows: ears, forehead, eyes, chin. ` +
-		`The eyes already own their row, and the bitmap ORs its rows in pairs before quadranting, ` +
-		`so detail drawn INTO the bitmap on one row is erased by the row above it. Everything ` +
-		`below is a character overlay, plotted after the body at cell precision, in a colour ` +
-		`derived from the coat so a new coat needs no new colours.</p>`)
+	b.WriteString(`<h1>asciiscapes &mdash; the companion, one mark at a time</h1>`)
+	b.WriteString(`<p class="nt">Every feature is a character overlay drawn after the body, in a ` +
+		`colour derived from the coat. The head is four rows and the eyes own one of them, so ` +
+		`there is room for very little &mdash; which is the argument for adding almost nothing.</p>`)
 
-	notes := map[string]string{
-		"plain":   "what ships today",
-		"nose":    "+ a rose nose below the eyes",
-		"classic": "+ whiskers and inner ears",
-		"tabby":   "+ the tabby M and ear tufts",
-		"tuxedo":  "+ pale muzzle, chest bib, toe tips",
-		"full":    "everything at once",
+	cell := func(label, note, body string) {
+		fmt.Fprintf(&b, `<div class="col"><div class="lbl"><b>%s</b>%s</div><div class="win">%s</div></div>`,
+			label, note, body)
 	}
 
-	for _, coat := range companion.CoatOrder {
-		fmt.Fprintf(&b, `<h2>%s</h2><div class="row">`, coat)
-		for _, k := range companion.FaceOrder {
-			fmt.Fprintf(&b, `<div class="col"><div class="lbl">%s &middot; %s</div><div class="win">%s</div></div>`,
-				k, notes[k],
-				portrait(companion.Faces[k], companion.Coats[coat], companion.Working, term.ProfileTrueColor, 3.1))
-		}
-		b.WriteString(`</div>`)
-	}
-
-	b.WriteString(`<h2>Terminal.app, 256 colours &mdash; the full face</h2>`)
-	b.WriteString(`<p class="nt">Markings derived from the coat move with it through quantisation, ` +
-		`so a coat that survives keeps its face.</p><div class="row">`)
-	for _, coat := range companion.CoatOrder {
-		fmt.Fprintf(&b, `<div class="col"><div class="lbl">%s &middot; 256</div><div class="win">%s</div></div>`,
-			coat, portrait(companion.Faces["full"], companion.Coats[coat], companion.Working, term.Profile256, 3.1))
+	// Each feature alone, so it can be judged without anything else competing.
+	b.WriteString(`<h2>One feature at a time &mdash; cream</h2>`)
+	b.WriteString(`<p class="nt">The plain cat first, then each mark on its own.</p><div class="row">`)
+	for _, s := range companion.Singles {
+		cell(s.Key, " &middot; "+s.Note,
+			portrait(s.Face, companion.Coats["cream"], companion.Working, term.ProfileTrueColor, 3.1))
 	}
 	b.WriteString(`</div>`)
 
-	b.WriteString(`<h2>Every state, in the three coats Lucas is leaning toward</h2>`)
-	b.WriteString(`<p class="nt">The whiskers droop and the eyes go amber when something is ` +
-		`broken; they splay and the eyes widen when the agent needs you.</p>`)
+	b.WriteString(`<h2>The same, on charcoal &mdash; where pale marks actually show</h2>`)
+	b.WriteString(`<div class="row">`)
+	for _, s := range companion.Singles {
+		cell(s.Key, "",
+			portrait(s.Face, companion.Coats["charcoal"], companion.Working, term.ProfileTrueColor, 3.1))
+	}
+	b.WriteString(`</div>`)
+
+	notes := map[string]string{
+		"plain":   "ships today",
+		"nose":    "last session's pick",
+		"hint":    "nose + chin",
+		"soft":    "+ muzzle",
+		"cat":     "nose + whiskers + muzzle",
+		"mitten":  "muzzle, bib, toes, tail tip",
+		"classic": "most of it",
+		"full":    "everything",
+	}
+
+	b.WriteString(`<h2>Combinations, quietest first</h2><div class="row">`)
+	for _, k := range companion.FaceOrder {
+		cell(k, " &middot; "+notes[k],
+			portrait(companion.Faces[k], companion.Coats["cream"], companion.Working, term.ProfileTrueColor, 3.1))
+	}
+	b.WriteString(`</div>`)
+
+	b.WriteString(`<h2>Coats &mdash; the three you liked, and six more</h2>`)
+	b.WriteString(`<p class="nt">Shown on "cat": nose, whiskers, muzzle.</p><div class="row">`)
+	for _, coat := range companion.CoatOrder {
+		cell(coat, "", portrait(companion.Faces["cat"], companion.Coats[coat], companion.Working, term.ProfileTrueColor, 3.1))
+	}
+	b.WriteString(`</div>`)
+
+	b.WriteString(`<h2>The same coats, plain &mdash; so the colour is the only variable</h2><div class="row">`)
+	for _, coat := range companion.CoatOrder {
+		cell(coat, "", portrait(companion.Faces["plain"], companion.Coats[coat], companion.Working, term.ProfileTrueColor, 3.1))
+	}
+	b.WriteString(`</div>`)
+
+	b.WriteString(`<h2>As Terminal.app paints them &mdash; 256 colours</h2><div class="row">`)
+	for _, coat := range companion.CoatOrder {
+		cell(coat, " &middot; 256", portrait(companion.Faces["cat"], companion.Coats[coat], companion.Working, term.Profile256, 3.1))
+	}
+	b.WriteString(`</div>`)
+
+	b.WriteString(`<h2>Every state</h2>`)
+	b.WriteString(`<p class="nt">Whiskers droop when something is broken and splay when the agent ` +
+		`needs you; the eyes carry the state itself.</p>`)
 	for _, coat := range []string{"cream", "slate", "charcoal"} {
 		b.WriteString(`<div class="row">`)
 		for _, st := range []struct {
 			s companion.State
 			n string
 		}{{companion.Resting, "resting"}, {companion.Working, "working"},
-			{companion.NeedsYou, "needs you"}, {companion.Worried, "something is broken"}} {
-			fmt.Fprintf(&b, `<div class="col"><div class="lbl">%s &middot; %s</div><div class="win">%s</div></div>`,
-				coat, st.n,
-				portrait(companion.Faces["full"], companion.Coats[coat], st.s, term.ProfileTrueColor, 3.1))
+			{companion.NeedsYou, "needs you"}, {companion.Worried, "broken"}} {
+			cell(coat+" · "+st.n, "",
+				portrait(companion.Faces["cat"], companion.Coats[coat], st.s, term.ProfileTrueColor, 3.1))
 		}
 		b.WriteString(`</div>`)
 	}
