@@ -41,12 +41,14 @@ func facePage(seed int64) string {
 	   text-transform:uppercase;margin:14px 0 6px}
 	h2+p{margin-top:4px}
 	</style>`)
-	b.WriteString(`<h1>asciiscapes &mdash; whiskers on the muzzle</h1>`)
-	b.WriteString(`<p class="nt">Ears are settled: inner shadow, the coat's own dark tone inside ` +
-		`each ear, so the cat stays monochrome. What is left is where the four whiskers sit. ` +
-		`All of these keep them on the muzzle rows &mdash; the chin row the nose sits on, and the ` +
-		`one below it &mdash; and vary how far each reaches. The old eye-row version is included ` +
-		`last so the difference is visible rather than asserted.</p>`)
+	b.WriteString(`<h1>asciiscapes &mdash; whiskers, connected to the fur</h1>`)
+	b.WriteString(`<p class="nt">Ears are settled: inner shadow. The whiskers are now drawn from the FUR ` +
+		`OUTWARD &mdash; found by looking at what the body actually painted on each row, not from ` +
+		`cell numbers worked out by hand. The head is not centred in its sprite, so at the chin row ` +
+		`the left edge lands on a half-filled cell while the right edge is solid; a stroke at a ` +
+		`fixed offset touches the fur on one side and leaves half a cell of daylight on the other. ` +
+		`That was the disconnection. All rows are on the snout &mdash; the chin row the nose sits ` +
+		`on and below &mdash; and the eyes at y+2 are deliberately never used.</p>`)
 
 	cell := func(label, note, body string) {
 		fmt.Fprintf(&b, `<div class="col"><div class="lbl"><b>%s</b>%s</div><div class="win">%s</div></div>`,
@@ -73,28 +75,28 @@ func facePage(seed int64) string {
 		}
 	}
 
-	b.WriteString(`<h2>"muzzle" across all five coats</h2><div class="row">`)
+	b.WriteString(`<h2>"lower long" across all five coats</h2><div class="row">`)
 	for _, coat := range companion.CoatOrder {
-		cell(coat, "", portrait(face(companion.WhiskerMuzzle, true), companion.Coats[coat],
+		cell(coat, "", portrait(face(companion.WhiskerLowerLong, true), companion.Coats[coat],
 			companion.Working, term.ProfileTrueColor, 3.1))
 	}
 	b.WriteString(`</div>`)
 
 	b.WriteString(`<h2>The same, as Terminal.app paints it</h2><div class="row">`)
 	for _, coat := range companion.CoatOrder {
-		cell(coat, " &middot; 256", portrait(face(companion.WhiskerMuzzle, true), companion.Coats[coat],
+		cell(coat, " &middot; 256", portrait(face(companion.WhiskerLowerLong, true), companion.Coats[coat],
 			companion.Working, term.Profile256, 3.1))
 	}
 	b.WriteString(`</div>`)
 
-	b.WriteString(`<h2>Every state &mdash; slate, "muzzle"</h2>`)
+	b.WriteString(`<h2>Every state &mdash; slate, "lower long"</h2>`)
 	b.WriteString(`<p class="nt">The whiskers drop a row when something is broken.</p><div class="row">`)
 	for _, st := range []struct {
 		s companion.State
 		n string
 	}{{companion.Resting, "resting"}, {companion.Working, "working"},
 		{companion.NeedsYou, "needs you"}, {companion.Worried, "broken"}} {
-		cell(st.n, "", portrait(face(companion.WhiskerMuzzle, true), companion.Coats["slate"],
+		cell(st.n, "", portrait(face(companion.WhiskerLowerLong, true), companion.Coats["slate"],
 			st.s, term.ProfileTrueColor, 3.1))
 	}
 	b.WriteString(`</div>`)

@@ -30,21 +30,17 @@ type WhiskerStyle int
 
 const (
 	NoWhiskers WhiskerStyle = iota
-	// WhiskerMuzzle: four strokes, all on the muzzle rows, mixing a flush
-	// stroke with a longer one so they fan instead of stacking.
-	WhiskerMuzzle
-	// WhiskerMuzzleWide: the same idea with the long stroke on top.
-	WhiskerMuzzleWide
-	// WhiskerMuzzleTight: both rows flush, no reach.
-	WhiskerMuzzleTight
-	// WhiskerMuzzleLong: both rows reaching out.
-	WhiskerMuzzleLong
-	// WhiskerSingleRow: two strokes a side on the nose row alone, flush then
-	// long, so each side reads as one whisker leaving the face.
-	WhiskerSingleRow
-	// WhiskerEyeRow is the previous version, kept for comparison: one stroke
-	// up at the eyes, which is what Lucas objected to.
-	WhiskerEyeRow
+	// WhiskerLowerLong: bottom pair longer than the top pair.
+	WhiskerLowerLong
+	// WhiskerUpperLong: top pair longer than the bottom pair.
+	WhiskerUpperLong
+	// WhiskerEven: both pairs the same length.
+	WhiskerEven
+	// WhiskerShort: one cell a side on each row.
+	WhiskerShort
+	// WhiskerSweep: three rows, longest in the middle, so the set reads as a
+	// spray rather than a pair of lines.
+	WhiskerSweep
 )
 
 // EarStyle is how the inside of the ear is treated. Every style below sits
@@ -103,12 +99,11 @@ var WhiskerStyles = []struct {
 	Name  string
 	Note  string
 }{
-	{WhiskerMuzzle, "muzzle", "flush on the nose row, long below"},
-	{WhiskerMuzzleWide, "muzzle wide", "long on the nose row, flush below"},
-	{WhiskerMuzzleTight, "muzzle tight", "both flush, no reach"},
-	{WhiskerMuzzleLong, "muzzle long", "both reaching past the fur"},
-	{WhiskerSingleRow, "single row", "two strokes, nose row only"},
-	{WhiskerEyeRow, "eye row (before)", "one stroke up at the eyes"},
+	{WhiskerLowerLong, "lower long", "bottom pair reaches further"},
+	{WhiskerUpperLong, "upper long", "top pair reaches further"},
+	{WhiskerEven, "even", "both pairs the same"},
+	{WhiskerShort, "short", "one cell a side, both rows"},
+	{WhiskerSweep, "sweep", "three rows, longest in the middle"},
 	{NoWhiskers, "none", "for comparison"},
 }
 
@@ -144,6 +139,26 @@ var (
 	noseCol  = term.RGB{R: 226, G: 138, B: 148} // muted rose
 	innerEar = term.RGB{R: 198, G: 130, B: 132}
 )
+
+// furSpan finds the solid fur on one row of an already-drawn body, in absolute
+// canvas cells. Absolute rather than sprite-relative on purpose: the body is
+// mirrored before this runs, so asking the pixels where the cat is avoids
+// having to mirror a second time and get it wrong.
+func furSpan(l *canvas.Layer, row, x, w int) (lo, hi int, ok bool) {
+	lo, hi = -1, -1
+	for cx := x - 1; cx < x+w+1; cx++ {
+		if cx < 0 || cx >= l.W || row < 0 || row >= l.H {
+			continue
+		}
+		if c := l.Cells[row*l.W+cx]; c.Set && c.R == '█' {
+			if lo < 0 {
+				lo = cx
+			}
+			hi = cx
+		}
+	}
+	return lo, hi, lo >= 0
+}
 
 // shade lightens or darkens the coat, so a marking belongs to the cat rather
 // than being painted on it -- and so a new coat needs no new colours.
@@ -219,51 +234,60 @@ func (c *Cat) drawFace(l *canvas.Layer, x, y int, f Face, st State) {
 
 	// Whiskers.
 	//
-	// All four land around the MUZZLE. The earlier version put one stroke a
-	// side up on the eye row, which reads as a brow or a squint rather than a
-	// whisker -- a cat's whiskers come out of the snout, and at this size the
-	// eye is only two rows above it, so the difference is the whole effect.
+	// They are drawn from the FUR OUTWARD, found by looking at what the body
+	// actually painted on each row, rather than from cell numbers worked out
+	// by hand. That is not fussiness: the head is not centred in its sprite,
+	// so at the chin row the left edge lands on a half-filled cell while the
+	// right edge is solid. A stroke placed at a fixed offset therefore touches
+	// the fur on one side and leaves half a cell of daylight on the other,
+	// which is exactly the disconnection that kept showing up.
 	//
-	// The rows available are y+3, the chin row the nose sits on, and y+4 just
-	// under it. Cell 0 and 8 are the fur edge; -1 and 9 reach past it. Mixing a
-	// flush stroke with a longer one is what makes them fan rather than stack.
+	// Row y+3 is the chin row the nose sits on and y+4 is just under it, so
+	// both are on the snout. The eyes are at y+2 and are deliberately not used.
 	if f.Whiskers != NoWhiskers {
-		hi, lo := y+3, y+4
+		rows := []int{y + 3, y + 4}
 		if st == Worried {
-			hi, lo = y+4, y+5 // drooping
+			rows = []int{y + 4, y + 5} // drooping
 		}
-		near, far := 1.0, 0.65
+		near, far := 1.0, 0.7
 		if st == Resting {
-			near, far = 0.8, 0.45
+			near, far = 0.8, 0.5
 		}
-		stroke := func(row int, cells []int, a float64) {
-			for _, cell := range cells {
-				l.Plot(at(cell), row, '─', light, a)
-			}
-		}
-		var (
-			flush = []int{0, 8}
-			long  = []int{-1, 9}
-		)
+
+		// lengths[i] is how many cells the whiskers on rows[i] reach.
+		var lengths []int
+		alphas := []float64{near, far}
 		switch f.Whiskers {
-		case WhiskerMuzzle:
-			stroke(hi, flush, near)
-			stroke(lo, long, far)
-		case WhiskerMuzzleWide:
-			stroke(hi, long, far)
-			stroke(lo, flush, near)
-		case WhiskerMuzzleTight:
-			stroke(hi, flush, near)
-			stroke(lo, flush, far)
-		case WhiskerMuzzleLong:
-			stroke(hi, long, near)
-			stroke(lo, long, far)
-		case WhiskerSingleRow:
-			stroke(hi, flush, near)
-			stroke(hi, long, far)
-		case WhiskerEyeRow:
-			stroke(y+3, flush, near)
-			stroke(y+2, flush, far)
+		case WhiskerLowerLong:
+			lengths = []int{1, 2}
+			alphas = []float64{far, near}
+		case WhiskerUpperLong:
+			lengths = []int{2, 1}
+		case WhiskerEven:
+			lengths = []int{2, 2}
+		case WhiskerShort:
+			lengths = []int{1, 1}
+		case WhiskerSweep:
+			rows = append(rows, rows[len(rows)-1]+1)
+			if st == Worried {
+				rows = []int{y + 4, y + 5, y + 6}
+			}
+			lengths = []int{1, 2, 1}
+			alphas = []float64{far, near, far * 0.8}
+		}
+
+		for i, row := range rows {
+			if i >= len(lengths) {
+				break
+			}
+			lo, hi, ok := furSpan(l, row, x, w)
+			if !ok {
+				continue
+			}
+			for n := 1; n <= lengths[i]; n++ {
+				l.Plot(lo-n, row, '─', light, alphas[i])
+				l.Plot(hi+n, row, '─', light, alphas[i])
+			}
 		}
 	}
 
