@@ -189,7 +189,12 @@ func (c *Cat) kitTail(b *Bitmap, segs, srcW int, wag float64, lift int) {
 }
 
 // drawSwimmers puts kittens in the sea, bobbing on the swell and waddling
-// slowly sideways. Each one keeps its own lane, so they do not converge.
+// slowly sideways.
+//
+// Positions are SLOTTED, not random. Each swimmer gets a lane, and within a
+// lane the width is divided evenly so every swimmer owns a slot; the waddle is
+// then bounded by whatever slack is left in that slot. Random home columns
+// looked fine at three swimmers and piled them on top of each other at twelve.
 func (c *Cat) drawSwimmers(l *canvas.Layer, idx []int, px, py, w, seaTop int, t float64, seed int64) int {
 	if len(idx) == 0 {
 		return 0
@@ -198,62 +203,97 @@ func (c *Cat) drawSwimmers(l *canvas.Layer, idx []int, px, py, w, seaTop int, t 
 		c.swim = ParseBitmap(KittenSwim)
 	}
 	kw, kh := c.swim.W/2, c.swim.H/4
-	// Open water runs from just under the horizon down to just above the sand.
-	// It is NOT the strip above the parent's head -- the parent stands on the
-	// beach in front of the sea, so its rows overlap the water it is standing
-	// before. Measuring the zone that way left one row and drew no swimmers.
+	// Open water runs from just under the horizon down to a clear row above the
+	// sand, so a swimmer in the lowest lane cannot touch a sitter's ears.
 	_, ph := c.Size()
 	top := seaTop + 1
-	bot := py + ph - 3
+	bot := py + ph - 4
 	lanes := bot - top
 	if lanes < 1 {
 		return 0
 	}
-	wake := '~'
+
+	// Bucket by lane, keeping index order so the layout is deterministic.
+	byLane := make([][]int, lanes)
+	for _, i := range idx {
+		ln := int(HashF(i, 13, seed) * float64(lanes))
+		if ln >= lanes {
+			ln = lanes - 1
+		}
+		byLane[ln] = append(byLane[ln], i)
+	}
+
+	// Start clear of the parent. Swimmers are drawn on the same layer and after
+	// it, so anything overlapping its footprint paints straight over its face.
+	pw, _ := c.Size()
+	x0 := px + pw + 1
+	span := w - x0 - 1
+	if span < kw+2 {
+		return 0
+	}
 	drawn := 0
 
-	for k, i := range idx {
-		phase := HashF(i, 12, seed) * 6.283
-		// Lane and home column are fixed per subagent; only the wander moves.
-		lane := int(HashF(i, 13, seed) * float64(lanes))
-		home := px + 2 + int(HashF(i, 14, seed)*float64(w-px-8))
-		x := home + int(2.5*math.Sin(t*0.32+phase))
-		y := top + lane
-
-		// Ride the swell rather than bobbing on a private clock.
-		if math.Sin(t*0.9+float64(x)*0.16+phase) > 0.35 {
-			y--
-		}
-		if x < 1 || x+kw >= w || y < top || y+kh > bot {
+	for ln := 0; ln < lanes; ln++ {
+		members := byLane[ln]
+		if len(members) == 0 {
 			continue
 		}
+		slot := span / len(members)
+		if slot < kw+1 {
+			// Lane is oversubscribed; take what fits and drop the rest.
+			members = members[:max(1, span/(kw+1))]
+			slot = span / len(members)
+		}
+		for k, i := range members {
+			phase := HashF(i, 12, seed) * 6.283
+			slack := (slot - kw) / 2
+			if slack > 3 {
+				slack = 3
+			}
+			if slack < 0 {
+				slack = 0
+			}
+			x := x0 + k*slot + (slot-kw)/2 + int(float64(slack)*math.Sin(t*0.32+phase))
+			y := top + ln
+			// Ride the swell rather than bobbing on a private clock.
+			if math.Sin(t*0.9+float64(x)*0.16+phase) > 0.35 {
+				y--
+			}
+			if x < 1 || x+kw >= w || y < top || y+kh > bot {
+				continue
+			}
 
-		f := c.swim.Blank()
-		for sy := 0; sy < f.H; sy++ {
-			for sx := 0; sx < f.W; sx++ {
-				if c.swim.at(sx, sy) {
-					f.Set(sx, sy)
+			f := c.swim.Blank()
+			for sy := 0; sy < f.H; sy++ {
+				for sx := 0; sx < f.W; sx++ {
+					if c.swim.at(sx, sy) {
+						f.Set(sx, sy)
+					}
 				}
 			}
-		}
-		if HashF(i, 15, seed) > 0.5 {
-			f = f.Mirrored()
-		}
-		(&Sprite{Rows: f.ToQuadrant(), Body: furCol, Alpha: 1}).Draw(l, x, y)
+			if HashF(i, 15, seed) > 0.5 {
+				f = f.Mirrored()
+			}
+			(&Sprite{Rows: f.ToQuadrant(), Body: furCol, Alpha: 1}).Draw(l, x, y)
 
-		e := eyeCols["kittenSwim"]
-		glyph := 'o'
-		if math.Mod(t+phase, 4.2+HashF(i, 16, seed)*3) < 0.17 {
-			glyph = '-'
+			e := eyeCols["kittenSwim"]
+			glyph := 'o'
+			if math.Mod(t+phase, 4.2+HashF(i, 16, seed)*3) < 0.17 {
+				glyph = '-'
+			}
+			l.Plot(x+e[0], y+1, glyph, kittenEye, 1)
+			l.Plot(x+e[1], y+1, glyph, kittenEye, 1)
+			l.Plot(x-1, y+kh-1, '~', furCol, 0.5)
+			l.Plot(x+kw, y+kh-1, '~', furCol, 0.5)
+			drawn++
 		}
-		l.Plot(x+e[0], y+1, glyph, kittenEye, 1)
-		l.Plot(x+e[1], y+1, glyph, kittenEye, 1)
-
-		// A little wake, so they sit IN the water rather than on it.
-		l.Plot(x-1, y+kh-1, wake, furCol, 0.5)
-		l.Plot(x+kw, y+kh-1, wake, furCol, 0.5)
-		_ = k
-		drawn++
 	}
 	return drawn
+}
+
+func max(a, b int) int {
+	if a > b {
+		return a
+	}
+	return b
 }
