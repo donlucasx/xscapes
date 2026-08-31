@@ -1,6 +1,8 @@
 package event
 
 import (
+	"crypto/sha256"
+	"encoding/hex"
 	"errors"
 	"os"
 	"path/filepath"
@@ -58,30 +60,32 @@ const maxSunPath = 103
 var ErrPathTooLong = errors.New("socket path too long for sockaddr_un; set ASCIISCAPES_HOME to something shorter")
 
 // Tag reduces a session id to the short, filesystem-safe token that names its
-// socket. Claude Code session ids are UUIDs, so eight hex characters is
-// plenty and keeps the path far under the sun_path limit.
+// socket and spool.
 //
-// The sanitising is not paranoia about Claude Code -- it is that the protocol
-// invites other adapters, and a session id is the one field an adapter passes
-// through from somewhere else. A "session" of "../../.ssh/id_rsa" must not
-// become a path.
+// A HASH of the whole id, not a prefix of it. A prefix is only unique if the
+// ids are, and nothing in the protocol promises that: two adapters numbering
+// their sessions "session-1" and "session-2" would have collided on the same
+// eight characters, silently sharing one socket, and each scape would have
+// shown the other's work. Hashing also makes the sanitising free -- a session
+// of "../../.ssh/id_rsa" cannot become a path when the output is hex.
 func Tag(session string) string {
 	if session == "" {
 		return "anon"
 	}
-	var b strings.Builder
-	for _, r := range session {
-		if (r >= '0' && r <= '9') || (r >= 'a' && r <= 'z') || (r >= 'A' && r <= 'Z') {
-			b.WriteRune(r)
-		}
-		if b.Len() >= 8 {
-			break
-		}
+	sum := sha256.Sum256([]byte(session))
+	return hex.EncodeToString(sum[:6])
+}
+
+// Short is a human-facing abbreviation of a session id, for messages. It is
+// never a path: use Tag for that.
+func Short(session string) string {
+	if session == "" {
+		return "(none)"
 	}
-	if b.Len() == 0 {
-		return "anon"
+	if len(session) > 8 {
+		return session[:8]
 	}
-	return b.String()
+	return session
 }
 
 // SockPath is where the engine for this session listens.

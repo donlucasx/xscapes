@@ -3,8 +3,10 @@ package main
 import (
 	"encoding/json"
 	"io"
+	"net/url"
 	"os"
 	"path/filepath"
+	"regexp"
 	"strings"
 	"time"
 
@@ -59,6 +61,60 @@ var needsYouTypes = map[string]bool{
 	"elicitation_url_dialog":   true,
 }
 
+// maxPayload bounds what we read from a hook. A PostToolUse carrying the full
+// output of a build can be far larger than anything we want to parse.
+const maxPayload = 1 << 20
+
+// salvage pulls the flat scalar fields out of a payload that would not parse.
+// Deliberately dumb: it only recognises `"key": "value"` and `"key": number`
+// at any depth, which is enough because every field here is unique by name and
+// appears before the bulky ones.
+func salvage(b []byte, p *hookPayload) {
+	str := func(key string) string {
+		m := regexp.MustCompile(`"` + key + `"\s*:\s*"((?:[^"\\]|\\.)*)"`).FindSubmatch(b)
+		if m == nil {
+			return ""
+		}
+		var out string
+		if json.Unmarshal(append(append([]byte{'"'}, m[1]...), '"'), &out) != nil {
+			return ""
+		}
+		return out
+	}
+	num := func(key string) int64 {
+		m := regexp.MustCompile(`"` + key + `"\s*:\s*(-?[0-9]+)`).FindSubmatch(b)
+		if m == nil {
+			return 0
+		}
+		var out int64
+		if json.Unmarshal(m[1], &out) != nil {
+			return 0
+		}
+		return out
+	}
+	if p.Event == "" {
+		p.Event = str("hook_event_name")
+	}
+	if p.Session == "" {
+		p.Session = str("session_id")
+	}
+	if p.ToolName == "" {
+		p.ToolName = str("tool_name")
+	}
+	if p.ToolUseID == "" {
+		p.ToolUseID = str("tool_use_id")
+	}
+	if p.AgentID == "" {
+		p.AgentID = str("agent_id")
+	}
+	if p.NotificationType == "" {
+		p.NotificationType = str("notification_type")
+	}
+	if p.DurationM == 0 {
+		p.DurationM = num("duration_ms")
+	}
+}
+
 // runHook is the adapter. It reads one hook payload on stdin, emits zero or
 // more protocol events, and exits 0.
 //
@@ -81,8 +137,16 @@ func runHook(args []string) {
 	defer func() { recover() }()
 
 	var p hookPayload
-	if b, err := io.ReadAll(io.LimitReader(os.Stdin, 1<<20)); err == nil {
-		_ = json.Unmarshal(b, &p)
+	if b, err := io.ReadAll(io.LimitReader(os.Stdin, maxPayload)); err == nil {
+		if json.Unmarshal(b, &p) != nil {
+			// The payload did not parse -- almost always because a big
+			// tool_response pushed it past the cap and the read cut it
+			// mid-object. Dropping it whole is the expensive failure: the
+			// tool_use_id goes with it, so the matching tool_start is never
+			// closed and the sea stays up forever. The scalar fields we need
+			// sit near the front, ahead of the payload that made it big.
+			salvage(b, &p)
+		}
 	}
 	if p.Event == "" && len(args) > 0 {
 		// The installed command names the event too, so a payload we could
@@ -110,6 +174,8 @@ func translate(p hookPayload) []event.Event {
 
 	case "SessionStart":
 		_ = event.SetCurrent(p.Session)
+		// Source rides along so the reducer can tell a new conversation from
+		// an auto-compaction re-announcing the same one mid-turn.
 		return []event.Event{{Kind: event.SessionStart, Text: p.Source}}
 
 	case "SessionEnd":
@@ -228,7 +294,7 @@ func classify(tool string, raw json.RawMessage) (event.Op, string) {
 		case in.Pattern != "":
 			return in.Pattern
 		case in.URL != "":
-			return in.URL
+			return safeURL(in.URL)
 		case in.Query != "":
 			return in.Query
 		}
@@ -248,9 +314,13 @@ func classify(tool string, raw json.RawMessage) (event.Op, string) {
 		// The command, not its arguments. A shell line is the one tool input
 		// that routinely contains a secret, and this string is written to a
 		// file and painted on a screen.
-		return event.OpShell, firstWord(in.Command)
-	case "WebFetch", "WebSearch":
-		return event.OpWeb, subject()
+		return event.OpShell, program(in.Command)
+	case "WebFetch":
+		return event.OpWeb, safeURL(in.URL)
+	case "WebSearch":
+		// A search query is the user's words, not a credential, but it is also
+		// not something to write across the beach in full.
+		return event.OpWeb, trimTo(in.Query, 40)
 	case "Agent", "Task":
 		s := in.SubagentTyp
 		if s == "" {
@@ -280,26 +350,81 @@ func shorten(p string) string {
 	return p
 }
 
-// firstWord keeps the program name from a shell command and drops everything
-// after it. `psql "postgresql://user:password@host"` must reach the sand as
-// `psql`, not as a credential.
-func firstWord(cmd string) string {
-	cmd = strings.TrimSpace(cmd)
-	if cmd == "" {
-		return ""
+// program extracts the command name from a shell line and nothing else.
+// `psql "postgresql://user:password@host"` must reach the sand as `psql`.
+//
+// The first token is NOT the program often enough to matter: the single most
+// common way a secret appears literally in a shell line is the leading
+// assignment form, `PGPASSWORD=hunter2 psql ...`, and taking token zero
+// published it verbatim. Leading assignments, and the wrappers that usually
+// carry them, are skipped rather than truncated -- half a secret is a secret.
+func program(cmd string) string {
+	for _, tok := range strings.Fields(cmd) {
+		if isAssignment(tok) {
+			continue
+		}
+		switch tok {
+		case "sudo", "env", "command", "nohup", "time", "exec", "doas":
+			continue
+		}
+		if i := strings.LastIndex(tok, "/"); i >= 0 && i+1 < len(tok) {
+			tok = tok[i+1:]
+		}
+		if len(tok) > 24 {
+			tok = tok[:24]
+		}
+		return tok
 	}
-	for _, sep := range []string{" ", "\t", "\n"} {
-		if i := strings.Index(cmd, sep); i > 0 {
-			cmd = cmd[:i]
+	// Nothing but assignments and wrappers. Naming the shape is safe; naming
+	// the variable is not, because the name is often the giveaway.
+	if strings.TrimSpace(cmd) != "" {
+		return "env"
+	}
+	return ""
+}
+
+// isAssignment reports whether tok is a leading NAME=VALUE.
+func isAssignment(tok string) bool {
+	i := strings.IndexByte(tok, '=')
+	if i <= 0 {
+		return false
+	}
+	for j, r := range tok[:i] {
+		ok := r == '_' || (r >= 'A' && r <= 'Z') || (r >= 'a' && r <= 'z') || (j > 0 && r >= '0' && r <= '9')
+		if !ok {
+			return false
 		}
 	}
-	if i := strings.LastIndex(cmd, "/"); i >= 0 && i+1 < len(cmd) {
-		cmd = cmd[i+1:]
+	return true
+}
+
+// safeURL keeps enough of a URL to say where the agent went and drops
+// everything that carries a credential: the query string (access tokens live
+// there), the fragment, and any userinfo. It is also the more legible line.
+func safeURL(raw string) string {
+	u, err := url.Parse(raw)
+	if err != nil || u.Host == "" {
+		// Not parseable as a URL: keep the scheme-ish head only.
+		if i := strings.IndexAny(raw, "?#"); i >= 0 {
+			raw = raw[:i]
+		}
+		return trimTo(raw, 60)
 	}
-	if len(cmd) > 24 {
-		cmd = cmd[:24]
+	out := u.Host
+	if p := strings.TrimPrefix(u.Path, "/"); p != "" {
+		if i := strings.IndexByte(p, '/'); i >= 0 {
+			p = p[:i]
+		}
+		out += "/" + p
 	}
-	return cmd
+	return trimTo(out, 60)
+}
+
+func trimTo(s string, n int) string {
+	if len([]rune(s)) <= n {
+		return s
+	}
+	return string([]rune(s)[:n-1]) + "…"
 }
 
 func firstLine(s string) string {

@@ -50,6 +50,8 @@ func main() {
 		ctxUsed = flag.Float64("ctx", 0, "context used, 0..1 (moon phase and altitude)")
 		mode    = flag.String("mode", "working", "strip mode: resting|working|needsyou|walk")
 		session = flag.String("session", "", "session to follow in -live (default: $CLAUDE_CODE_SESSION_ID, else the newest)")
+		mirror  = flag.Bool("mirror", false, "companion on the right, litter growing leftward")
+		mockup  = flag.String("mockup", "", "write the left-vs-mirrored composition study to an HTML file")
 	)
 	flag.Parse()
 
@@ -79,7 +81,16 @@ func main() {
 		if isSet("h") {
 			hl = *height
 		}
-		runLive(*seed, *fps, wl, hl, *ctxUsed, *tod, *asciiG, *session)
+		runLive(*seed, *fps, wl, hl, *ctxUsed, *tod, *asciiG, *session, *mirror)
+		return
+	}
+
+	if *mockup != "" {
+		if err := os.WriteFile(*mockup, []byte(mockupPage(*seed)), 0o644); err != nil {
+			fmt.Fprintln(os.Stderr, "asciiscapes:", err)
+			os.Exit(1)
+		}
+		fmt.Println(*mockup)
 		return
 	}
 

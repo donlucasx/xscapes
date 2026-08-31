@@ -39,6 +39,9 @@ type Bus struct {
 	off     int64
 	part    []byte
 	stop    chan struct{}
+	// spoolDone lets Close wait for the spool reader instead of reaching into
+	// its state while it is still running.
+	spoolDone chan struct{}
 
 	// dropped counts events discarded because the consumer fell behind. A
 	// drop is preferable to a stall, but it must be visible: the number is
@@ -72,8 +75,9 @@ func Listen(session string) (*Bus, error) {
 		C:       make(chan Event, 256),
 		session: session,
 		sock:    p,
-		conn:    conn,
-		stop:    make(chan struct{}),
+		conn:      conn,
+		stop:      make(chan struct{}),
+		spoolDone: make(chan struct{}),
 	}
 
 	if sp, err := SpoolPath(session); err == nil {
@@ -115,6 +119,29 @@ func bind(p string) (*net.UnixConn, error) {
 	if _, statErr := os.Stat(p); statErr != nil {
 		return nil, err // not an in-use problem; report the original
 	}
+
+	// Reclaiming a stale socket means unlinking a file, and unlinking a file
+	// somebody else is listening on is the worst outcome available here. Two
+	// scapes starting together could each probe, each see the other not yet
+	// bound, and each remove the other's socket. Serialise the whole
+	// probe-remove-bind with an exclusive create, so only one process is ever
+	// in that window.
+	lock := p + ".lock"
+	lf, lerr := os.OpenFile(lock, os.O_CREATE|os.O_EXCL|os.O_WRONLY, 0o600)
+	if lerr != nil {
+		// Someone else is mid-reclaim. If the lock is stale, take it over.
+		if st, sErr := os.Stat(lock); sErr == nil && time.Since(st.ModTime()) > 10*time.Second {
+			os.Remove(lock)
+			lf, lerr = os.OpenFile(lock, os.O_CREATE|os.O_EXCL|os.O_WRONLY, 0o600)
+		}
+		if lerr != nil {
+			return nil, ErrBusy
+		}
+	}
+	defer func() { lf.Close(); os.Remove(lock) }()
+
+	// Re-probe inside the lock: the holder may have finished binding since we
+	// first looked.
 	if probeAlive(p) {
 		return nil, ErrBusy
 	}
@@ -169,6 +196,7 @@ func (b *Bus) readSock() {
 }
 
 func (b *Bus) readSpool() {
+	defer close(b.spoolDone)
 	t := time.NewTicker(spoolPoll)
 	defer t.Stop()
 	for {
@@ -267,6 +295,9 @@ func (b *Bus) Close() error {
 	default:
 		close(b.stop)
 	}
+	// Wait for the spool reader to stop before touching its file: it opens
+	// b.spool lazily, so closing it from here is a race on the field itself.
+	<-b.spoolDone
 	err := b.conn.Close()
 	if b.spool != nil {
 		b.spool.Close()

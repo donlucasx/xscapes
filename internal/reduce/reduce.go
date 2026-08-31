@@ -61,6 +61,13 @@ const (
 	// SubStale drops a subagent whose end event never arrived, so one lost
 	// event does not strand a kitten on the beach for the rest of the day.
 	SubStale = 30 * time.Minute
+
+	// FlightStale drops a tool whose end never arrived. Without it, one lost
+	// tool_end pins the sea and the companion at "working" forever -- and the
+	// case is not exotic: kill the agent while a Bash is running and no
+	// PostToolUse, no Stop and no SessionEnd is ever sent. Generous, because a
+	// genuinely long command must not be swept while it is still running.
+	FlightStale = 20 * time.Minute
 )
 
 // State is everything the renderer needs, and nothing else. It is a plain
@@ -78,6 +85,9 @@ type State struct {
 
 	// Session is who we are following, for the footer.
 	Session string
+
+	// tail lets a renderer re-fit the sand to its own width.
+	tail *tail
 	// LastEvent is when we last heard anything at all.
 	LastEvent time.Time
 	// Events counts everything applied, which is the cheapest possible
@@ -131,9 +141,27 @@ func (r *Reducer) Apply(e event.Event, now time.Time) {
 	r.last = now
 	r.count++
 
+	// Any sign of work refreshes the turn clock. It used to be set once, at
+	// the prompt, so TurnSilence measured how LONG the turn was rather than
+	// how quiet it had gone -- and every turn past five minutes put the cat to
+	// sleep while the agent was still working.
+	if e.Busy() || e.Kind == event.SubStart || e.Kind == event.SubEnd ||
+		e.Kind == event.Error || e.Kind == event.TestPass || e.Kind == event.TestFail {
+		r.turnAt = now
+	}
+
 	switch e.Kind {
 	case event.SessionStart:
-		r.reset()
+		// Claude Code re-announces the session after an auto-compaction, in
+		// the middle of a live turn. Resetting there wipes the sea, the
+		// litter and the sand while the agent is still working. Only a
+		// genuinely new conversation resets; the source rides in Text.
+		switch e.Text {
+		case "compact", "fork":
+			r.heat += Impulse
+		default: // startup, clear, resume, or an unknown future source
+			r.reset()
+		}
 
 	case event.SessionEnd:
 		r.reset()
@@ -154,6 +182,10 @@ func (r *Reducer) Apply(e event.Event, now time.Time) {
 		if e.ID != "" {
 			r.flight[e.ID] = inflight{started: now, op: e.Op, tool: e.Tool, target: e.Target}
 		}
+		// A scape attached partway through a session never saw the prompt, so
+		// tool traffic has to be able to open a turn by itself -- otherwise it
+		// spends the whole turn insisting the agent is idle.
+		r.turnOpn, r.turnAt = true, now
 		// A tool starting means a permission prompt, if there was one, was
 		// answered. Nothing else clears it that reliably.
 		r.needsInput = false
@@ -186,18 +218,16 @@ func (r *Reducer) Apply(e event.Event, now time.Time) {
 
 	case event.NeedsInput:
 		r.needsInput = true
-		if e.Text != "" {
-			r.bubble = e.Text
-		}
+		r.bubble = e.Text
 
 	case event.Done:
 		r.turnOpn = false
 		r.needsInput = false
 		r.doneAt = now
 		r.flight = map[string]inflight{}
-		if e.Text != "" {
-			r.bubble = e.Text
-		}
+		// Clear first: a knock with no words is honest, a knock still showing
+		// the last permission request is a lie about what is being asked.
+		r.bubble = e.Text
 
 	case event.SubStart:
 		if e.Agent != "" {
@@ -245,7 +275,15 @@ func (r *Reducer) decay(now time.Time) {
 
 	// A turn nothing closed, and a subagent nothing stopped, are both single
 	// points of failure for a scene that never settles. Time them out.
-	if r.turnOpn && now.Sub(r.turnAt) > TurnSilence && len(r.flight) == 0 {
+	for id, f := range r.flight {
+		if now.Sub(f.started) > FlightStale {
+			delete(r.flight, id)
+		}
+	}
+	// TurnSilence is not conditioned on the flight map being empty. It used to
+	// be, which meant the one case the timeout was written for -- an agent
+	// killed mid-tool -- was the exact case that could not fire it.
+	if r.turnOpn && now.Sub(r.turnAt) > TurnSilence {
 		r.turnOpn = false
 	}
 	for id, t := range r.subs {
@@ -282,11 +320,18 @@ func (r *Reducer) State(now time.Time) State {
 		Pose:      r.pose(now),
 		Kittens:   len(r.subs),
 		Tail:      r.tail.lines(now),
+		tail:      &r.tail,
 		Session:   r.session,
 		LastEvent: r.last,
 		Events:    r.count,
 	}
-	if st.Pose == companion.NeedsYou {
+	// The bubble is NOT gated on the pose. Gating it meant that after any
+	// failed command the companion went Worried and swallowed everything --
+	// including a permission prompt that the agent is actually blocked on, so
+	// the session could sit waiting for input with no signal at all. The pose
+	// says how the companion feels; the bubble says what it needs. They are
+	// different channels and only one of them is allowed to be silent.
+	if r.needsInput || (!r.doneAt.IsZero() && now.Sub(r.doneAt) < DoneHold) {
 		st.Bubble = r.bubble
 	}
 	return st
@@ -321,6 +366,15 @@ func (r *Reducer) reset() {
 	r.doneAt = time.Time{}
 	r.bubble = ""
 	r.tail = tail{}
+}
+
+// FitTail re-renders the sand to a column budget, dropping whole pieces of a
+// line rather than chopping it where it runs out of room.
+func (s State) FitTail(now time.Time, cols int) []Line {
+	if s.tail == nil {
+		return s.Tail
+	}
+	return s.tail.fit(now, cols)
 }
 
 func clamp01(v float64) float64 {

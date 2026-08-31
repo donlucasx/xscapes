@@ -41,7 +41,7 @@ func termSize() (w, h int) {
 // With a session to follow it renders that session. Without one it runs the
 // demo cycle, which is what every frame in assets/frames was made from and
 // what you want when showing the thing to somebody with no agent running.
-func runLive(seed int64, fps float64, wIn, hIn int, ctxUsed, tod float64, ascii bool, session string) {
+func runLive(seed int64, fps float64, wIn, hIn int, ctxUsed, tod float64, ascii bool, session string, mirror bool) {
 	w, h := wIn, hIn
 	if w <= 0 || h <= 0 {
 		w, h = termSize()
@@ -64,7 +64,7 @@ func runLive(seed int64, fps float64, wIn, hIn int, ctxUsed, tod float64, ascii 
 		b, err := event.Listen(session)
 		switch {
 		case err == event.ErrBusy:
-			fmt.Fprintf(os.Stderr, "asciiscapes: a scape is already following session %s\n", event.Tag(session))
+			fmt.Fprintf(os.Stderr, "asciiscapes: a scape is already following session %s\n", event.Short(session))
 			os.Exit(1)
 		case err != nil:
 			// Not fatal. A scape that cannot bind is still a scape; it just
@@ -79,7 +79,17 @@ func runLive(seed int64, fps float64, wIn, hIn int, ctxUsed, tod float64, ascii 
 	c := canvas.New(w, h, canvas.AlphaFar, canvas.AlphaMid, canvas.AlphaNear)
 	sh := scape.NewShore(seed, ascii)
 	cat := companion.NewCat()
-	_, chh := cat.Size()
+	cat.FaceLeft(mirror)
+	ccw, chh := cat.Size()
+	lay := compose(w, ccw, mirror)
+	sh.MoonX = lay.MoonX
+
+	// React to a resized window. Without this the scene keeps the size it had
+	// when it started: drag the pane wider and the picture just sits there in
+	// the old rectangle. Polling is not an option -- termSize shells out to
+	// stty, which is far too expensive to do every frame -- so take the signal.
+	winch := make(chan os.Signal, 1)
+	signal.Notify(winch, syscall.SIGWINCH)
 
 	restore := func() { fmt.Print("\x1b[?25h\x1b[0m\n") }
 	sig := make(chan os.Signal, 1)
@@ -97,6 +107,14 @@ func runLive(seed int64, fps float64, wIn, hIn int, ctxUsed, tod float64, ascii 
 	defer restore()
 
 	profile := term.DetectProfile()
+	// A zero fps builds a ticker with a zero duration (panic), and anything
+	// under one frame a second fights the shore's own large-gap clamp.
+	if fps < 1 {
+		fps = 1
+	}
+	if fps > 120 {
+		fps = 120
+	}
 	tick := time.NewTicker(time.Duration(float64(time.Second) / fps))
 	defer tick.Stop()
 
@@ -104,6 +122,21 @@ func runLive(seed int64, fps float64, wIn, hIn int, ctxUsed, tod float64, ascii 
 	for range tick.C {
 		now := time.Now()
 		t := now.Sub(start).Seconds()
+
+		select {
+		case <-winch:
+			if wIn <= 0 || hIn <= 0 {
+				nw, nh := termSize()
+				nh--
+				if nw != c.W || nh != c.H {
+					c.Resize(nw, nh)
+					lay = compose(nw, ccw, mirror)
+					sh.MoonX = lay.MoonX
+					fmt.Print("\x1b[2J") // one clear, or the old frame's edges linger
+				}
+			}
+		default:
+		}
 
 		var st reduce.State
 		if red != nil {
@@ -118,6 +151,10 @@ func runLive(seed int64, fps float64, wIn, hIn int, ctxUsed, tod float64, ascii 
 				}
 			}
 			st = red.State(now)
+			// Re-render the sand to the columns this layout actually leaves
+			// it, so a narrow pane loses whole pieces of a line rather than
+			// getting a path chopped mid-word.
+			st.Tail = st.FitTail(now, lay.SandTo-lay.SandFrom)
 			// The sky is the world: time of day is the wall clock, never
 			// anything the agent did.
 			st.Act.TimeOfDay = timeOfDay(now)
@@ -133,21 +170,56 @@ func runLive(seed int64, fps float64, wIn, hIn int, ctxUsed, tod float64, ascii 
 
 		sh.Update(c, t, st.Act)
 		top := c.H - 2 - chh
-		cat.Draw(c.Near(), 5, top, t, st.Pose)
-
-		if st.Kittens > 0 {
-			cat.DrawKittens(c.Near(), c.Mid(), 5, top, st.Kittens, c.W-1,
-				int(float64(c.H)*0.42)+1, t, seed)
-		}
-		if st.Bubble != "" {
-			rows := companion.Bubble(st.Bubble)
-			(&companion.Sprite{Rows: rows, Body: bubbleCol}).Draw(c.Near(), 12, top-len(rows))
-		}
-		drawSand(c, st.Tail)
+		drawScene(c, sh, cat, lay, st, t, seed, top)
 
 		// Home the cursor and overwrite rather than clearing: clearing every
 		// frame is what makes a terminal animation flicker.
 		fmt.Print("\x1b[H" + c.Render(profile))
+	}
+}
+
+// layout is where the composition lives: which side the companion sits on and
+// what that implies for everything anchored to it. One function, so the mockup
+// and the live loop cannot disagree about it.
+type layout struct {
+	CatX     int // left cell of the companion sprite
+	BubbleX  int
+	SandFrom int
+	SandTo   int
+	MoonX    float64
+	Mirror   bool
+}
+
+// composeRight is the mirrored composition: companion on the right, litter
+// growing leftward, tail written from the left margin, moon moved across.
+//
+// The moon moves because it is the other thing a glance goes looking for. Left
+// where it was, at 0.72 of the width, it and the companion would stack into one
+// column and leave half the frame carrying nothing.
+func compose(w int, catW int, mirror bool) layout {
+	const margin = 2
+	if !mirror {
+		return layout{
+			CatX: 5, BubbleX: 12,
+			SandFrom: 5 + catW + 2, SandTo: w - margin,
+			MoonX: 0.72, Mirror: false,
+		}
+	}
+	catX := w - catW - margin
+	if catX < 0 {
+		// Narrower than the sprite. Pin it to the left edge rather than let it
+		// slide off: clipping the far side costs the tail, clipping the near
+		// side would start eating the face, and the face is the whole point.
+		catX = 0
+	}
+	bx := catX - 2
+	if bx < margin {
+		bx = margin
+	}
+	return layout{
+		CatX: catX, BubbleX: bx,
+		SandFrom: margin, SandTo: catX - 1,
+		MoonX: 0.28, Mirror: true,
 	}
 }
 
@@ -175,44 +247,93 @@ func timeOfDay(now time.Time) float64 {
 	return float64(h*3600+m*60+s) / 86400
 }
 
+// drawScene paints one composed frame: the companion, its litter, the bubble
+// and the sand. The live loop and the mockup both go through here, so a change
+// to the composition cannot land in one and miss the other.
+func drawScene(c *canvas.Canvas, sh *scape.Shore, cat *companion.Cat, lay layout,
+	st reduce.State, t float64, seed int64, top int) {
+	cat.Draw(c.Near(), lay.CatX, top, t, st.Pose)
+	if st.Kittens > 0 {
+		cat.DrawKittens(c.Near(), c.Mid(), lay.CatX, top, st.Kittens, c.W-1,
+			int(float64(c.H)*0.42)+1, t, seed)
+	}
+	if st.Bubble != "" {
+		rows := companion.Bubble(st.Bubble)
+		x := lay.BubbleX
+		if lay.Mirror {
+			if w := bubbleWidth(rows); x-w >= 0 {
+				x -= w
+			} else {
+				x = 0
+			}
+		}
+		(&companion.Sprite{Rows: rows, Body: bubbleCol}).Draw(c.Near(), x, top-len(rows))
+	}
+	drawSand(c, st.Tail, sh.SandTop(), lay.SandFrom, lay.SandTo)
+}
+
+func bubbleWidth(rows []string) int {
+	w := 0
+	for _, r := range rows {
+		if n := len([]rune(r)); n > w {
+			w = n
+		}
+	}
+	return w
+}
+
 // drawSand writes the activity tail into the beach.
 //
 // Sand tones rather than terminal tones, newest brightest, older lines fading
-// as the tide takes them. It is always visible, but it is scenery: the sea
-// says how much work is happening and the sand says what it is, which is why
-// no per-tool weather vocabulary is needed anywhere else.
-func drawSand(c *canvas.Canvas, lines []reduce.Line) {
-	if len(lines) == 0 {
+// as the tide takes them. Always visible, but scenery: the sea says how much
+// work is happening and the sand says what it is, which is why no per-tool
+// weather vocabulary is needed anywhere else.
+//
+// The block hangs off the WATERLINE, not off the bottom of the canvas. Anchored
+// to the canvas it drifts upward as lines accumulate and ends up written across
+// open water, which is the opposite of what "written in the sand" means.
+func drawSand(c *canvas.Canvas, lines []reduce.Line, sandTop, xFrom, xTo int) {
+	if len(lines) == 0 || xTo-xFrom < 12 {
 		return
 	}
 	sand := term.RGB{R: 76, G: 65, B: 54}
 	ink := term.RGB{R: 240, G: 230, B: 210}
 	bad := term.RGB{R: 244, G: 176, B: 96}
 
-	// Sit the block just above the bottom edge, newest last so the eye lands
-	// on the current line closest to the companion.
-	top := c.H - len(lines) - 1
-	if top < 2 {
-		top = 2
+	// However many rows the beach actually has. A short pane -- a wide bottom
+	// split is the obvious case -- has almost no beach, and writing six lines
+	// into two rows of sand would just put four of them back in the sea.
+	room := c.H - sandTop
+	if room < 1 {
+		return
 	}
+	if len(lines) > room {
+		lines = lines[len(lines)-room:]
+	}
+
+	// Newest at the bottom: furthest from the water, nearest the companion,
+	// and last in the reading order.
+	top := c.H - len(lines)
 	for i, ln := range lines {
 		row := top + i
-		if row >= c.H {
-			break
+		if row < 0 || row >= c.H {
+			continue
 		}
 		base := ink
 		if ln.Bad {
 			base = bad
 		}
 		// Fade on the line's own age rather than on its position, so a line
-		// that has been sitting there for two minutes looks it even when
-		// nothing newer has arrived to push it down.
+		// that has sat there two minutes looks it even when nothing newer has
+		// arrived to push it down.
 		col := term.Lerp(base, sand, 0.15+0.7*ln.Age)
-		for x, r := range []rune(ln.Text) {
-			if x+2 >= c.W {
+		x := xFrom
+		for _, r := range []rune(companion.NarrowOnly(ln.Text)) {
+			if x >= xTo {
 				break
 			}
-			c.Near().Plot(x+2, row, r, col, 1)
+			c.Near().Plot(x, row, r, col, 1)
+			x++
 		}
 	}
 }

@@ -81,12 +81,16 @@ func runEmit(args []string) {
 		session = fs.String("session", "", "session id (default: $CLAUDE_CODE_SESSION_ID, else current)")
 		quiet   = fs.Bool("q", false, "print nothing")
 	)
-	fs.Parse(args)
-
-	if fs.NArg() < 1 {
+	// The kind comes first and Go's flag package stops parsing at the first
+	// non-flag argument, so `emit tool_start -tool Read` -- the form printed
+	// in the help and the README -- silently dropped every flag and emitted an
+	// empty event. Split the kind off before parsing.
+	if len(args) == 0 || strings.HasPrefix(args[0], "-") {
 		fmt.Fprintln(os.Stderr, "asciiscapes emit: need a kind, e.g. `asciiscapes emit tool_start -tool Read`")
 		os.Exit(2)
 	}
+	kind := args[0]
+	fs.Parse(args[1:])
 
 	sess := *session
 	if sess == "" {
@@ -97,7 +101,7 @@ func runEmit(args []string) {
 	}
 
 	e := event.Event{
-		Kind: event.Kind(fs.Arg(0)), Session: sess, Src: "manual",
+		Kind: event.Kind(kind), Session: sess, Src: "manual",
 		Tool: *tool, Op: event.Op(*op), Target: *target, Detail: *detail,
 		Text: *text, ID: *id, Agent: *agent, MS: *ms,
 	}
@@ -115,12 +119,12 @@ func runEmit(args []string) {
 		fmt.Fprintln(os.Stderr, "asciiscapes:", err)
 		os.Exit(1)
 	case viaSock:
-		fmt.Printf("sent %s to session %s\n", e.Kind, event.Tag(sess))
+		fmt.Printf("sent %s to session %s\n", e.Kind, event.Short(sess))
 	default:
 		// Say so plainly. "It went to the spool" is the difference between
 		// "no scape is running" and "the scape is broken", and guessing
 		// wrong wastes an afternoon.
-		fmt.Printf("spooled %s for session %s (no scape listening)\n", e.Kind, event.Tag(sess))
+		fmt.Printf("spooled %s for session %s (no scape listening)\n", e.Kind, event.Short(sess))
 	}
 }
 
@@ -163,6 +167,13 @@ func runStatusline(args []string) {
 		})
 	}
 
+	// Strip the `--` separator. Without this the chain execs "--" and the
+	// user's statusline vanishes -- and the instruction install prints tells
+	// them to write exactly that, so following our own documentation deleted
+	// the thing we promised to preserve.
+	if len(args) > 0 && args[0] == "--" {
+		args = args[1:]
+	}
 	if len(args) == 0 {
 		return
 	}
@@ -170,7 +181,11 @@ func runStatusline(args []string) {
 	cmd.Stdin = bytes.NewReader(in)
 	cmd.Stdout = os.Stdout
 	cmd.Stderr = os.Stderr
-	_ = cmd.Run()
+	if err := cmd.Run(); err != nil {
+		// stdout here IS the statusline, so a silent failure leaves a blank
+		// bar and no clue why. Say something short in the space it owns.
+		fmt.Printf("asciiscapes: statusline chain failed: %v", err)
+	}
 }
 
 // runReplay feeds a recorded log back through the bus, which is how the

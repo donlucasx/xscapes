@@ -32,6 +32,10 @@ type Line struct {
 	// Bad marks a failure, so the sand can carry the same worry the
 	// companion does without the companion being the only place to see it.
 	Bad bool
+
+	// src is kept so the line can be re-rendered to a narrower budget without
+	// the reducer having to know the terminal's width.
+	src line
 }
 
 type line struct {
@@ -55,6 +59,57 @@ func (t *tail) push(l line) {
 	}
 }
 
+// Fit renders the tail to a column budget.
+//
+// Chopping a line where it runs out of room produces `edit internal/auth/ha`,
+// which names no file at all. Drop whole pieces in order of how much they
+// carry instead: the result column first, then the directories, so a narrow
+// pane still reads `edit handler.go` -- short, but it still says what happened
+// and to what.
+func (t *tail) fit(now time.Time, cols int) []Line {
+	out := t.lines(now)
+	for i := range out {
+		out[i].Text = fitLine(out[i].src, cols)
+	}
+	return out
+}
+
+func fitLine(l line, cols int) string {
+	if cols <= 0 {
+		return ""
+	}
+	for _, form := range []func(line) string{
+		func(x line) string { return format(x) },
+		func(x line) string { x.detail, x.ms = "", 0; return format(x) },
+		func(x line) string { x.target = fileName(x.target); return format(x) },
+		func(x line) string { x.detail, x.ms = "", 0; x.target = fileName(x.target); return format(x) },
+		func(x line) string { return strings.TrimSpace(verbOf(x)) + " " + fileName(x.target) },
+	} {
+		if s := form(l); len([]rune(s)) <= cols {
+			return s
+		}
+	}
+	// Even the shortest form does not fit: keep the verb, which at least says
+	// the agent is doing something rather than nothing.
+	return trimRunes(strings.TrimSpace(verbOf(l)), cols)
+}
+
+// fileName keeps the filename and drops the directories.
+func fileName(s string) string {
+	if i := strings.LastIndexByte(s, '/'); i >= 0 && i+1 < len(s) {
+		return s[i+1:]
+	}
+	return s
+}
+
+func trimRunes(s string, n int) string {
+	r := []rune(s)
+	if len(r) <= n {
+		return s
+	}
+	return string(r[:n])
+}
+
 func (t *tail) lines(now time.Time) []Line {
 	if len(t.items) == 0 {
 		return nil
@@ -69,6 +124,7 @@ func (t *tail) lines(now time.Time) []Line {
 			Text: format(it),
 			Age:  float64(age) / float64(TailTTL),
 			Bad:  it.bad,
+			src:  it,
 		})
 	}
 	if len(out) > TailLen {
@@ -83,7 +139,7 @@ func (t *tail) lines(now time.Time) []Line {
 // someone who has never used this agent and "Read" is a Claude Code noun. The
 // target keeps its tail rather than its head -- the end of a path identifies
 // the file, the start identifies the home directory.
-func format(l line) string {
+func verbOf(l line) string {
 	verb := string(l.op)
 	if verb == "" || l.op == event.OpOther {
 		verb = strings.ToLower(l.tool)
@@ -91,8 +147,11 @@ func format(l line) string {
 	if verb == "" {
 		verb = "run"
 	}
+	return fmt.Sprintf("%-5s", verb)
+}
 
-	parts := []string{fmt.Sprintf("%-5s", verb)}
+func format(l line) string {
+	parts := []string{verbOf(l)}
 	if l.target != "" {
 		parts = append(parts, l.target)
 	}

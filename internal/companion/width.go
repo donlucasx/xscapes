@@ -12,6 +12,36 @@ package companion
 // Notably NOT here, despite being tempting: · ° ≈ • ▒ ▓ █ ─ ⌒ ● ∧ ☆ ω (all
 // Ambiguous — one cell in a Western terminal, two in a CJK locale) and 人 つ
 // ・ ミ ノ (Wide — two cells everywhere).
+// NarrowOnly makes a string safe to paint one rune per cell.
+//
+// Everything the scene writes is derived from something the agent touched -- a
+// path, an error, an assistant message -- and any of those can carry a rune
+// that occupies two terminal cells. Painted one-per-cell it pushes the rest of
+// the row right, and every row after it in the frame is then misaligned. There
+// is no width table in this program and adding one is not worth it, so fail
+// closed: anything not known to be one cell wide becomes a placeholder.
+func NarrowOnly(s string) string {
+	safe := true
+	for _, r := range s {
+		if !isNarrow(r) {
+			safe = false
+			break
+		}
+	}
+	if safe {
+		return s
+	}
+	out := make([]rune, 0, len(s))
+	for _, r := range s {
+		if isNarrow(r) {
+			out = append(out, r)
+			continue
+		}
+		out = append(out, '?')
+	}
+	return string(out)
+}
+
 func isNarrow(r rune) bool {
 	switch {
 	case r >= 0x20 && r <= 0x7E: // printable ASCII

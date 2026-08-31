@@ -207,3 +207,133 @@ func TestContextOnlySetByContextEvents(t *testing.T) {
 		t.Errorf("context moved to %.3f on an unrelated event", got)
 	}
 }
+
+// --- regressions from the 2026-08-31 review ---
+
+// The worst one. After any failed command the companion goes Worried, and the
+// bubble used to be gated on the pose -- so a permission prompt the agent is
+// actually blocked on went silent, and the session could sit waiting for input
+// with nothing on screen saying so.
+func TestWorriedDoesNotSwallowThePermissionPrompt(t *testing.T) {
+	r := New("s")
+	r.Apply(event.Event{Kind: event.Prompt}, at(0))
+	r.Apply(event.Event{Kind: event.Error, Tool: "Bash", Detail: "exit 1"}, at(1))
+	r.Apply(event.Event{Kind: event.NeedsInput, Text: "allow Bash?"}, at(2))
+
+	st := r.State(at(2))
+	if st.Pose != companion.Worried {
+		t.Errorf("pose = %v, want Worried (a break still outranks a question)", st.Pose)
+	}
+	if st.Bubble != "allow Bash?" {
+		t.Errorf("bubble = %q; the agent is BLOCKED and the scene must say so even while worried", st.Bubble)
+	}
+}
+
+func TestDoneKnockShowsThroughAWorry(t *testing.T) {
+	r := New("s")
+	r.Apply(event.Event{Kind: event.Prompt}, at(0))
+	r.Apply(event.Event{Kind: event.Error, Tool: "Bash"}, at(1))
+	r.Apply(event.Event{Kind: event.Done, Text: "tests still failing"}, at(2))
+	if got := r.State(at(3)).Bubble; got != "tests still failing" {
+		t.Errorf("bubble = %q, want the finish message", got)
+	}
+}
+
+// A knock with no words is honest; a knock still showing the last permission
+// request is a lie about what is being asked.
+func TestDoneWithNoMessageDoesNotReuseTheOldBubble(t *testing.T) {
+	r := New("s")
+	r.Apply(event.Event{Kind: event.NeedsInput, Text: "allow Bash?"}, at(0))
+	r.Apply(event.Event{Kind: event.Done}, at(1))
+	if got := r.State(at(2)).Bubble; got != "" {
+		t.Errorf("bubble = %q, want empty", got)
+	}
+}
+
+// Kill the agent while a Bash is running: no tool_end, no Stop, no session_end.
+// The scene must eventually settle instead of insisting forever that the agent
+// is hard at work.
+func TestAKilledAgentEventuallySettles(t *testing.T) {
+	r := New("s")
+	r.Apply(event.Event{Kind: event.Prompt}, at(0))
+	r.Apply(event.Event{Kind: event.ToolStart, ID: "t1", Op: event.OpShell}, at(1))
+
+	// Still working a few minutes in -- a long command is normal.
+	if st := r.State(at(120)); !st.Act.Working {
+		t.Error("a two-minute command should still read as working")
+	}
+	// But not forever.
+	late := at(FlightStale.Seconds() + TurnSilence.Seconds() + 60)
+	st := r.State(late)
+	if st.Act.Working {
+		t.Error("a tool that never ended pinned the scene at working forever")
+	}
+	if st.Act.Level > 0.05 {
+		t.Errorf("sea never settled: level %.3f", st.Act.Level)
+	}
+	if st.Pose != companion.Resting {
+		t.Errorf("pose = %v, want Resting", st.Pose)
+	}
+}
+
+// Auto-compaction re-announces the session mid-turn. That must not wipe the
+// scene while the agent is still working.
+func TestCompactDoesNotResetTheScene(t *testing.T) {
+	r := New("s")
+	r.Apply(event.Event{Kind: event.Prompt}, at(0))
+	for i := 0; i < 5; i++ {
+		id := string(rune('a' + i))
+		r.Apply(event.Event{Kind: event.ToolStart, ID: id}, at(float64(i) * 0.2))
+		r.Apply(event.Event{Kind: event.ToolEnd, ID: id, Op: event.OpRead, Target: "x.go"}, at(float64(i)*0.2 + 0.1))
+	}
+	r.Apply(event.Event{Kind: event.SubStart, Agent: "a1"}, at(2))
+	before := r.State(at(2))
+
+	r.Apply(event.Event{Kind: event.SessionStart, Text: "compact"}, at(3))
+	after := r.State(at(3))
+
+	if after.Kittens != before.Kittens {
+		t.Errorf("compaction dropped the litter: %d -> %d", before.Kittens, after.Kittens)
+	}
+	if len(after.Tail) == 0 {
+		t.Error("compaction wiped the sand")
+	}
+	if !after.Act.Working {
+		t.Error("compaction stopped the turn while the agent was still working")
+	}
+
+	// A real new session still resets.
+	r.Apply(event.Event{Kind: event.SessionStart, Text: "startup"}, at(4))
+	if st := r.State(at(4)); st.Kittens != 0 || len(st.Tail) != 0 || st.Act.Working {
+		t.Error("a genuinely new session must reset the scene")
+	}
+}
+
+// TurnSilence has to measure silence, not turn length.
+func TestALongBusyTurnDoesNotTimeOut(t *testing.T) {
+	r := New("s")
+	r.Apply(event.Event{Kind: event.Prompt}, at(0))
+	// Seven minutes of steady work, well past TurnSilence.
+	for s := 10.0; s < 420; s += 10 {
+		id := string(rune('a' + int(s)%26))
+		r.Apply(event.Event{Kind: event.ToolStart, ID: id}, at(s))
+		r.Apply(event.Event{Kind: event.ToolEnd, ID: id}, at(s+1))
+	}
+	// Then the thinking gap the TurnFloor constant exists for.
+	if st := r.State(at(437)); !st.Act.Working {
+		t.Error("a healthy seven-minute turn timed out mid-work")
+	}
+	// Genuine silence still closes it.
+	if st := r.State(at(420 + TurnSilence.Seconds() + 30)); st.Act.Working {
+		t.Error("a turn that really went quiet should close")
+	}
+}
+
+// A scape attached partway through a session never sees the prompt.
+func TestToolTrafficAloneOpensATurn(t *testing.T) {
+	r := New("s")
+	r.Apply(event.Event{Kind: event.ToolStart, ID: "t1"}, at(0))
+	if st := r.State(at(1)); !st.Act.Working {
+		t.Error("tool traffic with no prompt must still read as working")
+	}
+}
