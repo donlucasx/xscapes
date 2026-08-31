@@ -90,3 +90,74 @@ Never paraphrase. Read the relevant section before editing anything it covers.
   ⇒ Companion moves RIGHT; kittens fill RIGHT-TO-LEFT; placement is intentional around the sand
     text, and overlap is ACCEPTABLE once the litter is large. Asked for an assessment first, not
     an implementation.
+
+## 2026-08-31 — session 6, verbatim
+
+**Mirroring the composition**
+- *"aligned, lets mirror the composition- shall we mock it up first?"* ⇒ mock BEFORE building.
+- *"also, are we accounting for the user experiencing the terminal on different aspect ratios?
+  are our scenes reactive? do they adjust to the widght/height/aspect ratio of the window?"*
+  ⇒ Exposed that `-live` never resized at all. See ▶ terminal fixes.
+- *"if we mirror the composition, would we risk the companion being lost if the width of the
+  terminal screen is too narrow?"* ⇒ Measured: NO, the opposite. Mirrored the cat tracks the
+  edge and stays whole to 14 cols; pinned-left it clipped at 16.
+- *"lets do both"* / *"explain in simpler terms what these decisions mean"* / *"ok, lets do both"*
+  ⇒ Reserved beach on short panes + tail degrades by dropping whole pieces. BOTH SHIPPED.
+  ⇒ And: when asked to explain, drop the jargon and SHOW rendered before/after. He asked once.
+
+**Seeing it**
+- *"where can i see it"* ⇒ built `wired-turn.gif`. A screenshot cannot show motion.
+- *"im on the app, can I see them here"* ⇒ published an artifact. He is often on the app, not
+  the terminal. Offer a viewable link, not just a local path.
+- *"need to test it on the terminal now. Can I do so within an existing session like this one?
+  or recommend to start a new one?"*
+- *"run it"* ⇒ I could not: `-live` needs a real TTY and the Bash tool has none. Say so.
+
+**Terminal reality — three bugs he found by running it**
+- *"[screenshots] ran the demo, this is how it looks when I open it (it doesnt fill the frame,
+  no color?) ... when shrank too much it breaks ... when I stretch it again it glitches"*
+  ⇒ ONE bug: `stty size` reads from stdin, which exec.Command gives /dev/null. Always 80x24.
+- *"looks much better. Still glitches a bit when resizing the screen (during the dragging) but
+  settles correctly. I noticed the 'shine' effect on the ocean is on the right side, but it
+  should be on the left, under the moon- correct? Regarding Colour: whats the best approach to
+  optimize the visual experience? can we override the terminal color settings when running
+  this? I have different terminal windows open working w different colors (mostly variations of
+  solids). How do we ensure everyone is having the same visual experience?"*
+  ⇒ He was right about the shine: `glitter()` hardcoded 0.72 while the moon moved to 0.28.
+- *"if I understand correctly, the terminal.app is limited to 256 colors, right? but is it
+  limited to greyscale? can we try an alternative approach to 256 using colors?"*
+  ⇒ **He was right to push and I had been wrong.** 256 is not greyscale. Led to the glyph
+    chroma boost. DO NOT let "the backgrounds cannot be coloured" become "256 cannot do colour".
+- *"i like glyph chroma 2.6x best."* ⇒ **LOCKED at 2.6.**
+
+**Companion**
+- *"can we take a look at the companion. Are there any more face details we can add to make it
+  look more like a cat? also try it on more solid colors? perhaps taking inspiration on claudes
+  mascot"*
+- *"love these, im leaning towards cream, slate or charcoal. Terracota and Ginger look great but
+  they are too similar to claude's."* ⇒ **Claude's own colours are OUT.**
+- *"I like this face variation for the cat, can we try additional details? any way we can get
+  some whiskers on the cat? or any other feline characteristics? expand the character study"*
+- *"im still leaning towards the original one, or the one with a nose we did last session. can we
+  attempt a few more subtle variations? also try again the chest bib and toe tips. Let me see
+  each variation on its own and then all together as well, keep same colors and try some new
+  ones"* ⇒ **SUBTLE. And show each feature ISOLATED before combining.**
+- *"fav colors so far: cream, fog, slate, sage, mauve and charcoal. as far as features, I like
+  the nose and the toes. Can we try an alternative approach to the whiskers and inner ears?"*
+- *"ok, colorwise lets keep cream, slate, sage, mauve and charcoal in the mix. I think
+  cream/sage/slate win because they stand out best. regarding features: whiskers dont quite read
+  yet, can we test the'strokes' closer to the body instead of having a gap? and also prob closer
+  to each other as well. Inner ears dont quite read- the inner ear detail should be within the
+  existing ears, not outside. Lets see a couple variations for each, with and without the toes"*
+- *"whiskers are better, they shouyld be flush, but all 4 whiskers should land around the nose,
+  not the eyes. maybe a mix of flush and long. for the inner ears, the inner shadow works best."*
+  ⇒ **Inner ears SETTLED: inner shadow.**
+- *"whiskers are not it yet. they all need to be connected to the body, and they should be closer
+  to the nose, not eye level. Maybe bottom whiskers are longer than the top ones, or viceversa,
+  try a couple more alts"*
+  ⇒ Root cause found on the 4th attempt: the head is NOT centred in its sprite, so any FIXED
+    cell offset connects on one side and gaps on the other. Whiskers now find the fur.
+    **Lesson: three rounds were spent moving a number when the placement model was wrong.**
+
+- *"lets /wrap and revisit this on a fresh session. Will look at the companion-study.png and get
+  back to u"* ⇒ Companion is PAUSED awaiting his pick. Nothing is defaulted.
