@@ -18,12 +18,11 @@ func kittenPage(seed int64) string {
 		n    int
 		note string
 	}{
-		{1, "large"},
-		{3, "large"},
-		{5, "large &mdash; the last count that keeps them big"},
-		{7, "the whole litter drops to small together"},
-		{9, "still small"},
-		{12, "the whole litter drops to tiny together"},
+		{2, "roughly one in three takes to the water"},
+		{5, "beach tier is set by how many are ON the beach, not the total"},
+		{8, "swimmers ride the swell and waddle sideways in their own lanes"},
+		{12, "the sea absorbs what the sand cannot hold"},
+		{18, "a proper fan-out"},
 	}
 
 	var b strings.Builder
@@ -41,7 +40,7 @@ func kittenPage(seed int64) string {
 			top := c.H - 2 - chh
 			kc := companion.NewCat()
 			kc.Draw(c.Near(), 3, top, t, companion.Working)
-			fit = kc.DrawKittens(c.Near(), c.Mid(), 3, top, cc.n, c.W-1, t, seed)
+			fit = kc.DrawKittens(c.Near(), c.Mid(), 3, top, cc.n, c.W-1, int(float64(c.H)*0.42)+1, t, seed)
 			fmt.Fprintf(&row, `<div class="win">%s</div>`, c.HTMLFragment(12))
 		}
 		short := ""

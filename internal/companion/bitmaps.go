@@ -71,7 +71,8 @@ var CatBody = []string{
 var Bitmaps = map[string][]string{"cat": PixelCat, "catBody": CatBody,
 	"catWalk": CatWalk, "catWorried": CatWorried,
 	"kittenSit": KittenSit, "kittenCurl": KittenCurl, "kittenFar": KittenFar,
-	"kittenSmall": KittenSmall, "kittenTiny": KittenTiny}
+	"kittenSmall": KittenSmall, "kittenTiny": KittenTiny,
+	"kittenSwim": KittenSwim}
 
 // CatWalk is the side view: torso and head only, facing right. Legs and tail
 // are drawn per frame, so the gait needs no art. Mirror the composed frame
@@ -212,6 +213,7 @@ var eyeRows = map[string][2]int{
 	"kittenCurl":  {4, 5},
 	"kittenSmall": {4, 5},
 	"kittenTiny":  {4, 5},
+	"kittenSwim":  {4, 5},
 }
 
 // KittenSmall and KittenTiny are the same animal compressed further, both
@@ -246,4 +248,19 @@ var KittenTiny = []string{
 	".######.",
 	".######.",
 	".#.##.#.",
+}
+
+// KittenSwim is a kitten in the water: ears, head and eyes, chin at the
+// waterline, everything else below it. Drawing a beach kitten higher up the
+// screen looked like a rendering fault; a sprite that ENDS at the waterline
+// reads as swimming.
+var KittenSwim = []string{
+	".##....##.",
+	".##....##.",
+	".########.",
+	".########.",
+	".##.##.##.",
+	".##.##.##.",
+	".########.",
+	"..######..",
 }

@@ -51,6 +51,7 @@ type Cat struct {
 	worried  *Bitmap
 	kitCache map[int]*Bitmap
 	kitTier  int // last chosen litter size, for hysteresis
+	swim     *Bitmap
 }
 
 func NewCat() *Cat {

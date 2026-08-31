@@ -17,7 +17,14 @@ var eyeCols = map[string][2]int{
 	"kittenCurl":  {1, 3},
 	"kittenSmall": {1, 3},
 	"kittenTiny":  {1, 2},
+	"kittenSwim":  {1, 3},
 }
+
+// swims decides, once and for all, whether a given subagent is a swimmer.
+// Keyed on index so a subagent does not climb in and out of the sea between
+// frames. Roughly one in three, which is enough to make the beach look less
+// like a police line-up without emptying it.
+func swims(i int, seed int64) bool { return i > 0 && HashF(i, 11, seed) > 0.64 }
 
 // kitTier is one rung of the size ladder.
 //
@@ -80,8 +87,13 @@ func (c *Cat) KittenSize() (w, h int) {
 // Every kitten runs its own breath, blink and tail on periods drawn from a hash
 // of its index -- periods, not just phases, so they never fall into step and
 // some coincidentally align, which is what a litter actually looks like.
-func (c *Cat) DrawKittens(near, mid *canvas.Layer, px, py, n, w int, t float64, seed int64) int {
-	_ = mid // every kitten is on the near layer now; kept for call-site stability
+// DrawKittens draws one kitten per running subagent and returns how many fit.
+//
+// Some sit on the sand and some swim. Swimmers use vertical space the beach
+// does not have, so the two together hold far more than either alone, and the
+// sea gives the litter somewhere to spread that still reads as one scene.
+func (c *Cat) DrawKittens(near, mid *canvas.Layer, px, py, n, w, seaTop int, t float64, seed int64) int {
+	_ = mid // every kitten is on the near layer; kept for call-site stability
 	if n <= 0 {
 		return 0
 	}
@@ -89,11 +101,22 @@ func (c *Cat) DrawKittens(near, mid *canvas.Layer, px, py, n, w int, t float64, 
 	x := px + pw + 1
 	drawn := 0
 
-	ti := TierFor(n, c.kitTier)
+	// Split first: the beach tier is chosen by how many are actually ON it.
+	var sitters, swimmers []int
+	for i := 0; i < n; i++ {
+		if swims(i, seed) {
+			swimmers = append(swimmers, i)
+		} else {
+			sitters = append(sitters, i)
+		}
+	}
+	ti := TierFor(len(sitters), c.kitTier)
 	c.kitTier = ti
 	spec := kitTiers[ti]
 
-	for i := 0; i < n; i++ {
+	drawn += c.drawSwimmers(near, swimmers, px, py, w, seaTop, t, seed)
+
+	for _, i := range sitters {
 		bm := c.kitBitmap(ti)
 		kw, kh := bm.W/2, bm.H/4
 		if x+kw > w {
@@ -163,4 +186,74 @@ func (c *Cat) kitTail(b *Bitmap, segs, srcW int, wag float64, lift int) {
 		y := rootY - int(float64(segs)*0.8*f+0.5) + lift
 		b.Set(x, y)
 	}
+}
+
+// drawSwimmers puts kittens in the sea, bobbing on the swell and waddling
+// slowly sideways. Each one keeps its own lane, so they do not converge.
+func (c *Cat) drawSwimmers(l *canvas.Layer, idx []int, px, py, w, seaTop int, t float64, seed int64) int {
+	if len(idx) == 0 {
+		return 0
+	}
+	if c.swim == nil {
+		c.swim = ParseBitmap(KittenSwim)
+	}
+	kw, kh := c.swim.W/2, c.swim.H/4
+	// Open water runs from just under the horizon down to just above the sand.
+	// It is NOT the strip above the parent's head -- the parent stands on the
+	// beach in front of the sea, so its rows overlap the water it is standing
+	// before. Measuring the zone that way left one row and drew no swimmers.
+	_, ph := c.Size()
+	top := seaTop + 1
+	bot := py + ph - 3
+	lanes := bot - top
+	if lanes < 1 {
+		return 0
+	}
+	wake := '~'
+	drawn := 0
+
+	for k, i := range idx {
+		phase := HashF(i, 12, seed) * 6.283
+		// Lane and home column are fixed per subagent; only the wander moves.
+		lane := int(HashF(i, 13, seed) * float64(lanes))
+		home := px + 2 + int(HashF(i, 14, seed)*float64(w-px-8))
+		x := home + int(2.5*math.Sin(t*0.32+phase))
+		y := top + lane
+
+		// Ride the swell rather than bobbing on a private clock.
+		if math.Sin(t*0.9+float64(x)*0.16+phase) > 0.35 {
+			y--
+		}
+		if x < 1 || x+kw >= w || y < top || y+kh > bot {
+			continue
+		}
+
+		f := c.swim.Blank()
+		for sy := 0; sy < f.H; sy++ {
+			for sx := 0; sx < f.W; sx++ {
+				if c.swim.at(sx, sy) {
+					f.Set(sx, sy)
+				}
+			}
+		}
+		if HashF(i, 15, seed) > 0.5 {
+			f = f.Mirrored()
+		}
+		(&Sprite{Rows: f.ToQuadrant(), Body: furCol, Alpha: 1}).Draw(l, x, y)
+
+		e := eyeCols["kittenSwim"]
+		glyph := 'o'
+		if math.Mod(t+phase, 4.2+HashF(i, 16, seed)*3) < 0.17 {
+			glyph = '-'
+		}
+		l.Plot(x+e[0], y+1, glyph, kittenEye, 1)
+		l.Plot(x+e[1], y+1, glyph, kittenEye, 1)
+
+		// A little wake, so they sit IN the water rather than on it.
+		l.Plot(x-1, y+kh-1, wake, furCol, 0.5)
+		l.Plot(x+kw, y+kh-1, wake, furCol, 0.5)
+		_ = k
+		drawn++
+	}
+	return drawn
 }
