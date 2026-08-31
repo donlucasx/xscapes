@@ -161,3 +161,16 @@ Never paraphrase. Read the relevant section before editing anything it covers.
 
 - *"lets /wrap and revisit this on a fresh session. Will look at the companion-study.png and get
   back to u"* ⇒ Companion is PAUSED awaiting his pick. Nothing is defaulted.
+
+## 2026-08-31 — session 7, verbatim
+
+- *"resume work on asciiscapes"*
+- Asked for the companion pick (coat / whiskers / toes / or defer). His four answers, verbatim:
+  - Coat: *"pull up the latest companion study"*
+  - Whiskers: *"need to revise this one"*
+  - Toes: *"tbd, let me see with and without still"*
+  - Defer: chose **"Not decided — build on"** (leave companion paused; work the done vs
+    needs_input distinct-cues gap).
+  ⇒ Companion stays PAUSED, still nothing defaulted. He wants the CURRENT study in front of him
+    (it already renders with/without toes), expects another whisker revision round after he
+    looks, and meanwhile the build continues on the locked-brief gap.
