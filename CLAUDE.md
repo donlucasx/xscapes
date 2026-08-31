@@ -1,16 +1,21 @@
 # asciiscapes — project brief for Claude Code
 
-> **Where we left off — 2026-08-31, commit `7b9c189`.**
-> **The scene is wired to a real session, reviewed, and mirrored.** Hook events
-> drive the sea, the companion, the kittens and the sand. New since the visual
-> vocabulary: `internal/event` (the protocol), `internal/reduce` (the fold),
-> `hook.go` (the Claude Code adapter), `install.go` (plan-first, byte-splicing
-> merge into `~/.claude/settings.json`), `emit`/`replay`/`statusline`.
-> `go build`, `go vet`, `go test` and `-race` all clean; 33 commits on `main`;
-> no remote.
+> **Where we left off — 2026-08-31, commit `7b67126`.**
+> **It runs in a real terminal and Lucas has run it.** The event plumbing, the
+> Claude Code adapter and the installer all shipped; then he ran it and found
+> that the scene had never been the size of its window (`stty size` reads from
+> stdin, which `exec.Command` gives /dev/null — so it always fell back to
+> 80×24). Fixed with the `TIOCGWINSZ` ioctl. Also this session: the composition
+> is **mirrored** (companion right, moon at 0.28), the waterline reserves a
+> beach on short panes, the sand tail degrades by dropping whole pieces, and
+> **256-colour terminals get real colour** by keeping the darkness in the
+> backgrounds and pushing chroma into the glyphs (`GlyphBoost` = 2.6).
+> `go build`, `go vet`, `go test` and `-race` clean; 49 commits on `main`; no
+> remote.
 > **`notes/claude-hooks-verified.md` is the hook payload schema, read out of the
 > Claude Code binary itself — trust it, do not re-derive it.**
-> ▶ NEXT is installing it and running a real day on it. See `RESUME.md`.
+> ▶ NEXT is Lucas's companion pick, then installing it and running a real day.
+> See `RESUME.md`.
 
 Working name: **asciiscapes** (not final; see open questions). A cozy ASCII "thinking screen" for terminal AI agents. While Claude Code (or any agent) works, a small living scene runs beside it — a shoreline whose sea rises with the work, and a companion animal — and nudges the user, visually and with a sound, when the agent finishes or needs input.
 
@@ -69,6 +74,7 @@ only if nothing else needs it.
 | time of day | **sky colour**, real wall clock | done |
 | weather | **deferred, not rejected** &mdash; no rain, clouds, fog or sync in v1; the thinking is parked in `ideas.md` | deferred 2026-08-30 |
 | needs you | **bubble**, rare: needs_input, error, done. Nothing else | done; ⚠ `done` and `needs_input` still look identical, which the notification section says they must not |
+| companion identity | **coat + face**: cream/slate/sage/mauve/charcoal, nose, toes, inner-shadow ears, whiskers | ⏸ options built, awaiting Lucas's pick; nothing defaulted |
 | what it is doing now | **text written in the sand**, newest brightest, older fading as the tide takes them | done — anchored to the waterline, degrades by dropping whole pieces when narrow |
 | todos completed | **star count** | not built |
 | subagents | **kittens** | done — `agent_id`/`agent_type`, counted live |
@@ -119,6 +125,16 @@ pane, where 80% used to leave a single row.
 - Go + bubbletea/lipgloss, single static binary. No Node, no Python.
 - Design target 80×24; must look fine at 40×12.
 - Glyphs: Unicode blocks + braille for water/fire, ASCII fallback. Truecolor with automatic 256-color fallback (Terminal.app is 256 max).
+- **256 is not greyscale** — it is 216 colours plus 24 greys. A dark palette
+  collapses to grey because the colour cube has almost no resolution below luma
+  25 (4 entries, all pure blue) against 108 above 150. So the darkness lives in
+  the BACKGROUNDS and the colour lives in the GLYPHS, which are the bright part
+  of the frame. `term.GlyphBoost` (2.6, `ASCIISCAPES_CHROMA` to override) lifts
+  glyph chroma toward a target of 100 before quantising; near-neutrals below
+  chroma 30 are left alone so the companion does not turn orange.
+- **Never emit an ANSI index below 16.** Those sixteen are the only colours a
+  terminal profile can repaint; 16-255 are fixed by the xterm standard, which is
+  what makes the scene look the same on every profile. Proven exhaustively.
 - Renderer is a real layer/alpha model from day one: three depth layers per scene (far α≈0.3 slow parallax sparse glyphs, mid α≈0.6, near α=1.0 dense fastest). Alpha = fg color blended toward bg/lower layer; quantize to palette on 256-color. Companion always in near layer. Weather modulates far-layer alpha (fog = one number).
 - Frame pacing and clean redraws matter more than scene count; judges will screen-record it.
 
