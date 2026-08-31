@@ -56,10 +56,20 @@ type Cat struct {
 	// mirror flips the companion and reverses the litter's layout, for a
 	// composition anchored to the right edge instead of the left.
 	mirror bool
+
+	// face is the detail drawn over the body; coat is what the body is made of.
+	face Face
+	coat term.RGB
 }
 
+// SetFace chooses how much detail the companion's face carries.
+func (c *Cat) SetFace(f Face) { c.face = f }
+
+// SetCoat chooses the body colour.
+func (c *Cat) SetCoat(col term.RGB) { c.coat = col }
+
 func NewCat() *Cat {
-	return &Cat{body: ParseBitmap(CatBody), worried: ParseBitmap(CatWorried)}
+	return &Cat{body: ParseBitmap(CatBody), worried: ParseBitmap(CatWorried), coat: furCol}
 }
 
 // Size is the character footprint, not the pixel size.
@@ -114,7 +124,8 @@ func (c *Cat) Draw(l *canvas.Layer, x, y int, t float64, st State) {
 		f = f.Mirrored()
 	}
 
-	(&Sprite{Rows: f.ToQuadrant(), Body: furCol}).Draw(l, x, y)
+	(&Sprite{Rows: f.ToQuadrant(), Body: c.coat}).Draw(l, x, y)
+	c.drawFace(l, x, y, c.face, st)
 	c.eyes(l, x, y, t, st)
 }
 

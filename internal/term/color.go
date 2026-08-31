@@ -133,11 +133,9 @@ func (c RGB) Index256() int {
 // So the darkness stays in the ground and the colour goes in the texture,
 // which is how ASCII art has always worked.
 func (c RGB) Saturate(k float64) RGB {
-	// Leave near-neutrals alone. The companion's fur is (236,232,222) -- a
-	// barely-warm white with 14 points of chroma -- and multiplying that turns
-	// the cat orange, which measured perfectly and looked absurd. Anything
-	// this close to grey is MEANT to be grey; only colours that are already
-	// colours get pushed.
+	// Leave near-neutrals alone. The companion's fur is a barely-warm white,
+	// and multiplying that turns the cat orange -- which measured perfectly and
+	// looked absurd.
 	mx, mn := c.R, c.R
 	for _, v := range []uint8{c.G, c.B} {
 		if v > mx {
@@ -147,38 +145,42 @@ func (c RGB) Saturate(k float64) RGB {
 			mn = v
 		}
 	}
-	if int(mx)-int(mn) < neutralChroma {
+	ch := float64(mx) - float64(mn)
+	if ch < neutralChroma {
 		return c
 	}
-	l := 0.30*float64(c.R) + 0.59*float64(c.G) + 0.11*float64(c.B)
-	ch := func(v uint8) uint8 {
-		f := l + (float64(v)-l)*k
-		if f < 0 {
-			f = 0
-		} else if f > 255 {
-			f = 255
-		}
-		return uint8(f + 0.5)
+
+	// Lift TOWARD a target chroma rather than multiplying by a factor.
+	//
+	// Multiplying is unbounded, so it does nothing useful to a colour that is
+	// already saturated and a great deal of damage: Claude's terracotta went
+	// neon on a 256 terminal, because 2.6x of an already-vivid orange clips
+	// every channel it can. The point of the boost is only to clear the grey
+	// ramp, and around 100 points of chroma is enough for that -- past it there
+	// is no gain, just distortion. So colours that need help get a lot and
+	// colours that do not get none.
+	want := ch + (chromaTarget-ch)*(k-1)/2
+	if want <= ch {
+		return c
 	}
-	return RGB{ch(c.R), ch(c.G), ch(c.B)}
+	scale := want / ch
+
+	l := 0.30*float64(c.R) + 0.59*float64(c.G) + 0.11*float64(c.B)
+	f := func(v uint8) uint8 {
+		x := l + (float64(v)-l)*scale
+		if x < 0 {
+			x = 0
+		} else if x > 255 {
+			x = 255
+		}
+		return uint8(x + 0.5)
+	}
+	return RGB{f(c.R), f(c.G), f(c.B)}
 }
 
-// FromIndex256 is the inverse of Index256: the colour a terminal actually
-// paints for an index. Needed to SHOW what a 256-colour terminal will do with
-// a palette, rather than describing it -- the HTML harness renders true RGB,
-// so without this a preview flatters the design by showing colours the target
-// terminal cannot produce.
-func FromIndex256(i int) RGB {
-	switch {
-	case i >= 232 && i <= 255:
-		v := uint8(8 + (i-232)*10)
-		return RGB{v, v, v}
-	case i >= 16 && i <= 231:
-		n := i - 16
-		return RGB{cubeLevels[n/36], cubeLevels[(n/6)%6], cubeLevels[n%6]}
-	}
-	return RGB{}
-}
+// chromaTarget is how much colour is enough to clear the greyscale ramp.
+// Measured: the ramp stops winning on distance somewhere around 90.
+const chromaTarget = 100
 
 // neutralChroma is how close to grey a colour has to be before the boost
 // leaves it alone.
@@ -200,7 +202,7 @@ const neutralChroma = 30
 // the rest fall into the grey ramp; at 2.0 it is 100%. Backgrounds are
 // deliberately NOT boosted -- they are the dark part of a night and belong in
 // the greys.
-var GlyphBoost = 2.2
+var GlyphBoost = 2.6
 
 func init() {
 	// Tunable without a rebuild, because the right value is a judgement made
@@ -210,6 +212,23 @@ func init() {
 			GlyphBoost = f
 		}
 	}
+}
+
+// FromIndex256 is the inverse of Index256: the colour a terminal actually
+// paints for an index. Needed to SHOW what a 256-colour terminal will do with
+// a palette, rather than describing it -- the HTML harness renders true RGB,
+// so without this a preview flatters the design by showing colours the target
+// terminal cannot produce.
+func FromIndex256(i int) RGB {
+	switch {
+	case i >= 232 && i <= 255:
+		v := uint8(8 + (i-232)*10)
+		return RGB{v, v, v}
+	case i >= 16 && i <= 231:
+		n := i - 16
+		return RGB{cubeLevels[n/36], cubeLevels[(n/6)%6], cubeLevels[n%6]}
+	}
+	return RGB{}
 }
 
 // Quantise returns the colour as the given profile would actually show it.

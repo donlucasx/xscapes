@@ -56,7 +56,7 @@ func TestBoostPreservesBrightness(t *testing.T) {
 		return 0.30*float64(c.R) + 0.59*float64(c.G) + 0.11*float64(c.B)
 	}
 	for _, c := range []RGB{{120, 170, 200}, {244, 176, 96}, {70, 110, 150}} {
-		before, after := luma(c), luma(c.Saturate(2.2))
+		before, after := luma(c), luma(c.Saturate(GlyphBoost))
 		if d := after - before; d > 20 || d < -20 {
 			t.Errorf("rgb(%d,%d,%d) changed brightness by %.1f", c.R, c.G, c.B, d)
 		}
