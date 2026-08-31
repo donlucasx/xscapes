@@ -1,21 +1,22 @@
 # asciiscapes — project brief for Claude Code
 
-> **Where we left off — 2026-08-31, last code change `6f6d5cd`, 51 commits.**
-> **It runs in a real terminal and Lucas has run it.** The event plumbing, the
-> Claude Code adapter and the installer all shipped; then he ran it and found
-> that the scene had never been the size of its window (`stty size` reads from
-> stdin, which `exec.Command` gives /dev/null — so it always fell back to
-> 80×24). Fixed with the `TIOCGWINSZ` ioctl. Also this session: the composition
-> is **mirrored** (companion right, moon at 0.28), the waterline reserves a
-> beach on short panes, the sand tail degrades by dropping whole pieces, and
-> **256-colour terminals get real colour** by keeping the darkness in the
-> backgrounds and pushing chroma into the glyphs (`GlyphBoost` = 2.6).
-> `go build`, `go vet`, `go test` and `-race` clean; 49 commits on `main`; no
-> remote.
+> **Where we left off — 2026-08-31 session 7, last code change `bf4a329`, 54 commits.**
+> **done and needs_input are now DISTINCT cues** — the oldest gap against a
+> locked requirement is closed. `done` is its own companion state (content `^ ^`
+> eyes, full tail held high and still) with a soft dotted balloon in the cool
+> bubble colour; the ask keeps the solid box, now in a warm attention colour.
+> Balloons are opaque (the sea used to write glyphs into the words) and the
+> mirrored pointer now aims at the cat, not a kitten. Also: the companion-study
+> PNG had ALWAYS been a cut-off capture — the five-coats, 256 and every-state
+> rows were never in the file Lucas reviewed; recaptured full height.
+> **The companion pick is still open**: he wants another whisker revision round
+> (no specifics yet — steer expected after he sees the full study), toes still
+> tbd, coat undecided. Nothing is defaulted.
+> `go build`, `go vet`, `go test` and `-race` clean; no remote.
 > **`notes/claude-hooks-verified.md` is the hook payload schema, read out of the
 > Claude Code binary itself — trust it, do not re-derive it.**
-> ▶ NEXT is Lucas's companion pick, then installing it and running a real day.
-> See `RESUME.md`.
+> ▶ NEXT is his whisker/coat/toes steer, then installing it and running a real
+> day. See `RESUME.md`.
 
 Working name: **asciiscapes** (not final; see open questions). A cozy ASCII "thinking screen" for terminal AI agents. While Claude Code (or any agent) works, a small living scene runs beside it — a shoreline whose sea rises with the work, and a companion animal — and nudges the user, visually and with a sound, when the agent finishes or needs input.
 
@@ -73,7 +74,7 @@ only if nothing else needs it.
 | context remaining | **moon** phase *and* altitude; numeric readout silent until 65%, brightens at 85% | done |
 | time of day | **sky colour**, real wall clock | done |
 | weather | **deferred, not rejected** &mdash; no rain, clouds, fog or sync in v1; the thinking is parked in `ideas.md` | deferred 2026-08-30 |
-| needs you | **bubble**, rare: needs_input, error, done. Nothing else | done; ⚠ `done` and `needs_input` still look identical, which the notification section says they must not |
+| needs you | **bubble**, rare: needs_input, error, done. Nothing else | done — distinct cues shipped 2026-08-31: ask = warm SOLID box + alert pose; done = cool DOTTED knock + content `^ ^` pose, bounded by DoneHold |
 | companion identity | **coat + face**: cream/slate/sage/mauve/charcoal, nose, toes, inner-shadow ears, whiskers | ⏸ options built, awaiting Lucas's pick; nothing defaulted |
 | what it is doing now | **text written in the sand**, newest brightest, older fading as the tide takes them | done — anchored to the waterline, degrades by dropping whole pieces when narrow |
 | todos completed | **star count** | not built |

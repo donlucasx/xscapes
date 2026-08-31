@@ -10,61 +10,52 @@ the why; ignore ideas.md — it is parked. Tell me where we left off, then pick 
 from ▶ NEXT.
 ```
 
-## Where we left off (2026-08-31, last code change `6f6d5cd`, 51 commits, branch `main`)
+## Where we left off (2026-08-31 session 7, last code change `bf4a329`, 54 commits, branch `main`)
 
-**It runs in a real terminal now, and Lucas has run it.** Most of this session
-was his findings from doing that, plus a companion design study that is PAUSED
-awaiting his pick.
+Session 7 opened by asking for the companion pick. He was not ready: *"pull up
+the latest companion study"*, whiskers *"need to revise this one"*, toes
+*"tbd, let me see with and without still"*, and he chose **build on** -- so the
+session closed the oldest gap against a locked requirement while the pick
+stays open.
 
 ### Shipped this session
 
-- **The scene was never the size of the window.** `termSize` shelled out to
-  `stty size`, which reads from ITS OWN stdin, and `exec.Command` gives a child
-  /dev/null -- so it failed every time and returned the 80x24 fallback, always,
-  on every machine. One bug wearing three costumes: doesn't fill the frame,
-  garbles when shrunk, glitches when stretched. Now the `TIOCGWINSZ` ioctl,
-  verified in a real pty at five sizes and across a live resize.
-- **The composition is mirrored** -- companion right, litter growing leftward,
-  sand from the left margin, moon at 0.28. The sprite is *flipped*, not moved:
-  its tail sweeps from the right hip. Measured, it is also MORE robust when
-  narrow, not less -- the cat stays whole to 14 columns against 16 before.
-- **The waterline reserves a beach** (never fewer than 5 rows; identical to the
-  old flat 80% at 24 rows and up) and **the sand tail degrades by dropping whole
-  pieces** rather than chopping, so a narrow pane reads `edit handler.go` and
-  not `edit internal/auth/ha`.
-- **Colour on 256.** Terminal.app is NOT greyscale -- 216 real colours plus 24
-  greys. The night went grey because the *palette* is dark and the cube has
-  almost no resolution down there. The fix is to keep the darkness in the
-  BACKGROUNDS and push chroma into the GLYPHS, which are the bright part of the
-  frame: glyphs meant to carry colour went 76% -> 100% off the grey ramp.
-  **`GlyphBoost` locked at 2.6**, tunable live with `ASCIISCAPES_CHROMA`.
-- **Moonlight follows the moon.** `glitter()` hardcoded 0.72 while the moon had
-  moved to 0.28 -- a reflection with no source. It dims as the moon wanes too.
-- **The sand writes in ink the beach can be read against**, derived per frame
-  from the palette rather than a constant pinned to midnight's sand.
-- `-live` runs on the alternate screen, and repaints on resize by polling the
-  now-cheap ioctl every frame instead of draining one SIGWINCH per frame.
-- **`assets/frames/wired-turn.gif`** -- 15 seconds of one turn, real reducer,
-  loops. A screenshot cannot show motion and this is the first artefact where
-  the whole vocabulary moves at once.
+- **done and needs_input are DISTINCT cues** (the brief locks this; both used
+  to raise the same NeedsYou pose and identical balloon).
+  - `companion.Done` is a fifth state: content `^ ^` eyes, full tail held
+    high and STILL, slow breath. Position and shape, not rate -- it survives a
+    screenshot. The reducer's DoneHold window resolves here now.
+  - Two balloon shapes: the **ask** is the solid box, now drawn in a warm
+    attention colour (`bubbleAskCol`, same family as the worried eyes); the
+    **finish knock** is `DoneBubble` -- dotted bars, colon walls, cool
+    `bubbleCol`. `reduce.State.BubbleAsk` says which; an open ask outranks a
+    stale knock on both channels. Tests cover all of it.
+- **Balloons are opaque now.** Transparent spaces let the sea write glyphs
+  into the middle of the words ("Rate limiting:is=in.") -- the exact defect
+  `sprite.go`'s own comment warns text about. Every balloon draw site fixed.
+- **The mirrored balloon pointer finds the cat.** The `v` sat under the LEFT
+  shoulder, aiming at whatever kitten was underneath, since the mirror landed.
+  `companion.MirrorTail` moves it right.
+- **The companion study PNG was a cut-off capture -- always had been.**
+  2200px viewport against a ~3380px page: the five-coats row, the Terminal.app
+  256 comparison and the every-state row were NEVER in the file Lucas was
+  reviewing. Recaptured full height and trimmed; he has been sent the full
+  version with a correction note. The study also gains a "done" state cell.
 
-### Paused, awaiting Lucas
+### Paused, awaiting Lucas (unchanged except as noted)
 
-The **companion study**. He is looking at `assets/frames/companion-study.png`
-and will come back with a pick. **Nothing is defaulted** -- `NewCat()` still
-returns exactly what shipped before this session.
+**Nothing is defaulted** -- `NewCat()` still returns what shipped before
+session 6.
 
 - **Coats in the running**: cream, slate, sage, mauve, charcoal. He said
   cream/sage/slate "stand out best". Terracotta and ginger are OUT, too close
-  to Claude's own mark.
-- **Settled**: the nose, the toe tips, and inner ears = **inner shadow** (the
-  coat's own dark tone, so the cat stays monochrome and a two-cell detail is not
-  the only hue on the body).
-- **Open**: which whisker variant -- lower long, upper long, even, short, sweep.
-  They now FIND the fur and grow outward from it, which took four attempts: the
-  head is not centred in its sprite, so any fixed cell offset connects on one
-  side and gaps on the other. Three of those rounds were spent moving a number
-  when the placement model was wrong.
+  to Claude's own mark. (Told this session: slate is the safe pick while
+  Terminal.app is the daily driver; charcoal is a truecolor bet.)
+- **Settled**: the nose, the toe tips, and inner ears = **inner shadow**.
+- **Whiskers: he wants ANOTHER revision round** -- said only *"need to revise
+  this one"*, no specifics. He had possibly only seen the truncated study;
+  wait for his steer off the full one before building variants.
+- **Toes: tbd** -- the study already shows every variant with and without.
 
 ## How to look at things
 
@@ -86,8 +77,9 @@ Demo flags: `-wired -mockup -anim -compare -layout -context -day -busy -kittens 
 
 ## ▶ NEXT
 
-1. **Take Lucas's companion pick** and make it the default -- coat, whisker
-   variant, whether the toes stay. Then put it in the live scene so he sees it
+1. **Take Lucas's whisker steer off the FULL study** (he has now been sent the
+   untruncated one) and build the revision round he asked for -- then coat and
+   toes. Make the pick the default and put it in the live scene so he sees it
    moving rather than posed.
 2. **Install for real and run a day on it.** Everything is still tested against
    synthetic streams and the schema read out of the Claude Code binary; no hook
@@ -99,13 +91,11 @@ Demo flags: `-wired -mockup -anim -compare -layout -context -day -busy -kittens 
 4. **Re-tune the reducer against a recording.** `asciiscapes replay` exists for
    exactly this. Are `TauFall=12s`, `TurnFloor=0.30`, `FlightFloor=0.45` right
    against his actual rhythm? Do real fan-outs reach the kitten ladder's numbers?
-5. **`done` and `needs_input` still look identical** -- both raise the same
-   bubble. The brief locks *"distinct cues"* for them. Oldest open gap against a
-   locked requirement.
 
 ## Open threads for Lucas
 
-- **The companion pick** — the one thing blocking. `companion-study.png`.
+- **The companion pick** — coat + whisker revision + toes. Full study is in
+  his hands now; waiting on his steer.
 - **Name** — still `asciiscapes`; `iixscapes` / `xscapes` on the list. Late call.
 - **Charcoal is a bet on the terminal.** It looks best in truecolor and worst in
   256, where it goes grey. Slate is the safe pick if Terminal.app stays the
@@ -113,10 +103,13 @@ Demo flags: `-wired -mockup -anim -compare -layout -context -day -busy -kittens 
   truecolor terminal is installed on this machine today.**
 - **Stars for completed todos** — the last unbuilt channel. The protocol carries
   `todo` with `n`/`of`; nothing renders it.
+- **`wired-turn.gif` is STALE** — recorded before the distinct cues; its finish
+  beat shows the old identical balloon. Regenerate when the companion settles,
+  not before (one GIF round, not two).
 - **A wide pane leaves an empty middle.** At 200x50 the cat and the tail sit at
   opposite edges with a lot of nothing between. Not wrong, just unused.
 - Swimmers: no perspective scaling, and 2 of 18 drop out when a lane is
   oversubscribed.
 - `CLAUDE.md` Milestone 1 list is stale — the installer is done; the tmux
   launcher is the only piece of it left.
-- **No git remote. Nothing pushed anywhere.** 49 commits live only on this disk.
+- **No git remote. Nothing pushed anywhere.** 54 commits live only on this disk.
