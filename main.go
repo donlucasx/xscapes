@@ -61,8 +61,8 @@ func main() {
 
 	if *info {
 		tw, th := termSize()
-		fmt.Printf("profile=%s  size=%dx%d  TERM=%q COLORTERM=%q TERM_PROGRAM=%q\n",
-			term.DetectProfile(), tw, th,
+		fmt.Printf("profile=%s  size=%dx%d  glyph-chroma=%.1fx  TERM=%q COLORTERM=%q TERM_PROGRAM=%q\n",
+			term.DetectProfile(), tw, th, term.GlyphBoost,
 			os.Getenv("TERM"), os.Getenv("COLORTERM"), os.Getenv("TERM_PROGRAM"))
 		return
 	}

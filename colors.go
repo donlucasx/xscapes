@@ -37,7 +37,10 @@ func colorPage(seed int64) string {
 		red.Apply(event.Event{Kind: event.SubStart, Agent: fmt.Sprint("a", i)}, at(3))
 	}
 
-	frame := func(tod float64, blueSky bool, p term.Profile, worried bool) string {
+	frame := func(tod float64, blueSky bool, p term.Profile, worried bool, boost float64) string {
+		saved := term.GlyphBoost
+		term.GlyphBoost = boost
+		defer func() { term.GlyphBoost = saved }()
 		st := red.State(at(4))
 		st.Act.Level, st.Act.Working, st.Act.TimeOfDay = 0.7, true, tod
 		st.Pose = companion.Working
@@ -75,38 +78,44 @@ func colorPage(seed int64) string {
 	b.WriteString(`<p class="nt">The same frame, same reducer, same seed. The 256 panels are put ` +
 		`through the real quantiser, so they show what Terminal.app will actually paint.</p>`)
 
-	b.WriteString(`<h2>Midnight &mdash; the everyday case</h2>`)
-	fmt.Fprintf(&b, `<div class="grid">
-	  <div class="col"><div class="lbl">A &middot; truecolor (Ghostty, iTerm2, WezTerm)</div><div class="win">%s</div></div>
-	  <div class="col"><div class="lbl">B &middot; 256 today &mdash; a monochrome night</div><div class="win">%s</div></div>
-	  <div class="col"><div class="lbl">C &middot; 256 with the sky in the pure-blue column</div><div class="win">%s</div></div>
-	</div>`,
-		frame(0, false, term.ProfileTrueColor, false),
-		frame(0, false, term.Profile256, false),
-		frame(0, true, term.Profile256, false))
+	b.WriteString(`<h2>The question: can 256 do a night in colour?</h2>`)
+	b.WriteString(`<p class="nt">Terminal.app is not greyscale &mdash; its palette is 216 real ` +
+		`colours plus 24 greys. The night came out grey because the PALETTE is dark, and the ` +
+		`colour cube has almost no resolution down there: 4 real colours below luma 25, against ` +
+		`46 between 110 and 150 and 108 above 150. But a background is meant to be dark, and the ` +
+		`glyphs are the bright part of the frame. So put the darkness in the ground and the ` +
+		`colour in the texture, which is how ASCII art has always worked. Boosting glyph chroma ` +
+		`before quantising takes them from 45% landing on a real colour to 100%.</p>`)
 
-	b.WriteString(`<h2>Evening &mdash; when Lucas actually ran it</h2>`)
-	fmt.Fprintf(&b, `<div class="grid">
-	  <div class="col"><div class="lbl">A &middot; truecolor</div><div class="win">%s</div></div>
-	  <div class="col"><div class="lbl">B &middot; 256 today</div><div class="win">%s</div></div>
-	  <div class="col"><div class="lbl">C &middot; 256, blue sky</div><div class="win">%s</div></div>
-	</div>`,
-		frame(0.888, false, term.ProfileTrueColor, false),
-		frame(0.888, false, term.Profile256, false),
-		frame(0.888, true, term.Profile256, false))
+	for _, tod := range []struct {
+		v    float64
+		name string
+	}{{0, "Midnight"}, {0.888, "Evening &mdash; when Lucas actually ran it"}} {
+		fmt.Fprintf(&b, `<h2>%s</h2><div class="grid">`, tod.name)
+		fmt.Fprintf(&b, `<div class="col"><div class="lbl">truecolor &mdash; the intended look</div><div class="win">%s</div></div>`,
+			frame(tod.v, false, term.ProfileTrueColor, false, 1.0))
+		for _, k := range []float64{1.0, 2.2} {
+			lbl := fmt.Sprintf("256 &middot; glyph chroma %.1f&times;", k)
+			if k == 1.0 {
+				lbl = "256 &middot; no boost (what you saw)"
+			}
+			fmt.Fprintf(&b, `<div class="col"><div class="lbl">%s</div><div class="win">%s</div></div>`,
+				lbl, frame(tod.v, false, term.Profile256, false, k))
+		}
+		b.WriteString(`</div>`)
+	}
 
-	b.WriteString(`<h2>The thing that must never be lost</h2>`)
-	b.WriteString(`<p class="nt">"Something is broken" is carried entirely by colour. It survives ` +
-		`quantisation intact: the worried amber lands on cube index 215, the alert yellow on 222 and ` +
-		`the calm cyan on 116 &mdash; three distinct hues, none of them grey. So even the monochrome ` +
-		`night keeps its signals, which is arguably the more legible outcome: the only colour on ` +
-		`screen is the colour that means something.</p>`)
+	b.WriteString(`<h2>The signals still have to read</h2>`)
+	b.WriteString(`<p class="nt">"Something is broken" is carried entirely by colour, and it must ` +
+		`not drown in a scene that now has colour everywhere.</p>`)
 	fmt.Fprintf(&b, `<div class="grid">
 	  <div class="col"><div class="lbl">worried &middot; truecolor</div><div class="win">%s</div></div>
-	  <div class="col"><div class="lbl">worried &middot; 256 &mdash; the amber holds</div><div class="win">%s</div></div>
+	  <div class="col"><div class="lbl">worried &middot; 256 no boost</div><div class="win">%s</div></div>
+	  <div class="col"><div class="lbl">worried &middot; 256 at 2.0&times;</div><div class="win">%s</div></div>
 	</div>`,
-		frame(0, false, term.ProfileTrueColor, true),
-		frame(0, false, term.Profile256, true))
+		frame(0, false, term.ProfileTrueColor, true, 1.0),
+		frame(0, false, term.Profile256, true, 1.0),
+		frame(0, false, term.Profile256, true, 2.0))
 
 	return canvas.HTMLPage("asciiscapes — colour study", b.String())
 }

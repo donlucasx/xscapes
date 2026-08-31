@@ -186,12 +186,12 @@ func (c *Canvas) HTMLFragmentAs(fontPx int, p term.Profile) string {
 		saveLayers[i] = append([]Cell(nil), l.Cells...)
 		for j := range l.Cells {
 			if l.Cells[j].Set {
-				l.Cells[j].FG = p.Quantise(l.Cells[j].FG)
+				l.Cells[j].FG = p.Quantise(l.Cells[j].FG, true)
 			}
 		}
 	}
 	for i := range c.BG {
-		c.BG[i] = p.Quantise(c.BG[i])
+		c.BG[i] = p.Quantise(c.BG[i], false)
 	}
 	out := c.HTMLFragment(fontPx)
 	c.BG = saveBG
