@@ -118,14 +118,21 @@ func runLive(seed int64, fps float64, wIn, hIn int, ctxUsed, tod float64, ascii 
 	lay := compose(w, ccw, mirror)
 	sh.MoonX = lay.MoonX
 
-	// React to a resized window. Without this the scene keeps the size it had
-	// when it started: drag the pane wider and the picture just sits there in
-	// the old rectangle. Polling is not an option -- termSize shells out to
-	// stty, which is far too expensive to do every frame -- so take the signal.
+	// React to a resized window by ASKING, every frame.
+	//
+	// The signal is still registered, because it wakes a terminal that would
+	// otherwise sit idle, but the size check no longer depends on it. Dragging
+	// a window edge fires dozens of SIGWINCHes and draining one per frame left
+	// the canvas chasing the window a step behind, which is what tore during
+	// the drag. An ioctl costs microseconds, so simply asking every frame
+	// coalesces the whole drag for free.
 	winch := make(chan os.Signal, 1)
 	signal.Notify(winch, syscall.SIGWINCH)
 
-	restore := func() { fmt.Print("\x1b[?25h\x1b[0m\n") }
+	// The alternate screen buffer gives the scene a page of its own: nothing
+	// of the shell shows through, and quitting puts the terminal back exactly
+	// as it was rather than leaving a beach in the scrollback.
+	restore := func() { fmt.Print("\x1b[0m\x1b[?25h\x1b[?1049l") }
 	sig := make(chan os.Signal, 1)
 	signal.Notify(sig, os.Interrupt, syscall.SIGTERM)
 	go func() {
@@ -137,7 +144,7 @@ func runLive(seed int64, fps float64, wIn, hIn int, ctxUsed, tod float64, ascii 
 		os.Exit(0)
 	}()
 
-	fmt.Print("\x1b[?25l\x1b[2J") // hide cursor, clear once
+	fmt.Print("\x1b[?1049h\x1b[?25l\x1b[2J") // alt screen, hide cursor, clear once
 	defer restore()
 
 	profile := term.DetectProfile()
@@ -157,19 +164,28 @@ func runLive(seed int64, fps float64, wIn, hIn int, ctxUsed, tod float64, ascii 
 		now := time.Now()
 		t := now.Sub(start).Seconds()
 
-		select {
-		case <-winch:
-			if wIn <= 0 || hIn <= 0 {
-				nw, nh := termSize()
-				nh--
-				if nw != c.W || nh != c.H {
-					c.Resize(nw, nh)
-					lay = compose(nw, ccw, mirror)
-					sh.MoonX = lay.MoonX
-					fmt.Print("\x1b[2J") // one clear, or the old frame's edges linger
+		// Drain any pending signals so they do not queue up during a drag.
+		for drained := true; drained; {
+			select {
+			case <-winch:
+			default:
+				drained = false
+			}
+		}
+		if wIn <= 0 || hIn <= 0 {
+			if nw, nh := termSize(); nw != c.W || nh-1 != c.H {
+				shrank := nw < c.W || nh-1 < c.H
+				c.Resize(nw, nh-1)
+				lay = compose(nw, ccw, mirror)
+				sh.MoonX = lay.MoonX
+				// Only clear when the window got SMALLER. Growing needs no
+				// clear -- the next frame paints strictly more cells than the
+				// last one -- and clearing anyway is a blank flash on every
+				// step of a drag.
+				if shrank {
+					fmt.Print("\x1b[2J")
 				}
 			}
-		default:
 		}
 
 		var st reduce.State

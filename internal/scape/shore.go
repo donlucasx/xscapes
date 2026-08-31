@@ -16,7 +16,8 @@ type Shore struct {
 	// without recomputing the position and drifting out of sync.
 	moonX, moonY int
 
-	pal Palette // this frame's colours, from the time of day
+	pal     Palette // this frame's colours, from the time of day
+	ctxUsed float64 // this frame's context reading, for the moon and its shine
 
 	// MoonX is where the moon sits, as a fraction of the width. It moves with
 	// the composition: the moon and the companion are the two things a glance
@@ -79,6 +80,7 @@ func (s *Shore) Name() string { return "shore" }
 func (s *Shore) Update(c *canvas.Canvas, t float64, act Activity) {
 	c.Clear()
 	s.pal = PaletteAt(act.TimeOfDay)
+	s.ctxUsed = act.ContextUsed
 	if c.W < 8 || c.H < 6 {
 		return
 	}
@@ -372,7 +374,21 @@ func (s *Shore) swells(c *canvas.Canvas, hy int, edge []float64, tt float64, act
 // glitter is the moon's reflection, widening as it comes toward shore.
 func (s *Shore) glitter(c *canvas.Canvas, hy int, edge []float64, tt float64) {
 	mid := c.Mid()
-	mx := float64(c.W) * 0.72
+	// The moonlight column has to sit UNDER the moon, so take the position the
+	// moon actually painted rather than recomputing it. This is why MoonPos
+	// exists, and this function ignored it: when the composition mirrored and
+	// the moon moved to 0.28, the shine stayed behind at a hardcoded 0.72 --
+	// a reflection with no source, on the wrong side of the frame.
+	mx := float64(s.moonX)
+
+	// A sliver of moon does not lay a path across the water. Tie the shine to
+	// how much of the moon is lit, which is also the context reading, so a
+	// nearly-full context dims the water as well as the moon.
+	lit := 1 - clamp01(s.ctxUsed)
+	strength := (0.35 + 0.65*lit) * s.pal.MoonVis
+	if strength <= 0.02 {
+		return
+	}
 	g := '•'
 	if s.ASCII {
 		g = '*'
@@ -386,7 +402,7 @@ func (s *Shore) glitter(c *canvas.Canvas, hy int, edge []float64, tt float64) {
 			}
 			a := 0.45 + 0.5*math.Abs(math.Sin(tt*1.3+float64(y)*0.9+float64(k)*1.7))
 			a *= 1 - math.Abs(float64(k))/float64(n+1)*0.6
-			mid.Plot(x, y, g, s.pal.Glitter, a)
+			mid.Plot(x, y, g, s.pal.Glitter, a*strength)
 		}
 	}
 }
