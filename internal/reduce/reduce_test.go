@@ -329,6 +329,46 @@ func TestALongBusyTurnDoesNotTimeOut(t *testing.T) {
 	}
 }
 
+// The brief locks done and needs_input as DISTINCT cues, and this was the
+// oldest open gap against it: both used to raise the same NeedsYou pose and
+// the same bubble.
+func TestDoneAndNeedsInputAreDistinct(t *testing.T) {
+	r := New("s")
+	r.Apply(event.Event{Kind: event.Prompt}, at(0))
+	r.Apply(event.Event{Kind: event.NeedsInput, Text: "allow Bash?"}, at(1))
+	st := r.State(at(1))
+	if st.Pose != companion.NeedsYou || !st.BubbleAsk {
+		t.Errorf("needs_input: pose=%v ask=%v, want NeedsYou with an ask balloon", st.Pose, st.BubbleAsk)
+	}
+
+	r.Apply(event.Event{Kind: event.Done, Text: "tests passed"}, at(2))
+	st = r.State(at(2))
+	if st.Pose != companion.Done || st.BubbleAsk {
+		t.Errorf("done: pose=%v ask=%v, want Done with the soft knock", st.Pose, st.BubbleAsk)
+	}
+	if st.Bubble != "tests passed" {
+		t.Errorf("bubble = %q", st.Bubble)
+	}
+
+	// The knock is bounded; an unanswered ask is not.
+	if got := r.State(at(2 + DoneHold.Seconds() + 1)).Pose; got != companion.Resting {
+		t.Errorf("after DoneHold pose = %v, want Resting", got)
+	}
+}
+
+// A nag can arrive after the knock: the agent finished, the user stayed away.
+// The open ask must outrank the stale knock on both channels.
+func TestAskAfterDoneOutranksTheKnock(t *testing.T) {
+	r := New("s")
+	r.Apply(event.Event{Kind: event.Done, Text: "all wired"}, at(0))
+	r.Apply(event.Event{Kind: event.NeedsInput, Text: "waiting for your input"}, at(1))
+	st := r.State(at(1))
+	if st.Pose != companion.NeedsYou || !st.BubbleAsk || st.Bubble != "waiting for your input" {
+		t.Errorf("pose=%v ask=%v bubble=%q; an open ask must outrank a stale knock",
+			st.Pose, st.BubbleAsk, st.Bubble)
+	}
+}
+
 // A scape attached partway through a session never sees the prompt.
 func TestToolTrafficAloneOpensATurn(t *testing.T) {
 	r := New("s")

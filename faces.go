@@ -95,7 +95,8 @@ func facePage(seed int64) string {
 		s companion.State
 		n string
 	}{{companion.Resting, "resting"}, {companion.Working, "working"},
-		{companion.NeedsYou, "needs you"}, {companion.Worried, "broken"}} {
+		{companion.NeedsYou, "needs you"}, {companion.Done, "done"},
+		{companion.Worried, "broken"}} {
 		cell(st.n, "", portrait(face(companion.WhiskerLowerLong, true), companion.Coats["slate"],
 			st.s, term.ProfileTrueColor, 3.1))
 	}

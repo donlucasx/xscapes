@@ -39,23 +39,59 @@ type Sprite struct {
 	Opaque bool
 }
 
-// Bubble builds a speech balloon. All three rows are the same width so the box
-// cannot shear; the tail sits under the left shoulder, pointing at the creature.
+// Bubble builds the ask balloon: the agent is blocked on the user. All three
+// rows are the same width so the box cannot shear; the tail sits under the
+// left shoulder, pointing at the creature. Solid strokes on purpose --
+// DoneBubble is the same footprint with every stroke softened, and the pair
+// has to stay distinguishable in a monochrome capture.
 func Bubble(text string) []string {
-	// The box is sized in runes, so a wide rune would make the drawn box
-	// narrower than the border it is measured against.
-	inner := " " + NarrowOnly(text) + " "
-	n := len([]rune(inner))
-	if n < 4 {
-		inner += strings.Repeat(" ", 4-n)
-		n = 4
-	}
+	inner, n := bubbleInner(text)
 	bar := strings.Repeat("-", n)
 	return []string{
 		"." + bar + ".",
 		"|" + inner + "|",
 		"'--v" + strings.Repeat("-", n-3) + "'",
 	}
+}
+
+// DoneBubble is the finish knock. Same footprint as Bubble, nothing solid
+// about it: dotted bars, colon walls. Shape carries the done/needs_input
+// distinction wherever colour cannot -- a screenshot, or -plain.
+func DoneBubble(text string) []string {
+	inner, n := bubbleInner(text)
+	dots := strings.Repeat(".", n)
+	return []string{
+		"." + dots + ".",
+		":" + inner + ":",
+		"'..v" + strings.Repeat(".", n-3) + "'",
+	}
+}
+
+// MirrorTail moves a balloon's pointer from the left shoulder to the right,
+// for the mirrored composition where the creature sits to the RIGHT of its
+// balloon -- left where it was, the pointer aims at whatever kitten happens
+// to be underneath instead.
+func MirrorTail(rows []string) []string {
+	out := append([]string(nil), rows...)
+	last := []rune(out[len(out)-1])
+	if i, j := 3, len(last)-4; j > 0 && j < len(last) && i < len(last) {
+		last[i], last[j] = last[j], last[i]
+	}
+	out[len(out)-1] = string(last)
+	return out
+}
+
+// bubbleInner pads the text into the balloon's middle row. Sized in runes,
+// because a wide rune would make the drawn box narrower than the border it is
+// measured against.
+func bubbleInner(text string) (string, int) {
+	inner := " " + NarrowOnly(text) + " "
+	n := len([]rune(inner))
+	if n < 4 {
+		inner += strings.Repeat(" ", 4-n)
+		n = 4
+	}
+	return inner, n
 }
 
 func (s *Sprite) Size() (w, h int) {

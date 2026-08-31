@@ -85,7 +85,7 @@ func card(name, note string, rows []string, col term.RGB, seed int64) string {
 	top := live.H - 2 - sh
 	s.Draw(live.Near(), 8, top)
 	rowsB := companion.Bubble("tests passed")
-	(&companion.Sprite{Rows: rowsB, Body: term.RGB{R: 224, G: 228, B: 238}}).
+	(&companion.Sprite{Rows: rowsB, Body: term.RGB{R: 224, G: 228, B: 238}, Opaque: true}).
 		Draw(live.Near(), 8+sw-2, top-len(rowsB))
 
 	return fmt.Sprintf(`<div class="card"><div class="meta"><div class="nm">%s</div>`+

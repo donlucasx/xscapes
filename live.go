@@ -280,12 +280,16 @@ func demoState(t, ctxUsed, tod float64) reduce.State {
 		Act:  scape.Activity{Working: true, Level: 0.65, ContextUsed: ctxUsed, TimeOfDay: tod},
 		Pose: companion.Working,
 	}
-	switch int(t/8) % 3 {
+	switch int(t/8) % 4 {
 	case 1:
 		st.Act = scape.Activity{ContextUsed: ctxUsed, TimeOfDay: tod}
 		st.Pose = companion.Resting
 	case 2:
 		st.Pose = companion.NeedsYou
+		st.Bubble, st.BubbleAsk = "allow Bash?", true
+	case 3:
+		st.Act = scape.Activity{Level: 0.3, ContextUsed: ctxUsed, TimeOfDay: tod}
+		st.Pose = companion.Done
 		st.Bubble = "tests passed"
 	}
 	return st
@@ -314,16 +318,22 @@ func drawScene(c *canvas.Canvas, sh *scape.Shore, cat *companion.Cat, lay layout
 			int(float64(c.H)*0.42)+1, t, seed)
 	}
 	if st.Bubble != "" {
-		rows := companion.Bubble(st.Bubble)
+		rows, col := companion.DoneBubble(st.Bubble), bubbleCol
+		if st.BubbleAsk {
+			rows, col = companion.Bubble(st.Bubble), bubbleAskCol
+		}
 		x := lay.BubbleX
 		if lay.Mirror {
+			rows = companion.MirrorTail(rows)
 			if w := bubbleWidth(rows); x-w >= 0 {
 				x -= w
 			} else {
 				x = 0
 			}
 		}
-		(&companion.Sprite{Rows: rows, Body: bubbleCol}).Draw(c.Near(), x, top-len(rows))
+		// Opaque: a balloon is TEXT, and a transparent space lets the sea
+		// write glyphs into the middle of the words.
+		(&companion.Sprite{Rows: rows, Body: col, Opaque: true}).Draw(c.Near(), x, top-len(rows))
 	}
 	drawSand(c, st.Tail, sh.SandColor(), sh.SandTop(), lay.SandFrom, lay.SandTo)
 }

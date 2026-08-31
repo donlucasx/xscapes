@@ -76,6 +76,11 @@ type State struct {
 	Act    scape.Activity
 	Pose   companion.State
 	Bubble string
+	// BubbleAsk says which of the two knocks the bubble is: true means the
+	// agent is blocked on the user (needs_input), false means the finish
+	// knock. The renderer draws them as different balloons, because the
+	// brief locks done and needs_input as distinct cues.
+	BubbleAsk bool
 
 	// Kittens is how many subagents are running right now.
 	Kittens int
@@ -331,7 +336,11 @@ func (r *Reducer) State(now time.Time) State {
 	// the session could sit waiting for input with no signal at all. The pose
 	// says how the companion feels; the bubble says what it needs. They are
 	// different channels and only one of them is allowed to be silent.
-	if r.needsInput || (!r.doneAt.IsZero() && now.Sub(r.doneAt) < DoneHold) {
+	// An open ask outranks a stale knock, same as it does for the pose.
+	switch {
+	case r.needsInput:
+		st.Bubble, st.BubbleAsk = r.bubble, true
+	case !r.doneAt.IsZero() && now.Sub(r.doneAt) < DoneHold:
 		st.Bubble = r.bubble
 	}
 	return st
@@ -349,7 +358,7 @@ func (r *Reducer) pose(now time.Time) companion.State {
 	case r.needsInput:
 		return companion.NeedsYou
 	case !r.doneAt.IsZero() && now.Sub(r.doneAt) < DoneHold:
-		return companion.NeedsYou
+		return companion.Done
 	case r.turnOpn || len(r.flight) > 0:
 		return companion.Working
 	default:

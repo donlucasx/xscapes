@@ -12,6 +12,10 @@ import (
 
 var bubbleCol = term.RGB{R: 224, G: 228, B: 238}
 
+// bubbleAskCol is the ask balloon: warm where the finish knock is cool, the
+// same attention family as the worried eyes.
+var bubbleAskCol = term.RGB{R: 244, G: 198, B: 122}
+
 // contactSheet renders every candidate twice: enlarged so the drawing can be
 // judged, and composited into a real 80x24 shore so the proportion is honest.
 // A companion shown only enlarged always looks better than it is.
@@ -38,7 +42,7 @@ func contactSheet(seed int64) string {
 		s.Draw(live.Near(), 8, top)
 		if s.Say != "" {
 			rows := companion.Bubble(s.Say)
-			bub := companion.Sprite{Rows: rows, Body: bubbleCol}
+			bub := companion.Sprite{Rows: rows, Body: bubbleCol, Opaque: true}
 			bub.Draw(live.Near(), 8+sw-2, top-len(rows))
 		}
 

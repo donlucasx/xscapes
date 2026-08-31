@@ -20,6 +20,12 @@ const (
 	// job rather than the weather's: a storm cannot say whether the sea is
 	// rough because the agent is busy or because the tests are red.
 	Worried
+	// Done is the finish knock: the turn closed and the companion holds a
+	// content pose for a bounded while. It is a separate state because the
+	// brief locks done and needs_input as DISTINCT cues -- both used to
+	// raise NeedsYou, so "come back when you like" and "you are blocking
+	// the agent" looked identical.
+	Done
 )
 
 func (s State) String() string {
@@ -30,6 +36,8 @@ func (s State) String() string {
 		return "needs you"
 	case Worried:
 		return "something is broken"
+	case Done:
+		return "all done"
 	}
 	return "resting"
 }
@@ -107,6 +115,10 @@ func (c *Cat) Draw(l *canvas.Layer, x, y int, t float64, st State) {
 		// Shallow, quick breathing and a tail tucked flat: distress reads as
 		// stillness where the other states read as motion.
 		period, wag, tailLen = 1.9, 0, 0.35
+	case Done:
+		// Content is the full tail held high and still, against NeedsYou's
+		// quick everything -- position, not rate, so a screenshot keeps it.
+		period, wag = 3.0, 0
 	}
 	lift := 0
 	if math.Sin(2*math.Pi*t/period) > 0 {
@@ -155,8 +167,10 @@ func (c *Cat) eyes(l *canvas.Layer, x, y int, t float64, st State) {
 		glyph, col = 'O', eyeAlert
 	case Worried:
 		glyph, col = 'o', eyeWorried
+	case Done:
+		glyph = '^' // content -- closed happy, so it cannot read as alert
 	}
-	if st != Resting && st != Worried && math.Mod(t, 5.3) < 0.16 {
+	if st != Resting && st != Worried && st != Done && math.Mod(t, 5.3) < 0.16 {
 		glyph = '-' // blink
 	}
 	// The eyes are plotted as characters on top of the quadrant body, so they

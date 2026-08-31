@@ -7,7 +7,6 @@ import (
 	"github.com/donlucasx/asciiscapes/internal/canvas"
 	"github.com/donlucasx/asciiscapes/internal/companion"
 	"github.com/donlucasx/asciiscapes/internal/scape"
-	"github.com/donlucasx/asciiscapes/internal/term"
 )
 
 // animPage renders each state as a real frame sequence and cycles it in the
@@ -23,7 +22,8 @@ func animPage(seed int64, frames int, fps float64) string {
 	}{
 		{companion.Resting, "slow breath, tail barely moves, eyes half shut", ""},
 		{companion.Working, "faster breath, tail sweeping, eyes open, occasional blink", ""},
-		{companion.NeedsYou, "quick breath, tail flicking, wide eyes, bubble", "tests passed"},
+		{companion.NeedsYou, "quick breath, tail flicking, wide eyes, ask balloon", "allow Bash?"},
+		{companion.Done, "slow breath, tail held high and still, content eyes, soft knock", "tests passed"},
 	}
 
 	var b strings.Builder
@@ -47,8 +47,11 @@ func animPage(seed int64, frames int, fps float64) string {
 			top := c.H - 2 - ch
 			cat.Draw(c.Near(), 6, top, t, s.st)
 			if s.say != "" {
-				rows := companion.Bubble(s.say)
-				(&companion.Sprite{Rows: rows, Body: term.RGB{R: 226, G: 230, B: 240}}).
+				rows, col := companion.Bubble(s.say), bubbleAskCol
+				if s.st == companion.Done {
+					rows, col = companion.DoneBubble(s.say), bubbleCol
+				}
+				(&companion.Sprite{Rows: rows, Body: col, Opaque: true}).
 					Draw(c.Near(), 6+cw-2, top-len(rows))
 			}
 			fmt.Fprintf(&st, `<div class="fr">%s</div>`, c.HTMLFragment(13))

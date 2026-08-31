@@ -51,6 +51,8 @@ func stripPage(seed int64, frames int, fps float64, mode string) string {
 				st, act = companion.Resting, scape.Activity{}
 			case "needsyou":
 				st = companion.NeedsYou
+			case "done":
+				st, act = companion.Done, scape.Activity{Level: 0.3}
 			case "kittens":
 				st, act = companion.Working, scape.Activity{Working: true, Level: 0.7}
 			case "worried":
@@ -58,15 +60,17 @@ func stripPage(seed int64, frames int, fps float64, mode string) string {
 			case "tour":
 				// One loop through every state, so a single GIF carries the
 				// whole vocabulary.
-				switch (i * 4) / frames {
+				switch (i * 5) / frames {
 				case 0:
 					st, act = companion.Working, scape.Activity{Working: true, Level: 0.9}
 				case 1:
 					st, act = companion.Worried, scape.Activity{Working: true, Level: 0.3}
 				case 2:
-					st, act = companion.Resting, scape.Activity{}
-				default:
 					st = companion.NeedsYou
+				case 3:
+					st, act = companion.Done, scape.Activity{Level: 0.3}
+				default:
+					st, act = companion.Resting, scape.Activity{}
 				}
 			}
 			scape.NewShore(seed, false).Update(c, t, act)
@@ -78,12 +82,17 @@ func stripPage(seed int64, frames int, fps float64, mode string) string {
 			}
 			if st == companion.Worried {
 				rows := companion.Bubble("tests failing")
-				(&companion.Sprite{Rows: rows, Body: term.RGB{R: 240, G: 200, B: 150}}).
+				(&companion.Sprite{Rows: rows, Body: term.RGB{R: 240, G: 200, B: 150}, Opaque: true}).
 					Draw(c.Near(), 6+cw-2, top-len(rows))
 			}
 			if st == companion.NeedsYou {
-				rows := companion.Bubble("tests passed")
-				(&companion.Sprite{Rows: rows, Body: term.RGB{R: 226, G: 230, B: 240}}).
+				rows := companion.Bubble("allow Bash?")
+				(&companion.Sprite{Rows: rows, Body: bubbleAskCol, Opaque: true}).
+					Draw(c.Near(), 6+cw-2, top-len(rows))
+			}
+			if st == companion.Done {
+				rows := companion.DoneBubble("tests passed")
+				(&companion.Sprite{Rows: rows, Body: bubbleCol, Opaque: true}).
 					Draw(c.Near(), 6+cw-2, top-len(rows))
 			}
 		}
