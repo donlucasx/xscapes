@@ -26,7 +26,26 @@ import (
 // the region starts at the top of the screen -- measured in Terminal.app,
 // rows 1-10 keeps every line and rows 5-14 keeps none. Anything painted above
 // the agent would cost the user the ability to scroll back through its output.
-func runInside(args []string) {
+// runClaude is `xscapes claude`. It hosts the agent inside the scape, which is
+// what that command means now; -beside gives the older tmux layout, which still
+// works and is still the right answer if you want the agent in its own pane.
+func runClaude(args []string) {
+	for i, a := range args {
+		if a == "--" {
+			break
+		}
+		if a == "-beside" || a == "--beside" {
+			rest := append(append([]string{}, args[:i]...), args[i+1:]...)
+			runClaudeLauncher(rest)
+			return
+		}
+	}
+	runInside(args, "claude")
+}
+
+// runInside hosts a command inside the scape. With agent set, the trailing
+// arguments belong to that agent; without it, they are the command to run.
+func runInside(args []string, agent string) {
 	fs := flag.NewFlagSet("inside", flag.ExitOnError)
 	seed := fs.Int64("seed", 7, "scene seed")
 	fps := fs.Float64("fps", 20, "scape frames per second")
@@ -35,18 +54,29 @@ func runInside(args []string) {
 	tod := fs.Float64("tod", 0, "pin the time of day, 0..1 (0 = the wall clock)")
 	ctxUsed := fs.Float64("ctx", 0, "pin context used, 0..1 (0 = the session's own)")
 	fs.Usage = func() {
-		fmt.Fprint(os.Stderr, `xscapes inside [flags] [command ...]
+		if agent != "" {
+			fmt.Fprintf(os.Stderr, `xscapes claude [flags] [%s arguments ...]
+
+Runs %s in the top rows of this window with the scape below it.
+Pass -beside for the older tmux layout, with the agent in its own pane.
+
+`, agent, agent)
+		} else {
+			fmt.Fprint(os.Stderr, `xscapes inside [flags] [command ...]
 
 Runs the command in the top rows of this window with the scape below it.
 With no command, runs claude.
 
 `)
+		}
 		fs.PrintDefaults()
 	}
 	fs.Parse(args)
 
 	argv := fs.Args()
-	if len(argv) == 0 {
+	if agent != "" {
+		argv = append([]string{agent}, argv...)
+	} else if len(argv) == 0 {
 		argv = []string{"claude"}
 	}
 

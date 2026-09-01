@@ -40,9 +40,9 @@ func dispatch(args []string) bool {
 	case "notify":
 		runNotify(args[1:])
 	case "claude":
-		runClaudeLauncher(args[1:])
+		runClaude(args[1:])
 	case "inside":
-		runInside(args[1:])
+		runInside(args[1:], "")
 	case "help", "-h", "--help":
 		usage()
 	default:
@@ -56,8 +56,9 @@ func dispatch(args []string) bool {
 func usage() {
 	fmt.Fprint(os.Stderr, `asciiscapes — a thinking screen for terminal agents
 
-  asciiscapes inside          run Claude Code INSIDE the scape, in this window
-  asciiscapes claude          start Claude Code with the scape beside it (tmux)
+  asciiscapes claude          run Claude Code INSIDE the scape, in this window
+  asciiscapes claude -beside  the older layout: agent in its own tmux pane
+  asciiscapes inside <cmd>    host any command inside the scape
   asciiscapes                 render one frame
   asciiscapes -live           run the scape in this terminal
 

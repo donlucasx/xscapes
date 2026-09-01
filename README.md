@@ -13,14 +13,14 @@ adapters, which is the part that generalises to any agent. On top there is a
 sea and a cat.
 
 ```
-xscapes inside
+xscapes claude
 ```
 
 That is the whole thing. Claude Code in the top of your window, the shoreline
 underneath it, one command and no tmux.
 
-`xscapes claude` gives you the older side-by-side layout instead: the agent in
-the left pane, the scape in the right.
+`xscapes claude -beside` gives you the older side-by-side layout instead: the
+agent in its own tmux pane, the scape in the next one.
 
 ## Install
 
@@ -41,8 +41,8 @@ GOBIN=~/.local/bin go install github.com/donlucasx/xscapes@latest
 Then run `xscapes claude` from whatever project you are working in. It is not
 something you run from this repo.
 
-`xscapes inside` has no dependencies at all. `xscapes claude`, the side by side
-layout, wants tmux:
+`xscapes claude` has no dependencies at all. The older side by side layout,
+`xscapes claude -beside`, wants tmux:
 
 ```sh
 brew install tmux
@@ -132,7 +132,8 @@ Claude Code is.
 ## Everything else
 
 ```sh
-xscapes inside <command>   # host any command, not just claude
+xscapes inside <command>   # host any command inside the scape, not just claude
+xscapes claude -beside     # the older side by side layout, in tmux
 xscapes -live              # the scape in this terminal, Ctrl-C to quit
 xscapes -info              # colour profile, size, which sound player
 xscapes notify             # hear both knocks
