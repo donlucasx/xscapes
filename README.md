@@ -21,12 +21,21 @@ That is the whole thing. Claude Code in the left pane, the scape in the right.
 ## Install
 
 ```sh
-git clone https://github.com/donlucasx/xscapes && cd xscapes
-go build -o xscapes .
+go install github.com/donlucasx/xscapes@latest
 
-./xscapes install claude          # prints a plan, writes nothing
-./xscapes install claude --apply  # writes the hooks, after a backup
+xscapes install claude          # prints a plan, writes nothing
+xscapes install claude --apply  # writes the hooks, after a backup
 ```
+
+That puts the binary in `$(go env GOPATH)/bin`. If that is not on your PATH,
+send it somewhere that is:
+
+```sh
+GOBIN=~/.local/bin go install github.com/donlucasx/xscapes@latest
+```
+
+Then run `xscapes claude` from whatever project you are working in. It is not
+something you run from this repo.
 
 The only dependency is tmux, for the side by side layout:
 
