@@ -52,11 +52,14 @@ session 6.
   to Claude's own mark. (Told this session: slate is the safe pick while
   Terminal.app is the daily driver; charcoal is a truecolor bet.)
 - **Settled**: the nose, the toe tips, and inner ears = **inner shadow**.
-- **Whiskers: REBUILT TO HIS SPEC, awaiting his pick of four variants**
-  (`4d513a0`). Spec verbatim: 4 total, 2 a side, connected to the head (not
-  the tail), levelled around the nose. Cause found and fixed: the unbounded
-  fur scan grabbed the TAIL (solid at nose height) and the torso. Variants
-  left: lower long / upper long / even / short; Sweep deleted. Study resent.
+- **Whiskers: rebuilt from HIS DRAWN GUIDE, awaiting his pick of three
+  reaches** (`6b2320a`). He drew the answer in red on the NONE portrait;
+  measured off the ink: both strokes hug the nose line (top = '─' at the nose
+  row's middle, bottom = '‾' on the row below, i.e. HALF a cell down -- the
+  half-cell is the whole trick), flush at the fur, top longer, and the
+  top-right passes BEHIND the tail (skip solid cells, don't stop). Variants:
+  guide (2/1) / long (3/1) / full (3/2). All earlier variants dead. The guide
+  file: `~/Downloads/Screenshot-2026-08-31-at-2.52.07 PMsd.gif` (nbsp in name).
 - **Ear shadows and toes: he LOVES them** -- but whether all 3 details ship
   together is a separate decision he wants AFTER the whisker lock.
 
