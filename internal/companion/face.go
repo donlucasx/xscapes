@@ -31,9 +31,20 @@ type WhiskerStyle int
 const (
 	NoWhiskers WhiskerStyle = iota
 	// WhiskerGuide is Lucas's drawn guideline (2026-08-31): solid lines,
-	// top pair on the nose row two cells long, bottom pair one cell, tucked
-	// on the row below, both flush at the fur.
+	// top pair on the nose row a cell and a half long, bottom pair one cell
+	// on the row below. Both pairs hang off the NOSE row's fur span, which
+	// is why the bottom pair floats: the row below is two cells narrower.
+	// Kept as a variant for comparison.
 	WhiskerGuide
+	// WhiskerTucked anchors the bottom pair to its OWN row -- the narrower
+	// block under the muzzle -- so all four touch fur.
+	WhiskerTucked
+	// WhiskerDouble puts both strokes inside the nose block itself: one
+	// double-line glyph per cell carries two parallel whiskers, so nothing
+	// reaches a row where the head is narrower. One cell a side.
+	WhiskerDouble
+	// WhiskerDoubleLong is WhiskerDouble reaching two cells.
+	WhiskerDoubleLong
 )
 
 // EarStyle is how the inside of the ear is treated. Every style below sits
@@ -92,7 +103,10 @@ var WhiskerStyles = []struct {
 	Name  string
 	Note  string
 }{
-	{WhiskerGuide, "guide", "his guideline: top 2, bottom 1"},
+	{WhiskerTucked, "tucked", "bottom pair on the narrower block, all four on fur"},
+	{WhiskerDouble, "double", "both strokes inside the nose block, one cell"},
+	{WhiskerDoubleLong, "double long", "both strokes inside the nose block, two cells"},
+	{WhiskerGuide, "current", "as it stands: the bottom pair floats"},
 	{NoWhiskers, "none", "for comparison"},
 }
 
@@ -248,9 +262,8 @@ func (c *Cat) drawFace(l *canvas.Layer, x, y int, f Face, st State) {
 	// top whisker and the bottom whisker floated amid the waves.
 	if f.Whiskers != NoWhiskers {
 		noseRow := y + 3
-		drop := 0
 		if st == Worried {
-			drop = 1 // drooping
+			noseRow++ // drooping
 		}
 		near, far := 1.0, 0.75
 		if st == Resting {
@@ -261,23 +274,56 @@ func (c *Cat) drawFace(l *canvas.Layer, x, y int, f Face, st State) {
 		if from > to {
 			from, to = to, from
 		}
-		if lo, hi, ok := furSpan(l, noseRow, from, to); ok {
-			plot := func(cx, row int, r rune, a float64) {
-				if cx < 0 || cx >= l.W || row < 0 || row >= l.H {
-					return
-				}
-				if c := l.Cells[row*l.W+cx]; c.Set && c.R == '█' {
-					return // pass behind the raised tail
-				}
-				l.Plot(cx, row, r, light, a)
+		plot := func(cx, row int, r rune, a float64) {
+			if cx < 0 || cx >= l.W || row < 0 || row >= l.H {
+				return
 			}
-			row := noseRow + drop
-			plot(lo-1, row, '─', near)
-			plot(hi+1, row, '─', near)
-			plot(lo-2, row, '╶', near) // tip: ink on the half facing the cat
-			plot(hi+2, row, '╴', near)
-			plot(lo-1, row+1, '⎺', far)
-			plot(hi+1, row+1, '⎺', far)
+			if c := l.Cells[row*l.W+cx]; c.Set && c.R == '█' {
+				return // pass behind the raised tail
+			}
+			l.Plot(cx, row, r, light, a)
+		}
+		// pair draws one whisker a side, growing outward from the fur found
+		// on that row. n is how far out the cell sits; lead and trail are the
+		// glyphs for the left and right side, which differ where the stroke
+		// is a half cell and has to point back at the cat.
+		pair := func(row, n int, lead, trail rune, a float64) {
+			lo, hi, ok := furSpan(l, row, from, to)
+			if !ok {
+				return
+			}
+			plot(lo-n, row, lead, a)
+			plot(hi+n, row, trail, a)
+		}
+
+		switch f.Whiskers {
+		case WhiskerTucked:
+			// The top pair hangs off the muzzle; the bottom pair off the
+			// narrower block on ITS OWN row, which is the whole difference --
+			// anchored to the nose row it reached two cells past that block
+			// and floated.
+			pair(noseRow, 1, '─', '─', near)
+			pair(noseRow, 2, '╶', '╴', near)
+			pair(noseRow+1, 1, '⎺', '⎺', far)
+
+		case WhiskerDouble:
+			pair(noseRow, 1, '═', '═', near)
+
+		case WhiskerDoubleLong:
+			pair(noseRow, 1, '═', '═', near)
+			pair(noseRow, 2, '═', '═', near*0.8)
+
+		default: // WhiskerGuide -- both pairs off the nose row's span
+			lo, hi, ok := furSpan(l, noseRow, from, to)
+			if !ok {
+				break
+			}
+			plot(lo-1, noseRow, '─', near)
+			plot(hi+1, noseRow, '─', near)
+			plot(lo-2, noseRow, '╶', near) // tip: ink on the half facing the cat
+			plot(hi+2, noseRow, '╴', near)
+			plot(lo-1, noseRow+1, '⎺', far)
+			plot(hi+1, noseRow+1, '⎺', far)
 		}
 	}
 

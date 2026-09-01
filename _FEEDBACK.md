@@ -222,3 +222,17 @@ Never paraphrase. Read the relevant section before editing anything it covers.
   ⇒ Direction CONFIRMED, fine-tuning now. Top: outer cell becomes a HALF dash ('╶'/'╴'),
     2 cells -> ~1.5. Bottom: '‾' (overline, ~12% down its cell) -> '⎺' (scan line 1, at the
     very top edge) -- a couple pixels up, literally a hair.
+
+- *"fit both whiskers within the nose block of the cat, currently the bottom whiskey is
+  floating in the air. you see what I mean? try another variant where the lower whiskers are
+  attached to the lower narrower block on the face of the cat. try variants with all the
+  whiskers attached to the body, and keep the current one as a variant too"*
+  ⇒ He is RIGHT and the cause is exact: both pairs anchor to the NOSE ROW's fur span, but
+    the row below is two cells narrower, so the bottom pair hangs in open air. Fixes built
+    as four variants: **current** (unchanged, for comparison) · **tucked** (bottom anchored
+    to ITS OWN row -- the narrower block) · **double** and **double long** ('═', one glyph
+    carrying two parallel strokes, so BOTH whiskers sit inside the nose block and both are
+    attached). Lesson: anchor a detail to the row it is DRAWN on, not to a neighbouring row.
+
+- *"switching models, do you still have full context?"* ⇒ Yes; a model switch keeps the
+  session's conversation.

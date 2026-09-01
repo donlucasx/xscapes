@@ -48,14 +48,16 @@ func facePage(seed int64) string {
 	   text-transform:uppercase;margin:14px 0 6px}
 	h2+p{margin-top:4px}
 	</style>`)
-	b.WriteString(`<h1>asciiscapes &mdash; whiskers, his guideline, plain</h1>`)
-	b.WriteString(`<p class="nt">Solid lines, per the drawn guide: top pair on the nose row, two ` +
-		`cells; bottom pair one cell, tucked on the row below; both flush at the fur; the top-right ` +
-		`passes behind the tail. Also fixed: these portraits used to sit the cat ONE ROW LOWER than ` +
-		`the live scene does, which parked the nose row on the waterline &mdash; the wave glyphs ` +
-		`continued the top whisker and the bottom whisker floated amid the waves. That collision ` +
-		`never exists live, and the last two rounds were judged against it. Portraits now match ` +
-		`the live composition. Ear shadows and toes on everywhere. Zoomed row first.</p>`)
+	b.WriteString(`<h1>asciiscapes &mdash; whiskers, off the float</h1>`)
+	b.WriteString(`<p class="nt">The float was real: both pairs hung off the NOSE ROW's fur span, ` +
+		`but the block under the muzzle is two cells narrower, so the bottom pair reached past it ` +
+		`into open air. Three fixes to compare, plus the current one for reference. ` +
+		`<b>tucked</b> anchors the bottom pair to its OWN row, so it grips the narrower block. ` +
+		`<b>double</b> and <b>double long</b> put both strokes INSIDE the nose block: one ` +
+		`double-line glyph draws two parallel whiskers in a single cell, so nothing ever reaches ` +
+		`a row where the head is narrower. A test now walks inward from every whisker cell and ` +
+		`fails unless it hits fur on its own row &mdash; it goes red on "current" and green on the ` +
+		`other three. Ear shadows and toes on everywhere. Zoomed row first.</p>`)
 
 	cell := func(label, note, body string) {
 		fmt.Fprintf(&b, `<div class="col"><div class="lbl"><b>%s</b>%s</div><div class="win">%s</div></div>`,
@@ -83,21 +85,21 @@ func facePage(seed int64) string {
 		b.WriteString(`</div>`)
 	}
 
-	b.WriteString(`<h2>"guide" across all five coats</h2><div class="row">`)
+	b.WriteString(`<h2>"tucked" across all five coats</h2><div class="row">`)
 	for _, coat := range companion.CoatOrder {
-		cell(coat, "", portrait(face(companion.WhiskerGuide, true), companion.Coats[coat],
+		cell(coat, "", portrait(face(companion.WhiskerTucked, true), companion.Coats[coat],
 			companion.Working, term.ProfileTrueColor, 3.1))
 	}
 	b.WriteString(`</div>`)
 
 	b.WriteString(`<h2>The same, as Terminal.app paints it</h2><div class="row">`)
 	for _, coat := range companion.CoatOrder {
-		cell(coat, " &middot; 256", portrait(face(companion.WhiskerGuide, true), companion.Coats[coat],
+		cell(coat, " &middot; 256", portrait(face(companion.WhiskerTucked, true), companion.Coats[coat],
 			companion.Working, term.Profile256, 3.1))
 	}
 	b.WriteString(`</div>`)
 
-	b.WriteString(`<h2>Every state &mdash; slate, "guide"</h2>`)
+	b.WriteString(`<h2>Every state &mdash; slate, "tucked"</h2>`)
 	b.WriteString(`<p class="nt">The whiskers drop a row when something is broken.</p><div class="row">`)
 	for _, st := range []struct {
 		s companion.State
@@ -105,7 +107,7 @@ func facePage(seed int64) string {
 	}{{companion.Resting, "resting"}, {companion.Working, "working"},
 		{companion.NeedsYou, "needs you"}, {companion.Done, "done"},
 		{companion.Worried, "broken"}} {
-		cell(st.n, "", portrait(face(companion.WhiskerGuide, true), companion.Coats["slate"],
+		cell(st.n, "", portrait(face(companion.WhiskerTucked, true), companion.Coats["slate"],
 			st.s, term.ProfileTrueColor, 3.1))
 	}
 	b.WriteString(`</div>`)

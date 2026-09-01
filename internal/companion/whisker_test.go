@@ -18,7 +18,8 @@ func TestWhiskersTouchTheFur(t *testing.T) {
 		s WhiskerStyle
 		n string
 	}{
-		{WhiskerGuide, "guide"},
+		{WhiskerGuide, "guide"}, {WhiskerTucked, "tucked"},
+		{WhiskerDouble, "double"}, {WhiskerDoubleLong, "double long"},
 	}
 	for _, mirror := range []bool{false, true} {
 		for _, st := range []State{Resting, Working, NeedsYou, Worried} {
@@ -58,7 +59,7 @@ func TestWhiskersTouchTheFur(t *testing.T) {
 // the nose row, scan-line-1 ('⎺') for the bottom pair tucked at the very top
 // edge of the row below.
 func isWhiskerRune(r rune) bool {
-	return r == '─' || r == '╶' || r == '╴' || r == '⎺'
+	return r == '─' || r == '╶' || r == '╴' || r == '⎺' || r == '═'
 }
 
 // touchesFur walks in direction d from x over the whisker run. The run is
@@ -89,13 +90,64 @@ func furAt(l *canvas.Layer, x, y int) bool {
 	return c.Set && c.R == '█'
 }
 
+// The variants built as "attached to the body" must reach fur on their OWN
+// row. TestWhiskersTouchTheFur allows a diagonal connection, and that
+// allowance is exactly what let the bottom pair hang two cells past the
+// narrower block under the muzzle and still count as connected -- the float
+// Lucas spotted. Walking inward from any whisker cell, skipping other whisker
+// cells, the first thing hit must be solid fur.
+func TestAttachedVariantsReachFurOnTheirOwnRow(t *testing.T) {
+	for _, mirror := range []bool{false, true} {
+		for _, st := range []State{Resting, Working, NeedsYou, Done, Worried} {
+			for _, style := range []WhiskerStyle{WhiskerTucked, WhiskerDouble, WhiskerDoubleLong} {
+				c := canvas.New(20, 10, canvas.AlphaFar, canvas.AlphaMid, canvas.AlphaNear)
+				cat := NewCat()
+				cat.FaceLeft(mirror)
+				cat.SetFace(Face{Nose: true, Toes: true, Whiskers: style, Ears: EarInnerDark})
+				cat.Draw(c.Near(), 3, 1, 3.1, st)
+
+				l := c.Near()
+				for y := 0; y < l.H; y++ {
+					for x := 0; x < l.W; x++ {
+						if cell := l.Cells[y*l.W+x]; !cell.Set || !isWhiskerRune(cell.R) {
+							continue
+						}
+						if !reachesFur(l, x, y, -1) && !reachesFur(l, x, y, +1) {
+							t.Errorf("mirror=%v state=%v style=%v: whisker at (%d,%d) floats -- no fur on its own row",
+								mirror, st, style, x, y)
+						}
+					}
+				}
+			}
+		}
+	}
+}
+
+// reachesFur walks direction d along ONE row: the run must end on solid fur.
+func reachesFur(l *canvas.Layer, x, y, d int) bool {
+	for cx := x + d; cx >= 0 && cx < l.W; cx += d {
+		cell := l.Cells[y*l.W+cx]
+		switch {
+		case cell.Set && cell.R == '█':
+			return true
+		case cell.Set && isWhiskerRune(cell.R):
+			continue
+		default:
+			return false
+		}
+	}
+	return false
+}
+
 // A whisker passes BEHIND the tail -- it must never replace a solid fur cell.
 // Render the same cat with and without whiskers: every cell the whiskers
 // changed has to have been non-solid before.
 func TestWhiskersDisplaceNoFur(t *testing.T) {
 	for _, mirror := range []bool{false, true} {
 		for _, st := range []State{Resting, Working, NeedsYou, Worried, Done} {
-			for _, style := range []WhiskerStyle{WhiskerGuide} {
+			for _, style := range []WhiskerStyle{
+				WhiskerGuide, WhiskerTucked, WhiskerDouble, WhiskerDoubleLong,
+			} {
 				render := func(w WhiskerStyle) *canvas.Layer {
 					c := canvas.New(20, 10, canvas.AlphaFar, canvas.AlphaMid, canvas.AlphaNear)
 					cat := NewCat()
