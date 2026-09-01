@@ -10,7 +10,7 @@ the why; ignore ideas.md — it is parked. Tell me where we left off, then pick 
 from ▶ NEXT.
 ```
 
-## Where we left off (2026-09-01, last code change `427a047`, 60 commits, branch `main`)
+## Where we left off (2026-09-01, last code change `a646440`, 76 commits, branch `main`, pushed)
 
 **Milestone 1 is COMPLETE and PUBLISHED**: https://github.com/donlucasx/xscapes
 (public, MIT, 74 commits). **The name is decided: `xscapes`.** The companion
@@ -26,8 +26,8 @@ study is PARKED at his request — see below.
   build outranks a question in the pose, so a pose-driven sound would go silent
   on the one event that needs answering), and edge-detected so Claude's
   60-second nag rings once. Silent when following nothing, `ASCIISCAPES_SILENT`
-  to mute, `asciiscapes notify` to audition.
-- **`asciiscapes claude`** — the launcher. Bootstraps tmux, or joins the window
+  to mute, `xscapes notify` to audition.
+- **`xscapes claude`** — the launcher. Bootstraps tmux, or joins the window
   it is already in, or falls back to a second Terminal via osascript. Agent
   keeps its own pane and TTY (exec, not wrap). `-print` is a dry run.
 - **`-live -await`** — the scape used to bind once at startup, so launching both
@@ -113,14 +113,14 @@ waiting for him. `NewCat()` still returns what shipped before session 6.
 ## How to look at things
 
 ```
-go build -o asciiscapes . && ./asciiscapes -live      # the real thing, Ctrl-C to quit
-./asciiscapes -faces  assets/frames/companion-study.html   # THE OPEN QUESTION
-./asciiscapes -colors assets/frames/color-study.html       # 256 vs truecolor
-./asciiscapes -wired  assets/frames/wired.html             # a turn through the REAL reducer
-./asciiscapes -info                                        # profile, size, chroma
-./asciiscapes -mockup assets/frames/composition-study.html   # left vs mirrored, every terminal shape
-./asciiscapes install claude                          # prints a plan, writes nothing
-./asciiscapes emit tool_start -tool Read -target x.go # drive the scene by hand
+go build -o xscapes . && ./xscapes -live      # the real thing, Ctrl-C to quit
+./xscapes -faces  assets/frames/companion-study.html   # THE OPEN QUESTION
+./xscapes -colors assets/frames/color-study.html       # 256 vs truecolor
+./xscapes -wired  assets/frames/wired.html             # a turn through the REAL reducer
+./xscapes -info                                        # profile, size, chroma
+./xscapes -mockup assets/frames/composition-study.html   # left vs mirrored, every terminal shape
+./xscapes install claude                          # prints a plan, writes nothing
+./xscapes emit tool_start -tool Read -target x.go # drive the scene by hand
 ```
 GIFs open directly. HTML demos need `python3 -m http.server` in `assets/frames/`.
 Demo flags: `-wired -mockup -anim -compare -layout -context -day -busy -kittens -sheet -strip -html`.
@@ -136,12 +136,12 @@ Demo flags: `-wired -mockup -anim -compare -layout -context -day -busy -kittens 
    2026-09-17.
 2. **Install for real and run a day on it.** Everything is still tested against
    synthetic streams and the schema read out of the Claude Code binary; no hook
-   has ever fired into it. `./asciiscapes install claude` prints a plan and
+   has ever fired into it. `./xscapes install claude` prints a plan and
    writes nothing; `--apply` writes, after a backup, and uninstall restores
    byte-for-byte.
 3. **Add the statusline chain by hand** or the moon stays dark. Install prints
    the exact line rather than taking over the statusLine Lucas wrote.
-4. **Re-tune the reducer against a recording.** `asciiscapes replay` exists for
+4. **Re-tune the reducer against a recording.** `xscapes replay` exists for
    exactly this. Are `TauFall=12s`, `TurnFloor=0.30`, `FlightFloor=0.45` right
    against his actual rhythm? Do real fan-outs reach the kitten ladder's numbers?
 5. **Keypress focuses the agent pane** — the last half of Milestone 1 #6. The
@@ -152,17 +152,17 @@ Demo flags: `-wired -mockup -anim -compare -layout -context -day -busy -kittens 
 ## How to look at things (additions)
 
 ```
-./asciiscapes claude -print          # the launcher's plan, writes nothing
-./asciiscapes claude                 # agent left, scape right, one command
-./asciiscapes notify                 # hear both knocks
-ASCIISCAPES_SILENT=1 ./asciiscapes … # mute
+./xscapes claude -print          # the launcher's plan, writes nothing
+./xscapes claude                 # agent left, scape right, one command
+./xscapes notify                 # hear both knocks
+ASCIISCAPES_SILENT=1 ./xscapes … # mute
 ```
 
 ## Open threads for Lucas
 
 - **The companion pick** — coat + whisker revision + toes. Full study is in
   his hands now; waiting on his steer.
-- **Name** — still `asciiscapes`; `iixscapes` / `xscapes` on the list. Late call.
+- ~~Name~~ **DECIDED 2026-09-01: `xscapes`**, with the repo. The dir and these docs still say asciiscapes; renaming those (plus `ASCIISCAPES_*` and `~/.config/asciiscapes/`) is a migration he has not asked for.
 - **Charcoal is a bet on the terminal.** It looks best in truecolor and worst in
   256, where it goes grey. Slate is the safe pick if Terminal.app stays the
   daily driver; charcoal wins if Ghostty or iTerm2 gets installed. **No
@@ -178,4 +178,4 @@ ASCIISCAPES_SILENT=1 ./asciiscapes … # mute
   oversubscribed.
 - `CLAUDE.md` Milestone 1 list is stale — the installer is done; the tmux
   launcher is the only piece of it left.
-- **No git remote. Nothing pushed anywhere.** 54 commits live only on this disk.
+- ~~No git remote~~ **PUBLISHED 2026-09-01**: github.com/donlucasx/xscapes, public, MIT.
