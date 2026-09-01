@@ -52,15 +52,15 @@ session 6.
   to Claude's own mark. (Told this session: slate is the safe pick while
   Terminal.app is the daily driver; charcoal is a truecolor bet.)
 - **Settled**: the nose, the toe tips, and inner ears = **inner shadow**.
-- **Whiskers: LINES, his guideline plain** (`b93d679`), after he rejected the
-  braille detour ("you had it going fine w the lines... use it"). ONE design:
-  top '─' on the nose row x2 cells, bottom '‾' tucked on the row below x1,
-  flush at the fur, passing behind the tail. **Root cause of the two earlier
-  line rejections found**: the study portraits drew the cat one row lower
-  than every live surface, parking the nose row ON the waterline -- waves
-  visually extended the whiskers ("too long") and the bottom one floated in
-  the wave field ("too low"). Portraits now use c.H-2-chh like live. Study
-  resent; AWAITING his verdict on the corrected framing. The guide file:
+- **Whiskers: LINES, his guideline, fine-tuning converging** (`b3cbde0`).
+  After the braille detour was rejected he said "closer" and asked two
+  tweaks, both in: top pair = full dash + HALF-dash tip (~1.5 cells);
+  bottom pair = scan-line-1 '⎺' at the very top edge of the row below,
+  tucked under the nose line. Flush at the fur, passing behind the tail.
+  **Root cause of the earlier line rejections**: the study portraits drew
+  the cat one row lower than every live surface, parking the nose row ON
+  the waterline (waves extended the whiskers). Portraits now use c.H-2-chh
+  like live. AWAITING his verdict on the tuned pair. The guide file:
   `~/Downloads/Screenshot-2026-08-31-at-2.52.07 PMsd.gif` (nbsp in name).
 - **Ear shadows and toes: he LOVES them** -- but whether all 3 details ship
   together is a separate decision he wants AFTER the whisker lock.
