@@ -13,3 +13,6 @@ xscapes
 
 # scratch build from the mirror branch
 /as
+
+# overlay mockups composite a capture of a real agent pane; never publish one
+/assets/frames/overlay*.png

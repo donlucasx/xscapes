@@ -59,6 +59,7 @@ func main() {
 		await   = flag.Bool("await", false, "in -live, keep looking for a session instead of settling for the demo")
 		mirror  = flag.Bool("mirror", true, "companion on the right, litter growing leftward (-mirror=false for the old left-anchored layout)")
 		mockup  = flag.String("mockup", "", "write the left-vs-mirrored composition study to an HTML file")
+		overlay = flag.String("overlay", "", "mock the agent INSIDE the scape: composite a captured pane (text file) over the scene")
 	)
 	flag.Parse()
 
@@ -91,6 +92,19 @@ func main() {
 			hl = *height
 		}
 		runLive(*seed, *fps, wl, hl, *ctxUsed, *tod, *asciiG, *session, *mirror, *await)
+		return
+	}
+
+	if *overlay != "" {
+		if flag.NArg() < 1 {
+			fmt.Fprintln(os.Stderr, "asciiscapes: -overlay needs a captured pane file, e.g. -overlay out.html pane.txt")
+			os.Exit(2)
+		}
+		if err := os.WriteFile(*overlay, []byte(overlayPage(*seed, flag.Arg(0))), 0o644); err != nil {
+			fmt.Fprintln(os.Stderr, "asciiscapes:", err)
+			os.Exit(1)
+		}
+		fmt.Println(*overlay)
 		return
 	}
 

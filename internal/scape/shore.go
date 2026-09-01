@@ -39,6 +39,16 @@ type Shore struct {
 	// is a better answer than a garish blue one.
 	BlueSky bool
 
+	// SkyRows and SandRows override the proportional layout, in rows. Zero
+	// means the default fractions.
+	//
+	// They exist because a fixed fraction is wrong for a tall window: the sky
+	// is the least informative region on screen -- measured on a real 66x35
+	// pane it paints 1.7 glyphs a row against the sea's 34.9 -- and giving it
+	// 42% of every extra row spends the new space on nothing. The beach is
+	// where the agent's actual work is written, so it is what should grow.
+	SkyRows, SandRows int
+
 	// MoonX is where the moon sits, as a fraction of the width. It moves with
 	// the composition: the moon and the companion are the two things a glance
 	// goes looking for, and stacking them in one column leaves half the frame
@@ -133,6 +143,9 @@ func (s *Shore) Update(c *canvas.Canvas, t float64, act Activity) {
 		return
 	}
 	hy := int(float64(c.H) * 0.42) // horizon
+	if s.SkyRows > 0 {
+		hy = s.SkyRows
+	}
 	// Mean waterline. Eight tenths down is right in a tall window and
 	// collapses the beach in a short one -- at fourteen rows it left a single
 	// row of sand, so three of the four lines of writing had nowhere to go.
@@ -142,6 +155,9 @@ func (s *Shore) Update(c *canvas.Canvas, t float64, act Activity) {
 	sy := c.H - 5
 	if p := c.H / 5; p > 5 {
 		sy = c.H - p
+	}
+	if s.SandRows > 0 {
+		sy = c.H - s.SandRows
 	}
 	if sy <= hy+1 {
 		sy = hy + 2
