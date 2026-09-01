@@ -52,16 +52,18 @@ session 6.
   to Claude's own mark. (Told this session: slate is the safe pick while
   Terminal.app is the daily driver; charcoal is a truecolor bet.)
 - **Settled**: the nose, the toe tips, and inner ears = **inner shadow**.
-- **Whiskers: LINES, his guideline, fine-tuning converging** (`b3cbde0`).
-  After the braille detour was rejected he said "closer" and asked two
-  tweaks, both in: top pair = full dash + HALF-dash tip (~1.5 cells);
-  bottom pair = scan-line-1 '⎺' at the very top edge of the row below,
-  tucked under the nose line. Flush at the fur, passing behind the tail.
-  **Root cause of the earlier line rejections**: the study portraits drew
-  the cat one row lower than every live surface, parking the nose row ON
-  the waterline (waves extended the whiskers). Portraits now use c.H-2-chh
-  like live. AWAITING his verdict on the tuned pair. The guide file:
-  `~/Downloads/Screenshot-2026-08-31-at-2.52.07 PMsd.gif` (nbsp in name).
+- **Whiskers: FOUR VARIANTS on the table, awaiting his pick** (`b192179`).
+  He caught the bottom pair "floating in the air" -- cause: both pairs
+  anchored to the NOSE ROW's span while the block under the muzzle is two
+  cells narrower. Variants: **tucked** (bottom anchored to its own row) ·
+  **double** / **double long** ('═', two parallel strokes in ONE cell, so
+  both whiskers sit inside the nose block) · **current** (unchanged, floats).
+  Test `TestAttachedVariantsReachFurOnTheirOwnRow` walks inward on one row
+  and demands fur -- proven red on current, green on the other three.
+  Earlier rounds: lines are locked (braille rejected); the top pair is a
+  dash + half-dash tip; the study portraits were fixed to c.H-2-chh (they
+  had sat the cat a row low, putting the waterline at nose height).
+  Guide file: `~/Downloads/Screenshot-2026-08-31-at-2.52.07 PMsd.gif` (nbsp).
 - **Ear shadows and toes: he LOVES them** -- but whether all 3 details ship
   together is a separate decision he wants AFTER the whisker lock.
 
