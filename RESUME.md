@@ -52,15 +52,16 @@ session 6.
   to Claude's own mark. (Told this session: slate is the safe pick while
   Terminal.app is the daily driver; charcoal is a truecolor bet.)
 - **Settled**: the nose, the toe tips, and inner ears = **inner shadow**.
-- **Whiskers: now BRAILLE, both lines inside the nose row** (`4973a97`), after
-  two rejections ("too long", "bottom sitting too low"). His ink, measured as
-  fractions of the nose cell: top at 56%, bottom at 89% -- a third of a cell
-  apart, which only braille dot rows (~62% / ~87%) can render. Dots 3+6 =
-  top line, 3+6+7+8 = shared cell; flush at the fur; passes behind the tail.
-  Variants awaiting his pick: snug (1/1) / guide (2/1, his draft) / taper
-  (2/1, tip fading). OPEN QUESTION he must judge: dotted texture vs solid.
-  The guide file: `~/Downloads/Screenshot-2026-08-31-at-2.52.07 PMsd.gif`
-  (nbsp in name; copy in scratchpad dies with the session).
+- **Whiskers: LINES, his guideline plain** (`b93d679`), after he rejected the
+  braille detour ("you had it going fine w the lines... use it"). ONE design:
+  top '─' on the nose row x2 cells, bottom '‾' tucked on the row below x1,
+  flush at the fur, passing behind the tail. **Root cause of the two earlier
+  line rejections found**: the study portraits drew the cat one row lower
+  than every live surface, parking the nose row ON the waterline -- waves
+  visually extended the whiskers ("too long") and the bottom one floated in
+  the wave field ("too low"). Portraits now use c.H-2-chh like live. Study
+  resent; AWAITING his verdict on the corrected framing. The guide file:
+  `~/Downloads/Screenshot-2026-08-31-at-2.52.07 PMsd.gif` (nbsp in name).
 - **Ear shadows and toes: he LOVES them** -- but whether all 3 details ship
   together is a separate decision he wants AFTER the whisker lock.
 
