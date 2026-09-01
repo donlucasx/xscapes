@@ -206,3 +206,14 @@ Never paraphrase. Read the relevant section before editing anything it covers.
     adjacent rows can sit a third of a cell apart; BRAILLE can (dot row 3 ~62%, dot row 4
     ~87%, same cell). Whiskers go braille, both lines inside the nose row. Reaches shrink:
     3-cell variants dead; snug (1/1) / guide (2/1) / taper (2/1, tip fading).
+
+- *"you had it going fine w the lines before, issue was placement and length. I gave you a
+  very easy guideline to follow, use it"*
+  ⇒ Braille REJECTED. Solid lines were right; fix ONLY length and placement, per his draft:
+    top '─' on the nose row, 2 cells; bottom '‾' tucked on the row below, 1 cell. And found
+    while reverting: the STUDY portraits alone drew the cat one row lower than every other
+    surface (`c.H-1-chh` vs the live scene's `c.H-2-chh`), which parked the nose row ON the
+    waterline -- wave glyphs continued the top whisker ("too long") and the bottom whisker
+    floated amid the waves ("too low"). Portraits now match the live composition. Lesson:
+    when he rejects a render twice, audit the CONTEXT the thing is judged in, not just the
+    thing.

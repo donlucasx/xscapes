@@ -25,7 +25,11 @@ func facePage(seed int64) string {
 		cat.SetFace(f)
 		cat.SetCoat(coat)
 		_, chh := cat.Size()
-		cat.Draw(c.Near(), 2, c.H-1-chh, t, st)
+		// c.H-2-chh, same as every live surface. The portraits used to sit the
+		// cat one row lower, which parked the nose row ON the waterline: wave
+		// glyphs continued the top whisker and two whisker rounds were judged
+		// against a collision the live scene never has.
+		cat.Draw(c.Near(), 2, c.H-2-chh, t, st)
 		return c.HTMLFragmentAs(px, prof)
 	}
 	portrait := func(f companion.Face, coat term.RGB, st companion.State, prof term.Profile, t float64) string {
@@ -44,15 +48,14 @@ func facePage(seed int64) string {
 	   text-transform:uppercase;margin:14px 0 6px}
 	h2+p{margin-top:4px}
 	</style>`)
-	b.WriteString(`<h1>asciiscapes &mdash; whiskers, braille, inside the nose row</h1>`)
-	b.WriteString(`<p class="nt">Round three, his ink re-measured after "too long, bottom too low": ` +
-		`the top stroke sits 56% down the NOSE CELL and the bottom at 89% &mdash; both INSIDE the ` +
-		`nose row, a third of a cell apart. No two line glyphs on adjacent rows can sit that close, ` +
-		`which is why the overline version read too low. Braille can: dot row three lands at ~62% ` +
-		`and dot row four at ~87% of the same cell, so both whiskers now render in the nose row ` +
-		`itself, flush at the fur, top longer, passing behind the tail. Reaches are shorter across ` +
-		`the board; nothing reaches past two cells. Ear shadows and toes on everywhere. Zoomed row ` +
-		`first.</p>`)
+	b.WriteString(`<h1>asciiscapes &mdash; whiskers, his guideline, plain</h1>`)
+	b.WriteString(`<p class="nt">Solid lines, per the drawn guide: top pair on the nose row, two ` +
+		`cells; bottom pair one cell, tucked on the row below; both flush at the fur; the top-right ` +
+		`passes behind the tail. Also fixed: these portraits used to sit the cat ONE ROW LOWER than ` +
+		`the live scene does, which parked the nose row on the waterline &mdash; the wave glyphs ` +
+		`continued the top whisker and the bottom whisker floated amid the waves. That collision ` +
+		`never exists live, and the last two rounds were judged against it. Portraits now match ` +
+		`the live composition. Ear shadows and toes on everywhere. Zoomed row first.</p>`)
 
 	cell := func(label, note, body string) {
 		fmt.Fprintf(&b, `<div class="col"><div class="lbl"><b>%s</b>%s</div><div class="win">%s</div></div>`,

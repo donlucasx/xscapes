@@ -30,15 +30,10 @@ type WhiskerStyle int
 
 const (
 	NoWhiskers WhiskerStyle = iota
-	// The styles below are all Lucas's drawn guide (2026-08-31): both lines
-	// INSIDE the nose row, attached at the fur, top longer than bottom. They
-	// differ only in reach.
-	// WhiskerSnug: one cell a side carrying both lines.
-	WhiskerSnug
-	// WhiskerGuide is his draft as measured: top 2 cells, bottom 1.
+	// WhiskerGuide is Lucas's drawn guideline (2026-08-31): solid lines,
+	// top pair on the nose row two cells long, bottom pair one cell, tucked
+	// on the row below, both flush at the fur.
 	WhiskerGuide
-	// WhiskerTaper: guide, with the top's outer cell fading.
-	WhiskerTaper
 )
 
 // EarStyle is how the inside of the ear is treated. Every style below sits
@@ -97,9 +92,7 @@ var WhiskerStyles = []struct {
 	Name  string
 	Note  string
 }{
-	{WhiskerSnug, "snug", "one cell a side, both lines"},
-	{WhiskerGuide, "guide", "his draft as measured: top 2, bottom 1"},
-	{WhiskerTaper, "taper", "guide, top tip fading"},
+	{WhiskerGuide, "guide", "his guideline: top 2, bottom 1"},
 	{NoWhiskers, "none", "for comparison"},
 }
 
@@ -230,73 +223,60 @@ func (c *Cat) drawFace(l *canvas.Layer, x, y int, f Face, st State) {
 		l.Plot(at(4), y+3, '▾', noseCol, 1)
 	}
 
-	// Whiskers, round three of Lucas's drawn guide (2026-08-31, _FEEDBACK.md
-	// s7): four, two a side, both lines hugging the nose, attached at the
-	// fur, top pair longer -- and after "the bottom whisker is sitting too
-	// low", his ink re-measured as fractions of the NOSE CELL: top stroke at
-	// 56% down it, bottom at 89%. Both lines live INSIDE the nose row, a
-	// third of a cell apart.
+	// Whiskers: Lucas's guideline, followed plainly. Four, two a side, solid
+	// lines: the top pair '─' on the nose row, TWO cells, and the bottom pair
+	// '‾' on the row below -- the overline renders at the top edge of its
+	// cell, tucked under the top pair -- ONE cell. Top longer than bottom.
+	// Both anchor to the muzzle, measured once on the nose row and bounded to
+	// the head's own cells (an unbounded scan finds the tail, which is solid
+	// at nose height).
 	//
-	// No two line glyphs on adjacent rows can sit that close -- the overline
-	// on the next row rendered at ~112% and read too low, twice. BRAILLE can:
-	// dot row three sits at ~62% of the cell and dot row four at ~87%, so
-	// both whiskers render in the nose row itself. Dots 3+6 carry the top
-	// line, dots 7+8 the bottom, one glyph carrying both where they overlap.
-	// Braille is Narrow on the width allow-list, unlike the Ambiguous line
-	// glyphs it replaces.
+	// A whisker skips solid cells and resumes past them -- his top-right
+	// stroke runs straight across the raised tail, and at one glyph per cell
+	// an interrupted stroke is how "passing behind" is drawn. It still paints
+	// over non-solid cells: the head's own half-filled edge is one, and
+	// skipping it would hang daylight between fur and whisker.
 	//
-	// His top-right stroke runs straight across the raised tail, so a whisker
-	// does not stop at the tail: it SKIPS solid cells and resumes past them,
-	// which at one glyph per cell is how "passing behind" is drawn. It still
-	// paints over non-solid cells -- the head's own half-filled edge is one,
-	// and skipping it would hang daylight between fur and whisker.
+	// When these read wrong before, twice, the fault was the STUDY's own
+	// portraits: they drew the cat one row lower than every live surface,
+	// which parked the nose row on the waterline -- wave glyphs continued the
+	// top whisker and the bottom whisker floated amid the waves.
 	if f.Whiskers != NoWhiskers {
-		row := y + 3 // the nose row
+		noseRow := y + 3
+		drop := 0
 		if st == Worried {
-			row++ // drooping
+			drop = 1 // drooping
 		}
-		bright := 1.0
+		near, far := 1.0, 0.75
 		if st == Resting {
-			bright = 0.75
+			near, far = 0.8, 0.55
 		}
-
-		top, tip := 2, 1.0
-		switch f.Whiskers {
-		case WhiskerSnug:
-			top = 1
-		case WhiskerTaper:
-			tip = 0.55
-		}
-		const bottom = 1
+		const top, bottom = 2, 1
 
 		from, to := at(0), at(8)
 		if from > to {
 			from, to = to, from
 		}
-		if lo, hi, ok := furSpan(l, y+3, from, to); ok {
-			solid := func(cx int) bool {
-				if cx < 0 || cx >= l.W || row < 0 || row >= l.H {
-					return true
+		if lo, hi, ok := furSpan(l, noseRow, from, to); ok {
+			stroke := func(row int, r rune, length int, a float64) {
+				solid := func(cx int) bool {
+					if cx < 0 || cx >= l.W || row < 0 || row >= l.H {
+						return true
+					}
+					c := l.Cells[row*l.W+cx]
+					return c.Set && c.R == '█'
 				}
-				c := l.Cells[row*l.W+cx]
-				return c.Set && c.R == '█'
-			}
-			for n := 1; n <= top; n++ {
-				r := '⠤' // dots 3+6: the top line alone
-				if n <= bottom {
-					r = '⣤' // dots 3+6+7+8: both lines share the cell
-				}
-				a := bright
-				if n == top && top > 1 {
-					a = bright * tip
-				}
-				if !solid(lo - n) {
-					l.Plot(lo-n, row, r, light, a)
-				}
-				if !solid(hi + n) {
-					l.Plot(hi+n, row, r, light, a)
+				for n := 1; n <= length; n++ {
+					if !solid(lo - n) {
+						l.Plot(lo-n, row, r, light, a)
+					}
+					if !solid(hi + n) {
+						l.Plot(hi+n, row, r, light, a)
+					}
 				}
 			}
+			stroke(noseRow+drop, '─', top, near)
+			stroke(noseRow+1+drop, '‾', bottom, far)
 		}
 	}
 
