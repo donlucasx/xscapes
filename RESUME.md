@@ -45,6 +45,22 @@ study is PARKED at his request — see below.
   Every command was run before being written down; three first-draft claims
   were wrong and were fixed (event names are `sub_start`/`sub_end`; the process
   adapter is NOT built; `go install` cannot work with no remote).
+- **⭐ THE BEACH FALLS AWAY TO BLACK** (`DefaultSandFade = 1.0`, locked). Newest
+  line contrast 132→204 midday, 148→204 night, and equal at every hour. It
+  exposed two things it did not cause: `drawSand` picked ink from the palette's
+  NOMINAL sand while painting onto a darkened background, so a half fade at
+  midday LOST contrast (now samples the painted background per row); and
+  `internal/scape/sandfade_test.go` mirrored that rule instead of running it, so
+  it passed throughout — deleted, replaced by `sand_ink_test.go` which renders a
+  frame and reads the pixels back. Verified on 256: monotonic, all indices ≥16,
+  and it ADDS depth (without it the lower half of a tall beach was one flat colour).
+- **⭐ NEW DIRECTION: the agent goes INSIDE the scape** — *"the entire Claude
+  experience should happen within the xscape, not next to it"*, and *"the taller
+  the window the more sand below"*. Mocked with `-overlay`; 83.5% of a real
+  Claude pane is blank. `Shore.SkyRows/SandRows` added so a taller window spends
+  its extra rows on beach (4 lines of history at 24 rows, 9 at 43, 16 at 60).
+  **NOT BUILT**: it needs xscapes to host Claude in a PTY and composite, i.e. a
+  terminal emulator. See ▶ NEXT.
 - **⭐ INSTALLED FOR REAL, and the whole chain works.** `xscapes install claude
   --apply` on 2026-09-01, with his say-so. His four existing hooks survived
   byte-for-byte (the VERCEL_TOKEN secret guard included), statusLine untouched,
@@ -137,7 +153,14 @@ Demo flags: `-wired -mockup -anim -compare -layout -context -day -busy -kittens 
 
 ## ▶ NEXT
 
-1. **Run a day on it and re-tune.** The hooks are INSTALLED and firing (see
+1. **DECIDE: build the embedded terminal?** He has asked for the agent to run
+   inside the scape. That means a PTY, a VT parser, a cell-grid composite, input
+   forwarding and resize — days, not hours, and the risk is fidelity (a parser
+   bug corrupts Claude's UI, not just the picture). Sizing Claude's viewport to
+   (window height − beach rows) solves the text collision by construction. It
+   bends "stdlib only" (PTY needs syscalls or one small pure-Go dep). Strongest
+   remaining move for the rubric; would consume most of the 16 days left.
+2. **Run a day on it and re-tune.** The hooks are INSTALLED and firing (see
    below); what is missing is a day of real rhythm to tune `TauFall=12s`,
    `TurnFloor=0.30`, `FlightFloor=0.45` against. `xscapes replay` exists for
    exactly this, and the spool files in `~/.config/asciiscapes/run/*.jsonl` are
