@@ -197,3 +197,12 @@ Never paraphrase. Read the relevant section before editing anything it covers.
     ~1.3; and his top-right stroke runs STRAIGHT ACROSS the raised tail -- the whisker passes
     the tail (drawn by skipping solid cells), it does not stop at it. The four length
     variants from the previous rounds are all dead.
+
+- *"whiskers: they are all too long, and for all the alts, the bottom whisker is sitting to
+  low. Review my reference once again"*
+  ⇒ Re-measured his ink as fractions of the NOSE CELL: top stroke at 56%, bottom at 89% --
+    the bottom is INSIDE the nose cell, a third of a cell below the top. The overline on the
+    next row rendered at ~112%: half a cell lower than his ink. No two line glyphs on
+    adjacent rows can sit a third of a cell apart; BRAILLE can (dot row 3 ~62%, dot row 4
+    ~87%, same cell). Whiskers go braille, both lines inside the nose row. Reaches shrink:
+    3-cell variants dead; snug (1/1) / guide (2/1) / taper (2/1, tip fading).

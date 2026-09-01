@@ -18,7 +18,7 @@ func TestWhiskersTouchTheFur(t *testing.T) {
 		s WhiskerStyle
 		n string
 	}{
-		{WhiskerGuide, "guide"}, {WhiskerLong, "long"}, {WhiskerFull, "full"},
+		{WhiskerSnug, "snug"}, {WhiskerGuide, "guide"}, {WhiskerTaper, "taper"},
 	}
 	for _, mirror := range []bool{false, true} {
 		for _, st := range []State{Resting, Working, NeedsYou, Worried} {
@@ -54,7 +54,9 @@ func TestWhiskersTouchTheFur(t *testing.T) {
 	}
 }
 
-func isWhiskerRune(r rune) bool { return r == '─' || r == '‾' }
+// The whisker glyphs are braille: dots 3+6 for the top line alone, all of
+// 3+6+7+8 where the bottom line shares the cell.
+func isWhiskerRune(r rune) bool { return r == '⠤' || r == '⣤' }
 
 // touchesFur walks in direction d from x over the whisker run. The run is
 // connected if it ends against solid fur on its own row, or hangs off a fur
@@ -90,7 +92,7 @@ func furAt(l *canvas.Layer, x, y int) bool {
 func TestWhiskersDisplaceNoFur(t *testing.T) {
 	for _, mirror := range []bool{false, true} {
 		for _, st := range []State{Resting, Working, NeedsYou, Worried, Done} {
-			for _, style := range []WhiskerStyle{WhiskerGuide, WhiskerLong, WhiskerFull} {
+			for _, style := range []WhiskerStyle{WhiskerSnug, WhiskerGuide, WhiskerTaper} {
 				render := func(w WhiskerStyle) *canvas.Layer {
 					c := canvas.New(20, 10, canvas.AlphaFar, canvas.AlphaMid, canvas.AlphaNear)
 					cat := NewCat()

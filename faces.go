@@ -44,15 +44,15 @@ func facePage(seed int64) string {
 	   text-transform:uppercase;margin:14px 0 6px}
 	h2+p{margin-top:4px}
 	</style>`)
-	b.WriteString(`<h1>asciiscapes &mdash; whiskers, from his guide</h1>`)
-	b.WriteString(`<p class="nt">Built from Lucas's drawn guide, measured off the ink: both strokes ` +
-		`hug the NOSE LINE &mdash; the top at the nose row's vertical middle, the bottom at the nose ` +
-		`cell's bottom edge, HALF a cell down rather than a full row (that half-cell is the whole ` +
-		`difference from every earlier attempt) &mdash; both start flush at the fur, and the top pair ` +
-		`is longer. His top-right stroke runs straight across the raised tail, so a whisker no ` +
-		`longer stops there: it skips the tail's cells and resumes past them, passing behind. ` +
-		`Three reaches to pick from; "guide" is his draft as measured. Ear shadows and toes on ` +
-		`everywhere. Zoomed row first.</p>`)
+	b.WriteString(`<h1>asciiscapes &mdash; whiskers, braille, inside the nose row</h1>`)
+	b.WriteString(`<p class="nt">Round three, his ink re-measured after "too long, bottom too low": ` +
+		`the top stroke sits 56% down the NOSE CELL and the bottom at 89% &mdash; both INSIDE the ` +
+		`nose row, a third of a cell apart. No two line glyphs on adjacent rows can sit that close, ` +
+		`which is why the overline version read too low. Braille can: dot row three lands at ~62% ` +
+		`and dot row four at ~87% of the same cell, so both whiskers now render in the nose row ` +
+		`itself, flush at the fur, top longer, passing behind the tail. Reaches are shorter across ` +
+		`the board; nothing reaches past two cells. Ear shadows and toes on everywhere. Zoomed row ` +
+		`first.</p>`)
 
 	cell := func(label, note, body string) {
 		fmt.Fprintf(&b, `<div class="col"><div class="lbl"><b>%s</b>%s</div><div class="win">%s</div></div>`,
