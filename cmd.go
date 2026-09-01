@@ -41,6 +41,8 @@ func dispatch(args []string) bool {
 		runNotify(args[1:])
 	case "claude":
 		runClaudeLauncher(args[1:])
+	case "inside":
+		runInside(args[1:])
 	case "help", "-h", "--help":
 		usage()
 	default:

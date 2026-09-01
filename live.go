@@ -11,7 +11,6 @@ import (
 	"github.com/donlucasx/xscapes/internal/canvas"
 	"github.com/donlucasx/xscapes/internal/companion"
 	"github.com/donlucasx/xscapes/internal/event"
-	"github.com/donlucasx/xscapes/internal/notify"
 	"github.com/donlucasx/xscapes/internal/reduce"
 	"github.com/donlucasx/xscapes/internal/scape"
 	"github.com/donlucasx/xscapes/internal/term"
@@ -93,8 +92,8 @@ func runLive(seed int64, fps float64, wIn, hIn int, ctxUsed, tod float64, ascii 
 		session = event.Current()
 	}
 
-	var bus *event.Bus
-	var red *reduce.Reducer
+	f := newFrames(w, h, seed, ascii, mirror, ctxUsed, tod)
+
 	// bind attaches to a session, or reports that there is nothing to attach
 	// to yet. Split out because -await calls it again every second: the
 	// launcher starts the scape and the agent together, and whichever comes
@@ -114,7 +113,7 @@ func runLive(seed int64, fps float64, wIn, hIn int, ctxUsed, tod float64, ascii 
 			fmt.Fprintln(os.Stderr, "asciiscapes:", err)
 			return false
 		}
-		bus, red = b, reduce.New(session)
+		f.follow(b, reduce.New(session))
 		return true
 	}
 	// -await means "the agent has not started yet; wait for it", so the
@@ -129,22 +128,11 @@ func runLive(seed int64, fps float64, wIn, hIn int, ctxUsed, tod float64, ascii 
 	} else {
 		bind(session)
 	}
-	// Closed here rather than where it is opened: -await can bind on any
-	// frame, and a defer inside that closure would close the bus the instant
-	// it was created.
 	defer func() {
-		if bus != nil {
-			bus.Close()
+		if f.bus != nil {
+			f.bus.Close()
 		}
 	}()
-
-	c := canvas.New(w, h, canvas.AlphaFar, canvas.AlphaMid, canvas.AlphaNear)
-	sh := scape.NewShore(seed, ascii)
-	cat := companion.NewCat()
-	cat.FaceLeft(mirror)
-	ccw, chh := cat.Size()
-	lay := compose(w, ccw, mirror)
-	sh.MoonX = lay.MoonX
 
 	// React to a resized window by ASKING, every frame.
 	//
@@ -165,8 +153,8 @@ func runLive(seed int64, fps float64, wIn, hIn int, ctxUsed, tod float64, ascii 
 	signal.Notify(sig, os.Interrupt, syscall.SIGTERM)
 	go func() {
 		<-sig
-		if bus != nil {
-			bus.Close()
+		if f.bus != nil {
+			f.bus.Close()
 		}
 		restore()
 		os.Exit(0)
@@ -175,9 +163,6 @@ func runLive(seed int64, fps float64, wIn, hIn int, ctxUsed, tod float64, ascii 
 	fmt.Print("\x1b[?1049h\x1b[?25l\x1b[2J") // alt screen, hide cursor, clear once
 	defer restore()
 
-	profile := term.DetectProfile()
-	sound := notify.New()
-	var knocker notify.Knocker
 	// A zero fps builds a ticker with a zero duration (panic), and anything
 	// under one frame a second fights the shore's own large-gap clamp.
 	if fps < 1 {
@@ -189,11 +174,9 @@ func runLive(seed int64, fps float64, wIn, hIn int, ctxUsed, tod float64, ascii 
 	tick := time.NewTicker(time.Duration(float64(time.Second) / fps))
 	defer tick.Stop()
 
-	start := time.Now()
 	var nextBind time.Time
 	for range tick.C {
 		now := time.Now()
-		t := now.Sub(start).Seconds()
 
 		// Drain any pending signals so they do not queue up during a drag.
 		for drained := true; drained; {
@@ -204,16 +187,12 @@ func runLive(seed int64, fps float64, wIn, hIn int, ctxUsed, tod float64, ascii 
 			}
 		}
 		if wIn <= 0 || hIn <= 0 {
-			if nw, nh := termSize(); nw != c.W || nh-1 != c.H {
-				shrank := nw < c.W || nh-1 < c.H
-				c.Resize(nw, nh-1)
-				lay = compose(nw, ccw, mirror)
-				sh.MoonX = lay.MoonX
+			if nw, nh := termSize(); nw != f.c.W || nh-1 != f.c.H {
 				// Only clear when the window got SMALLER. Growing needs no
 				// clear -- the next frame paints strictly more cells than the
 				// last one -- and clearing anyway is a blank flash on every
 				// step of a drag.
-				if shrank {
+				if f.resize(nw, nh-1) {
 					fmt.Print("\x1b[2J")
 				}
 			}
@@ -223,63 +202,16 @@ func runLive(seed int64, fps float64, wIn, hIn int, ctxUsed, tod float64, ascii 
 		// and the agent at the same moment, and the agent cannot announce
 		// itself until it is up, so a scape that gave up at startup would run
 		// the demo beside a live session for the rest of the day.
-		if red == nil && await && now.After(nextBind) {
+		if !f.following() && await && now.After(nextBind) {
 			nextBind = now.Add(time.Second)
 			if cur := event.Current(); cur != "" && cur != stale {
 				bind(cur)
 			}
 		}
 
-		var st reduce.State
-		if red != nil {
-			// Drain everything that arrived since the last frame. Non
-			// blocking: a frame must never wait on the bus.
-			for draining := true; draining; {
-				select {
-				case e := <-bus.C:
-					red.Apply(e, now)
-				default:
-					draining = false
-				}
-			}
-			st = red.State(now)
-			// Re-render the sand to the columns this layout actually leaves
-			// it, so a narrow pane loses whole pieces of a line rather than
-			// getting a path chopped mid-word.
-			st.Tail = st.FitTail(now, lay.SandTo-lay.SandFrom)
-			// The sky is the world: time of day is the wall clock, never
-			// anything the agent did.
-			st.Act.TimeOfDay = timeOfDay(now)
-			if tod != 0 {
-				st.Act.TimeOfDay = tod
-			}
-			if ctxUsed != 0 {
-				st.Act.ContextUsed = ctxUsed
-			}
-		} else {
-			st = demoState(t, ctxUsed, tod)
-		}
-
-		// The audible half of the nudge. Keyed off the bubble rather than the
-		// pose, and edge-detected, so a sixty-second permission nag knocks
-		// once rather than once a minute.
-		//
-		// Only when following a real session: the demo cycles every state on a
-		// timer, and a scape nobody attached to has nothing to announce.
-		// `asciiscapes notify` is how the sounds get auditioned.
-		if red != nil {
-			if k, ring := knocker.Knock(st.Bubble, st.BubbleAsk); ring {
-				sound.Play(k)
-			}
-		}
-
-		sh.Update(c, t, st.Act)
-		top := c.H - 2 - chh
-		drawScene(c, sh, cat, lay, st, t, seed, top)
-
 		// Home the cursor and overwrite rather than clearing: clearing every
 		// frame is what makes a terminal animation flicker.
-		fmt.Print("\x1b[H" + c.Render(profile))
+		fmt.Print("\x1b[H" + f.frame(now))
 	}
 }
 

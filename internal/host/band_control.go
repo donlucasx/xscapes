@@ -1,0 +1,53 @@
+package host
+
+import "fmt"
+
+// The escape sequences that hold the agent in its band.
+//
+// The band is DECSTBM, a scroll region covering rows 1..n. Inside it the
+// agent's newlines scroll only those rows, its ESC[1B stops at the bottom
+// margin, and its ESC[2K erases only the line the cursor is on -- so the scape
+// below cannot be touched by anything Claude Code was measured emitting.
+//
+// Origin mode (DECOM) is the other half. Claude homes the cursor with ESC[H
+// and repaints from the top when the window resizes; that is the only absolute
+// move it makes. Origin mode makes ESC[H mean "the top of the region", so the
+// repaint lands in the band. Claude never sets or resets DECOM itself, so once
+// the host turns it on it stays on.
+const (
+	saveCursor    = "\x1b7"
+	restoreCursor = "\x1b8"
+	originOn      = "\x1b[?6h"
+	originOff     = "\x1b[?6l"
+	regionReset   = "\x1b[r"
+)
+
+// EnterBand pins the agent to rows 1..rows. Zero rows means the window had no
+// room for a scape, so the terminal is left alone.
+func EnterBand(rows int) string {
+	if rows <= 0 {
+		return ""
+	}
+	return fmt.Sprintf("\x1b[1;%dr%s", rows, originOn)
+}
+
+// LeaveBand hands the whole screen back.
+func LeaveBand() string { return regionReset + originOff }
+
+// BeginPaint opens a window in which the rows below the band can be addressed.
+//
+// Order matters twice over. The cursor is saved FIRST because DECSTBM moves the
+// cursor to home as a side effect -- saving afterwards would record the top of
+// the screen and drop the agent's cursor there on every frame. Origin mode is
+// dropped because with it on, absolute positions are clamped to the region, so
+// the scape's rows are unaddressable.
+func BeginPaint() string { return saveCursor + originOff + regionReset }
+
+// EndPaint closes it again: the region first, then the cursor, so the restored
+// position is interpreted under the same geometry it was saved in.
+func EndPaint(rows int) string {
+	if rows <= 0 {
+		return restoreCursor
+	}
+	return EnterBand(rows) + restoreCursor
+}
