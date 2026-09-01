@@ -248,3 +248,15 @@ Never paraphrase. Read the relevant section before editing anything it covers.
     `go install` is broken for everyone, so module → `github.com/donlucasx/xscapes`, which
     also makes the built binary `xscapes`. Working directory, CLAUDE.md and RESUME.md still
     say "asciiscapes" -- ⏸ ASK before renaming those; he asked for a repo, not a migration.
+
+- *"go ahead"* (to `install claude --apply`, which writes his live `~/.claude/settings.json`)
+  ⇒ INSTALLED 2026-09-01. His 4 existing hooks survived byte-for-byte, secret guard
+    included; statusLine untouched; 12 xscapes hooks added; backup written to
+    `~/.config/asciiscapes/backups/`. **First real hook events in the project's life**, and
+    they arrived within seconds across THREE live sessions at once, with no restart needed.
+    Verified end to end in tmux: his own commands appeared in the sand ("shell echo",
+    "shell grep"), whitecaps on the sea, cat in the working pose.
+    ⚠ **DOUBLE SOUND**: his own afplay beep hooks are still on Notification / Stop /
+    PermissionRequest alongside the xscapes knocks, so both fire. The brief always said
+    "replace the beep" -- but they are HIS hooks and they still work when no scape is
+    running, so this is his call, never a silent removal.

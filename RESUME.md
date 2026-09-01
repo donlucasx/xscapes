@@ -45,6 +45,13 @@ study is PARKED at his request — see below.
   Every command was run before being written down; three first-draft claims
   were wrong and were fixed (event names are `sub_start`/`sub_end`; the process
   adapter is NOT built; `go install` cannot work with no remote).
+- **⭐ INSTALLED FOR REAL, and the whole chain works.** `xscapes install claude
+  --apply` on 2026-09-01, with his say-so. His four existing hooks survived
+  byte-for-byte (the VERCEL_TOKEN secret guard included), statusLine untouched,
+  backup in `~/.config/asciiscapes/backups/`. Real events arrived within seconds
+  on THREE live sessions at once, no restart needed. Proven in tmux: his own
+  commands written into the sand, whitecaps on the sea, cat in the working pose.
+  This retires "no hook has ever fired into it", which had been true all project.
 - **The test suite was writing the user's live session pointer.** adapter_test
   feeds real payloads through `translate()`, which records the session as
   current — into `~/.config/asciiscapes/run/current` with no override. `TestMain`
@@ -130,15 +137,18 @@ Demo flags: `-wired -mockup -anim -compare -layout -context -day -busy -kittens 
 
 ## ▶ NEXT
 
-1. **Install for real and run a day on it.** No hook has ever fired into this;
-   everything is tested against synthetic streams. Then the 45-60s demo video,
-   which the brief calls the highest-leverage deliverable. Entries close
+1. **Run a day on it and re-tune.** The hooks are INSTALLED and firing (see
+   below); what is missing is a day of real rhythm to tune `TauFall=12s`,
+   `TurnFloor=0.30`, `FlightFloor=0.45` against. `xscapes replay` exists for
+   exactly this, and the spool files in `~/.config/asciiscapes/run/*.jsonl` are
+   already a real recording.
+2. **The 45-60s demo video**, which the brief calls the highest-leverage
+   deliverable. Record in a truecolor terminal, NOT Terminal.app. Entries close
    2026-09-17.
-2. **Install for real and run a day on it.** Everything is still tested against
-   synthetic streams and the schema read out of the Claude Code binary; no hook
-   has ever fired into it. `./xscapes install claude` prints a plan and
-   writes nothing; `--apply` writes, after a backup, and uninstall restores
-   byte-for-byte.
+3. **Decide the double sound.** His own afplay beep hooks still fire alongside
+   the xscapes knocks on Notification / Stop / PermissionRequest. The brief said
+   "replace the beep"; his hooks are his, so this is his call.
+
 3. **Add the statusline chain by hand** or the moon stays dark. Install prints
    the exact line rather than taking over the statusLine Lucas wrote.
 4. **Re-tune the reducer against a recording.** `xscapes replay` exists for

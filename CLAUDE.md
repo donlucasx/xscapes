@@ -14,8 +14,10 @@
 > **Live at https://github.com/donlucasx/xscapes (public, MIT).**
 > **`notes/claude-hooks-verified.md` is the hook payload schema, read out of the
 > Claude Code binary itself — trust it, do not re-derive it.**
-> ▶ NEXT: install for real and run a day on it (no hook has ever fired into
-> this), then the demo video. See `RESUME.md`.
+> **The hooks are INSTALLED and firing** (2026-09-01, with his say-so); the
+> full chain is proven against real Claude Code sessions.
+> ▶ NEXT: run a day on it and re-tune the reducer, then the demo video.
+> See `RESUME.md`.
 
 **Name: `xscapes`** (decided 2026-09-01 with the repo; asciiscapes and iixscapes are out). The working directory and these docs still say asciiscapes. A cozy ASCII "thinking screen" for terminal AI agents. While Claude Code (or any agent) works, a small living scene runs beside it — a shoreline whose sea rises with the work, and a companion animal — and nudges the user, visually and with a sound, when the agent finishes or needs input.
 
