@@ -12,19 +12,63 @@ is parked. Tell me where we left off, then pick up from ▶ NEXT — starting wi
 the decision at the top of it, which is mine to make, not yours.
 ```
 
-## Where we left off (2026-09-01, last code change `a38c67c`, 83 commits, `main`, pushed)
+## Where we left off (2026-09-01, session 8, last code change `c5a19cb`, `main`, pushed)
 
 **Live: https://github.com/donlucasx/xscapes** (public, MIT). Milestone 1 is
-COMPLETE and the hooks are installed and firing against real sessions.
+COMPLETE, the hooks are installed and firing, and **the agent now runs INSIDE
+the scape**.
 
-**⚠ THE LAYOUT IS MID-CHANGE.** He has ruled that the agent must run INSIDE the
-scape, not beside it. The side-by-side tmux launcher still ships and still
-works, but it is now the OLD design. The next real step is a decision, not code
-— see ▶ NEXT #1. Do not start the terminal emulator without his go-ahead.
+**⭐ `xscapes inside` SHIPS.** His ruling — "the entire Claude experience should
+happen within the xscape, not next to it" — is built. One window: Claude Code in
+a band pinned to the top rows, the scape painting the rows below it, no tmux.
+He chose the pass-through band over a full terminal emulator after the probe
+came back clean (below). The old `xscapes claude` tmux launcher is untouched and
+still works.
 
-The companion study is PARKED at his request — see below.
+**It is not a terminal emulator, on purpose.** The agent runs on a pty sized to
+its band, held there by DECSTBM, and its bytes reach the terminal untouched
+except for one three-byte sequence. Nothing xscapes fails to understand about
+Claude Code's output can corrupt it — the failure a real emulator invites.
 
-### Shipped 2026-09-01
+The companion study is still PARKED at his request — see below.
+
+### Shipped 2026-09-01, session 8
+
+- **⭐ `xscapes inside [command]` — the agent runs inside the scape.** One
+  window, no tmux, no seam. `internal/host`:
+  - **A pty on stdlib syscalls** (darwin and linux), so the no-dependency rule
+    holds. The child is sized to the band, not the window, so Claude lays
+    itself out inside it with no further help and its text can never collide
+    with the scape.
+  - **`Filter`** strips DECSTBM out of the child's stream. Claude emits `ESC[r`
+    once at startup; that one sequence resets the region to the whole screen
+    and its next scroll would walk over the scape. Handles the sequence
+    arriving split across reads.
+  - **`Band`** splits the window: a third to the scape, clamped to 8..20 rows,
+    the rest to the agent. 27/13 at 40 rows, 35/17 at 52, 14/8 at 22 — all
+    three verified on screen.
+  - **Raw mode**, so every keystroke reaches the agent as typed. Ctrl-C belongs
+    to Claude Code, which uses it to interrupt a turn.
+- **The band MUST be anchored at row 1, and that is measured, not chosen.**
+  Lines scrolled out of a scroll region reach the scrollback only when the
+  region starts at the top: Terminal.app keeps every line for a region on rows
+  1-10 and **none** for one on rows 5-14. So nothing can be painted above the
+  agent, and the scape reads downward from it instead — sky strip, sea, beach.
+  Verified live: 99 of 100 scrolled lines stayed reachable.
+- **⚠ DECSTBM homes the cursor, and a parameterless `ESC[r` is still DECSTBM.**
+  This cost an afternoon. The exit path placed the cursor below the band and
+  then reset the region once more from a deferred call, which pulled the cursor
+  back to row 1 — and a zsh prompt redraw opens with `ESC[J`, so from row 1 it
+  erased everything the agent had drawn. Every exit blanked the screen. The rule
+  now in tests: **save the cursor before touching the region, place it after the
+  last time you touch it.**
+- **`frames.go`** extracts the frame producer the live pane and the band now
+  share, so the two compositions cannot drift.
+- **Probe first, build second.** `notes/claude-terminal-emissions.md` is what
+  Claude Code actually writes to a terminal, measured off `tmux pipe-pane` over
+  two sessions including a real turn. Trust it; do not re-derive it.
+
+### Shipped 2026-09-01, session 7
 
 - **Two notification sounds** (`internal/notify`). 30% of the rubric is the
   waiting experience and the note says the nudge must beat a terminal bell; a
@@ -144,7 +188,9 @@ waiting for him. `NewCat()` still returns what shipped before session 6.
 ## How to look at things
 
 ```
-go build -o xscapes . && ./xscapes -live      # the real thing, Ctrl-C to quit
+go build -o xscapes . && ./xscapes inside     # THE REAL THING: agent inside the scape
+./xscapes inside sh -c "seq 1 100; sleep 30"  # host anything; proves the band holds
+./xscapes -live                               # the scape alone, Ctrl-C to quit
 ./xscapes -faces  assets/frames/companion-study.html   # THE OPEN QUESTION
 ./xscapes -colors assets/frames/color-study.html       # 256 vs truecolor
 ./xscapes -wired  assets/frames/wired.html             # a turn through the REAL reducer
@@ -161,21 +207,22 @@ Demo flags: `-wired -mockup -anim -compare -layout -context -day -busy -kittens 
 
 ## ▶ NEXT
 
-1. **DECIDE: build the embedded terminal?** He has asked for the agent to run
-   inside the scape. That means a PTY, a VT parser, a cell-grid composite, input
-   forwarding and resize — days, not hours, and the risk is fidelity (a parser
-   bug corrupts Claude's UI, not just the picture). Sizing Claude's viewport to
-   (window height − beach rows) solves the text collision by construction. It
-   bends "stdlib only" (PTY needs syscalls or one small pure-Go dep). Strongest
-   remaining move for the rubric; would consume most of the 16 days left.
-2. **Run a day on it and re-tune.** The hooks are INSTALLED and firing (see
+1. **Run a day on `xscapes inside` and re-tune.** It has been proven in a real
+   terminal but not lived in. The reducer's `TauFall=12s`, `TurnFloor=0.30`,
+   `FlightFloor=0.45` have still never been tuned against his actual rhythm, and
+   `~/.config/asciiscapes/run/*.jsonl` is a real recording that `xscapes replay`
+   folds. ⚠ `reduce.TailLen` is still a hard 4 — it should be a function of the
+   beach's rows now that the beach's height varies with the window.
+2. **The 45-60s demo video**, now of the thing running inside one window.
+   Record in a truecolor terminal, NOT Terminal.app. Entries close 2026-09-17.
+3. **Should `xscapes inside` become the default?** `xscapes claude` is still the
+   tmux launcher and the README now leads with `inside`. Whether `claude` should
+   become an alias for `inside` is his call.
+4. **Run a day on it and re-tune.** The hooks are INSTALLED and firing (see
    below); what is missing is a day of real rhythm to tune `TauFall=12s`,
    `TurnFloor=0.30`, `FlightFloor=0.45` against. `xscapes replay` exists for
    exactly this, and the spool files in `~/.config/asciiscapes/run/*.jsonl` are
    already a real recording.
-2. **The 45-60s demo video**, which the brief calls the highest-leverage
-   deliverable. Record in a truecolor terminal, NOT Terminal.app. Entries close
-   2026-09-17.
 3. **Decide the double sound.** His own afplay beep hooks still fire alongside
    the xscapes knocks on Notification / Stop / PermissionRequest. The brief said
    "replace the beep"; his hooks are his, so this is his call.
@@ -201,11 +248,12 @@ ASCIISCAPES_SILENT=1 ./xscapes … # mute
 
 ## Open threads for Lucas
 
-- **⭐ THE BIG ONE: build the embedded terminal?** Everything else is small
-  beside it. Days of work, bends "stdlib only", and the risk is fidelity —
-  a VT-parser bug corrupts Claude's UI rather than just the picture. 16 days
-  to the deadline. My read: it is the strongest remaining move for the rubric
-  (originality 25%, fit 20%) and it would eat most of that time.
+- ~~**Build the embedded terminal?**~~ **DECIDED 2026-09-01: the pass-through
+  band, and it is built.** Not the full emulator. What that costs: the sea does
+  not show through the agent's own blank space — its band is opaque. Upgrading
+  to a real emulator later would buy that back (and would own the scrollback,
+  lifting the row-1 constraint), but it was days of work against 16 days left
+  and a parser bug corrupts Claude's UI rather than just the picture.
 - **Double sound.** His own afplay beeps still fire on Notification / Stop /
   PermissionRequest alongside the xscapes knocks, so he hears both. The brief
   always said "replace the beep", but they are HIS hooks and still work with no
