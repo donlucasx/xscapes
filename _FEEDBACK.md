@@ -261,6 +261,30 @@ Never paraphrase. Read the relevant section before editing anything it covers.
     "replace the beep" -- but they are HIS hooks and they still work when no scape is
     running, so this is his call, never a silent removal.
 
+- *"why is it split screen?"* (with a screenshot of the launcher's two panes)
+  ⇒ I MISREAD IT as the horizontal horizon seam and spent a round measuring that (real finding,
+    kept: a 124-luma step in one row at the horizon, and the sky paints 1.7 glyphs/row against
+    the sea's 34.9). He meant the VERTICAL split. **Lesson: when a one-line question has two
+    readings, ask or show both — do not pick one and measure it for a round.**
+
+- *"I meant the vertical split. The entire Claude experience should happen within the xscape,
+  not next to it"*
+  ⇒ **THE SIDE-BY-SIDE LAYOUT IS OUT.** This supersedes the locked "scape is a full pane
+    alongside the agent via tmux" decision, and it satisfies his older *"the user should always
+    be able to see what the agent is working on"* BETTER, not worse. Mocked with `-overlay`
+    before building: 83.5% of a real 145x43 Claude pane is blank.
+
+- *"yes, should be within the scene, and extending the window's height should allow the user to
+  preview more of the work that claude is doing, perhaps the taller the window the more sand
+  below where we can see what claude is working on?"*
+  ⇒ **Extra window height goes to BEACH, not sky.** `Shore.SkyRows/SandRows` added: sky held to
+    a band, beach absorbs the rest — 4 lines of work history at 24 rows, 9 at 43, 16 at 60.
+    Also fixes the empty-sky problem, since the emptiest region was taking 42% of every new row.
+    ⚠ `reduce.TailLen` is still a hard 4 — it must become a function of the beach's rows.
+    ⚠ Building the embedded agent = xscapes hosts Claude in a PTY and composites (a terminal
+    emulator). Sizing Claude's viewport to (height − beach) solves the text collision by
+    construction. NOT STARTED, awaiting his go-ahead.
+
 - *"shall we have the sand turn into a gradient as it goes down so the text is clearer / most
   legible at the bottom? sand fades into black bkg"* then *"proceed with your recommendation"*
   ⇒ **SHIPPED at full strength, `DefaultSandFade = 1.0`.** Measured on the newest line (lowest,

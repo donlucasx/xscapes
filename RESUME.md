@@ -1,20 +1,28 @@
-# Resume — asciiscapes
+# Resume — xscapes (directory still `asciiscapes/`)
 
 **Copy-paste this prompt into a fresh session:**
 
 ```
 cd ~/Documents/claude/asciiscapes/ and read CLAUDE.md (the brief, authoritative)
-and RESUME.md before responding. notes/claude-hooks-verified.md is the Claude Code
-hook schema — trust it, do not re-derive it. Skim origin-chat.md only if you need
-the why; ignore ideas.md — it is parked. Tell me where we left off, then pick up
-from ▶ NEXT.
+and RESUME.md before responding. The project is named xscapes now; the directory
+and the ASCIISCAPES_* env vars still say asciiscapes on purpose.
+notes/claude-hooks-verified.md is the Claude Code hook schema — trust it, do not
+re-derive it. Skim origin-chat.md only if you need the why; ignore ideas.md — it
+is parked. Tell me where we left off, then pick up from ▶ NEXT — starting with
+the decision at the top of it, which is mine to make, not yours.
 ```
 
-## Where we left off (2026-09-01, last code change `a646440`, 76 commits, branch `main`, pushed)
+## Where we left off (2026-09-01, last code change `a38c67c`, 83 commits, `main`, pushed)
 
-**Milestone 1 is COMPLETE and PUBLISHED**: https://github.com/donlucasx/xscapes
-(public, MIT, 74 commits). **The name is decided: `xscapes`.** The companion
-study is PARKED at his request — see below.
+**Live: https://github.com/donlucasx/xscapes** (public, MIT). Milestone 1 is
+COMPLETE and the hooks are installed and firing against real sessions.
+
+**⚠ THE LAYOUT IS MID-CHANGE.** He has ruled that the agent must run INSIDE the
+scape, not beside it. The side-by-side tmux launcher still ships and still
+works, but it is now the OLD design. The next real step is a decision, not code
+— see ▶ NEXT #1. Do not start the terminal emulator without his go-ahead.
+
+The companion study is PARKED at his request — see below.
 
 ### Shipped 2026-09-01
 
@@ -192,6 +200,16 @@ ASCIISCAPES_SILENT=1 ./xscapes … # mute
 ```
 
 ## Open threads for Lucas
+
+- **⭐ THE BIG ONE: build the embedded terminal?** Everything else is small
+  beside it. Days of work, bends "stdlib only", and the risk is fidelity —
+  a VT-parser bug corrupts Claude's UI rather than just the picture. 16 days
+  to the deadline. My read: it is the strongest remaining move for the rubric
+  (originality 25%, fit 20%) and it would eat most of that time.
+- **Double sound.** His own afplay beeps still fire on Notification / Stop /
+  PermissionRequest alongside the xscapes knocks, so he hears both. The brief
+  always said "replace the beep", but they are HIS hooks and still work with no
+  scape running. Never remove them silently.
 
 - **The companion pick** — coat + whisker revision + toes. Full study is in
   his hands now; waiting on his steer.

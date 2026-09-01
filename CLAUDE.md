@@ -1,25 +1,29 @@
-# asciiscapes — project brief for Claude Code
+# xscapes — project brief for Claude Code
 
-> **Where we left off — 2026-09-01 session 7, last code change `427a047`, 60 commits.**
-> **Milestone 1 is COMPLETE and PUBLISHED.** Shipped since the last
-> banner: distinct `done` vs `needs_input` cues (content `^ ^` pose + cool
-> dotted knock vs the warm solid ask box); **two notification sounds** keyed off
-> the bubble and edge-detected, so a 60-second nag rings once; and
-> **`asciiscapes claude`**, the launcher that bootstraps tmux and puts the agent
-> and the scape side by side, verified end to end in a real tmux.
-> **The companion pick is PARKED at his request** (2026-09-01: "keep the
-> characters as is for now"). Four whisker variants are built and waiting —
-> do NOT re-ask, and do not default anything.
+*(Working directory, env vars and some prose below still say "asciiscapes". Deliberate: renaming live state orphans an installed hook.)*
+
+> **Where we left off — 2026-09-01, last code change `a38c67c`, 83 commits, pushed.**
+> **Live: https://github.com/donlucasx/xscapes** (public, MIT). Milestone 1 is
+> COMPLETE: protocol, Claude Code adapter, installer, launcher, distinct
+> done/needs_input cues with two sounds, README + LICENSE. **The hooks are
+> installed and firing against real sessions** — proven end to end in tmux, so
+> "no hook has ever fired into it" is retired.
+> **⚠ THE LAYOUT IS MID-CHANGE and this brief's "alongside the agent via tmux"
+> is now the OLD design.** He has ruled the agent must run INSIDE the scape.
+> Mocked (`-overlay`), not built: 83.5% of a real Claude pane is blank, and a
+> taller window must spend its extra rows on BEACH (`Shore.SkyRows/SandRows`).
+> Building it means hosting Claude in a PTY and compositing — a terminal
+> emulator, days of work. **DO NOT START IT WITHOUT HIS GO-AHEAD.**
+> **The beach now falls away to black** (`DefaultSandFade` = 1.0): newest-line
+> contrast 132→204 midday, 148→204 night, equal at every hour.
+> **The companion pick is PARKED at his request** — four whisker variants built
+> and waiting; do NOT re-ask, do not default anything.
 > `go build`, `go vet`, `go test` and `-race` clean.
-> **Live at https://github.com/donlucasx/xscapes (public, MIT).**
 > **`notes/claude-hooks-verified.md` is the hook payload schema, read out of the
 > Claude Code binary itself — trust it, do not re-derive it.**
-> **The hooks are INSTALLED and firing** (2026-09-01, with his say-so); the
-> full chain is proven against real Claude Code sessions.
-> ▶ NEXT: run a day on it and re-tune the reducer, then the demo video.
-> See `RESUME.md`.
+> ▶ NEXT is the embedded-terminal decision. See `RESUME.md`.
 
-**Name: `xscapes`** (decided 2026-09-01 with the repo; asciiscapes and iixscapes are out). The working directory and these docs still say asciiscapes. A cozy ASCII "thinking screen" for terminal AI agents. While Claude Code (or any agent) works, a small living scene runs beside it — a shoreline whose sea rises with the work, and a companion animal — and nudges the user, visually and with a sound, when the agent finishes or needs input.
+**Name: `xscapes`** (decided 2026-09-01 with the repo; asciiscapes and iixscapes are out). The working directory and these docs still say asciiscapes. A cozy ASCII "thinking screen" for terminal AI agents. While Claude Code (or any agent) works, a small living scene runs WITH it — a shoreline whose sea rises with the work, and a companion animal — and nudges the user, visually and with a sound, when the agent finishes or needs input.
 
 Owner: Lucas (cinematographer + solo dev, LA). Solo build, AI-assisted. Start from this file; do not re-derive decisions already made here.
 
@@ -97,7 +101,15 @@ light, sky, motion (the WATER, not the air), surface, accumulator, companion. An
 works with the whole encoding system for free. The rainy window currently fails
 on companion &mdash; fix by putting the cat on the inside sill.
 
-### Layout &mdash; supersedes the popup default below
+### Layout &mdash; ⚠ SUPERSEDED 2026-09-01, agent goes INSIDE the scape
+
+**Everything in this section describes the side-by-side design, which he has
+ruled out**: *"The entire Claude experience should happen within the xscape,
+not next to it."* It still ships and still works, so it is kept as the record
+of what is running today, but it is no longer the target. The replacement is
+mocked in `-overlay` and not built. Read `RESUME.md` ▶ NEXT before touching it.
+
+### Layout (the shipped, superseded design) &mdash; supersedes the popup default below
 The scape is a full pane and carries the activity tail written into the sand.
 Not a popup: a popup covers the session, and the user should always be able to
 see what the agent is doing.
