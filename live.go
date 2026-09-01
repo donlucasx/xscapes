@@ -76,7 +76,7 @@ func winSize(fd uintptr) (cols, rows int, ok bool) {
 // With a session to follow it renders that session. Without one it runs the
 // demo cycle, which is what every frame in assets/frames was made from and
 // what you want when showing the thing to somebody with no agent running.
-func runLive(seed int64, fps float64, wIn, hIn int, ctxUsed, tod float64, ascii bool, session string, mirror bool) {
+func runLive(seed int64, fps float64, wIn, hIn int, ctxUsed, tod float64, ascii bool, session string, mirror bool, await bool) {
 	w, h := wIn, hIn
 	if w <= 0 || h <= 0 {
 		w, h = termSize()
@@ -95,7 +95,14 @@ func runLive(seed int64, fps float64, wIn, hIn int, ctxUsed, tod float64, ascii 
 
 	var bus *event.Bus
 	var red *reduce.Reducer
-	if session != "" {
+	// bind attaches to a session, or reports that there is nothing to attach
+	// to yet. Split out because -await calls it again every second: the
+	// launcher starts the scape and the agent together, and whichever comes
+	// up first must not decide the scape's fate for the rest of the session.
+	bind := func(session string) bool {
+		if session == "" {
+			return false
+		}
 		b, err := event.Listen(session)
 		switch {
 		case err == event.ErrBusy:
@@ -105,11 +112,31 @@ func runLive(seed int64, fps float64, wIn, hIn int, ctxUsed, tod float64, ascii 
 			// Not fatal. A scape that cannot bind is still a scape; it just
 			// runs the demo instead of going dark, and says why.
 			fmt.Fprintln(os.Stderr, "asciiscapes:", err)
-		default:
-			bus, red = b, reduce.New(session)
-			defer bus.Close()
+			return false
 		}
+		bus, red = b, reduce.New(session)
+		return true
 	}
+	// -await means "the agent has not started yet; wait for it", so the
+	// pointer left behind by whatever ran last is exactly the wrong thing to
+	// follow. Binding to it succeeds -- Listen happily opens a socket for a
+	// session that is over -- and the scape then runs beside a live agent
+	// showing a session that ended yesterday. Remember it instead, and take
+	// the first session that differs.
+	stale := ""
+	if await {
+		stale = event.Current()
+	} else {
+		bind(session)
+	}
+	// Closed here rather than where it is opened: -await can bind on any
+	// frame, and a defer inside that closure would close the bus the instant
+	// it was created.
+	defer func() {
+		if bus != nil {
+			bus.Close()
+		}
+	}()
 
 	c := canvas.New(w, h, canvas.AlphaFar, canvas.AlphaMid, canvas.AlphaNear)
 	sh := scape.NewShore(seed, ascii)
@@ -163,6 +190,7 @@ func runLive(seed int64, fps float64, wIn, hIn int, ctxUsed, tod float64, ascii 
 	defer tick.Stop()
 
 	start := time.Now()
+	var nextBind time.Time
 	for range tick.C {
 		now := time.Now()
 		t := now.Sub(start).Seconds()
@@ -188,6 +216,17 @@ func runLive(seed int64, fps float64, wIn, hIn int, ctxUsed, tod float64, ascii 
 				if shrank {
 					fmt.Print("\x1b[2J")
 				}
+			}
+		}
+
+		// -await: keep looking for the session. The launcher starts the scape
+		// and the agent at the same moment, and the agent cannot announce
+		// itself until it is up, so a scape that gave up at startup would run
+		// the demo beside a live session for the rest of the day.
+		if red == nil && await && now.After(nextBind) {
+			nextBind = now.Add(time.Second)
+			if cur := event.Current(); cur != "" && cur != stale {
+				bind(cur)
 			}
 		}
 

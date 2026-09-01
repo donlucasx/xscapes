@@ -39,6 +39,8 @@ func dispatch(args []string) bool {
 		runReplay(args[1:])
 	case "notify":
 		runNotify(args[1:])
+	case "claude":
+		runClaudeLauncher(args[1:])
 	case "help", "-h", "--help":
 		usage()
 	default:
@@ -52,6 +54,7 @@ func dispatch(args []string) bool {
 func usage() {
 	fmt.Fprint(os.Stderr, `asciiscapes — a thinking screen for terminal agents
 
+  asciiscapes claude          start Claude Code with the scape beside it
   asciiscapes                 render one frame
   asciiscapes -live           run the scape in this terminal
 
