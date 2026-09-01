@@ -82,9 +82,6 @@ later. Let's keep working and keep the characters as is for now."*
 **Do not re-ask, do not default anything.** Everything below is built and
 waiting for him. `NewCat()` still returns what shipped before session 6.
 
-**Nothing is defaulted** -- `NewCat()` still returns what shipped before
-session 6.
-
 - **Coats in the running**: cream, slate, sage, mauve, charcoal. He said
   cream/sage/slate "stand out best". Terracotta and ginger are OUT, too close
   to Claude's own mark. (Told this session: slate is the safe pick while
