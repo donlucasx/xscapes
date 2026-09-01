@@ -54,9 +54,12 @@ func TestWhiskersTouchTheFur(t *testing.T) {
 	}
 }
 
-// The whisker glyphs: '─' for the top pair on the nose row, '‾' for the
-// bottom pair tucked at the top edge of the row below.
-func isWhiskerRune(r rune) bool { return r == '─' || r == '‾' }
+// The whisker glyphs: '─' plus a half-dash tip ('╶'/'╴') for the top pair on
+// the nose row, scan-line-1 ('⎺') for the bottom pair tucked at the very top
+// edge of the row below.
+func isWhiskerRune(r rune) bool {
+	return r == '─' || r == '╶' || r == '╴' || r == '⎺'
+}
 
 // touchesFur walks in direction d from x over the whisker run. The run is
 // connected if it ends against solid fur on its own row, or hangs off a fur

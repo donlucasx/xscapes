@@ -217,3 +217,8 @@ Never paraphrase. Read the relevant section before editing anything it covers.
     floated amid the waves ("too low"). Portraits now match the live composition. Lesson:
     when he rejects a render twice, audit the CONTEXT the thing is judged in, not just the
     thing.
+
+- *"closer, lets try the upper whiskers a tad shorter, and the bottom nudged up a hair"*
+  ⇒ Direction CONFIRMED, fine-tuning now. Top: outer cell becomes a HALF dash ('╶'/'╴'),
+    2 cells -> ~1.5. Bottom: '‾' (overline, ~12% down its cell) -> '⎺' (scan line 1, at the
+    very top edge) -- a couple pixels up, literally a hair.

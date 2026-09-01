@@ -223,10 +223,15 @@ func (c *Cat) drawFace(l *canvas.Layer, x, y int, f Face, st State) {
 		l.Plot(at(4), y+3, '▾', noseCol, 1)
 	}
 
-	// Whiskers: Lucas's guideline, followed plainly. Four, two a side, solid
-	// lines: the top pair '─' on the nose row, TWO cells, and the bottom pair
-	// '‾' on the row below -- the overline renders at the top edge of its
-	// cell, tucked under the top pair -- ONE cell. Top longer than bottom.
+	// Whiskers: Lucas's guideline, followed plainly, then fine-tuned to his
+	// "a tad shorter / nudged up a hair". Four, two a side, solid lines:
+	//
+	// The top pair sits on the nose row -- a full dash flush at the fur, then
+	// a HALF dash for the tip ('╶'/'╴', ink on the cell half facing the cat),
+	// about a cell and a half in all. The bottom pair is one cell on the row
+	// below, drawn with scan-line-1 ('⎺'), which renders at the very top edge
+	// of its cell -- a hair above the overline it replaces -- so it tucks
+	// directly under the top pair. Top longer than bottom, per his draft.
 	// Both anchor to the muzzle, measured once on the nose row and bounded to
 	// the head's own cells (an unbounded scan finds the tail, which is solid
 	// at nose height).
@@ -251,32 +256,28 @@ func (c *Cat) drawFace(l *canvas.Layer, x, y int, f Face, st State) {
 		if st == Resting {
 			near, far = 0.8, 0.55
 		}
-		const top, bottom = 2, 1
 
 		from, to := at(0), at(8)
 		if from > to {
 			from, to = to, from
 		}
 		if lo, hi, ok := furSpan(l, noseRow, from, to); ok {
-			stroke := func(row int, r rune, length int, a float64) {
-				solid := func(cx int) bool {
-					if cx < 0 || cx >= l.W || row < 0 || row >= l.H {
-						return true
-					}
-					c := l.Cells[row*l.W+cx]
-					return c.Set && c.R == '█'
+			plot := func(cx, row int, r rune, a float64) {
+				if cx < 0 || cx >= l.W || row < 0 || row >= l.H {
+					return
 				}
-				for n := 1; n <= length; n++ {
-					if !solid(lo - n) {
-						l.Plot(lo-n, row, r, light, a)
-					}
-					if !solid(hi + n) {
-						l.Plot(hi+n, row, r, light, a)
-					}
+				if c := l.Cells[row*l.W+cx]; c.Set && c.R == '█' {
+					return // pass behind the raised tail
 				}
+				l.Plot(cx, row, r, light, a)
 			}
-			stroke(noseRow+drop, '─', top, near)
-			stroke(noseRow+1+drop, '‾', bottom, far)
+			row := noseRow + drop
+			plot(lo-1, row, '─', near)
+			plot(hi+1, row, '─', near)
+			plot(lo-2, row, '╶', near) // tip: ink on the half facing the cat
+			plot(hi+2, row, '╴', near)
+			plot(lo-1, row+1, '⎺', far)
+			plot(hi+1, row+1, '⎺', far)
 		}
 	}
 
