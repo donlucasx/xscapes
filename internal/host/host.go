@@ -86,11 +86,20 @@ func (h *Host) Run() error {
 	if err != nil {
 		return fmt.Errorf("raw mode: %w", err)
 	}
-	restore := func() {
-		h.write(LeaveBand() + "\x1b[0m")
-		restoreTermios(in.Fd(), saved)
+	// One exit path, however the host ends: the child exiting, a signal, or an
+	// error. Once, because the signal handler and the deferred call race, and
+	// emitting the sequence twice repaints the shell's prompt over itself.
+	//
+	// It reads agentRows and rows as they are at the time, so a window resized
+	// during the session is cleared to its real size rather than its first one.
+	var leaving sync.Once
+	leave := func() {
+		leaving.Do(func() {
+			h.write(clearRows(agentRows+1, rows) + LeaveTo(agentRows+1))
+			restoreTermios(in.Fd(), saved)
+		})
 	}
-	defer restore()
+	defer leave()
 
 	// A signal that kills the host must not leave the terminal in raw mode
 	// with a scroll region pinned to the top of the screen.
@@ -98,7 +107,7 @@ func (h *Host) Run() error {
 	signal.Notify(sig, syscall.SIGTERM, syscall.SIGHUP)
 	go func() {
 		<-sig
-		restore()
+		leave()
 		os.Exit(1)
 	}()
 
@@ -158,9 +167,7 @@ func (h *Host) Run() error {
 	for {
 		select {
 		case err := <-done:
-			// Give the terminal its screen back, below the band, so the shell
-			// prompt does not land on top of the beach.
-			h.write(LeaveBand() + clearRows(agentRows+1, rows) + fmt.Sprintf("\x1b[%d;1H", agentRows+1))
+			leave()
 			var ee *exec.ExitError
 			if errors.As(err, &ee) {
 				return nil // the agent exiting is not the host failing

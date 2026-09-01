@@ -76,3 +76,28 @@ func TestNoBandWhenThereAreNoRowsToSpare(t *testing.T) {
 		t.Errorf("EnterBand(0) = %q, want nothing", got)
 	}
 }
+
+// DECSTBM homes the cursor -- ESC[r included. Measured: on exit the host put
+// the cursor below the band and then reset the region one last time, which
+// pulled it back to row 1, and the shell's prompt redraw (which begins with
+// ESC[J) then erased the agent's whole screen from there.
+//
+// So the rule is the mirror of BeginPaint's: nothing may touch the scroll
+// region AFTER the cursor has been placed.
+func TestLeaveToPlacesTheCursorAfterTheLastRegionChange(t *testing.T) {
+	got := LeaveTo(19)
+	last := strings.LastIndex(got, "\x1b[r")
+	if last < 0 {
+		t.Fatalf("no scroll-region reset in %q", got)
+	}
+	cur := idx(t, got, "\x1b[19;1H", "cursor placed on row 19")
+	if cur < last {
+		t.Errorf("cursor placed at %d, before the last region reset at %d: %q", cur, last, got)
+	}
+}
+
+func TestLeaveToStillGivesTheWholeScreenBack(t *testing.T) {
+	got := LeaveTo(5)
+	idx(t, got, "\x1b[r", "scroll region reset")
+	idx(t, got, "\x1b[?6l", "origin mode off")
+}

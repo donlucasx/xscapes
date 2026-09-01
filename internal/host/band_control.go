@@ -51,3 +51,19 @@ func EndPaint(rows int) string {
 	}
 	return EnterBand(rows) + restoreCursor
 }
+
+// LeaveTo hands the terminal back and leaves the cursor on row, so the shell
+// that gets control next draws its prompt below the agent's last screen
+// instead of on top of it.
+//
+// The order is the point. DECSTBM moves the cursor to home, and a parameterless
+// ESC[r is still DECSTBM: resetting the region after placing the cursor pulls
+// it back to row 1, and the first thing a zsh prompt emits is ESC[J, which from
+// row 1 erases everything the agent ever drew. Measured, not reasoned: that is
+// exactly how the agent's screen went missing on exit.
+func LeaveTo(row int) string {
+	if row < 1 {
+		row = 1
+	}
+	return LeaveBand() + "\x1b[0m" + fmt.Sprintf("\x1b[%d;1H", row)
+}

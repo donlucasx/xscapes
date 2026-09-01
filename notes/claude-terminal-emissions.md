@@ -78,3 +78,17 @@ beach -- a horizon works just as well with the agent above it as with sky above 
   real Claude pane is blank, and in a band that stays black. Only a real
   emulator, which owns every cell, can composite into it -- and it would then
   own the scrollback too, removing the row-1 constraint above.
+
+## One more thing the host has to know
+
+**DECSTBM moves the cursor to home, and a parameterless `ESC[r` is still
+DECSTBM.** This is not about Claude Code; it is about every terminal. It cost
+an afternoon anyway: the host placed the cursor below the band on exit and then
+reset the scroll region one last time, which pulled the cursor back to row 1 --
+and the first thing a zsh prompt emits is `ESC[J`, so from row 1 it erased
+everything the agent had drawn. The screen went blank on every exit and the
+agent's last output was simply gone.
+
+The rule that falls out of it, and that `internal/host` now encodes in tests:
+**save the cursor before touching the region, and place the cursor after the
+last time you touch it.**

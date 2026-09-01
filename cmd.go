@@ -56,7 +56,8 @@ func dispatch(args []string) bool {
 func usage() {
 	fmt.Fprint(os.Stderr, `asciiscapes — a thinking screen for terminal agents
 
-  asciiscapes claude          start Claude Code with the scape beside it
+  asciiscapes inside          run Claude Code INSIDE the scape, in this window
+  asciiscapes claude          start Claude Code with the scape beside it (tmux)
   asciiscapes                 render one frame
   asciiscapes -live           run the scape in this terminal
 
