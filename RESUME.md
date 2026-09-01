@@ -12,8 +12,9 @@ from ▶ NEXT.
 
 ## Where we left off (2026-09-01, last code change `427a047`, 60 commits, branch `main`)
 
-**Milestone 1 is complete except for a git remote.** README + LICENSE landed
-2026-09-01. The companion study is PARKED at his request — see below.
+**Milestone 1 is COMPLETE and PUBLISHED**: https://github.com/donlucasx/xscapes
+(public, MIT, 74 commits). **The name is decided: `xscapes`.** The companion
+study is PARKED at his request — see below.
 
 ### Shipped 2026-09-01
 
@@ -33,6 +34,13 @@ from ▶ NEXT.
   halves together left it in demo mode forever. It now keeps looking, and
   deliberately ignores the session pointer present at startup (binding to a
   stale pointer SUCCEEDS and shows a dead session beside a live agent).
+- **Published, and named.** `xscapes` on the `donlucasx` account, public, MIT.
+  The Go module path had to follow the repo URL (Go resolves modules by URL, so
+  a mismatch breaks install for everyone), renamed across 37 files, which also
+  makes the binary `xscapes`. Clone-and-build verified from the public repo.
+  ⚠ NOT renamed, deliberately: `ASCIISCAPES_*` env vars and
+  `~/.config/asciiscapes/` (live state; a rename orphans an installed hook),
+  the working directory, and these docs. That migration is his call.
 - **README + MIT LICENSE.** Leads with the protocol, then the encoding table.
   Every command was run before being written down; three first-draft claims
   were wrong and were fixed (event names are `sub_start`/`sub_end`; the process
@@ -122,10 +130,10 @@ Demo flags: `-wired -mockup -anim -compare -layout -context -day -busy -kittens 
 
 ## ▶ NEXT
 
-1. **Push to a git remote.** 62 commits exist only on this disk, nothing is
-   published, and the README's install instructions assume a clone URL that
-   does not resolve. This is now the single thing between here and a
-   submittable entry. Entries close 2026-09-17.
+1. **Install for real and run a day on it.** No hook has ever fired into this;
+   everything is tested against synthetic streams. Then the 45-60s demo video,
+   which the brief calls the highest-leverage deliverable. Entries close
+   2026-09-17.
 2. **Install for real and run a day on it.** Everything is still tested against
    synthetic streams and the schema read out of the Claude Code binary; no hook
    has ever fired into it. `./asciiscapes install claude` prints a plan and
