@@ -18,12 +18,13 @@ the decision at the top of it, which is mine to make, not yours.
 COMPLETE, the hooks are installed and firing, and **the agent now runs INSIDE
 the scape**.
 
-**⭐ `xscapes inside` SHIPS.** His ruling — "the entire Claude experience should
+**⭐ `xscapes claude` NOW RUNS THE AGENT INSIDE THE SCAPE.** His ruling — "the entire Claude experience should
 happen within the xscape, not next to it" — is built. One window: Claude Code in
 a band pinned to the top rows, the scape painting the rows below it, no tmux.
 He chose the pass-through band over a full terminal emulator after the probe
-came back clean (below). The old `xscapes claude` tmux launcher is untouched and
-still works.
+came back clean (below), then ruled that `claude` should mean this: *"1. it
+should"*. The old tmux launcher is untouched and still reachable as
+`xscapes claude -beside`; `xscapes inside <cmd>` hosts anything.
 
 **It is not a terminal emulator, on purpose.** The agent runs on a pty sized to
 its band, held there by DECSTBM, and its bytes reach the terminal untouched
@@ -188,8 +189,9 @@ waiting for him. `NewCat()` still returns what shipped before session 6.
 ## How to look at things
 
 ```
-go build -o xscapes . && ./xscapes inside     # THE REAL THING: agent inside the scape
+go build -o xscapes . && ./xscapes claude     # THE REAL THING: agent inside the scape
 ./xscapes inside sh -c "seq 1 100; sleep 30"  # host anything; proves the band holds
+./xscapes claude -beside                      # the OLD side-by-side tmux layout
 ./xscapes -live                               # the scape alone, Ctrl-C to quit
 ./xscapes -faces  assets/frames/companion-study.html   # THE OPEN QUESTION
 ./xscapes -colors assets/frames/color-study.html       # 256 vs truecolor
@@ -215,9 +217,6 @@ Demo flags: `-wired -mockup -anim -compare -layout -context -day -busy -kittens 
    beach's rows now that the beach's height varies with the window.
 2. **The 45-60s demo video**, now of the thing running inside one window.
    Record in a truecolor terminal, NOT Terminal.app. Entries close 2026-09-17.
-3. **Should `xscapes inside` become the default?** `xscapes claude` is still the
-   tmux launcher and the README now leads with `inside`. Whether `claude` should
-   become an alias for `inside` is his call.
 4. **Run a day on it and re-tune.** The hooks are INSTALLED and firing (see
    below); what is missing is a day of real rhythm to tune `TauFall=12s`,
    `TurnFloor=0.30`, `FlightFloor=0.45` against. `xscapes replay` exists for
