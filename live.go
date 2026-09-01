@@ -11,6 +11,7 @@ import (
 	"github.com/donlucasx/asciiscapes/internal/canvas"
 	"github.com/donlucasx/asciiscapes/internal/companion"
 	"github.com/donlucasx/asciiscapes/internal/event"
+	"github.com/donlucasx/asciiscapes/internal/notify"
 	"github.com/donlucasx/asciiscapes/internal/reduce"
 	"github.com/donlucasx/asciiscapes/internal/scape"
 	"github.com/donlucasx/asciiscapes/internal/term"
@@ -148,6 +149,8 @@ func runLive(seed int64, fps float64, wIn, hIn int, ctxUsed, tod float64, ascii 
 	defer restore()
 
 	profile := term.DetectProfile()
+	sound := notify.New()
+	var knocker notify.Knocker
 	// A zero fps builds a ticker with a zero duration (panic), and anything
 	// under one frame a second fights the shore's own large-gap clamp.
 	if fps < 1 {
@@ -216,6 +219,19 @@ func runLive(seed int64, fps float64, wIn, hIn int, ctxUsed, tod float64, ascii 
 			}
 		} else {
 			st = demoState(t, ctxUsed, tod)
+		}
+
+		// The audible half of the nudge. Keyed off the bubble rather than the
+		// pose, and edge-detected, so a sixty-second permission nag knocks
+		// once rather than once a minute.
+		//
+		// Only when following a real session: the demo cycles every state on a
+		// timer, and a scape nobody attached to has nothing to announce.
+		// `asciiscapes notify` is how the sounds get auditioned.
+		if red != nil {
+			if k, ring := knocker.Knock(st.Bubble, st.BubbleAsk); ring {
+				sound.Play(k)
+			}
 		}
 
 		sh.Update(c, t, st.Act)

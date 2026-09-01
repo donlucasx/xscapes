@@ -10,6 +10,7 @@ import (
 	"os"
 
 	"github.com/donlucasx/asciiscapes/internal/canvas"
+	"github.com/donlucasx/asciiscapes/internal/notify"
 	"github.com/donlucasx/asciiscapes/internal/scape"
 	"github.com/donlucasx/asciiscapes/internal/term"
 )
@@ -62,8 +63,8 @@ func main() {
 
 	if *info {
 		tw, th := termSize()
-		fmt.Printf("profile=%s  size=%dx%d  glyph-chroma=%.1fx  TERM=%q COLORTERM=%q TERM_PROGRAM=%q\n",
-			term.DetectProfile(), tw, th, term.GlyphBoost,
+		fmt.Printf("profile=%s  size=%dx%d  glyph-chroma=%.1fx  sound=%s  TERM=%q COLORTERM=%q TERM_PROGRAM=%q\n",
+			term.DetectProfile(), tw, th, term.GlyphBoost, notify.New().Describe(),
 			os.Getenv("TERM"), os.Getenv("COLORTERM"), os.Getenv("TERM_PROGRAM"))
 		return
 	}

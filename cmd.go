@@ -12,6 +12,7 @@ import (
 	"time"
 
 	"github.com/donlucasx/asciiscapes/internal/event"
+	"github.com/donlucasx/asciiscapes/internal/notify"
 )
 
 // dispatch handles the subcommands. They are checked before flag.Parse so that
@@ -36,6 +37,8 @@ func dispatch(args []string) bool {
 		runUninstall(args[1:])
 	case "replay":
 		runReplay(args[1:])
+	case "notify":
+		runNotify(args[1:])
 	case "help", "-h", "--help":
 		usage()
 	default:
@@ -56,6 +59,7 @@ func usage() {
   asciiscapes uninstall claude
   asciiscapes emit <kind>     send one event by hand (for testing)
   asciiscapes replay <file>   feed a recorded event log to a running scape
+  asciiscapes notify [kind]   play the knock sounds (ask, done, or both)
   asciiscapes hook [Event]    adapter; reads a Claude Code hook payload on stdin
   asciiscapes statusline      adapter for the context moon; chains to your statusline
 
@@ -186,6 +190,37 @@ func runStatusline(args []string) {
 		// bar and no clue why. Say something short in the space it owns.
 		fmt.Printf("asciiscapes: statusline chain failed: %v", err)
 	}
+}
+
+// runNotify plays the knocks on demand. The scape itself is silent unless it
+// is following a real session -- the demo cycles through every state on a
+// timer and would otherwise chime at the user forever -- so this is how the
+// sounds get heard and judged.
+func runNotify(args []string) {
+	p := notify.New()
+	fmt.Printf("player: %s\n", p.Describe())
+
+	kinds := []notify.Kind{notify.Ask, notify.Done}
+	if len(args) > 0 {
+		switch args[0] {
+		case "ask", "needs_input":
+			kinds = []notify.Kind{notify.Ask}
+		case "done", "finish":
+			kinds = []notify.Kind{notify.Done}
+		default:
+			fmt.Fprintf(os.Stderr, "asciiscapes notify: unknown kind %q (ask, done)\n", args[0])
+			os.Exit(2)
+		}
+	}
+	for i, k := range kinds {
+		if i > 0 {
+			time.Sleep(1400 * time.Millisecond) // let the first finish
+		}
+		fmt.Printf("  %s\n", k)
+		p.Play(k)
+	}
+	// Play starts the player and returns; exiting immediately would kill it.
+	time.Sleep(1400 * time.Millisecond)
 }
 
 // runReplay feeds a recorded log back through the bus, which is how the
