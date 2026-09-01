@@ -10,7 +10,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/donlucasx/asciiscapes/internal/event"
+	"github.com/donlucasx/xscapes/internal/event"
 )
 
 // hookPayload is the subset of Claude Code's hook input we read. The full

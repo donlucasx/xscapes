@@ -12,9 +12,9 @@ import (
 	"math"
 	"time"
 
-	"github.com/donlucasx/asciiscapes/internal/companion"
-	"github.com/donlucasx/asciiscapes/internal/event"
-	"github.com/donlucasx/asciiscapes/internal/scape"
+	"github.com/donlucasx/xscapes/internal/companion"
+	"github.com/donlucasx/xscapes/internal/event"
+	"github.com/donlucasx/xscapes/internal/scape"
 )
 
 // The time constants. Every one of these is a claim about how a person glances

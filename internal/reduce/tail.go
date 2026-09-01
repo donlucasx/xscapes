@@ -5,7 +5,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/donlucasx/asciiscapes/internal/event"
+	"github.com/donlucasx/xscapes/internal/event"
 )
 
 // TailLen is how many lines the sand holds. Four fits the beach at 80x24 with

@@ -1,6 +1,6 @@
 package scape
 
-import "github.com/donlucasx/asciiscapes/internal/term"
+import "github.com/donlucasx/xscapes/internal/term"
 
 // Palette is every colour the shore needs at one moment of the day. Keeping
 // them together means a new time of day is one struct, not thirty edits.

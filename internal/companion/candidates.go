@@ -1,6 +1,6 @@
 package companion
 
-import "github.com/donlucasx/asciiscapes/internal/term"
+import "github.com/donlucasx/xscapes/internal/term"
 
 var (
 	warm  = term.RGB{R: 232, G: 224, B: 206}

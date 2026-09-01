@@ -5,8 +5,8 @@ package companion
 import (
 	"strings"
 
-	"github.com/donlucasx/asciiscapes/internal/canvas"
-	"github.com/donlucasx/asciiscapes/internal/term"
+	"github.com/donlucasx/xscapes/internal/canvas"
+	"github.com/donlucasx/xscapes/internal/term"
 )
 
 // Register is how a sprite is drawn. Kept explicit because it decides the glyph

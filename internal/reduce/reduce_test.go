@@ -4,8 +4,8 @@ import (
 	"testing"
 	"time"
 
-	"github.com/donlucasx/asciiscapes/internal/companion"
-	"github.com/donlucasx/asciiscapes/internal/event"
+	"github.com/donlucasx/xscapes/internal/companion"
+	"github.com/donlucasx/xscapes/internal/event"
 )
 
 // base is an arbitrary fixed instant. Everything here is relative to it, so

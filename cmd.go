@@ -11,8 +11,8 @@ import (
 	"strings"
 	"time"
 
-	"github.com/donlucasx/asciiscapes/internal/event"
-	"github.com/donlucasx/asciiscapes/internal/notify"
+	"github.com/donlucasx/xscapes/internal/event"
+	"github.com/donlucasx/xscapes/internal/notify"
 )
 
 // dispatch handles the subcommands. They are checked before flag.Parse so that

@@ -1,8 +1,8 @@
 package companion
 
 import (
-	"github.com/donlucasx/asciiscapes/internal/canvas"
-	"github.com/donlucasx/asciiscapes/internal/term"
+	"github.com/donlucasx/xscapes/internal/canvas"
+	"github.com/donlucasx/xscapes/internal/term"
 )
 
 // Face is the feline detail drawn on top of the body bitmap.

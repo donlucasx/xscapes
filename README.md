@@ -1,7 +1,7 @@
-# asciiscapes
+# xscapes
 
 Waiting for an agent is dead time. You fire off a prompt, the terminal goes
-quiet, you tab away, and then you forget to come back. asciiscapes gives that
+quiet, you tab away, and then you forget to come back. xscapes gives that
 dead time a face: a small living shoreline that runs beside your agent, rises
 while it works, and knocks when it wants you.
 
@@ -13,7 +13,7 @@ adapters, which is the part that generalises to any agent. On top there is a
 sea and a cat.
 
 ```
-asciiscapes claude
+xscapes claude
 ```
 
 That is the whole thing. Claude Code in the left pane, the scape in the right.
@@ -21,11 +21,11 @@ That is the whole thing. Claude Code in the left pane, the scape in the right.
 ## Install
 
 ```sh
-git clone https://github.com/donlucasx/asciiscapes && cd asciiscapes
-go build -o asciiscapes .
+git clone https://github.com/donlucasx/xscapes && cd xscapes
+go build -o xscapes .
 
-./asciiscapes install claude          # prints a plan, writes nothing
-./asciiscapes install claude --apply  # writes the hooks, after a backup
+./xscapes install claude          # prints a plan, writes nothing
+./xscapes install claude --apply  # writes the hooks, after a backup
 ```
 
 The only dependency is tmux, for the side by side layout:
@@ -75,15 +75,16 @@ sub_start  sub_end  needs_input  done  compact  context  todo  session_end
 Send one by hand:
 
 ```sh
-asciiscapes emit tool_end -tool Read -target internal/auth/handler.go -detail "142 lines"
-asciiscapes emit needs_input -text "allow Bash?"
+xscapes emit tool_end -tool Read -target internal/auth/handler.go -detail "142 lines"
+xscapes emit needs_input -text "allow Bash?"
 ```
 
 Events reach a running scape over a unix socket in `~/.config/asciiscapes/run/`,
 and spool to a file when nothing is listening, so a scape started late still
-picks up the session.
+picks up the session. (State paths and the `ASCIISCAPES_*` variables still carry
+the project's older working name.)
 
-**Adapter 1: Claude Code**, via hooks. `asciiscapes install claude` writes them.
+**Adapter 1: Claude Code**, via hooks. `xscapes install claude` writes them.
 The payload schema was read out of the Claude Code binary rather than guessed;
 see `notes/claude-hooks-verified.md`.
 
@@ -97,14 +98,14 @@ Claude Code is.
 ## Everything else
 
 ```sh
-asciiscapes -live              # the scape in this terminal, Ctrl-C to quit
-asciiscapes -info              # colour profile, size, which sound player
-asciiscapes notify             # hear both knocks
-asciiscapes replay session.jsonl   # feed a recorded session back through the engine
+xscapes -live              # the scape in this terminal, Ctrl-C to quit
+xscapes -info              # colour profile, size, which sound player
+xscapes notify             # hear both knocks
+xscapes replay session.jsonl   # feed a recorded session back through the engine
 ASCIISCAPES_SILENT=1 …         # mute
 ```
 
-`asciiscapes claude -print` shows you the exact commands it would run and
+`xscapes claude -print` shows you the exact commands it would run and
 changes nothing.
 
 ## Notes for anyone reading the code

@@ -3,8 +3,8 @@ package scape
 import (
 	"math"
 
-	"github.com/donlucasx/asciiscapes/internal/canvas"
-	"github.com/donlucasx/asciiscapes/internal/term"
+	"github.com/donlucasx/xscapes/internal/canvas"
+	"github.com/donlucasx/xscapes/internal/term"
 )
 
 // Shore: night beach. Stars and moon far, open water mid, foam and sand near.

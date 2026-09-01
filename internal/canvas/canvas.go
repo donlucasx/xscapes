@@ -7,7 +7,7 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/donlucasx/asciiscapes/internal/term"
+	"github.com/donlucasx/xscapes/internal/term"
 )
 
 // Layer alphas. Far is sparse, slow and washed out; near is dense, fast, solid.

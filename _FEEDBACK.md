@@ -236,3 +236,15 @@ Never paraphrase. Read the relevant section before editing anything it covers.
 
 - *"switching models, do you still have full context?"* ⇒ Yes; a model switch keeps the
   session's conversation.
+
+- *"let's save the progress on the character study and defer the decision for later. Let's keep
+  working and keep the characters as is for now."*
+  ⇒ Companion study PARKED. Nothing defaulted, `NewCat()` unchanged. Do NOT re-ask.
+
+- *"create the repo on the donlucasx gh account, call it xscapes"*
+  ⇒ **THE NAME IS DECIDED: `xscapes`** (from the candidate list asciiscapes / iixscapes /
+    xscapes; the brief always said the name would be picked late, from the built thing).
+    Public repo under `donlucasx`. The Go module path MUST match the repo URL or
+    `go install` is broken for everyone, so module → `github.com/donlucasx/xscapes`, which
+    also makes the built binary `xscapes`. Working directory, CLAUDE.md and RESUME.md still
+    say "asciiscapes" -- ⏸ ASK before renaming those; he asked for a repo, not a migration.

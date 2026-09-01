@@ -1,5 +1,6 @@
 # built binary
 /asciiscapes
+/xscapes
 
 # generated frames — regenerable with `go run . -html=...`
 # the PNG references are kept deliberately as a visual record
@@ -8,6 +9,7 @@
 # macOS
 .DS_Store
 asciiscapes
+xscapes
 
 # scratch build from the mirror branch
 /as

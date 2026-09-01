@@ -3,7 +3,7 @@ package scape
 import (
 	"testing"
 
-	"github.com/donlucasx/asciiscapes/internal/canvas"
+	"github.com/donlucasx/xscapes/internal/canvas"
 )
 
 // The moonlight on the water must sit under the moon. It used to be pinned to a

@@ -4,9 +4,9 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/donlucasx/asciiscapes/internal/canvas"
-	"github.com/donlucasx/asciiscapes/internal/companion"
-	"github.com/donlucasx/asciiscapes/internal/scape"
+	"github.com/donlucasx/xscapes/internal/canvas"
+	"github.com/donlucasx/xscapes/internal/companion"
+	"github.com/donlucasx/xscapes/internal/scape"
 )
 
 // animPage renders each state as a real frame sequence and cycles it in the

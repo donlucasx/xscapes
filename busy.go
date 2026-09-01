@@ -4,9 +4,9 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/donlucasx/asciiscapes/internal/canvas"
-	"github.com/donlucasx/asciiscapes/internal/companion"
-	"github.com/donlucasx/asciiscapes/internal/scape"
+	"github.com/donlucasx/xscapes/internal/canvas"
+	"github.com/donlucasx/xscapes/internal/companion"
+	"github.com/donlucasx/xscapes/internal/scape"
 )
 
 // busyPage sweeps the activity level so the range can be judged. The question

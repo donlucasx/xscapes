@@ -5,9 +5,9 @@ import (
 	"math"
 	"strings"
 
-	"github.com/donlucasx/asciiscapes/internal/canvas"
-	"github.com/donlucasx/asciiscapes/internal/companion"
-	"github.com/donlucasx/asciiscapes/internal/scape"
+	"github.com/donlucasx/xscapes/internal/canvas"
+	"github.com/donlucasx/xscapes/internal/companion"
+	"github.com/donlucasx/xscapes/internal/scape"
 )
 
 func kittenPage(seed int64) string {

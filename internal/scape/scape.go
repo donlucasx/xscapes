@@ -3,7 +3,7 @@
 // what lets one renderer serve every adapter.
 package scape
 
-import "github.com/donlucasx/asciiscapes/internal/canvas"
+import "github.com/donlucasx/xscapes/internal/canvas"
 
 // Activity is the agent's state, normalised. Level is 0 (idle) to 1 (flat out).
 type Activity struct {

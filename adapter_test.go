@@ -7,9 +7,9 @@ import (
 	"testing"
 	"time"
 
-	"github.com/donlucasx/asciiscapes/internal/companion"
-	"github.com/donlucasx/asciiscapes/internal/event"
-	"github.com/donlucasx/asciiscapes/internal/reduce"
+	"github.com/donlucasx/xscapes/internal/companion"
+	"github.com/donlucasx/xscapes/internal/event"
+	"github.com/donlucasx/xscapes/internal/reduce"
 )
 
 // The payload shapes below are the real ones, taken from the Zod schema

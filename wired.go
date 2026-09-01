@@ -5,11 +5,11 @@ import (
 	"strings"
 	"time"
 
-	"github.com/donlucasx/asciiscapes/internal/canvas"
-	"github.com/donlucasx/asciiscapes/internal/companion"
-	"github.com/donlucasx/asciiscapes/internal/event"
-	"github.com/donlucasx/asciiscapes/internal/reduce"
-	"github.com/donlucasx/asciiscapes/internal/scape"
+	"github.com/donlucasx/xscapes/internal/canvas"
+	"github.com/donlucasx/xscapes/internal/companion"
+	"github.com/donlucasx/xscapes/internal/event"
+	"github.com/donlucasx/xscapes/internal/reduce"
+	"github.com/donlucasx/xscapes/internal/scape"
 )
 
 // wiredPage renders one simulated session through the real reducer.

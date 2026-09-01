@@ -4,9 +4,9 @@ import (
 	"testing"
 	"time"
 
-	"github.com/donlucasx/asciiscapes/internal/event"
-	"github.com/donlucasx/asciiscapes/internal/notify"
-	"github.com/donlucasx/asciiscapes/internal/reduce"
+	"github.com/donlucasx/xscapes/internal/event"
+	"github.com/donlucasx/xscapes/internal/notify"
+	"github.com/donlucasx/xscapes/internal/reduce"
 )
 
 // The two halves of the nudge have to fit: the reducer decides what the bubble

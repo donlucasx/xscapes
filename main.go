@@ -9,10 +9,10 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/donlucasx/asciiscapes/internal/canvas"
-	"github.com/donlucasx/asciiscapes/internal/notify"
-	"github.com/donlucasx/asciiscapes/internal/scape"
-	"github.com/donlucasx/asciiscapes/internal/term"
+	"github.com/donlucasx/xscapes/internal/canvas"
+	"github.com/donlucasx/xscapes/internal/notify"
+	"github.com/donlucasx/xscapes/internal/scape"
+	"github.com/donlucasx/xscapes/internal/term"
 )
 
 func main() {

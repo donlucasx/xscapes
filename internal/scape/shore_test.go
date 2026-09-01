@@ -4,7 +4,7 @@ import (
 	"math"
 	"testing"
 
-	"github.com/donlucasx/asciiscapes/internal/canvas"
+	"github.com/donlucasx/xscapes/internal/canvas"
 )
 
 // TestActivityChangeDoesNotTeleportTheSea is the regression test for the bug

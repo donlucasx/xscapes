@@ -3,8 +3,8 @@ package companion
 import (
 	"math"
 
-	"github.com/donlucasx/asciiscapes/internal/canvas"
-	"github.com/donlucasx/asciiscapes/internal/term"
+	"github.com/donlucasx/xscapes/internal/canvas"
+	"github.com/donlucasx/xscapes/internal/term"
 )
 
 var kittenEye = term.RGB{R: 150, G: 214, B: 158} // dimmer than the parent's

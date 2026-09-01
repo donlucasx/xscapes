@@ -5,8 +5,8 @@ import (
 	"os"
 	"testing"
 
-	"github.com/donlucasx/asciiscapes/internal/canvas"
-	"github.com/donlucasx/asciiscapes/internal/term"
+	"github.com/donlucasx/xscapes/internal/canvas"
+	"github.com/donlucasx/xscapes/internal/term"
 )
 
 // The right population is glyphs that are MEANT to carry colour. Foam, fur,

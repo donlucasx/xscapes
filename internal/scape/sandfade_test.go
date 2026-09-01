@@ -3,7 +3,7 @@ package scape
 import (
 	"testing"
 
-	"github.com/donlucasx/asciiscapes/internal/term"
+	"github.com/donlucasx/xscapes/internal/term"
 )
 
 // The activity tail fades toward the beach as the tide takes it. The target has

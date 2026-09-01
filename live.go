@@ -8,13 +8,13 @@ import (
 	"time"
 	"unsafe"
 
-	"github.com/donlucasx/asciiscapes/internal/canvas"
-	"github.com/donlucasx/asciiscapes/internal/companion"
-	"github.com/donlucasx/asciiscapes/internal/event"
-	"github.com/donlucasx/asciiscapes/internal/notify"
-	"github.com/donlucasx/asciiscapes/internal/reduce"
-	"github.com/donlucasx/asciiscapes/internal/scape"
-	"github.com/donlucasx/asciiscapes/internal/term"
+	"github.com/donlucasx/xscapes/internal/canvas"
+	"github.com/donlucasx/xscapes/internal/companion"
+	"github.com/donlucasx/xscapes/internal/event"
+	"github.com/donlucasx/xscapes/internal/notify"
+	"github.com/donlucasx/xscapes/internal/reduce"
+	"github.com/donlucasx/xscapes/internal/scape"
+	"github.com/donlucasx/xscapes/internal/term"
 )
 
 // termSize asks the kernel how big the window is, via the TIOCGWINSZ ioctl.

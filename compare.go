@@ -4,10 +4,10 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/donlucasx/asciiscapes/internal/canvas"
-	"github.com/donlucasx/asciiscapes/internal/companion"
-	"github.com/donlucasx/asciiscapes/internal/scape"
-	"github.com/donlucasx/asciiscapes/internal/term"
+	"github.com/donlucasx/xscapes/internal/canvas"
+	"github.com/donlucasx/xscapes/internal/companion"
+	"github.com/donlucasx/xscapes/internal/scape"
+	"github.com/donlucasx/xscapes/internal/term"
 )
 
 // meowCat is ref 4 transcribed character-exact from the source image, rather

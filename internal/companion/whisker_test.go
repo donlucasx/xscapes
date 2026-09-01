@@ -3,7 +3,7 @@ package companion
 import (
 	"testing"
 
-	"github.com/donlucasx/asciiscapes/internal/canvas"
+	"github.com/donlucasx/xscapes/internal/canvas"
 )
 
 // Every whisker must touch the fur.

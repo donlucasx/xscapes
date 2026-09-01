@@ -3,8 +3,8 @@ package companion
 import (
 	"math"
 
-	"github.com/donlucasx/asciiscapes/internal/canvas"
-	"github.com/donlucasx/asciiscapes/internal/term"
+	"github.com/donlucasx/xscapes/internal/canvas"
+	"github.com/donlucasx/xscapes/internal/term"
 )
 
 // State is what the companion is reacting to. Deliberately not the agent's
