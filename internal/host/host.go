@@ -125,9 +125,15 @@ func (h *Host) Run() error {
 	p.slave.Close()
 	p.slave = nil
 
-	// Clear the scape's rows once, then pin the agent. Clearing first because
-	// whatever the shell left there is not scenery.
-	h.write(clearRows(agentRows+1, rows) + EnterBand(agentRows))
+	// Clear the WHOLE screen once, then pin the agent.
+	//
+	// The whole screen, not just the scape's rows: Claude Code never clears the
+	// display (measured -- no ED in anything it emits), so it simply prints over
+	// whatever is already there. Clearing only below the band left the previous
+	// run's output sitting inside the new one's, half-overwritten.
+	h.write(clearRows(1, rows) + EnterBand(agentRows))
+	// Only what moved gets sent. See damage.
+	var dmg damage
 
 	// The agent's output, filtered and forwarded. Never buffered by the frame
 	// loop: a keystroke echoes at the speed the agent produces it.
@@ -184,6 +190,8 @@ func (h *Host) Run() error {
 				// the rows below it cleared because the old scape is still
 				// sitting wherever the last size put it.
 				h.write(clearRows(agentRows+1, rows) + EnterBand(agentRows))
+				// The screen was just touched behind the tracker's back.
+				dmg.reset()
 			}
 			if scapeRows <= 0 || h.Paint == nil {
 				continue
@@ -192,14 +200,18 @@ func (h *Host) Run() error {
 			if len(lines) == 0 {
 				continue
 			}
+			if len(lines) > scapeRows {
+				lines = lines[:scapeRows]
+			}
+			dirty := dmg.changed(lines)
+			if len(dirty) == 0 {
+				continue
+			}
 			var b strings.Builder
 			b.WriteString(BeginPaint())
-			for i, ln := range lines {
-				if i >= scapeRows {
-					break
-				}
+			for _, i := range dirty {
 				fmt.Fprintf(&b, "\x1b[%d;1H", agentRows+1+i)
-				b.WriteString(ln)
+				b.WriteString(lines[i])
 			}
 			b.WriteString(EndPaint(agentRows))
 			// One write, so the terminal sees a whole frame between the

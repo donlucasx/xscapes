@@ -48,7 +48,7 @@ func runClaude(args []string) {
 func runInside(args []string, agent string) {
 	fs := flag.NewFlagSet("inside", flag.ExitOnError)
 	seed := fs.Int64("seed", 7, "scene seed")
-	fps := fs.Float64("fps", 20, "scape frames per second")
+	fps := fs.Float64("fps", 12, "scape frames per second")
 	ascii := fs.Bool("ascii", false, "ASCII glyphs only, no Unicode")
 	mirror := fs.Bool("mirror", true, "companion on the right")
 	tod := fs.Float64("tod", 0, "pin the time of day, 0..1 (0 = the wall clock)")
