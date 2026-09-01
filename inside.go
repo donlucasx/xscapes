@@ -53,6 +53,7 @@ func runInside(args []string, agent string) {
 	mirror := fs.Bool("mirror", true, "companion on the right")
 	tod := fs.Float64("tod", 0, "pin the time of day, 0..1 (0 = the wall clock)")
 	ctxUsed := fs.Float64("ctx", 0, "pin context used, 0..1 (0 = the session's own)")
+	dry := fs.Bool("print", false, "print what would run and how the window splits, then exit")
 	fs.Usage = func() {
 		if agent != "" {
 			fmt.Fprintf(os.Stderr, `xscapes claude [flags] [%s arguments ...]
@@ -81,7 +82,18 @@ With no command, runs claude.
 	}
 
 	cols, rows := termSize()
-	_, scapeRows := host.Band(rows)
+	agentRows, scapeRows := host.Band(rows)
+	if *dry {
+		fmt.Printf("window   %dx%d\n", cols, rows)
+		fmt.Printf("agent    rows 1-%d   %s\n", agentRows, strings.Join(argv, " "))
+		if scapeRows > 0 {
+			fmt.Printf("scape    rows %d-%d\n", agentRows+1, rows)
+		} else {
+			fmt.Printf("scape    none: %d rows are needed and the window has %d\n",
+				host.MinAgentRows+host.MinScapeRows, rows)
+		}
+		return
+	}
 	if scapeRows == 0 {
 		fmt.Fprintf(os.Stderr, "xscapes: window is %d rows; %d are needed before a scape fits. Running %s bare.\n",
 			rows, host.MinAgentRows+host.MinScapeRows, argv[0])

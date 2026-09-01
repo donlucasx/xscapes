@@ -141,8 +141,9 @@ xscapes replay session.jsonl   # feed a recorded session back through the engine
 ASCIISCAPES_SILENT=1 …         # mute
 ```
 
-`xscapes claude -print` shows you the exact commands it would run and
-changes nothing.
+`xscapes claude -print` shows you how the window will be split and what will be
+run in it, and changes nothing. `xscapes claude -beside -print` does the same for
+the tmux layout.
 
 ## Notes for anyone reading the code
 
