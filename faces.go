@@ -44,15 +44,15 @@ func facePage(seed int64) string {
 	   text-transform:uppercase;margin:14px 0 6px}
 	h2+p{margin-top:4px}
 	</style>`)
-	b.WriteString(`<h1>asciiscapes &mdash; whiskers, four, on the muzzle</h1>`)
-	b.WriteString(`<p class="nt">The spec: FOUR whiskers, two a side, connected to the head, ` +
-		`levelled around the nose. The last round failed it both ways at once &mdash; the raised tail ` +
-		`is solid at nose height, so the row scan grew the right pair out of the TAIL; and the lower ` +
-		`pair anchored to the torso a row down, reading as chest hairs at chin level. Both pairs now ` +
-		`hang off the muzzle corners, measured once on the nose row and bounded to the head's own ` +
-		`cells. A whisker stops at anything solid, which keeps it off the tail &mdash; the ` +
-		`muzzle-to-tail gap is a single cell, so the tail-side pair runs shorter by nature. ` +
-		`Ear shadows and toes are on in every portrait. Zoomed row first; pick from either.</p>`)
+	b.WriteString(`<h1>asciiscapes &mdash; whiskers, from his guide</h1>`)
+	b.WriteString(`<p class="nt">Built from Lucas's drawn guide, measured off the ink: both strokes ` +
+		`hug the NOSE LINE &mdash; the top at the nose row's vertical middle, the bottom at the nose ` +
+		`cell's bottom edge, HALF a cell down rather than a full row (that half-cell is the whole ` +
+		`difference from every earlier attempt) &mdash; both start flush at the fur, and the top pair ` +
+		`is longer. His top-right stroke runs straight across the raised tail, so a whisker no ` +
+		`longer stops there: it skips the tail's cells and resumes past them, passing behind. ` +
+		`Three reaches to pick from; "guide" is his draft as measured. Ear shadows and toes on ` +
+		`everywhere. Zoomed row first.</p>`)
 
 	cell := func(label, note, body string) {
 		fmt.Fprintf(&b, `<div class="col"><div class="lbl"><b>%s</b>%s</div><div class="win">%s</div></div>`,
@@ -80,21 +80,21 @@ func facePage(seed int64) string {
 		b.WriteString(`</div>`)
 	}
 
-	b.WriteString(`<h2>"lower long" across all five coats</h2><div class="row">`)
+	b.WriteString(`<h2>"guide" across all five coats</h2><div class="row">`)
 	for _, coat := range companion.CoatOrder {
-		cell(coat, "", portrait(face(companion.WhiskerLowerLong, true), companion.Coats[coat],
+		cell(coat, "", portrait(face(companion.WhiskerGuide, true), companion.Coats[coat],
 			companion.Working, term.ProfileTrueColor, 3.1))
 	}
 	b.WriteString(`</div>`)
 
 	b.WriteString(`<h2>The same, as Terminal.app paints it</h2><div class="row">`)
 	for _, coat := range companion.CoatOrder {
-		cell(coat, " &middot; 256", portrait(face(companion.WhiskerLowerLong, true), companion.Coats[coat],
+		cell(coat, " &middot; 256", portrait(face(companion.WhiskerGuide, true), companion.Coats[coat],
 			companion.Working, term.Profile256, 3.1))
 	}
 	b.WriteString(`</div>`)
 
-	b.WriteString(`<h2>Every state &mdash; slate, "lower long"</h2>`)
+	b.WriteString(`<h2>Every state &mdash; slate, "guide"</h2>`)
 	b.WriteString(`<p class="nt">The whiskers drop a row when something is broken.</p><div class="row">`)
 	for _, st := range []struct {
 		s companion.State
@@ -102,7 +102,7 @@ func facePage(seed int64) string {
 	}{{companion.Resting, "resting"}, {companion.Working, "working"},
 		{companion.NeedsYou, "needs you"}, {companion.Done, "done"},
 		{companion.Worried, "broken"}} {
-		cell(st.n, "", portrait(face(companion.WhiskerLowerLong, true), companion.Coats["slate"],
+		cell(st.n, "", portrait(face(companion.WhiskerGuide, true), companion.Coats["slate"],
 			st.s, term.ProfileTrueColor, 3.1))
 	}
 	b.WriteString(`</div>`)

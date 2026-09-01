@@ -30,14 +30,15 @@ type WhiskerStyle int
 
 const (
 	NoWhiskers WhiskerStyle = iota
-	// WhiskerLowerLong: bottom pair longer than the top pair.
-	WhiskerLowerLong
-	// WhiskerUpperLong: top pair longer than the bottom pair.
-	WhiskerUpperLong
-	// WhiskerEven: both pairs the same length.
-	WhiskerEven
-	// WhiskerShort: one cell a side on each row.
-	WhiskerShort
+	// The styles below are all Lucas's drawn guide (2026-08-31): both strokes
+	// hug the nose line, attached at the fur, and the top pair is LONGER than
+	// the bottom. They differ only in reach.
+	// WhiskerGuide is his draft as measured: top 2 cells, bottom 1.
+	WhiskerGuide
+	// WhiskerLong: top 3, bottom 1.
+	WhiskerLong
+	// WhiskerFull: top 3, bottom 2.
+	WhiskerFull
 )
 
 // EarStyle is how the inside of the ear is treated. Every style below sits
@@ -96,10 +97,9 @@ var WhiskerStyles = []struct {
 	Name  string
 	Note  string
 }{
-	{WhiskerLowerLong, "lower long", "bottom pair reaches further"},
-	{WhiskerUpperLong, "upper long", "top pair reaches further"},
-	{WhiskerEven, "even", "both pairs the same"},
-	{WhiskerShort, "short", "one cell a side, both rows"},
+	{WhiskerGuide, "guide", "his draft as measured: top 2, bottom 1"},
+	{WhiskerLong, "long", "top 3, bottom 1"},
+	{WhiskerFull, "full", "top 3, bottom 2"},
 	{NoWhiskers, "none", "for comparison"},
 }
 
@@ -230,49 +230,41 @@ func (c *Cat) drawFace(l *canvas.Layer, x, y int, f Face, st State) {
 		l.Plot(at(4), y+3, '▾', noseCol, 1)
 	}
 
-	// Whiskers. The spec is locked (2026-08-31): exactly FOUR, two a side,
-	// connected to the HEAD, levelled around the nose.
+	// Whiskers, built to Lucas's drawn guide (2026-08-31, _FEEDBACK.md s7):
+	// four, two a side, both strokes HUGGING the nose line, attached at the
+	// fur, top pair longer than the bottom.
 	//
-	// The muzzle is measured ONCE, on the nose row, bounded to the head's own
-	// cells 0-8. The per-row unbounded scan this replaces failed his spec both
-	// ways at once: the tail is SOLID at nose height, so the right whiskers
-	// grew out of the tail; and the lower pair, anchored to the torso a row
-	// down, sat wider and lower than the head and read as chest hairs at chin
-	// level. Both pairs now hang off the muzzle corners.
+	// The geometry is measured off his ink, not eyeballed. His top stroke
+	// sits at the vertical middle of the nose row -- exactly where '─'
+	// renders -- and his bottom stroke at the nose cell's BOTTOM EDGE, half a
+	// cell down, which is where '‾' on the row BELOW renders. That half-cell
+	// spacing is the whole difference from every earlier attempt, which put
+	// the lower pair a full row down and read as chest hairs.
 	//
-	// A whisker grows outward cell by cell and stops at anything solid, which
-	// is what keeps it off the tail: the gap between muzzle and raised tail is
-	// a single cell, so the tail-side pair simply runs shorter. It may paint
-	// over a non-solid cell -- the head's own half-filled edge is one, and
-	// skipping it would hang half a cell of daylight between fur and whisker
-	// (the head is not centred in its sprite).
+	// His top-right stroke runs straight across the raised tail, so a whisker
+	// does not stop at the tail: it SKIPS solid cells and resumes past them,
+	// which at one glyph per cell is how "passing behind" is drawn. It still
+	// paints over non-solid cells -- the head's own half-filled edge is one,
+	// and skipping it would hang daylight between fur and whisker.
 	//
-	// Row y+3 is the row the nose sits on and y+4 is just under it. The eyes
-	// at y+2 are deliberately never used.
+	// '‾' is Ambiguous-width like '─'; overlays already accept that exposure.
 	if f.Whiskers != NoWhiskers {
 		noseRow := y + 3
-		rows := [2]int{y + 3, y + 4}
+		drop := 0
 		if st == Worried {
-			rows = [2]int{y + 4, y + 5} // drooping
+			drop = 1 // drooping
 		}
 		near, far := 1.0, 0.7
 		if st == Resting {
 			near, far = 0.8, 0.5
 		}
 
-		// lengths[i] is how many cells the whiskers on rows[i] reach for.
-		var lengths [2]int
-		alphas := [2]float64{near, far}
+		top, bottom := 2, 1
 		switch f.Whiskers {
-		case WhiskerLowerLong:
-			lengths = [2]int{1, 2}
-			alphas = [2]float64{far, near}
-		case WhiskerUpperLong:
-			lengths = [2]int{2, 1}
-		case WhiskerEven:
-			lengths = [2]int{2, 2}
-		case WhiskerShort:
-			lengths = [2]int{1, 1}
+		case WhiskerLong:
+			top = 3
+		case WhiskerFull:
+			top, bottom = 3, 2
 		}
 
 		from, to := at(0), at(8)
@@ -282,19 +274,23 @@ func (c *Cat) drawFace(l *canvas.Layer, x, y int, f Face, st State) {
 		if lo, hi, ok := furSpan(l, noseRow, from, to); ok {
 			solid := func(cx, row int) bool {
 				if cx < 0 || cx >= l.W || row < 0 || row >= l.H {
-					return true // the frame edge stops a whisker like fur does
+					return true
 				}
 				c := l.Cells[row*l.W+cx]
 				return c.Set && c.R == '█'
 			}
-			for i, row := range rows {
-				for n := 1; n <= lengths[i] && !solid(lo-n, row); n++ {
-					l.Plot(lo-n, row, '─', light, alphas[i])
-				}
-				for n := 1; n <= lengths[i] && !solid(hi+n, row); n++ {
-					l.Plot(hi+n, row, '─', light, alphas[i])
+			stroke := func(row int, r rune, length int, a float64) {
+				for n := 1; n <= length; n++ {
+					if !solid(lo-n, row) {
+						l.Plot(lo-n, row, r, light, a)
+					}
+					if !solid(hi+n, row) {
+						l.Plot(hi+n, row, r, light, a)
+					}
 				}
 			}
+			stroke(noseRow+drop, '─', top, near)
+			stroke(noseRow+1+drop, '‾', bottom, far)
 		}
 	}
 

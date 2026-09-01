@@ -186,3 +186,14 @@ Never paraphrase. Read the relevant section before editing anything it covers.
     on the nose line. Right-side whiskers must not touch/read as the tail. Ear shadows and
     toes are LOVED (not yet locked as included). Order of decisions: whiskers first, then
     which of the 3 details ship together.
+
+- *"none of your whiskers hit the mark. Here is a very rough draft I made, where I drew the
+  whiskers in red (for you to see them). You see how they are attached to the body around the
+  nose level, and the top are longer than the bottom? re generate a couple versions based on
+  this guide"* (+ a marked-up screenshot of the NONE portrait)
+  ⇒ HE DREW THE ANSWER. Measured off his ink, in cells: both strokes per side hug the NOSE
+    LINE (upper at the nose row's vertical middle, lower at the nose cell's BOTTOM EDGE --
+    half a cell down, not a full row); both start flush at the fur edge; top ~2 cells, bottom
+    ~1.3; and his top-right stroke runs STRAIGHT ACROSS the raised tail -- the whisker passes
+    the tail (drawn by skipping solid cells), it does not stop at it. The four length
+    variants from the previous rounds are all dead.
