@@ -301,3 +301,32 @@ Never paraphrase. Read the relevant section before editing anything it covers.
     `sand_ink_test.go`, which renders a real frame and reads the pixels back.
     Verified on 256: the fade quantises to a clean monotonic descent, every index >= 16, and it
     ADDS depth — without it the bottom half of a tall beach was one flat colour repeated.
+
+## 2026-09-01 — session 8, verbatim
+
+- *"resume work on asciiscapes"*
+  ⇒ Reported state, then put the blocking decision to him: build the embedded terminal or not.
+
+- *"I thought we were designing the claude experience WITHIN the xscape all along. How do you
+  recommend we proceed? explain the difference between the options provided"*
+  ⇒ He is right that the DESIGN has been "within" since the ruling on 09-01, and the layout code
+    for it was already built (`Shore.SkyRows/SandRows`, the beach growing with height, the sand
+    fading to black). What did not exist was anything that HOSTS the agent — `xscapes claude`
+    still opened it in a tmux pane beside the scape. The two options were two ways to make it
+    real, and the difference is whether the scape shows THROUGH the agent (a real emulator,
+    every cell ours, days of work, a parser bug corrupts Claude's UI) or AROUND it (a pty band,
+    the agent's bytes untouched, 1-2 days).
+
+- *"run it"* (the probe, before committing to either)
+  ⇒ Measured, in `notes/claude-terminal-emissions.md`. Claude Code never uses the alternate
+    screen and emits NO absolute row addressing during a turn — only relative moves, column
+    addressing and erase-line. Two exceptions: `ESC[r` once at startup (swallow it) and `ESC[H`
+    on resize (origin mode redirects it into the band). And the constraint that shaped the
+    layout: scrollback survives only when the band is anchored at ROW 1, so nothing can be
+    painted above the agent.
+
+- *"yes"* (build the pass-through band)
+  ⇒ **SHIPPED.** `xscapes inside [command]`. Verified in a real terminal with real Claude Code:
+    a turn ran inside the band, 99 of 100 scrolled lines stayed reachable in the scrollback,
+    resizes landed exactly on the computed split (40 rows → 27/13, 52 → 35/17, 22 → 14/8), and
+    the exit hands the terminal back with the agent's screen intact.
