@@ -13,10 +13,14 @@ adapters, which is the part that generalises to any agent. On top there is a
 sea and a cat.
 
 ```
-xscapes claude
+xscapes inside
 ```
 
-That is the whole thing. Claude Code in the left pane, the scape in the right.
+That is the whole thing. Claude Code in the top of your window, the shoreline
+underneath it, one command and no tmux.
+
+`xscapes claude` gives you the older side-by-side layout instead: the agent in
+the left pane, the scape in the right.
 
 ## Install
 
@@ -37,7 +41,8 @@ GOBIN=~/.local/bin go install github.com/donlucasx/xscapes@latest
 Then run `xscapes claude` from whatever project you are working in. It is not
 something you run from this repo.
 
-The only dependency is tmux, for the side by side layout:
+`xscapes inside` has no dependencies at all. `xscapes claude`, the side by side
+layout, wants tmux:
 
 ```sh
 brew install tmux
@@ -45,6 +50,26 @@ brew install tmux
 
 Without tmux it opens a second Terminal window instead. Uninstall restores your
 settings byte for byte.
+
+### How the agent runs inside the scape
+
+xscapes is not a terminal emulator, and deliberately so. It runs the agent on a
+pty, tells it the window is only as tall as its own band, and pins that band to
+the top of the screen with a scroll region. The agent's bytes then reach your
+terminal untouched -- so no bug in xscapes can corrupt the agent's own display,
+which is the failure a real emulator invites.
+
+The band is anchored at the top because that is the only place it can be. Lines
+scrolled out of a scroll region reach your scrollback only when the region
+starts at row 1: measured in Terminal.app, a region on rows 1-10 keeps every
+scrolled line and a region on rows 5-14 keeps none. Anything painted above the
+agent would cost you the ability to scroll back through its output. So the
+scape reads downward instead -- a strip of sky under the agent, then the sea,
+then the beach -- and a taller window spends its extra rows on beach, where the
+agent's work is written.
+
+What xscapes gives up by not being an emulator: the sea does not show through
+the agent's own blank space. Its band is its own.
 
 ## What you are looking at
 
@@ -107,6 +132,7 @@ Claude Code is.
 ## Everything else
 
 ```sh
+xscapes inside <command>   # host any command, not just claude
 xscapes -live              # the scape in this terminal, Ctrl-C to quit
 xscapes -info              # colour profile, size, which sound player
 xscapes notify             # hear both knocks
