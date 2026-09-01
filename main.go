@@ -60,6 +60,7 @@ func main() {
 		mirror  = flag.Bool("mirror", true, "companion on the right, litter growing leftward (-mirror=false for the old left-anchored layout)")
 		mockup  = flag.String("mockup", "", "write the left-vs-mirrored composition study to an HTML file")
 		overlay = flag.String("overlay", "", "mock the agent INSIDE the scape: composite a captured pane (text file) over the scene")
+		sandfd  = flag.String("sandfade", "", "tuner: how far the lower beach falls away to black")
 	)
 	flag.Parse()
 
@@ -92,6 +93,18 @@ func main() {
 			hl = *height
 		}
 		runLive(*seed, *fps, wl, hl, *ctxUsed, *tod, *asciiG, *session, *mirror, *await)
+		return
+	}
+
+	if *sandfd != "" {
+		if err := os.WriteFile(*sandfd, []byte(sandFadePage(*seed)), 0o644); err != nil {
+			fmt.Fprintln(os.Stderr, "asciiscapes:", err)
+			os.Exit(1)
+		}
+		for _, ln := range sandFadeContrast(*seed, *tod) {
+			fmt.Fprintln(os.Stderr, "  ", ln)
+		}
+		fmt.Println(*sandfd)
 		return
 	}
 

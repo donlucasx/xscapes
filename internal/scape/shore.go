@@ -39,6 +39,11 @@ type Shore struct {
 	// is a better answer than a garish blue one.
 	BlueSky bool
 
+	// SandFade sinks the lower beach toward black, 0 off and 1 fully dark at
+	// the last row. Squared, so the sand stays sand for most of its depth and
+	// only lets go near the bottom.
+	SandFade float64
+
 	// SkyRows and SandRows override the proportional layout, in rows. Zero
 	// means the default fractions.
 	//
@@ -212,6 +217,17 @@ func (s *Shore) waterline(w, sy int, tt float64, act Activity, scale float64) []
 	return e
 }
 
+// voidCol is what the beach falls away into: not pure black, which reads as a
+// hole punched in the frame, but the near-black a dark terminal already sits
+// on, so the scene ends by running out rather than by being cut off.
+var voidCol = term.RGB{R: 10, G: 10, B: 12}
+
+// sandFadeStart is how far down the beach the fade begins, as a fraction. The
+// top of the sand has to stay sand: it meets the water, and a beach that
+// started darkening at the waterline would read as wet, which is a thing the
+// palette already says with WetSand.
+const sandFadeStart = 0.30
+
 func (s *Shore) paintBG(c *canvas.Canvas, hy int, edge []float64) {
 	fh := math.Max(1, float64(hy))
 	for x := 0; x < c.W; x++ {
@@ -231,6 +247,22 @@ func (s *Shore) paintBG(c *canvas.Canvas, hy int, edge []float64) {
 			default:
 				f := (fy - ex) / math.Max(1, float64(c.H-1)-ex)
 				col = term.Lerp(s.pal.WetSand, s.pal.SandNear, math.Min(1, f*1.3))
+				// The beach can fall away into the terminal's own black.
+				//
+				// It buys the one thing the sand is for: the writing. Ink on
+				// mid-tone sand is the worst contrast on screen, and the
+				// NEWEST line sits lowest, so the line that matters most is
+				// the one the beach was fighting hardest. It also means the
+				// scene ends by dissolving rather than by stopping at an
+				// edge, which is what lets an agent's own black-backed UI sit
+				// on top of it without a seam.
+				if s.SandFade > 0 {
+					d := (f - sandFadeStart) / (1 - sandFadeStart)
+					if d > 0 {
+						d = math.Min(1, d)
+						col = term.Lerp(col, voidCol, s.SandFade*d*d)
+					}
+				}
 			}
 			c.SetBG(x, y, col)
 		}

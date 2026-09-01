@@ -424,10 +424,29 @@ func drawSand(c *canvas.Canvas, lines []reduce.Line, sand term.RGB, sandTop, xFr
 	// noon, when the sand is brighter than the ink is. So pick the direction
 	// from the beach -- light on a dark beach, dark on a bright one -- and let
 	// age close the gap without ever closing it completely.
+	//
+	// Sampled from the PAINTED background of each row rather than from the
+	// palette's nominal sand, because those two stopped being the same thing
+	// the moment the beach could fall away toward black. Measured at midday
+	// with a full fade, the nominal sand still read 175 and chose dark ink,
+	// while the row it landed on had already sunk to 62: dark on dark, and the
+	// newest line -- the lowest one, the one that matters most -- was the worst
+	// hit. It is also more correct without the fade, since the top of the beach
+	// is wet and darker than the bottom.
 	bad := term.RGB{R: 244, G: 176, B: 96}
-	toward := term.RGB{R: 244, G: 236, B: 220}
-	if luma(sand) > 140 {
-		toward = term.RGB{R: 34, G: 26, B: 20}
+	beachAt := func(row int) term.RGB {
+		if row < 0 || row >= c.H || len(c.BG) < c.W*c.H {
+			return sand
+		}
+		var r, g, b, n int
+		for x := xFrom; x < xTo && x < c.W; x += 4 {
+			p := c.BG[row*c.W+x]
+			r, g, b, n = r+int(p.R), g+int(p.G), b+int(p.B), n+1
+		}
+		if n == 0 {
+			return sand
+		}
+		return term.RGB{R: uint8(r / n), G: uint8(g / n), B: uint8(b / n)}
 	}
 
 	// However many rows the beach actually has. A short pane -- a wide bottom
@@ -449,7 +468,11 @@ func drawSand(c *canvas.Canvas, lines []reduce.Line, sand term.RGB, sandTop, xFr
 		if row < 0 || row >= c.H {
 			continue
 		}
-		base := toward
+		beach := beachAt(row)
+		base := term.RGB{R: 244, G: 236, B: 220}
+		if luma(beach) > 140 {
+			base = term.RGB{R: 34, G: 26, B: 20}
+		}
 		if ln.Bad {
 			base = bad
 		}
@@ -457,7 +480,7 @@ func drawSand(c *canvas.Canvas, lines []reduce.Line, sand term.RGB, sandTop, xFr
 		// that has sat there two minutes looks it even when nothing newer has
 		// arrived to push it down. It stops at 0.72 rather than 1: the tide
 		// takes a line by TTL, not by fading it into unreadability first.
-		col := term.Lerp(base, sand, 0.10+0.62*ln.Age)
+		col := term.Lerp(base, beach, 0.10+0.62*ln.Age)
 		x := xFrom
 		for _, r := range []rune(companion.NarrowOnly(ln.Text)) {
 			if x >= xTo {
