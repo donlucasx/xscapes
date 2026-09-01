@@ -330,3 +330,24 @@ Never paraphrase. Read the relevant section before editing anything it covers.
     a turn ran inside the band, 99 of 100 scrolled lines stayed reachable in the scrollback,
     resizes landed exactly on the computed split (40 rows → 27/13, 52 → 35/17, 22 → 14/8), and
     the exit hands the terminal back with the agent's screen intact.
+
+## 2026-09-01 — session 9, verbatim
+
+- *"do some research on ascii waiting screens for the terminal. are there any"*
+  ⇒ Surveyed and written to `research/prior-art.md`. Yes, dozens, in four categories:
+    idle screensavers (cmatrix, pipes.sh, asciiquarium, termsaver, ascsaver), per-command
+    spinners (terminal-animations/tan), fake-activity generators (genact, hollywood), and
+    agent-aware indicators — the only one that matters. That last category is NEW, all
+    within the last year, and growing: pi-animations (26 animations for the pi agent,
+    3 phases, inline + widget), claude-code-mascot-statusline (9 hook-driven states),
+    tweakcc, and a whole `terminal-pet` GitHub topic (buddy at 102 stars). Four open
+    upstream issues asking for exactly this (claude-code #66284/#29200/#35249,
+    opencode #24937) — Anthropic has not shipped it.
+    **The four gaps that keep xscapes distinct**: nobody runs the agent INSIDE the scene;
+    nobody encodes the amount of work into what the scene shows (everyone keys off a
+    3-to-9-value state enum); everything is a pet rather than a place; everything is
+    host-locked TypeScript. ⚠ The risk that came out of it: the terminal-pet topic is
+    crowded, and a skimming reader will file xscapes there on sight.
+
+- *"ok save this in a subfolder /research/ and /wrap"*
+  ⇒ `research/prior-art.md`, then this wrap.

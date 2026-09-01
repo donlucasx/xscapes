@@ -2,18 +2,20 @@
 
 *(Working directory, env vars and some prose below still say "asciiscapes". Deliberate: renaming live state orphans an installed hook.)*
 
-> **Where we left off — 2026-09-01, last code change `a38c67c`, 83 commits, pushed.**
+> **Where we left off — 2026-09-01 (session 9), last code change `d70ff65`, 92 commits, pushed.**
 > **Live: https://github.com/donlucasx/xscapes** (public, MIT). Milestone 1 is
 > COMPLETE: protocol, Claude Code adapter, installer, launcher, distinct
 > done/needs_input cues with two sounds, README + LICENSE. **The hooks are
 > installed and firing against real sessions** — proven end to end in tmux, so
 > "no hook has ever fired into it" is retired.
-> **⚠ THE LAYOUT IS MID-CHANGE and this brief's "alongside the agent via tmux"
-> is now the OLD design.** He has ruled the agent must run INSIDE the scape.
-> Mocked (`-overlay`), not built: 83.5% of a real Claude pane is blank, and a
-> taller window must spend its extra rows on BEACH (`Shore.SkyRows/SandRows`).
-> Building it means hosting Claude in a PTY and compositing — a terminal
-> emulator, days of work. **DO NOT START IT WITHOUT HIS GO-AHEAD.**
+> **⭐ THE AGENT NOW RUNS INSIDE THE SCAPE — BUILT, session 8.** Anywhere this
+> brief still says "alongside the agent via tmux", that is the OLD design.
+> `xscapes claude` puts Claude Code in a band pinned to the top rows with the
+> scape painting below it, one window, no tmux; `xscapes claude -beside` is the
+> old layout. It is a pty band held by DECSTBM, **not** a terminal emulator, on
+> purpose: the agent's bytes reach the terminal untouched, so no gap in our
+> parsing can corrupt its display. See `RESUME.md` and
+> `notes/claude-terminal-emissions.md`.
 > **The beach now falls away to black** (`DefaultSandFade` = 1.0): newest-line
 > contrast 132→204 midday, 148→204 night, equal at every hour.
 > **The companion pick is PARKED at his request** — four whisker variants built
@@ -21,7 +23,10 @@
 > `go build`, `go vet`, `go test` and `-race` clean.
 > **`notes/claude-hooks-verified.md` is the hook payload schema, read out of the
 > Claude Code binary itself — trust it, do not re-derive it.**
-> ▶ NEXT is the embedded-terminal decision. See `RESUME.md`.
+> **`research/prior-art.md` answers "has anyone built this already"** — surveyed
+> 2026-09-01. Four categories, nobody in the overlap. Trust it, do not re-run it.
+> ▶ NEXT is a day of real use on `xscapes inside` plus the demo video (entries
+> close 2026-09-17). See `RESUME.md`.
 
 **Name: `xscapes`** (decided 2026-09-01 with the repo; asciiscapes and iixscapes are out). The working directory and these docs still say asciiscapes. A cozy ASCII "thinking screen" for terminal AI agents. While Claude Code (or any agent) works, a small living scene runs WITH it — a shoreline whose sea rises with the work, and a companion animal — and nudges the user, visually and with a sound, when the agent finishes or needs input.
 

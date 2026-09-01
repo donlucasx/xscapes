@@ -12,7 +12,7 @@ is parked. Tell me where we left off, then pick up from ▶ NEXT — starting wi
 the decision at the top of it, which is mine to make, not yours.
 ```
 
-## Where we left off (2026-09-01, session 8, last code change `c5a19cb`, `main`, pushed)
+## Where we left off (2026-09-01, session 9, last code change `d70ff65`, 92 commits, `main`, pushed)
 
 **Live: https://github.com/donlucasx/xscapes** (public, MIT). Milestone 1 is
 COMPLETE, the hooks are installed and firing, and **the agent now runs INSIDE
@@ -32,6 +32,51 @@ except for one three-byte sequence. Nothing xscapes fails to understand about
 Claude Code's output can corrupt it — the failure a real emulator invites.
 
 The companion study is still PARKED at his request — see below.
+
+### Shipped 2026-09-01, session 9 (research only, no code)
+
+- **`research/prior-art.md` — has anyone already built this?** A survey, not a
+  code read. Trust it; do not re-run it unless something looks stale. Answer:
+  the space is crowded but in four separate categories, and xscapes sits
+  cleanly in none of them.
+  - **Idle screensavers** (cmatrix, pipes.sh, asciiquarium, termsaver,
+    ascsaver, cacademo). Own the whole screen, agent-blind. `ascsaver` is the
+    only one with any trigger at all, and it is a raw no-I/O check.
+    asciiquarium is the ONE real *place* in the whole survey, and it is twenty
+    years old.
+  - **Per-command spinners** (terminal-animations/tan, the ora lineage). One
+    line, two states.
+  - **Fake-activity generators** (genact, hollywood). Useful only as evidence
+    that people will watch a terminal do nothing if it looks good.
+  - **⭐ Agent-aware indicators — the real neighbourhood, and it is NEW.**
+    Barely existed two years ago. `pi-animations` (MIT, ~26 stars, 26
+    animations for the pi agent, hooked to thinking/working/tool, inline
+    single-line plus 3-to-5-row widgets above the editor) is closest in
+    spirit, and its own docs call them pure loading indicators, not scenes.
+    `claude-code-mascot-statusline` (MIT, 23 stars) is closest on reacting to
+    real state: a 16-cell half-block sprite across 9 hook-driven states, but
+    event-driven rather than animated. Plus `tweakcc` (patches Claude Code's
+    bundle) and a whole `terminal-pet` GitHub topic (`buddy` 102 stars,
+    `buddymon` 44, `tokengotchi`, `desk-waifu`, `codex-pets`).
+  - **Demand signal, all open, no maintainer reply**: claude-code #66284
+    (customizable ASCII working animation, `area:tui`), #29200 (thinking
+    words), #35249 (statusline mascot), opencode #24937 (TUI pet). Note the
+    shape of #66284: if Anthropic ships its `command` variant, a
+    statusline-style hook for the working animation, that is a DISTRIBUTION
+    CHANNEL for a scape strip, not a threat to `xscapes inside`.
+- **The four gaps, and they are the pitch.** (1) Nobody runs the agent inside
+  the scene — every agent-aware project is a strip beside or above it, and the
+  screensavers only run when the agent is absent. The pty band has no analog.
+  (2) Nobody encodes the amount of work; everyone keys off a 3-to-9-value
+  state enum, so "the water is the work" has no competitor. (3) Everything is
+  a pet, not a place. (4) Everything is host-locked TypeScript; one Go binary
+  with an adapter protocol is unusual here.
+- **⚠ The risk it surfaced**: the terminal-pet topic is crowded and growing,
+  and a skimming reader files xscapes there on sight. The first screenshot has
+  to say "instrument in a place", not "companion".
+- **One lead not chased**: an "ascii-agents" Rust TUI with weather and ambient
+  effects surfaced only through an aggregator page, no GitHub URL in any
+  result. If it is real it is the nearest competitor found.
 
 ### Shipped 2026-09-01, session 8
 
@@ -236,6 +281,13 @@ Demo flags: `-wired -mockup -anim -compare -layout -context -day -busy -kittens 
    `tmux select-pane -t <agent>`. The launcher knows the pane id and could
    pass it.
 
+6. **Re-open the README's first 10 lines against `research/prior-art.md`.** Cheap,
+   and it moves the two heaviest rubric weights (25% originality + 20% fit). The
+   survey says a skimming reader files xscapes in the `terminal-pet` topic on
+   sight, and that topic is crowded (`buddy` alone has 102 stars). The README
+   already leads with the protocol, which is right; what it does not yet do is
+   say what nobody else does. The four gaps are the copy.
+
 ## How to look at things (additions)
 
 ```
@@ -246,6 +298,11 @@ ASCIISCAPES_SILENT=1 ./xscapes … # mute
 ```
 
 ## Open threads for Lucas
+
+- **Is "ascii-agents" real?** A Rust TUI for Claude Code with weather and ambient
+  effects, multi-floor layout for concurrent agents, surfaced 2026-09-01 through an
+  aggregator page only, with no GitHub URL in any search result. If it exists it is
+  the nearest competitor found in the whole survey. Five minutes to settle.
 
 - ~~**Build the embedded terminal?**~~ **DECIDED 2026-09-01: the pass-through
   band, and it is built.** Not the full emulator. What that costs: the sea does
