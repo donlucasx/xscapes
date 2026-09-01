@@ -1,22 +1,20 @@
 # asciiscapes — project brief for Claude Code
 
-> **Where we left off — 2026-08-31 session 7, last code change `bf4a329`, 54 commits.**
-> **done and needs_input are now DISTINCT cues** — the oldest gap against a
-> locked requirement is closed. `done` is its own companion state (content `^ ^`
-> eyes, full tail held high and still) with a soft dotted balloon in the cool
-> bubble colour; the ask keeps the solid box, now in a warm attention colour.
-> Balloons are opaque (the sea used to write glyphs into the words) and the
-> mirrored pointer now aims at the cat, not a kitten. Also: the companion-study
-> PNG had ALWAYS been a cut-off capture — the five-coats, 256 and every-state
-> rows were never in the file Lucas reviewed; recaptured full height.
-> **The companion pick is still open**: he wants another whisker revision round
-> (no specifics yet — steer expected after he sees the full study), toes still
-> tbd, coat undecided. Nothing is defaulted.
+> **Where we left off — 2026-09-01 session 7, last code change `427a047`, 60 commits.**
+> **Milestone 1 is one README away from submittable.** Shipped since the last
+> banner: distinct `done` vs `needs_input` cues (content `^ ^` pose + cool
+> dotted knock vs the warm solid ask box); **two notification sounds** keyed off
+> the bubble and edge-detected, so a 60-second nag rings once; and
+> **`asciiscapes claude`**, the launcher that bootstraps tmux and puts the agent
+> and the scape side by side, verified end to end in a real tmux.
+> **The companion pick is PARKED at his request** (2026-09-01: "keep the
+> characters as is for now"). Four whisker variants are built and waiting —
+> do NOT re-ask, and do not default anything.
 > `go build`, `go vet`, `go test` and `-race` clean; no remote.
 > **`notes/claude-hooks-verified.md` is the hook payload schema, read out of the
 > Claude Code binary itself — trust it, do not re-derive it.**
-> ▶ NEXT is his whisker/coat/toes steer, then installing it and running a real
-> day. See `RESUME.md`.
+> ▶ NEXT is the README (it blocks submission), then installing for real and
+> running a day on it. See `RESUME.md`.
 
 Working name: **asciiscapes** (not final; see open questions). A cozy ASCII "thinking screen" for terminal AI agents. While Claude Code (or any agent) works, a small living scene runs beside it — a shoreline whose sea rises with the work, and a companion animal — and nudges the user, visually and with a sound, when the agent finishes or needs input.
 
@@ -196,15 +194,18 @@ pane, where 80% used to leave a single row.
 5. ~~Does the Commons "Code" tab have a sandbox/terminal?~~ **Chat-only as far as tested.** GitHub account is linked; repo import untested.
 6. Per-model credit rates on Commons, and how 150/day reconciles with 600/month.
 
-## Milestone 1 (target: ~Sep 1, submittable)
-1. Go module, bubbletea app, 80×24 canvas, layer/alpha renderer with truecolor→256 fallback.
-2. Shore scape, three layers, working/resting states.
-3. Event protocol (socket + file), `asciiscapes emit <event>` CLI for testing.
-4. Claude Code hook adapter (generate hook JSON into `~/.claude/settings.json` via `asciiscapes install claude`).
-5. `asciiscapes claude` launcher that bootstraps tmux (main pane + popup/split).
-6. needs_input/done cues with one sound, keypress focuses agent pane.
-7. Cat companion, three states.
-8. README with one-line install; submit.
+## Milestone 1 (target: ~Sep 1, submittable) — status 2026-09-01
+1. ✅ Go module, 80×24 canvas, layer/alpha renderer with truecolor→256 fallback. (No bubbletea; stdlib only.)
+2. ✅ Shore scape, three layers, working/resting states.
+3. ✅ Event protocol (socket + file), `asciiscapes emit <event>` CLI for testing.
+4. ✅ Claude Code hook adapter + `asciiscapes install claude`.
+5. ✅ `asciiscapes claude` launcher — bootstraps tmux, joins an existing session,
+   osascript fallback, `-print` dry run. Verified in a real tmux.
+6. ◑ needs_input/done cues ✅ (distinct: warm solid ask box vs cool dotted knock, and
+   two sounds via `internal/notify`, edge-detected so a 60s nag rings once).
+   **Keypress-focuses-agent-pane is NOT built** — the live loop reads no keys.
+7. ✅ Cat companion — five states (resting, working, needs-you, done, worried).
+8. ❌ **README with one-line install — NOT WRITTEN. Blocks submission.**
 
 ## Milestone 2
 Campsite + rainy window, weather mapping, plant-a-tree, per-repo seed, generic process adapter, Kimi/Hermes tests, bird companion, demo video.

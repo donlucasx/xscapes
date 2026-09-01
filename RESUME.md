@@ -10,7 +10,35 @@ the why; ignore ideas.md — it is parked. Tell me where we left off, then pick 
 from ▶ NEXT.
 ```
 
-## Where we left off (2026-08-31 session 7, last code change `bf4a329`, 54 commits, branch `main`)
+## Where we left off (2026-09-01, last code change `427a047`, 60 commits, branch `main`)
+
+**Milestone 1 is one README away from submittable.** The companion study is
+PARKED at his request — see "Parked" below.
+
+### Shipped 2026-09-01
+
+- **Two notification sounds** (`internal/notify`). 30% of the rubric is the
+  waiting experience and the note says the nudge must beat a terminal bell; a
+  scape in a side pane is not the pane being looked at, so sound is the only
+  channel that reaches the user. Bright chime = the agent is BLOCKED on you;
+  deep sonar note = it finished. Keyed off the BUBBLE, not the pose (a broken
+  build outranks a question in the pose, so a pose-driven sound would go silent
+  on the one event that needs answering), and edge-detected so Claude's
+  60-second nag rings once. Silent when following nothing, `ASCIISCAPES_SILENT`
+  to mute, `asciiscapes notify` to audition.
+- **`asciiscapes claude`** — the launcher. Bootstraps tmux, or joins the window
+  it is already in, or falls back to a second Terminal via osascript. Agent
+  keeps its own pane and TTY (exec, not wrap). `-print` is a dry run.
+- **`-live -await`** — the scape used to bind once at startup, so launching both
+  halves together left it in demo mode forever. It now keeps looking, and
+  deliberately ignores the session pointer present at startup (binding to a
+  stale pointer SUCCEEDS and shows a dead session beside a live agent).
+- **The test suite was writing the user's live session pointer.** adapter_test
+  feeds real payloads through `translate()`, which records the session as
+  current — into `~/.config/asciiscapes/run/current` with no override. `TestMain`
+  now points the main package at a temp dir.
+
+## Earlier in session 7 (2026-08-31)
 
 Session 7 opened by asking for the companion pick. He was not ready: *"pull up
 the latest companion study"*, whiskers *"need to revise this one"*, toes
@@ -42,7 +70,13 @@ stays open.
   reviewing. Recaptured full height and trimmed; he has been sent the full
   version with a correction note. The study also gains a "done" state cell.
 
-### Paused, awaiting Lucas (unchanged except as noted)
+### PARKED — the companion study (2026-09-01)
+
+*"let's save the progress on the character study and defer the decision for
+later. Let's keep working and keep the characters as is for now."*
+
+**Do not re-ask, do not default anything.** Everything below is built and
+waiting for him. `NewCat()` still returns what shipped before session 6.
 
 **Nothing is defaulted** -- `NewCat()` still returns what shipped before
 session 6.
@@ -87,10 +121,8 @@ Demo flags: `-wired -mockup -anim -compare -layout -context -day -busy -kittens 
 
 ## ▶ NEXT
 
-1. **Take Lucas's whisker steer off the FULL study** (he has now been sent the
-   untruncated one) and build the revision round he asked for -- then coat and
-   toes. Make the pick the default and put it in the live scene so he sees it
-   moving rather than posed.
+1. **README with a one-line install — it BLOCKS submission** (Milestone 1 #8,
+   the only unbuilt item). Entries close 2026-09-17.
 2. **Install for real and run a day on it.** Everything is still tested against
    synthetic streams and the schema read out of the Claude Code binary; no hook
    has ever fired into it. `./asciiscapes install claude` prints a plan and
@@ -101,6 +133,19 @@ Demo flags: `-wired -mockup -anim -compare -layout -context -day -busy -kittens 
 4. **Re-tune the reducer against a recording.** `asciiscapes replay` exists for
    exactly this. Are `TauFall=12s`, `TurnFloor=0.30`, `FlightFloor=0.45` right
    against his actual rhythm? Do real fan-outs reach the kitten ladder's numbers?
+5. **Keypress focuses the agent pane** — the last half of Milestone 1 #6. The
+   live loop reads no keys at all today; it needs raw mode plus
+   `tmux select-pane -t <agent>`. The launcher knows the pane id and could
+   pass it.
+
+## How to look at things (additions)
+
+```
+./asciiscapes claude -print          # the launcher's plan, writes nothing
+./asciiscapes claude                 # agent left, scape right, one command
+./asciiscapes notify                 # hear both knocks
+ASCIISCAPES_SILENT=1 ./asciiscapes … # mute
+```
 
 ## Open threads for Lucas
 
