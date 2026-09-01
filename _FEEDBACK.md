@@ -260,3 +260,20 @@ Never paraphrase. Read the relevant section before editing anything it covers.
     PermissionRequest alongside the xscapes knocks, so both fire. The brief always said
     "replace the beep" -- but they are HIS hooks and they still work when no scape is
     running, so this is his call, never a silent removal.
+
+- *"shall we have the sand turn into a gradient as it goes down so the text is clearer / most
+  legible at the bottom? sand fades into black bkg"* then *"proceed with your recommendation"*
+  ⇒ **SHIPPED at full strength, `DefaultSandFade = 1.0`.** Measured on the newest line (lowest,
+    matters most): contrast 132→204 midday, 148→204 night, and EQUAL at every hour — a black
+    bottom row is black at noon and midnight, which the flat beach never was. Full rather than
+    0.8 because the agent is moving inside the scene and a true-black bottom merges with its
+    own background instead of leaving a seam. Middle values are the WORST place to sit: the ink
+    flips direction as the beach crosses mid-luma.
+    ⚠ It exposed a defect it did not cause: `drawSand` chose ink from the palette's NOMINAL sand
+    while writing onto the PAINTED background; once the beach could darken those diverged and a
+    half fade at midday LOST contrast (132→129). Ink now samples the real background per row.
+    ⚠ And a test that could not fail: `internal/scape/sandfade_test.go` MIRRORED drawSand's rule
+    instead of running it, so it kept passing through all of this. Deleted; replaced by
+    `sand_ink_test.go`, which renders a real frame and reads the pixels back.
+    Verified on 256: the fade quantises to a clean monotonic descent, every index >= 16, and it
+    ADDS depth — without it the bottom half of a tall beach was one flat colour repeated.

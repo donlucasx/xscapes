@@ -41,7 +41,8 @@ type Shore struct {
 
 	// SandFade sinks the lower beach toward black, 0 off and 1 fully dark at
 	// the last row. Squared, so the sand stays sand for most of its depth and
-	// only lets go near the bottom.
+	// only lets go near the bottom. NewShore sets DefaultSandFade; the field
+	// stays settable for the tuner and for tests.
 	SandFade float64
 
 	// SkyRows and SandRows override the proportional layout, in rows. Zero
@@ -132,7 +133,9 @@ func (s *Shore) SandColor() term.RGB { return s.pal.SandNear }
 // MoonPos is the moon's centre cell from the last Update.
 func (s *Shore) MoonPos() (x, y int) { return s.moonX, s.moonY }
 
-func NewShore(seed int64, asciiOnly bool) *Shore { return &Shore{Seed: seed, ASCII: asciiOnly} }
+func NewShore(seed int64, asciiOnly bool) *Shore {
+	return &Shore{Seed: seed, ASCII: asciiOnly, SandFade: DefaultSandFade}
+}
 
 func (s *Shore) Name() string { return "shore" }
 
@@ -221,6 +224,25 @@ func (s *Shore) waterline(w, sy int, tt float64, act Activity, scale float64) []
 // hole punched in the frame, but the near-black a dark terminal already sits
 // on, so the scene ends by running out rather than by being cut off.
 var voidCol = term.RGB{R: 10, G: 10, B: 12}
+
+// DefaultSandFade is locked at full (2026-09-01).
+//
+// Measured on the newest line of writing, which sits lowest and matters most,
+// the contrast against its background goes from 132 to 204 at midday and 148
+// to 204 at night. The equality is the real argument: a black bottom row is
+// black at every hour, so legibility stops depending on the clock, which a
+// flat beach could never manage -- it was always a compromise between noon
+// sand and midnight sand.
+//
+// Full rather than a softer 0.8 because of where the scene is going: with the
+// agent rendered inside the scape, a beach that ends in true black merges into
+// the agent's own black background instead of stopping at a visible seam.
+//
+// Middle values are the worst place to sit. The ink flips from dark to light
+// as the beach crosses mid-luma, so a half fade at midday actually cost
+// contrast (132 down to 129) before the ink was taught to read the real
+// background. Either off, or 0.8 and up.
+const DefaultSandFade = 1.0
 
 // sandFadeStart is how far down the beach the fade begins, as a fraction. The
 // top of the sand has to stay sand: it meets the water, and a beach that

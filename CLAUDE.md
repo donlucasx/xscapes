@@ -77,7 +77,7 @@ only if nothing else needs it.
 | weather | **deferred, not rejected** &mdash; no rain, clouds, fog or sync in v1; the thinking is parked in `ideas.md` | deferred 2026-08-30 |
 | needs you | **bubble**, rare: needs_input, error, done. Nothing else | done — distinct cues shipped 2026-08-31: ask = warm SOLID box + alert pose; done = cool DOTTED knock + content `^ ^` pose, bounded by DoneHold |
 | companion identity | **coat + face**: cream/slate/sage/mauve/charcoal, nose, toes, inner-shadow ears, whiskers | ⏸ options built, awaiting Lucas's pick; nothing defaulted |
-| what it is doing now | **text written in the sand**, newest brightest, older fading as the tide takes them | done — anchored to the waterline, degrades by dropping whole pieces when narrow |
+| what it is doing now | **text written in the sand**, newest brightest, older fading as the tide takes them | done — anchored to the waterline, degrades by dropping whole pieces when narrow. **The lower beach falls away to black (`DefaultSandFade` = 1.0, locked 2026-09-01)**: contrast on the newest line 132→204 at midday, 148→204 at night, and equal at every hour, so legibility stops depending on the clock. Ink is sampled from the PAINTED background per row, never the palette's nominal sand. |
 | todos completed | **star count** | not built |
 | subagents | **kittens** | done — `agent_id`/`agent_type`, counted live |
 
