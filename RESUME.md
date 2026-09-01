@@ -12,8 +12,8 @@ from ▶ NEXT.
 
 ## Where we left off (2026-09-01, last code change `427a047`, 60 commits, branch `main`)
 
-**Milestone 1 is one README away from submittable.** The companion study is
-PARKED at his request — see "Parked" below.
+**Milestone 1 is complete except for a git remote.** README + LICENSE landed
+2026-09-01. The companion study is PARKED at his request — see below.
 
 ### Shipped 2026-09-01
 
@@ -33,6 +33,10 @@ PARKED at his request — see "Parked" below.
   halves together left it in demo mode forever. It now keeps looking, and
   deliberately ignores the session pointer present at startup (binding to a
   stale pointer SUCCEEDS and shows a dead session beside a live agent).
+- **README + MIT LICENSE.** Leads with the protocol, then the encoding table.
+  Every command was run before being written down; three first-draft claims
+  were wrong and were fixed (event names are `sub_start`/`sub_end`; the process
+  adapter is NOT built; `go install` cannot work with no remote).
 - **The test suite was writing the user's live session pointer.** adapter_test
   feeds real payloads through `translate()`, which records the session as
   current — into `~/.config/asciiscapes/run/current` with no override. `TestMain`
@@ -121,8 +125,10 @@ Demo flags: `-wired -mockup -anim -compare -layout -context -day -busy -kittens 
 
 ## ▶ NEXT
 
-1. **README with a one-line install — it BLOCKS submission** (Milestone 1 #8,
-   the only unbuilt item). Entries close 2026-09-17.
+1. **Push to a git remote.** 62 commits exist only on this disk, nothing is
+   published, and the README's install instructions assume a clone URL that
+   does not resolve. This is now the single thing between here and a
+   submittable entry. Entries close 2026-09-17.
 2. **Install for real and run a day on it.** Everything is still tested against
    synthetic streams and the schema read out of the Claude Code binary; no hook
    has ever fired into it. `./asciiscapes install claude` prints a plan and

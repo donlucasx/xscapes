@@ -1,7 +1,7 @@
 # asciiscapes — project brief for Claude Code
 
 > **Where we left off — 2026-09-01 session 7, last code change `427a047`, 60 commits.**
-> **Milestone 1 is one README away from submittable.** Shipped since the last
+> **Milestone 1 is COMPLETE except for a git remote.** Shipped since the last
 > banner: distinct `done` vs `needs_input` cues (content `^ ^` pose + cool
 > dotted knock vs the warm solid ask box); **two notification sounds** keyed off
 > the bubble and edge-detected, so a 60-second nag rings once; and
@@ -13,8 +13,8 @@
 > `go build`, `go vet`, `go test` and `-race` clean; no remote.
 > **`notes/claude-hooks-verified.md` is the hook payload schema, read out of the
 > Claude Code binary itself — trust it, do not re-derive it.**
-> ▶ NEXT is the README (it blocks submission), then installing for real and
-> running a day on it. See `RESUME.md`.
+> ▶ NEXT: **push to a remote** (nothing is published, and the README's install
+> line depends on it), then install for real and run a day on it. See `RESUME.md`.
 
 Working name: **asciiscapes** (not final; see open questions). A cozy ASCII "thinking screen" for terminal AI agents. While Claude Code (or any agent) works, a small living scene runs beside it — a shoreline whose sea rises with the work, and a companion animal — and nudges the user, visually and with a sound, when the agent finishes or needs input.
 
@@ -205,7 +205,8 @@ pane, where 80% used to leave a single row.
    two sounds via `internal/notify`, edge-detected so a 60s nag rings once).
    **Keypress-focuses-agent-pane is NOT built** — the live loop reads no keys.
 7. ✅ Cat companion — five states (resting, working, needs-you, done, worried).
-8. ❌ **README with one-line install — NOT WRITTEN. Blocks submission.**
+8. ✅ README + MIT LICENSE written 2026-09-01; every command in it verified by running it.
+   ⚠ Install is build-from-source: **there is still no git remote**, so `go install` cannot work.
 
 ## Milestone 2
 Campsite + rainy window, weather mapping, plant-a-tree, per-repo seed, generic process adapter, Kimi/Hermes tests, bird companion, demo video.
