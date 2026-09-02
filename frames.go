@@ -76,7 +76,16 @@ func (f *frames) following() bool { return f.red != nil }
 // the bus.
 func (f *frames) state(now time.Time, t float64) reduce.State {
 	if f.red == nil {
-		return demoState(t, f.ctxUsed, f.tod)
+		// The sky is the world: time of day is the wall clock whether or not
+		// there is a session to follow. Without this the demo ran at tod 0 --
+		// midnight, which is deliberately monochrome -- so every launch showed
+		// a black-and-white scene for the second or two before the agent
+		// announced itself, and then jumped to colour.
+		tod := f.tod
+		if tod == 0 {
+			tod = timeOfDay(now)
+		}
+		return demoState(t, f.ctxUsed, tod)
 	}
 	for draining := true; draining; {
 		select {

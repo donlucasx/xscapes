@@ -201,3 +201,36 @@ func TestTheShorelineIsRaggedWhenTheAgentIsWorking(t *testing.T) {
 		t.Errorf("shoreline spans only %.2f rows: it is a ruled line, not a shore", hi-lo)
 	}
 }
+
+// The whole beach is one tone, so the only thing that reads against it is the
+// water's edge. It also guards a seam that appeared when a graded beach sat
+// above a flat band: the graded part ended its last row in black and drew a
+// hard black line across the shore -- "the beach has a black line and is not
+// working".
+func TestAllTheSandIsOneToneWithNoBlackSeam(t *testing.T) {
+	sh := NewShore(7, false)
+	c := canvas.New(120, 26, canvas.AlphaFar, canvas.AlphaMid, canvas.AlphaNear)
+	for i := 0; i < 20; i++ {
+		sh.Update(c, float64(i)*0.1, Activity{Working: true, Level: 0.7, TimeOfDay: 0.3868})
+	}
+	hi := 0.0
+	for _, e := range sh.lastEdge {
+		if e > hi {
+			hi = e
+		}
+	}
+	tones := map[term.RGB]bool{}
+	for y := int(hi) + 2; y < c.H; y++ {
+		for x := 0; x < c.W; x++ {
+			bg := c.BGAt(x, y)
+			tones[bg] = true
+			if bandLuma(bg) < 30 {
+				t.Fatalf("row %d col %d is near-black rgb(%d,%d,%d): a seam across the shore",
+					y, x, bg.R, bg.G, bg.B)
+			}
+		}
+	}
+	if len(tones) != 1 {
+		t.Errorf("the sand below the water uses %d tones, want exactly 1", len(tones))
+	}
+}

@@ -380,31 +380,19 @@ func (s *Shore) paintBG(c *canvas.Canvas, hy int, edge []float64) {
 				// is the page, not the picture.
 				col = writeBandColor(s.pal)
 			default:
-				bottom := float64(c.H - 1)
-				if s.writeTop > 0 && s.writeTop < c.H {
-					bottom = float64(s.writeTop - 1)
-				}
-				f := (fy - mean) / math.Max(1, bottom-mean)
-				if f < 0 {
-					f = 0
-				}
-				col = term.Lerp(s.pal.WetSand, s.pal.SandNear, math.Min(1, f*1.3))
-				// The beach can fall away into the terminal's own black.
+				// ALL the sand is one tone, and it is the water's edge that reads
+				// against it: "ok for all the sand to be the same color (which
+				// should vary from day to night), but we should be able to see the
+				// water receding".
 				//
-				// It buys the one thing the sand is for: the writing. Ink on
-				// mid-tone sand is the worst contrast on screen, and the
-				// NEWEST line sits lowest, so the line that matters most is
-				// the one the beach was fighting hardest. It also means the
-				// scene ends by dissolving rather than by stopping at an
-				// edge, which is what lets an agent's own black-backed UI sit
-				// on top of it without a seam.
-				if s.SandFade > 0 {
-					d := (f - sandFadeStart) / (1 - sandFadeStart)
-					if d > 0 {
-						d = math.Min(1, d)
-						col = term.Lerp(col, voidCol, s.SandFade*d*d)
-					}
-				}
+				// This supersedes the graded beach and, with it, SandFade. The fade
+				// was locked at full to buy contrast for the newest line and to let
+				// the scene dissolve rather than stop at an edge. The flat sand buys
+				// the contrast instead -- measured, and the writing sits directly on
+				// it -- and the fade's other job had turned into a defect: a graded
+				// beach above a flat band ended its last row in black and drew a hard
+				// black line across the shore.
+				col = writeBandColor(s.pal)
 			}
 			c.SetBG(x, y, col)
 		}
