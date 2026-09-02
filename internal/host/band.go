@@ -27,17 +27,18 @@ const (
 
 // Band divides h rows between the agent and the scape. They always sum to h.
 //
-// Two fifths of the window: 12 rows of scape at 30, 20 at 52, the 28-row cap
-// from 70 up. It was a third, which he found cramped in use -- "the art gets
-// cramped" -- and a third of a short window is not enough rows for a sky, a
-// sea and a beach to read as three things. Never the majority, though: the
+// Nine twentieths of the window: 13 rows of scape at 30, 23 at 52, the 28-row
+// cap from 63 up. It was a third, then two fifths, and it keeps moving the same
+// way -- "lets make it a tad taller so all the xscape layers can shine". A short
+// scape spends its rows on the beach floor and leaves the sea a strip; the sky,
+// the sea and the beach only read as three things once there are rows for them. Never the majority, though: the
 // agent is what is being used. A window too short to hold both gets no scape
 // rather than a broken one.
 func Band(h int) (agent, scape int) {
 	if h < MinAgentRows+MinScapeRows {
 		return h, 0
 	}
-	s := h * 2 / 5
+	s := h * 9 / 20
 	if s < MinScapeRows {
 		s = MinScapeRows
 	}

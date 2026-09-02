@@ -78,9 +78,9 @@ func TestShortWindowDropsTheScapeRatherThanTheAgent(t *testing.T) {
 
 func TestTypicalWindows(t *testing.T) {
 	for _, c := range []struct{ h, agent, scape int }{
-		{24, 15, 9},
-		{30, 18, 12},
-		{52, 32, 20},
+		{24, 14, 10},
+		{30, 17, 13},
+		{52, 29, 23},
 		{79, 51, 28},
 	} {
 		a, s := Band(c.h)

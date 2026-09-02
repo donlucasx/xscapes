@@ -271,7 +271,7 @@ func (s *Shore) Update(c *canvas.Canvas, t float64, act Activity) {
 
 	s.paintBG(c, hy, edge)
 	s.stars(c, hy, t)
-	s.moon(c, hy, scale, 1-clamp01(act.ContextUsed), s.pal.MoonVis)
+	s.moon(c, hy, scale, 1-clamp01(act.ContextUsed), moonVis(s.pal))
 	s.sea(c, hy, edge, tt, act)
 	s.sand(c, edge)
 	s.foam(c, edge, scale)
@@ -652,7 +652,7 @@ func (s *Shore) glitter(c *canvas.Canvas, hy int, edge []float64, tt float64) {
 	// how much of the moon is lit, which is also the context reading, so a
 	// nearly-full context dims the water as well as the moon.
 	lit := 1 - clamp01(s.ctxUsed)
-	strength := (0.35 + 0.65*lit) * s.pal.MoonVis
+	strength := (0.35 + 0.65*lit) * moonVis(s.pal)
 	if strength <= 0.02 {
 		return
 	}
@@ -722,4 +722,24 @@ func (s *Shore) foam(c *canvas.Canvas, edge []float64, scale float64) {
 			near.Plot(x, yy, g, s.pal.Foam, 0.5+0.45*(1-h/cut))
 		}
 	}
+}
+
+// moonVisFloor keeps the moon legible at every hour.
+//
+// The moon carries context remaining, which is a fact about the agent, and its
+// visibility was bound to the wall clock, which is a fact about the world. That
+// breaks the rule the whole scene is built on -- the water is the work, the sky
+// is the world, and nothing crosses. In practice it meant the context readout
+// was invisible for the entire working day: measured against its own sky, the
+// moon sat +198 luma at midnight, +14 at half past eleven and +10 at noon.
+//
+// The hour still sets the moon's colour and the reach of its shine on the water.
+// It no longer decides whether you can see it at all.
+const moonVisFloor = 0.55
+
+func moonVis(p Palette) float64 {
+	if p.MoonVis < moonVisFloor {
+		return moonVisFloor
+	}
+	return p.MoonVis
 }
