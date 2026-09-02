@@ -95,7 +95,7 @@ Everything on screen means one thing, and no two things share a channel.
 | it needs you | **a solid balloon** in a warm colour, plus a bright chime |
 | it finished | **a dotted balloon** in a cool colour, plus a low sonar note |
 | subagents | **kittens**, one per agent, some of them swimming |
-| context left | **the moon**: phase and height, with a readout that stays quiet until 65% |
+| context left | **the sun by day, the moon by night** -- one body, phase and height, with a readout that stays quiet until 65% |
 | time of day | **the sky**, from your actual clock |
 
 The rule underneath is that **the water is the work and the sky is the world**.

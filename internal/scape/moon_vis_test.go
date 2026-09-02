@@ -40,3 +40,28 @@ func TestTheMoonIsLegibleAtEveryHour(t *testing.T) {
 		}
 	}
 }
+
+// One body in the sky, not two.
+//
+// His call: "what if we use the moon as a sun. Same object, same variable. only
+// thing we gotta change is the color (like the rest of the scape does)". So the
+// disc keeps carrying context by phase and altitude at every hour, and only its
+// colour moves with the clock -- warm through the day, cool at night -- exactly
+// as the sky, the sea and the sand already do. A second body would have meant a
+// second encoding for the same variable.
+func TestTheSkyBodyIsWarmByDayAndCoolAtNight(t *testing.T) {
+	warm := func(tod float64) float64 {
+		m := PaletteAt(tod).Moon
+		return float64(m.R) - float64(m.B) // positive is warm, negative is cool
+	}
+	for _, tod := range []float64{0.30, 0.42, 0.50, 0.58, 0.70} {
+		if w := warm(tod); w < 60 {
+			t.Errorf("tod %.2f: the sun is only %.0f warmer than it is cool -- it will not read as a sun", tod, w)
+		}
+	}
+	for _, tod := range []float64{0.0, 0.95} {
+		if w := warm(tod); w > 0 {
+			t.Errorf("tod %.2f: the moon is %.0f warm -- at night it should be cool, not golden", tod, w)
+		}
+	}
+}
