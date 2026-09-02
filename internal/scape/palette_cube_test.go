@@ -138,3 +138,58 @@ func TestTheSeaShowsItsDepthOn256(t *testing.T) {
 		}
 	}
 }
+
+// A blue with no green lead is a violet, and the terminal will hand you one.
+//
+// Chasing band count alone produced exactly that: #005faf to #d7d7ff renders
+// ten distinct blues instead of eight and puts rgb(175,175,255) across the
+// middle of the sky, where red has caught green up. On screen it is a lavender
+// stripe in a blue sky, and no count of distinct colours can see it -- the band
+// is as distinct as any other.
+//
+// It reads the RENDERED frame. The first version recomputed the ramp from the
+// two palette colours, which made it blind to how the sky is actually painted:
+// a change to the ramp's shape in paintBG moved nothing in it at all.
+func TestTheSkyNeverGoesViolet(t *testing.T) {
+	for i := 0; i < 48; i++ {
+		tod := float64(i) / 48
+		if !daylight(tod) {
+			continue
+		}
+		c := canvas.New(80, 26, canvas.AlphaFar, canvas.AlphaMid, canvas.AlphaNear)
+		sh := NewShore(7, false)
+		sh.MoonX = 0.28
+		sh.Update(c, 3.0, Activity{Working: true, Level: 0.5, TimeOfDay: tod, ContextUsed: 0.3})
+
+		// The sky is everything above the biggest downward step in luma.
+		hy, drop := 0, 0.0
+		for y := 1; y < c.H*3/4; y++ {
+			if d := lumaOf(c.BGAt(2, y-1)) - lumaOf(c.BGAt(2, y)); d > drop {
+				drop, hy = d, y
+			}
+		}
+		for y := 0; y < hy; y++ {
+			want := c.BGAt(2, y)
+			// What the renderer actually paints, not what a quantiser called
+			// here would. Naming a function in a test is how a test ends up
+			// checking the path nothing uses.
+			_, _, got := c.ResolveAt(2, y, term.Profile256)
+			lo := got.R
+			if got.G < lo {
+				lo = got.G
+			}
+			// Only judge colours the terminal paints as STRONGLY blue. A warm
+			// dawn horizon has blue at its minimum and is not this test's
+			// business, and a pale blue-grey that loses a little green is a
+			// tint rather than a hue error. 60 is where the cast stops being a
+			// shade of the sky and starts being lavender.
+			if int(got.B)-int(lo) < 60 {
+				continue
+			}
+			if int(got.G)-int(got.R) < 20 {
+				t.Errorf("%05.2f, sky row %d of %d: asked for (%d,%d,%d), terminal shows (%d,%d,%d) -- blue with no green lead is violet",
+					tod*24, y, hy, want.R, want.G, want.B, got.R, got.G, got.B)
+			}
+		}
+	}
+}

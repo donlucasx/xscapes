@@ -101,11 +101,13 @@ func (c *Canvas) Far() *Layer  { return c.Layers[0] }
 func (c *Canvas) Mid() *Layer  { return c.Layers[1] }
 func (c *Canvas) Near() *Layer { return c.Layers[2] }
 
-// composite resolves one cell to a final glyph plus foreground colour.
-func (c *Canvas) composite(i int) (rune, term.RGB) {
+// composite resolves one cell to a final glyph plus foreground colour, and
+// says whether any layer actually put something there.
+func (c *Canvas) composite(i int) (rune, term.RGB, bool) {
 	bg := c.BG[i]
 	fg := bg
 	ch := ' '
+	set := false
 	for _, l := range c.Layers {
 		cell := l.Cells[i]
 		if !cell.Set {
@@ -113,8 +115,104 @@ func (c *Canvas) composite(i int) (rune, term.RGB) {
 		}
 		fg = fg.Blend(cell.FG, l.Alpha*cell.A)
 		ch = cell.R
+		set = true
 	}
-	return ch, fg
+	return ch, fg, set
+}
+
+// resolved is one cell ready to draw. glyph says the foreground came from a
+// layer rather than from shading, which decides whether it gets the chroma
+// boost -- a shade block is half a background and must not be lifted away from
+// the other half.
+type resolved struct {
+	ch     rune
+	fg, bg term.RGB
+	glyph  bool
+}
+
+// halfStep is how far apart two rows may be, in luma, and still be treated as
+// part of one ramp rather than as an edge.
+//
+// It matters at the horizon: there the row above is bright sky and the row
+// below is dark water, and splitting that cell in half would paint a band of
+// sky-into-sea mix along the waterline. That is a halo, not smoothing. Inside a
+// ramp consecutive rows are a few luma apart, so one number separates the two
+// cases.
+const halfStep = 26
+
+func lumaOf(c term.RGB) float64 {
+	return 0.30*float64(c.R) + 0.59*float64(c.G) + 0.11*float64(c.B)
+}
+
+// halves returns the colours a quarter of a row above and below this cell's
+// centre, or ok=false if this row is an edge rather than part of a ramp.
+func (c *Canvas) halves(x, y int) (up, down term.RGB, ok bool) {
+	i := y*c.W + x
+	up, down = c.BG[i], c.BG[i]
+	if y > 0 {
+		a := c.BG[i-c.W]
+		if d := lumaOf(a) - lumaOf(c.BG[i]); d > halfStep || d < -halfStep {
+			return up, down, false
+		}
+		up = term.Lerp(a, c.BG[i], 0.75)
+	}
+	if y < c.H-1 {
+		b := c.BG[i+c.W]
+		if d := lumaOf(b) - lumaOf(c.BG[i]); d > halfStep || d < -halfStep {
+			return up, down, false
+		}
+		down = term.Lerp(c.BG[i], b, 0.25)
+	}
+	return up, down, true
+}
+
+// resolve is the single place a cell becomes colours. Both renderers go
+// through it so a preview and a terminal cannot disagree about a frame.
+//
+// Two things happen here and only on 256, and only where no layer drew
+// anything -- a glyph owns its cell and a background showing through one cannot
+// also be two colours.
+//
+//  1. A cell is split in half. U+2580 paints the top half in the foreground and
+//     leaves the bottom to the background, so one row can carry TWO steps of a
+//     vertical ramp. This costs nothing in tone accuracy and adds no texture:
+//     it is the same colours, placed twice as finely.
+//  2. Where the two halves land on the same colour anyway, the cell falls back
+//     to blending BETWEEN two cube colours with a shade block.
+//
+// The order is deliberate. Splitting is free and invisible; shading is a real
+// pattern on the screen, so it is the second choice rather than the first.
+func (c *Canvas) resolve(x, y int, p term.Profile) resolved {
+	i := y*c.W + x
+	ch, fg, set := c.composite(i)
+	bg := c.BG[i]
+	if p == term.Profile256 && !set && term.Shading {
+		if up, down, ok := c.halves(x, y); ok {
+			ui, di := up.Index256Keeping(), down.Index256Keeping()
+			if ui != di {
+				// A band edge falls inside this cell: put it there.
+				return resolved{ch: '\u2580',
+					fg: term.FromIndex256(ui), bg: term.FromIndex256(di)}
+			}
+		}
+		if sbg, sfg, r, ok := term.ShadeCell(bg); ok {
+			return resolved{ch: r, fg: sfg, bg: sbg}
+		}
+	}
+	return resolved{ch: ch, fg: fg, bg: bg, glyph: true}
+}
+
+// ResolveAt reports what will actually be drawn in one cell for a profile:
+// the glyph, its colour, and the background. Studies and tests need it because
+// on 256 a cell can carry two colours, and anything that reads c.BG alone is
+// blind to half of what the terminal shows.
+func (c *Canvas) ResolveAt(x, y int, p term.Profile) (rune, term.RGB, term.RGB) {
+	r := c.resolve(x, y, p)
+	fg := r.fg
+	if r.glyph {
+		fg = p.Quantise(fg, true)
+	}
+	return r.ch, fg, p.Quantise(r.bg, false)
 }
 
 // Render emits the frame. Colours are only re-stated when they change, which
@@ -123,21 +221,24 @@ func (c *Canvas) Render(p term.Profile) string {
 	c.buf = c.buf[:0]
 	var lastFG, lastBG term.RGB
 	haveLast := false
+	lastGlyph := false
 	for y := 0; y < c.H; y++ {
 		for x := 0; x < c.W; x++ {
-			i := y*c.W + x
-			ch, fg := c.composite(i)
-			bg := c.BG[i]
-			if !haveLast || bg != lastBG {
-				c.buf = p.AppendBG(c.buf, bg)
-				lastBG = bg
+			r := c.resolve(x, y, p)
+			if !haveLast || r.bg != lastBG {
+				c.buf = p.AppendBG(c.buf, r.bg)
+				lastBG = r.bg
 			}
-			if !haveLast || fg != lastFG {
-				c.buf = p.AppendFG(c.buf, fg)
-				lastFG = fg
+			if !haveLast || r.fg != lastFG || r.glyph != lastGlyph {
+				if r.glyph {
+					c.buf = p.AppendFG(c.buf, r.fg)
+				} else {
+					c.buf = p.AppendFGRaw(c.buf, r.fg)
+				}
+				lastFG, lastGlyph = r.fg, r.glyph
 			}
 			haveLast = true
-			c.buf = append(c.buf, string(ch)...)
+			c.buf = append(c.buf, string(r.ch)...)
 		}
 		c.buf = append(c.buf, term.Reset...)
 		haveLast = false
@@ -154,7 +255,9 @@ func (c *Canvas) RenderPlain() string {
 	var b strings.Builder
 	for y := 0; y < c.H; y++ {
 		for x := 0; x < c.W; x++ {
-			ch, _ := c.composite(y*c.W + x)
+			// Deliberately the un-shaded glyph: -plain is for reading the
+			// scene's structure, and shade blocks are tone, not structure.
+			ch, _, _ := c.composite(y*c.W + x)
 			b.WriteRune(ch)
 		}
 		if y < c.H-1 {
@@ -180,28 +283,14 @@ func (c *Canvas) RenderHTML(title string) string {
 // HTMLFragmentAs renders as a given profile would actually show it, so a
 // preview of a 256-colour terminal is honest rather than flattering.
 func (c *Canvas) HTMLFragmentAs(fontPx int, p term.Profile) string {
-	saveBG := append([]term.RGB(nil), c.BG...)
-	saveLayers := make([][]Cell, len(c.Layers))
-	for i, l := range c.Layers {
-		saveLayers[i] = append([]Cell(nil), l.Cells...)
-		for j := range l.Cells {
-			if l.Cells[j].Set {
-				l.Cells[j].FG = p.Quantise(l.Cells[j].FG, true)
-			}
-		}
-	}
-	for i := range c.BG {
-		c.BG[i] = p.Quantise(c.BG[i], false)
-	}
-	out := c.HTMLFragment(fontPx)
-	c.BG = saveBG
-	for i, l := range c.Layers {
-		l.Cells = saveLayers[i]
-	}
-	return out
+	return c.htmlFragment(fontPx, p, true)
 }
 
 func (c *Canvas) HTMLFragment(fontPx int) string {
+	return c.htmlFragment(fontPx, term.ProfileTrueColor, false)
+}
+
+func (c *Canvas) htmlFragment(fontPx int, p term.Profile, quantise bool) string {
 	var b strings.Builder
 	b.WriteString(`<pre style="font-size:`)
 	b.WriteString(strconv.Itoa(fontPx))
@@ -226,14 +315,19 @@ func (c *Canvas) HTMLFragment(fontPx int) string {
 	}
 	for y := 0; y < c.H; y++ {
 		for x := 0; x < c.W; x++ {
-			i := y*c.W + x
-			ch, fg := c.composite(i)
-			bg := c.BG[i]
+			r := c.resolve(x, y, p)
+			fg, bg := r.fg, r.bg
+			if quantise {
+				// A shade block's colours are already exact cube entries, and
+				// they must not take the glyph boost -- see AppendFGRaw.
+				fg = p.Quantise(fg, r.glyph)
+				bg = p.Quantise(bg, false)
+			}
 			if run.Len() > 0 && (fg != rFG || bg != rBG) {
 				flush()
 			}
 			rFG, rBG = fg, bg
-			switch ch {
+			switch r.ch {
 			case '<':
 				run.WriteString("&lt;")
 			case '>':
@@ -241,7 +335,7 @@ func (c *Canvas) HTMLFragment(fontPx int) string {
 			case '&':
 				run.WriteString("&amp;")
 			default:
-				run.WriteRune(ch)
+				run.WriteRune(r.ch)
 			}
 		}
 		flush()

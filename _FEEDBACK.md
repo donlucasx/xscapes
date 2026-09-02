@@ -415,3 +415,20 @@ Never paraphrase. Read the relevant section before editing anything it covers.
 
   ⚠ **For him to judge: daylight is brighter and the sea is more turquoise.** Forced, not chosen --
   the cube keeps no blue below luma 60 except the electric pure-blue column already rejected.
+
+- *"ok looking good. Some of the sky gradients in 256 dont look as good/smooth though, can we look
+  for opportunities to make the gradients more subtle even in 256? truecolor looks great. Where
+  could users experience the truecolor version?"*
+  ⇒ The premise was smoothing and the real defect was HUE. Independent per-channel rounding turns a
+    mid blue into a lavender -- rgb(48,112,170) becomes rgb(95,95,175) -- six rows of sky a day.
+    `Index256Keeping` preserves any channel ordering the source states clearly, backgrounds only.
+
+  **Three smoothing ideas, two rejected on sight after measuring well.** Shade blocks bought 11 ->
+  14 tones and look like stipple. The 1x2 dither measured worse and its premise (the eye averages
+  half a cell) is false at terminal size. Only the U+2580 split survived: 5% closer to the ramp,
+  no texture.
+
+  ⚠ **Two of my own instruments lied this session and I quoted one before catching it.** A regex
+  sweep of the sky-ramp curve corrupted the source and I read four rows of numbers off a build
+  failure. And the violet test recomputed the ramp instead of reading the render, so it could not
+  see the fix at all -- it now goes through `ResolveAt`, and is proven red without the fix.

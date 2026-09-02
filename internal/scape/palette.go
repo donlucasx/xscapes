@@ -52,11 +52,25 @@ type Palette struct {
 // Every value below is a cube entry, so it survives quantisation unchanged and
 // a truecolor terminal shows the same picture rather than a nicer one.
 var (
-	// Sky. The noon ramp steps 26 -> 32 -> 68 -> 111 -> 153, five distinct
-	// blues with evenly spaced luma; picked for that, not for the endpoints
-	// alone -- a ramp between two good colours can still spend eight rows on
-	// one of them, which is what the old noon sky did.
-	skyDeep = term.RGB{R: 0, G: 95, B: 215} // 26  zenith, mid-morning to mid-afternoon
+	// Sky. The endpoints are chosen for how many cube colours the ramp BETWEEN
+	// them crosses, not for how good either one looks on its own.
+	//
+	// That is the whole trick and it is not the obvious move. A band appears
+	// wherever the ramp crosses a quantisation boundary in ANY channel, so the
+	// smoothest gradient is the one whose channels travel furthest. #005fd7 to
+	// #afd7ff is the better-looking pair and renders worse -- 7 bands against
+	// 10 over seventeen rows -- because its blue channel starts at 215 and
+	// crosses one boundary the whole way down. Searched over every surviving
+	// cube blue; these are the best pairs that still read as a sky and a sea.
+	//
+	// The search has to be told what "still reads as a sky" MEANS, and the
+	// first version was not. Ranked on band count alone it picked #d7d7ff for
+	// the horizon, which is ten bands and a lavender stripe across the middle
+	// of the sky: the ramp passes through rgb(175,175,255), where red has
+	// caught green up and blue is still high. Blue with no green lead is
+	// violet. The constraint that fixes it -- green at least 20 above red
+	// wherever blue leads -- is what TestTheSkyNeverGoesViolet holds.
+	skyDeep = term.RGB{R: 0, G: 95, B: 175} // 25  zenith, mid-morning to mid-afternoon
 	//
 	// One zenith for the whole working day, and the horizon carries the hour.
 	// It is not only that a real sky barely moves between nine and three: the
@@ -64,8 +78,18 @@ var (
 	// luma spent up there comes off the context readout. A zenith of #0087d7
 	// instead of this one cost the moon 8 of its 54 luma of headroom.
 	skyPale = term.RGB{R: 175, G: 215, B: 255} // 153 horizon at noon
-	skyDawn = term.RGB{R: 0, G: 95, B: 175}    // 25  deep blue, before the sun
-	skyDusk = term.RGB{R: 95, G: 0, B: 175}    // 55  violet, after it
+	skyDawn = term.RGB{R: 0, G: 95, B: 135}    // 24  deep blue, before the sun
+	skyDusk = term.RGB{R: 0, G: 95, B: 175}    // 25  and the same blue after it
+	//
+	// Dusk was a violet, #5f00af, and it looked the most distinctive sky in the
+	// set. It also put a GREY one in the middle of the afternoon. The leg from
+	// the daylight zenith to a violet runs red up from 0 to 95 while green runs
+	// down from 95 to 0, and half way along that is rgb(48,48,175) -- which has
+	// plenty of chroma and no home in the cube, whose nearest dark blue-violets
+	// are all further off than grey 58. Measured at 16:30, on a clear afternoon.
+	//
+	// So both twilights are deep blue overhead and the horizon carries the
+	// hour, which is what a real one does anyway.
 	// Both are dark -- luma 75 and 48 -- and both still hold their hue, which
 	// the BlueSky note said was impossible. It counted the cube's dark colours
 	// below luma 40 and found only the pure #0000xx column. Between 40 and 80
@@ -80,23 +104,31 @@ var (
 	// against a floor of 40.
 	firePeach  = term.RGB{R: 255, G: 175, B: 135} // 216 dawn horizon
 	fireOrange = term.RGB{R: 255, G: 135, B: 95}  // 209 dusk horizon
-	skyCool    = term.RGB{R: 215, G: 215, B: 255} // 189 horizon, mid-morning
+	skyCool    = term.RGB{R: 175, G: 215, B: 255} // 153 horizon, mid-morning (= skyPale)
 	skyWarm    = term.RGB{R: 255, G: 215, B: 175} // 223 horizon, mid-afternoon
 
-	// Sea. Far is deep water, near is the shallow the swell breaks over, and
-	// the pair has to be at least TWO cube steps apart in some channel or the
-	// ramp shows two bands and nothing between: a one-step ramp rounds its own
-	// midpoint back onto an end. seaDeep -> seaShallow moves one step in red
-	// and two in green and blue, and those cross at different points along the
-	// ramp, which is what puts distinct colours in the middle of it.
+	// Sea. The same rule, and it mattered more here: the old pair gave four
+	// colours over fifteen rows with eight of them the same cell, and #005f5f
+	// to #87afff gives ten with the longest run halved.
+	//
+	// The near end is also held by a SECOND constraint that the search does not
+	// see. A longer ramp means a given movement of the mean waterline repaints
+	// more cells, and the open sea holding still is a thing he asked for by
+	// name. Of the pairs that gave ten bands, this is the one that also keeps
+	// the backdrop under the 8% churn TestTheBackdropHoldsStillBetweenFrames
+	// allows -- 7.83%. Two of the better-looking pairs are at 8.7 and 9.6.
 	//
 	// The sea holds one ramp from mid-morning to mid-afternoon on purpose. Time
 	// of day is the SKY's channel; the sea's job is the agent's work, and a
 	// backdrop that keeps shifting under it is noise in the wrong signal.
-	seaDeep    = term.RGB{R: 0, G: 95, B: 135}   // 24  deep water at noon
-	seaShallow = term.RGB{R: 95, G: 175, B: 215} // 74  shallow at noon
-	seaSlate   = term.RGB{R: 95, G: 95, B: 135}  // 60  the low-light sea
-	seaSteel   = term.RGB{R: 95, G: 135, B: 175} // 67  the sea under a dusk sky
+	seaDeep = term.RGB{R: 0, G: 95, B: 95} // 23  deep water, every hour --
+	//                                              the darkest the cube can hold and
+	//                                              still be water, since every darker
+	//                                              blue is the pure #0000xx column
+	//                                              Shore.BlueSky documents as rejected
+	seaShallow = term.RGB{R: 135, G: 175, B: 255} // 75  shallow at noon
+	seaSlate   = term.RGB{R: 95, G: 95, B: 135}   // 60  the low-light sea
+	seaSteel   = term.RGB{R: 95, G: 135, B: 175}  // 67  the sea under a dusk sky
 	//
 	// Not the mauve it was first given. A dusk sea reflects the darkening blue
 	// overhead, not the orange on the horizon -- the warm at that hour belongs
@@ -105,12 +137,6 @@ var (
 	// middle of that crossing is rgb(122,122,162), which the terminal shows as
 	// grey 128. Five in the evening, the sea grey, on the day the whole point
 	// of the change was that it should not be.
-	seaDim = term.RGB{R: 0, G: 95, B: 95} // 23  the darkest water the cube
-	//                                                  can hold and still be water:
-	//                                                  every darker blue is the pure
-	//                                                  #0000xx column, and that is the
-	//                                                  electric sky Shore.BlueSky
-	//                                                  documents as rejected.
 )
 
 // dayKeys are keyframes around the clock; everything between is interpolated.
@@ -138,7 +164,7 @@ var dayKeys = []struct {
 	}},
 	{0.25, Palette{ // dawn
 		SkyTop: skyDawn, SkyHorizon: firePeach,
-		SeaFar: seaDim, SeaNear: seaSlate,
+		SeaFar: seaDeep, SeaNear: seaSlate,
 		Foam:    term.RGB{R: 250, G: 226, B: 210},
 		WetSand: term.RGB{R: 92, G: 76, B: 68}, SandNear: term.RGB{R: 152, G: 126, B: 102},
 		Grain: term.RGB{R: 190, G: 162, B: 134},
@@ -178,7 +204,7 @@ var dayKeys = []struct {
 	}},
 	{0.75, Palette{ // dusk
 		SkyTop: skyDusk, SkyHorizon: fireOrange,
-		SeaFar: seaDim, SeaNear: seaSteel,
+		SeaFar: seaDeep, SeaNear: seaSteel,
 		Foam:    term.RGB{R: 252, G: 208, B: 178},
 		WetSand: term.RGB{R: 82, G: 64, B: 56}, SandNear: term.RGB{R: 140, G: 110, B: 86},
 		Grain: term.RGB{R: 178, G: 144, B: 112},

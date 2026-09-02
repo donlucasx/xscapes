@@ -45,7 +45,7 @@ func dayPage(seed int64) string {
 
 	// render paints one hour and hands back both profiles plus the measurement,
 	// from a single frame so the two panels cannot drift apart.
-	render := func(tod float64) (tc, c256 string, distinct, worst int) {
+	render := func(tod float64) (tc, smooth, raw, blocks string, distinct, worst int) {
 		c := canvas.New(w, h, canvas.AlphaFar, canvas.AlphaMid, canvas.AlphaNear)
 		sh := scape.NewShore(seed, false)
 		sh.MoonX = lay.MoonX
@@ -56,30 +56,64 @@ func dayPage(seed int64) string {
 		drawScene(c, sh, cat, lay,
 			reduce.State{Pose: companion.Working, Tail: tail}, 3.7, seed, c.H-2-chh)
 
-		seen := map[int]bool{}
-		run, prev := 0, -1
-		for y := 0; y < c.H; y++ {
-			i := c.BGAt(2, y).Index256()
-			seen[i] = true
-			if i == prev {
-				run++
-			} else {
-				run = 1
+		// Counted at HALF-ROW resolution and over the SKY only. A cell on 256
+		// can carry two colours, so anything reading c.BG alone is blind to
+		// half of what is drawn; and the flat writing band would otherwise
+		// dominate the longest-run figure with a flatness that is deliberate.
+		// The horizon is the biggest downward step in luma, not the first step
+		// over a threshold. A fixed threshold works by day and finds nothing at
+		// midnight, where sky and sea are two neighbouring greys -- and "found
+		// nothing" came out as a caption reading "0 distinct tones".
+		sky, drop := 0, 0.0
+		for y := 1; y < c.H*3/4; y++ {
+			if d := luma(c.BGAt(2, y-1)) - luma(c.BGAt(2, y)); d > drop {
+				drop, sky = d, y
 			}
-			if run > worst {
-				worst = run
-			}
-			prev = i
 		}
-		// HTMLFragmentAs restores the canvas, so the same frame renders twice.
-		return c.HTMLFragmentAs(11, term.ProfileTrueColor),
-			c.HTMLFragmentAs(11, term.Profile256), len(seen), worst
+		seen := map[term.RGB]bool{}
+		run, prev := 0, term.RGB{R: 1, G: 2, B: 3}
+		for y := 0; y < sky; y++ {
+			ch, fg, bg := c.ResolveAt(2, y, term.Profile256)
+			up, dn := bg, bg
+			switch ch {
+			case '\u2580':
+				up = fg
+			case '\u2591':
+				up, dn = bg.Blend(fg, 0.25), bg.Blend(fg, 0.25)
+			case '\u2592':
+				up, dn = bg.Blend(fg, 0.5), bg.Blend(fg, 0.5)
+			case '\u2593':
+				up, dn = bg.Blend(fg, 0.75), bg.Blend(fg, 0.75)
+			}
+			for _, v := range []term.RGB{up, dn} {
+				seen[v] = true
+				if v == prev {
+					run++
+				} else {
+					run = 1
+				}
+				if run > worst {
+					worst = run
+				}
+				prev = v
+			}
+		}
+		tc = c.HTMLFragmentAs(11, term.ProfileTrueColor)
+		smooth = c.HTMLFragmentAs(11, term.Profile256)
+		sh1, sh2 := term.Shading, term.ShadeBlocks
+		term.ShadeBlocks = true
+		blocks = c.HTMLFragmentAs(11, term.Profile256)
+		term.ShadeBlocks = sh2
+		term.Shading = false
+		raw = c.HTMLFragmentAs(11, term.Profile256)
+		term.Shading, term.ShadeBlocks = sh1, sh2
+		return tc, smooth, raw, blocks, len(seen), worst
 	}
 
 	var b strings.Builder
 	b.WriteString(`<style>
 .win{border:1px solid #2a2a32;border-radius:6px;overflow:hidden}
-.pair{display:flex;gap:16px;align-items:flex-start}
+.pair{display:flex;gap:16px;align-items:flex-start;flex-wrap:wrap}
 .lv{font-size:10px;color:#55555f;letter-spacing:.11em;margin-bottom:5px;text-transform:uppercase}
 .lv b{color:#c9c9d4;font-weight:600}
 .moment{margin-bottom:20px}
@@ -104,6 +138,14 @@ func dayPage(seed int64) string {
 	b.WriteString(`<div class="cap">The same frame, rendered twice. <b style="color:#c9c9d4">TRUECOLOR</b> ` +
 		`is what the palette asks for. <b style="color:#c9c9d4">256</b> is what Terminal.app can hold, ` +
 		`through the real quantiser &mdash; that is the one you get.<br>` +
+		`<b style="color:#c9c9d4">SMOOTHED</b> is the default now: on 256 a cell can carry ` +
+		`two colours, so where a band edge falls inside a cell it is split with U+2580 and ` +
+		`the ramp gets twice the vertical resolution. No extra texture, same colours, placed ` +
+		`more finely. <code>ASCIISCAPES_SHADE=0</code> is the panel beside it.<br>` +
+		`<b style="color:#c9c9d4">SHADE BLOCKS</b> is the idea that lost. It buys three more ` +
+		`tones between every pair of cube colours &mdash; 11 to 14 in the sky &mdash; and it ` +
+		`still looks worse, because the dot pattern reads as stipple before it reads as tone. ` +
+		`Judge it in a real terminal before believing me: <code>ASCIISCAPES_SHADE_BLOCKS=1</code>.<br>` +
 		`Wave phase is fixed across all 24 hours so the only thing changing is colour. ` +
 		`Drag the slider, press play, or show every hour at once.</div>`)
 
@@ -117,20 +159,25 @@ func dayPage(seed int64) string {
 	b.WriteString(`<div id="reel" class="single">`)
 	for i := 0; i < hours; i++ {
 		tod := float64(i) / float64(hours)
-		tc, c256, distinct, worst := render(tod)
+		tc, smooth, raw, blocks, distinct, worst := render(tod)
 		on := ""
 		if i == 12 {
 			on = " on"
 		}
 		fmt.Fprintf(&b, `<div class="moment%s" data-i="%d">`, on, i)
-		fmt.Fprintf(&b, `<div class="lv"><b>%02d:00</b> &middot; tod %.3f &middot; %d distinct background `+
-			`colours down one column on 256, longest flat run %d rows</div>`, i, tod, distinct, worst)
+		fmt.Fprintf(&b, `<div class="lv"><b>%02d:00</b> &middot; tod %.3f &middot; the SKY carries %d `+
+			`distinct tones at half-row resolution, longest flat run %d half-rows</div>`, i, tod, distinct, worst)
 		b.WriteString(`<div class="pair">`)
 		fmt.Fprintf(&b, `<div><div class="lv">truecolor &mdash; what the palette asks for</div>`+
 			`<div class="win">%s</div></div>`, tc)
-		fmt.Fprintf(&b, `<div><div class="lv">256 &mdash; Terminal.app</div>`+
-			`<div class="win">%s</div></div>`, c256)
+		fmt.Fprintf(&b, `<div><div class="lv">256 &mdash; smoothed</div>`+
+			`<div class="win">%s</div></div>`, smooth)
+		fmt.Fprintf(&b, `<div><div class="lv">256 &mdash; no smoothing</div>`+
+			`<div class="win">%s</div></div>`, raw)
+		fmt.Fprintf(&b, `<div><div class="lv">256 + shade blocks &mdash; rejected</div>`+
+			`<div class="win">%s</div></div>`, blocks)
 
+		b.WriteString(`</div>`)
 		p := scape.PaletteAt(tod)
 		b.WriteString(`<div><div class="lv">backgrounds: asked &rarr; shown</div><div class="bar2">`)
 		for _, f := range []struct {
@@ -147,7 +194,7 @@ func dayPage(seed int64) string {
 				`<div class="sw" style="background:rgb(%d,%d,%d)"></div>%s<br><span%s>%d %s</span></div>`,
 				f.c.R, f.c.G, f.c.B, shown.R, shown.G, shown.B, f.n, cls, f.c.Index256(), kind)
 		}
-		b.WriteString(`</div></div></div></div>`)
+		b.WriteString(`</div></div></div>`)
 	}
 	b.WriteString(`</div>`)
 

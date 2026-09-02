@@ -14,6 +14,44 @@ the decision at the top of it, which is mine to make, not yours.
 
 ## Where we left off (2026-09-02, session 11, `main`, NOT yet pushed)
 
+**⭐ SECOND PASS: the 256 sky was not just banded, it was the WRONG HUE.** He
+looked at the day page and said the gradients did not read as smooth. Chasing
+that found something better than smoothing: **independent per-channel rounding
+was turning blues into violets.** rgb(48,112,170) is a mid blue with green
+sixty-four clear of red; the quantiser rounds red UP to 95 and green DOWN to 95
+and hands back rgb(95,95,175), a lavender. Six rows of sky a day, worst around
+five in the afternoon. `Index256Keeping` now keeps any channel ordering the
+source states clearly, for BACKGROUNDS only -- glyphs keep the old path, since
+the chroma boost has already moved them on purpose. It costs about 3% of
+distance and buys the hue.
+
+**Three smoothing ideas, one kept.** Splitting a cell with U+2580 so a band edge
+can fall mid-cell: kept, 5% closer to the true ramp, no texture. Shade blocks
+(U+2591/2/3) between two cube colours: measured a real gain -- 11 tones to 14 --
+and rejected on sight, the dot pattern reads as stipple before it reads as tone.
+Stacking the two bracketing colours as a 1x2 dither: rejected, worse on
+measurement AND the averaging assumption fails, since half a cell is three or
+four pixels and the eye resolves it. `ASCIISCAPES_SHADE_BLOCKS=1` renders the
+rejected one in a real terminal if he wants to overrule me.
+
+**Endpoints re-picked by search, then re-picked again.** A band appears wherever
+the ramp crosses a quantisation boundary in ANY channel, so the smoothest
+gradient is the one whose channels travel furthest -- `#005fd7` to `#afd7ff`
+looks like the better noon sky and renders worse than `#005faf` to `#afd7ff`.
+⚠ The first search ranked on band count alone and picked a horizon that put a
+lavender stripe across the sky: **ten bands, one of them wrong.**
+`TestTheSkyNeverGoesViolet` exists because of that, and it reads the RENDERED
+frame -- the first version recomputed the ramp and was blind to the fix.
+
+**Sea endpoints are held by a second constraint the search cannot see**: a longer
+ramp repaints more cells when the mean waterline moves, and the open sea holding
+still is his. Of the pairs giving ten bands, `#005f5f` to `#87afff` is the only
+one under the 8% churn `TestTheBackdropHoldsStillBetweenFrames` allows.
+
+**Dusk is no longer violet** -- not on taste, on measurement. A deep-blue-to-violet
+zenith leg passes through rgb(48,48,175), which has plenty of chroma and no home
+in the cube, and lands on grey 58 at half past four.
+
 **⭐ THE SKY AND THE SEA ARE CHOSEN FROM THE 256 CUBE NOW** -- ▶ NEXT #1, done.
 The note this session started from was half right and the half it got wrong was
 the important half. The complaint on record was that the sea's depth gradient
@@ -38,11 +76,9 @@ rows were one colour at noon; the cap is half).
 
 **⚠ TWO THINGS FOR HIS EYE, both one constant away from being changed.**
 
-1. **Dusk reads magenta.** `skyDusk` is `#5f00af`, a real violet, and the ramp
-   from it to the orange horizon crosses pink because green stays at 0 the whole
-   way. Violet overhead at dusk is true to life and it is the most distinct sky
-   in the set, but it is loud. The tamer option is `#005faf`, which is what dawn
-   uses -- then dawn and dusk differ only by their horizon and by the stars.
+1. ~~Dusk reads magenta.~~ **GONE**, and it had to go for a reason better than
+   taste -- see above. Both twilights are deep blue overhead now with the hour
+   in the horizon.
 2. **Daylight is brighter and the sea is more turquoise.** That one is not a style choice, it is the cube's
    shape -- below luma 60 it holds no blue except the electric `#0000xx` column
    that `Shore.BlueSky` already documents as rejected, so a sea that keeps its
