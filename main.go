@@ -42,13 +42,12 @@ func main() {
 		strip   = flag.String("strip", "", "write a frame strip (for GIF assembly) to an HTML file")
 		layout  = flag.String("layout", "", "write the layout mockups to an HTML file")
 		ctxdemo = flag.String("context", "", "write the context-moon demo to an HTML file")
-		dayHTML = flag.String("day", "", "write the day-cycle demo to an HTML file")
+		dayHTML = flag.String("day", "", "write the day cycle, truecolor vs 256, to an HTML file")
 		busy    = flag.String("busy", "", "write the activity-level sweep to an HTML file")
 		kits    = flag.String("kittens", "", "write the subagent-kitten demo to an HTML file")
 		wired   = flag.String("wired", "", "write a simulated session, folded by the real reducer, to an HTML file")
 		reel    = flag.String("reel", "", "write a frame strip of one simulated turn (for GIF assembly)")
 		colors  = flag.String("colors", "", "write the 256-vs-truecolor study to an HTML file")
-		cubeHT  = flag.String("cube", "", "write the day cycle AS TERMINAL.APP PAINTS IT to an HTML file")
 		facesHT = flag.String("faces", "", "write the companion face/coat study to an HTML file")
 		reelAt  = flag.Int("reel-from", 0, "first frame of the reel strip")
 		reelN   = flag.Int("reel-count", 40, "how many frames of the reel strip")
@@ -137,15 +136,6 @@ func main() {
 			os.Exit(1)
 		}
 		fmt.Println(*facesHT)
-		return
-	}
-
-	if *cubeHT != "" {
-		if err := os.WriteFile(*cubeHT, []byte(cubePage(*seed)), 0o644); err != nil {
-			fmt.Fprintln(os.Stderr, "asciiscapes:", err)
-			os.Exit(1)
-		}
-		fmt.Println(*cubeHT)
 		return
 	}
 

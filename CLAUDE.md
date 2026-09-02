@@ -22,9 +22,11 @@
 > "the gradient bands": measured across 48 half-hours, the far sea landed on the
 > GREYSCALE ramp at 40 of them and the sky zenith at 36, so for most of a working
 > day the two biggest regions on screen had no colour at all on his terminal.
-> Zero of the 25 daylight half-hours now do. `./xscapes -cube <file>.html` is the
-> before/after, and it is the first study in this repo that renders through the
-> real quantiser — every other one shows true RGB, which is why this went unseen.
+> Zero of the 25 daylight half-hours now do. **`./xscapes -day <file>.html` renders
+> every hour twice, truecolor beside 256** — it is the first study here that goes
+> through the real quantiser, and every other one still shows true RGB, which is
+> why this went unseen for a month. `assets/frames/cube-study.png` is the
+> before/after against the old palette.
 > **The statusline is chained**, so the context moon has a live feed at last.
 
 **Name: `xscapes`** (decided 2026-09-01 with the repo; asciiscapes and iixscapes are out). The working directory and these docs still say asciiscapes. A cozy ASCII "thinking screen" for terminal AI agents. While Claude Code (or any agent) works, a small living scene runs WITH it — a shoreline whose sea rises with the work, and a companion animal — and nudges the user, visually and with a sound, when the agent finishes or needs input.

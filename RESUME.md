@@ -25,8 +25,11 @@ the count is now **zero** for all four background colours.
 
 It went unseen because **every HTML study in this repo renders true RGB**,
 `-day` included, so the previews have always shown a blue sea that his terminal
-never painted. `./xscapes -cube <file>.html` is the first one that goes through
-the real quantiser; `assets/frames/cube-study.html` is the before/after.
+never painted. **`./xscapes -day <file>.html` is now the honest one**: every hour
+rendered TWICE from the same frame, truecolor beside 256, with a slider, a play
+button and a show-every-hour grid. `assets/frames/cube-study.png` is the
+before/after against the old palette, and it cannot be regenerated -- it needed
+two binaries.
 
 Two regression tests now hold it, both proven RED against the old palette:
 `TestSkyAndSeaKeepTheirColourThroughTheWorkingDay` (13 daylight samples grey on
@@ -265,7 +268,7 @@ go build -o xscapes . && ./xscapes claude     # THE REAL THING: agent inside the
 ./xscapes -live                               # the scape alone, Ctrl-C to quit
 ./xscapes -faces  assets/frames/companion-study.html   # THE OPEN QUESTION
 ./xscapes -colors assets/frames/color-study.html       # 256 vs truecolor
-./xscapes -cube   assets/frames/cube-study.html        # WHAT TERMINAL.APP ACTUALLY PAINTS
+./xscapes -day    assets/frames/day-cycle.html         # ALL 24 HOURS, TRUECOLOR vs 256, with a slider
 ./xscapes -wired  assets/frames/wired.html             # a turn through the REAL reducer
 ./xscapes -info                                        # profile, size, chroma
 ./xscapes -mockup assets/frames/composition-study.html   # left vs mirrored, every terminal shape
@@ -287,10 +290,10 @@ Demo flags: `-wired -mockup -anim -compare -layout -context -day -busy -kittens 
      measured. Glyph colours take the `GlyphBoost` chroma lift before
      quantisation, so they are a different problem with a different answer, and
      `Foam`, `Grain`, `Star` and `WetSand` are all still free-chosen RGB.
-   - **`-day`, `-wired`, `-mockup`, `-faces` and `-colors` all still render true
-     RGB** except where `-colors` explicitly asks for 256. They flatter every
-     palette they show. `HTMLFragmentAs(px, term.Profile256)` is the fix and it
-     is one argument per call site.
+   - ~~`-day` renders true RGB~~ **FIXED**: it renders both profiles from one
+     frame now. **`-wired`, `-mockup`, `-faces`, `-strip`, `-anim` and `-reel`
+     still flatter every palette they show.** `HTMLFragmentAs(px,
+     term.Profile256)` is the fix and it is one argument per call site.
    - The night stays monochrome and that is still the right answer; the cube has
      nothing dark and coloured except the pure-blue column, which was rendered
      and rejected. Dawn and dusk DID move off grey: between luma 40 and 80 there
