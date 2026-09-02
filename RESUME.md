@@ -12,71 +12,57 @@ is parked. Tell me where we left off, then pick up from ▶ NEXT — starting wi
 the decision at the top of it, which is mine to make, not yours.
 ```
 
-## Where we left off (2026-09-01, session 9, last code change `d70ff65`, 92 commits, `main`, pushed)
+## Where we left off (2026-09-02, session 10, last code change `0e7f265`, `main`, pushed)
 
-**Live: https://github.com/donlucasx/xscapes** (public, MIT). Milestone 1 is
-COMPLETE, the hooks are installed and firing, and **the agent now runs INSIDE
-the scape**.
+**Live: https://github.com/donlucasx/xscapes** (public, MIT, tagged `v0.2.1`).
+Milestone 1 COMPLETE. The agent runs inside the scape, on the **alternate
+screen**, and he has used it all day.
 
-**⭐ `xscapes claude` NOW RUNS THE AGENT INSIDE THE SCAPE.** His ruling — "the entire Claude experience should
-happen within the xscape, not next to it" — is built. One window: Claude Code in
-a band pinned to the top rows, the scape painting the rows below it, no tmux.
-He chose the pass-through band over a full terminal emulator after the probe
-came back clean (below), then ruled that `claude` should mean this: *"1. it
-should"*. The old tmux launcher is untouched and still reachable as
-`xscapes claude -beside`; `xscapes inside <cmd>` hosts anything.
+**⭐ NEW RULING, and it reverses a standing recommendation: TARGET TERMINAL.APP.**
+*"at this point I want to optimize the experience for terminal.app which should
+be the most used?"* I had been telling him to install a truecolor terminal;
+he is not going to. **That makes cube-exact colour the general rule for the
+whole scape, not a special case.** Only the sand and the sun are cube-exact
+today. Everything else is still chosen for truecolor and mangled by the 256
+cube -- measured, the sea's depth gradient collapses THREE different blues onto
+one saturated teal, `rgb(0,95,135)`, errors 38-47. See ▶ NEXT #1.
 
-**It is not a terminal emulator, on purpose.** The agent runs on a pty sized to
-its band, held there by DECSTBM, and its bytes reach the terminal untouched
-except for one three-byte sequence. Nothing xscapes fails to understand about
-Claude Code's output can corrupt it — the failure a real emulator invites.
+**Install note that cost an hour**: `~/go/bin` is NOT on his PATH. His only
+binary is `~/.local/bin/xscapes`. Build straight to it:
+`go build -o ~/.local/bin/xscapes .`
 
-The companion study is still PARKED at his request — see below.
+### Shipped 2026-09-02, session 10
 
-### Shipped 2026-09-01, session 9 (research only, no code)
-
-- **`research/prior-art.md` — has anyone already built this?** A survey, not a
-  code read. Trust it; do not re-run it unless something looks stale. Answer:
-  the space is crowded but in four separate categories, and xscapes sits
-  cleanly in none of them.
-  - **Idle screensavers** (cmatrix, pipes.sh, asciiquarium, termsaver,
-    ascsaver, cacademo). Own the whole screen, agent-blind. `ascsaver` is the
-    only one with any trigger at all, and it is a raw no-I/O check.
-    asciiquarium is the ONE real *place* in the whole survey, and it is twenty
-    years old.
-  - **Per-command spinners** (terminal-animations/tan, the ora lineage). One
-    line, two states.
-  - **Fake-activity generators** (genact, hollywood). Useful only as evidence
-    that people will watch a terminal do nothing if it looks good.
-  - **⭐ Agent-aware indicators — the real neighbourhood, and it is NEW.**
-    Barely existed two years ago. `pi-animations` (MIT, ~26 stars, 26
-    animations for the pi agent, hooked to thinking/working/tool, inline
-    single-line plus 3-to-5-row widgets above the editor) is closest in
-    spirit, and its own docs call them pure loading indicators, not scenes.
-    `claude-code-mascot-statusline` (MIT, 23 stars) is closest on reacting to
-    real state: a 16-cell half-block sprite across 9 hook-driven states, but
-    event-driven rather than animated. Plus `tweakcc` (patches Claude Code's
-    bundle) and a whole `terminal-pet` GitHub topic (`buddy` 102 stars,
-    `buddymon` 44, `tokengotchi`, `desk-waifu`, `codex-pets`).
-  - **Demand signal, all open, no maintainer reply**: claude-code #66284
-    (customizable ASCII working animation, `area:tui`), #29200 (thinking
-    words), #35249 (statusline mascot), opencode #24937 (TUI pet). Note the
-    shape of #66284: if Anthropic ships its `command` variant, a
-    statusline-style hook for the working animation, that is a DISTRIBUTION
-    CHANNEL for a scape strip, not a threat to `xscapes inside`.
-- **The four gaps, and they are the pitch.** (1) Nobody runs the agent inside
-  the scene — every agent-aware project is a strip beside or above it, and the
-  screensavers only run when the agent is absent. The pty band has no analog.
-  (2) Nobody encodes the amount of work; everyone keys off a 3-to-9-value
-  state enum, so "the water is the work" has no competitor. (3) Everything is
-  a pet, not a place. (4) Everything is host-locked TypeScript; one Go binary
-  with an adapter protocol is unusual here.
-- **⚠ The risk it surfaced**: the terminal-pet topic is crowded and growing,
-  and a skimming reader files xscapes there on sight. The first screenshot has
-  to say "instrument in a place", not "companion".
-- **One lead not chased**: an "ascii-agents" Rust TUI with weather and ambient
-  effects surfaced only through an aggregator page, no GitHub URL in any
-  result. If it is real it is the nearest competitor found.
+- **`xscapes claude` now means the agent INSIDE the scape.** `-beside` keeps the
+  tmux layout, `inside <cmd>` hosts anything, `-print` works on all three.
+- **⭐ THE ALTERNATE SCREEN.** The resize bug was never an off-by-one. Claude Code
+  emits ZERO bytes on a resize and places its input purely by relative moves;
+  growing a window makes the terminal pull scrollback back in, which pushes the
+  agent's UI out of its band. Controls that pinned it: no-resize works, plain
+  Claude plus the same resize works, hosted plus resize fails. The alternate
+  screen has no history to pull back. Cost: output scrolling out of the band is
+  gone rather than saved. `-alt=false` takes both back.
+  ⚠ An earlier note in this repo said Claude repaints on SIGWINCH. That was
+  measured on a FRESH session and was its startup draw. Corrected in
+  `notes/claude-terminal-emissions.md`; it cost a morning.
+- **DECSTBM homes the cursor -- three times.** Paint, exit, and resize each had to
+  learn it: save the cursor before touching the scroll region, place it after the
+  last time you touch it. All three are in tests now.
+- **The beach, in four corrections from him.** One flat sand tone that varies day
+  to night; a ragged waterline (2.9 rows of relief resting, 7.5 at full) scaled
+  to fit rather than clipped; the writing band INSIDE the beach's share; no black
+  seam. Sea and beach ramps anchored to the MEAN waterline: one row carried 87
+  distinct tones and 58.6% of open-sea cells changed every frame, now 24 and 3.7%.
+- **⭐ The moon is the sun by day.** His call. Context is carried by phase AND
+  altitude, so a second body would have needed a second encoding for one
+  variable; one disc whose colour follows the hour is the only version that
+  holds. It also fixed a rule violation: MoonVis bound an AGENT channel to the
+  clock, so the context readout was invisible all working day (+10 luma at noon,
+  now never below +54).
+- **The statusline is chained**, so context reaches the sky for the first time.
+  Verified end to end; his own statusline renders unchanged.
+- Scape takes 9/20 of the window; `-scape N` overrides. Full repaint every 50th
+  frame so stale cells heal.
 
 ### Shipped 2026-09-01, session 8
 
@@ -254,39 +240,25 @@ Demo flags: `-wired -mockup -anim -compare -layout -context -day -busy -kittens 
 
 ## ▶ NEXT
 
-1. **Run a day on `xscapes inside` and re-tune.** It has been proven in a real
-   terminal but not lived in. The reducer's `TauFall=12s`, `TurnFloor=0.30`,
-   `FlightFloor=0.45` have still never been tuned against his actual rhythm, and
-   `~/.config/asciiscapes/run/*.jsonl` is a real recording that `xscapes replay`
-   folds. ⚠ `reduce.TailLen` is still a hard 4 — it should be a function of the
-   beach's rows now that the beach's height varies with the window.
-2. **The 45-60s demo video**, now of the thing running inside one window.
-   Record in a truecolor terminal, NOT Terminal.app. Entries close 2026-09-17.
-4. **Run a day on it and re-tune.** The hooks are INSTALLED and firing (see
-   below); what is missing is a day of real rhythm to tune `TauFall=12s`,
-   `TurnFloor=0.30`, `FlightFloor=0.45` against. `xscapes replay` exists for
-   exactly this, and the spool files in `~/.config/asciiscapes/run/*.jsonl` are
-   already a real recording.
-3. **Decide the double sound.** His own afplay beep hooks still fire alongside
-   the xscapes knocks on Notification / Stop / PermissionRequest. The brief said
-   "replace the beep"; his hooks are his, so this is his call.
-
-3. **Add the statusline chain by hand** or the moon stays dark. Install prints
-   the exact line rather than taking over the statusLine Lucas wrote.
-4. **Re-tune the reducer against a recording.** `xscapes replay` exists for
-   exactly this. Are `TauFall=12s`, `TurnFloor=0.30`, `FlightFloor=0.45` right
-   against his actual rhythm? Do real fan-outs reach the kitten ladder's numbers?
-5. **Keypress focuses the agent pane** — the last half of Milestone 1 #6. The
-   live loop reads no keys at all today; it needs raw mode plus
-   `tmux select-pane -t <agent>`. The launcher knows the pane id and could
-   pass it.
-
-6. **Re-open the README's first 10 lines against `research/prior-art.md`.** Cheap,
-   and it moves the two heaviest rubric weights (25% originality + 20% fit). The
-   survey says a skimming reader files xscapes in the `terminal-pet` topic on
-   sight, and that topic is crowded (`buddy` alone has 102 stars). The README
-   already leads with the protocol, which is right; what it does not yet do is
-   say what nobody else does. The four gaps are the copy.
+1. **⭐ Make the whole scape cube-exact, per his Terminal.app ruling.** The sand
+   and the sun already are, and they are the two regions he stopped complaining
+   about. Everything else is picked for truecolor and quantised badly:
+   - sea depth: `rgb(30,79,118)` / `(41,96,132)` / `(46,105,139)` all land on
+     `rgb(0,95,135)` -- the gradient is gone and the hue is off (errors 38-47).
+   - sky: `rgb(78,110,163)` -> `rgb(95,95,175)`, blue reads purple.
+   The method that worked: pick colours the xterm-256 palette actually holds, so
+   they survive quantisation unchanged and look the same in both profiles. The
+   cube has six levels per channel and almost no browns, which is why every
+   free-chosen sand landed on olive, dusty rose, dusty red or grey.
+2. **Re-tune the reducer against a real recording.** Still never done.
+   `~/.config/asciiscapes/run/*.jsonl` is a real day now; `xscapes replay` folds
+   it. `TauFall=12s`, `TurnFloor=0.30`, `FlightFloor=0.45` are all unverified.
+   ⚠ `reduce.TailLen` is still a hard 4 while the scape's write band now scales
+   with height.
+3. **The 45-60s demo video.** Entries close 2026-09-17. Record on Terminal.app
+   now, not a truecolor terminal -- that follows from the ruling.
+4. **Watch the kitten accounting.** 122 `sub_start` against 233 `sub_end` across
+   all his sessions. Kittens may linger or the count may drift over a long run.
 
 ## How to look at things (additions)
 
