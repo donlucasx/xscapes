@@ -197,6 +197,15 @@ func translate(p hookPayload) []event.Event {
 			Kind: event.ToolEnd, Op: op, Tool: p.ToolName,
 			Target: target, ID: p.ToolUseID, MS: p.DurationM,
 		}
+		// A checklist is its own channel, not a flavour of tool use, so it gets
+		// its own event rather than counts bolted onto this one. The protocol
+		// has carried `todo` with n/of since the beginning and nothing has ever
+		// emitted it: TodoWrite was classified as an op and stopped there, so
+		// the reducer's Todo case could only ever be reached by hand from
+		// `xscapes emit`. Two halves of one feature that were never joined.
+		if done, total, ok := todoCounts(p.ToolName, p.ToolInput); ok {
+			return []event.Event{e, {Kind: event.Todo, N: done, Of: total}}
+		}
 		return []event.Event{e}
 
 	case "PostToolUseFailure":
@@ -253,6 +262,37 @@ func translate(p hookPayload) []event.Event {
 		return []event.Event{{Kind: event.Compact, Text: p.Trigger}}
 	}
 	return nil
+}
+
+// todoCounts reads a TodoWrite call and reports how much of the list is done.
+//
+// ⚠ The payload shape here is INFERRED, not measured. notes/claude-hooks-verified.md
+// covers every hook this program uses and says nothing about TodoWrite's
+// tool_input, because in 13,682 recorded tool events and every transcript since
+// the hook was installed, TodoWrite has been called exactly zero times. So this
+// is written to fail quiet rather than fail wrong: an unrecognised shape
+// reports ok=false and the sky shows nothing, which is the same as today.
+//
+// It counts "completed" and treats everything else as outstanding, so a status
+// value nobody anticipated lands on "not done" rather than on "done".
+func todoCounts(tool string, in json.RawMessage) (done, total int, ok bool) {
+	if tool != "TodoWrite" || len(in) == 0 {
+		return 0, 0, false
+	}
+	var p struct {
+		Todos []struct {
+			Status string `json:"status"`
+		} `json:"todos"`
+	}
+	if err := json.Unmarshal(in, &p); err != nil || len(p.Todos) == 0 {
+		return 0, 0, false
+	}
+	for _, t := range p.Todos {
+		if strings.EqualFold(t.Status, "completed") {
+			done++
+		}
+	}
+	return done, len(p.Todos), true
 }
 
 // toolInput is the handful of tool_input keys that name a subject. Claude Code

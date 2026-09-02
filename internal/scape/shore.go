@@ -272,6 +272,7 @@ func (s *Shore) Update(c *canvas.Canvas, t float64, act Activity) {
 	s.paintBG(c, hy, edge)
 	s.stars(c, hy, t)
 	s.moon(c, hy, scale, 1-clamp01(act.ContextUsed), moonVis(s.pal))
+	s.todoStars(c, hy, act.TodoDone, act.TodoTotal)
 	s.sea(c, hy, edge, tt, act)
 	s.sand(c, edge)
 	s.foam(c, edge, scale)
@@ -442,7 +443,11 @@ func (s *Shore) paintBG(c *canvas.Canvas, hy int, edge []float64) {
 
 func (s *Shore) stars(c *canvas.Canvas, hy int, t float64) {
 	far := c.Far()
-	glyphs := []rune{'.', '.', '*', '+'}
+	// No '*' here. It belongs to the checklist, and a channel that shares a
+	// glyph with the scenery is not a channel: at midnight the ambient field
+	// drew stars indistinguishable from finished todos and the count could not
+	// be read off the sky at all.
+	glyphs := []rune{'.', '.', '\u00b7', '+'}
 	for y := 0; y < hy; y++ {
 		// Thin out toward the horizon, where haze would eat them.
 		density := 0.045 * (1 - float64(y)/math.Max(1, float64(hy))*0.75)
@@ -484,6 +489,67 @@ func clamp01(v float64) float64 {
 // a fresh session is a full moon, and the light goes out as the window fills.
 // The unlit face is still painted, faintly, so the moon never disappears --
 // a missing moon reads as a bug, a dark moon reads as a warning.
+// todoStarFloor keeps the checklist legible at every hour.
+//
+// The same rule as the moon and needed for the same reason: a completed todo is
+// a fact about the AGENT, and the ambient star field's visibility is a fact
+// about the WORLD. StarVis is 0 at noon. Hanging the checklist on it would
+// switch the readout off for the whole working day -- which is exactly the bug
+// moonVisFloor exists to fix, arriving a second time through a different door.
+const todoStarFloor = 0.85
+
+// todoStars lights one star per finished todo and leaves a faint mark where one
+// is still outstanding, so the sky carries "n of N" rather than just n.
+//
+// Position, not rate: each slot's place is fixed by its index and the scene
+// seed, so a star lights where it always was rather than appearing somewhere
+// new. A star that moved would encode nothing and read as noise, and a glance
+// is the whole budget.
+//
+// Deliberately NOT a row across the top. A progress bar in the sky is a piece
+// of UI and the brief cuts anything that makes this feel like a dashboard; a
+// constellation filling in does the same work and belongs to the picture.
+func (s *Shore) todoStars(c *canvas.Canvas, hy, done, total int) {
+	if total <= 0 || hy < 3 {
+		return
+	}
+	if done > total {
+		done = total
+	}
+	// The upper sky is the darkest part of it at every hour, and so the only
+	// part where a white mark reads by day as well as by night.
+	top, bot := 1, hy*3/5
+	if bot <= top {
+		bot = top + 1
+	}
+	near := c.Near()
+	for i := 0; i < total; i++ {
+		// Spread across the width by index so the constellation grows outward
+		// rather than piling up, then jittered so it is not a ruled line.
+		frac := (float64(i) + 0.5) / float64(total)
+		x := int(frac*float64(c.W-6)) + 3
+		x += int(HashF(i, 11, s.Seed+31)*3) - 1
+		y := top + int(HashF(i, 23, s.Seed+37)*float64(bot-top))
+		if x < 0 || x >= c.W || y < 0 || y >= c.H {
+			continue
+		}
+		// Never on the moon: it carries context remaining, and a star inside
+		// the disc would be read as part of it. Cells are twice as tall as they
+		// are wide, so the exclusion is an ellipse, not a circle.
+		if dx, dy := x-s.moonX, y-s.moonY; dx*dx+4*dy*dy <= 16 {
+			continue
+		}
+		if i < done {
+			near.Plot(x, y, '*', s.pal.Star, todoStarFloor)
+		} else {
+			// A ring, not a dot: the ambient field is made of dots, and an
+			// outstanding todo has to be legible as a DIFFERENT thing rather
+			// than as a dim one.
+			near.Plot(x, y, '\u2218', s.pal.Star, 0.30)
+		}
+	}
+}
+
 func (s *Shore) moon(c *canvas.Canvas, hy int, scale, lit, vis float64) {
 	frac := s.MoonX
 	if frac <= 0 {

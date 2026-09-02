@@ -20,6 +20,11 @@ type Activity struct {
 	// the zero value on purpose: it is the look the scape was designed around,
 	// so forgetting to set this yields the good palette rather than a broken one.
 	TimeOfDay float64
+
+	// TodoDone and TodoTotal are the agent's checklist. Zero total means there
+	// is no list, which is not the same as a list with nothing done -- the sky
+	// shows nothing in the first case and an unlit constellation in the second.
+	TodoDone, TodoTotal int
 }
 
 type Scape interface {

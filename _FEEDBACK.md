@@ -432,3 +432,27 @@ Never paraphrase. Read the relevant section before editing anything it covers.
   sweep of the sky-ramp curve corrupted the source and I read four rows of numbers off a build
   failure. And the violet test recomputed the ramp instead of reading the render, so it could not
   see the fix at all -- it now goes through `ResolveAt`, and is proven red without the fix.
+
+- *"2. what is this? explain further and lmk how we can test it / tune it"* (the shade blocks)
+  ⇒ Built `xscapes shades`: the same frame three ways in HIS terminal -- no smoothing, split cells,
+    split + shade blocks -- same wave phase, stacked, labelled. The judgement cannot be made in a
+    browser and I had been making it there.
+
+- *"3. what does this mean"* (the sand ink falling into the grey ramp)
+  ⇒ Explained; not a defect I fixed. The glyph audit I then wrote says the glyphs are in far better
+    shape than the backgrounds were: 0.6% wash out, all at night, 3.9% take a wrong hue.
+
+- *"4. ok i ll look out for them. anything you can test?"* (glyph colours never audited)
+  ⇒ Built `TestProbeGlyphColoursOn256`: renders each hour twice, truecolor against 256, compares
+    every glyph cell. ⚠ **It found that I had shipped an electric night** two commits earlier --
+    `Index256Keeping` forced grey answers onto the pure-blue column. Fixed and guarded.
+
+- *"5. nice, lets do this"* (stars for completed todos)
+  ⇒ **BUILT.** Two halves that had never been joined: the hook classified TodoWrite as an op and
+    stopped, so n/of were never filled and the reducer's Todo case was unreachable from a real
+    session. ⚠ **TodoWrite has been called ZERO times in 13,682 recorded tool events** -- the
+    payload shape is inferred and fails quiet, and today the stars only light from the demo cycle
+    or by hand.
+
+- *"6. push!"*
+  ⇒ Pushed.

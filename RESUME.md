@@ -386,8 +386,18 @@ ASCIISCAPES_SILENT=1 ./xscapes … # mute
   256, where it goes grey. Slate is the safe pick if Terminal.app stays the
   daily driver; charcoal wins if Ghostty or iTerm2 gets installed. **No
   truecolor terminal is installed on this machine today.**
-- **Stars for completed todos** — the last unbuilt channel. The protocol carries
-  `todo` with `n`/`of`; nothing renders it.
+- ~~**Stars for completed todos**~~ **BUILT 2026-09-02.** It was two halves that
+  had never been joined: the hook classified TodoWrite as an *op* and stopped
+  there, so `n`/`of` were never filled and the reducer's `Todo` case could only
+  be reached by hand from `xscapes emit`. Now the hook emits a real `todo` event
+  and the upper sky carries a constellation: `*` per finished item, `∘` per
+  outstanding one, position fixed by index and seed, held at a visibility floor
+  like the moon so the clock cannot switch an agent channel off.
+  ⚠ **The payload shape is INFERRED, not measured** — `notes/claude-hooks-verified.md`
+  says nothing about TodoWrite's `tool_input` because **TodoWrite has been called
+  zero times across 13,682 recorded tool events and every transcript since the
+  hook was installed.** `todoCounts` fails quiet on an unrecognised shape.
+  Drive it by hand: `xscapes -todo 3/5`, or `xscapes emit todo -n 3 -of 5`.
 - **`wired-turn.gif` is STALE** — recorded before the distinct cues; its finish
   beat shows the old identical balloon. Regenerate when the companion settles,
   not before (one GIF round, not two).

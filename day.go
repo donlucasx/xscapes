@@ -51,7 +51,8 @@ func dayPage(seed int64) string {
 		sh.MoonX = lay.MoonX
 		for i := 0; i < 14; i++ {
 			sh.Update(c, 3.0+float64(i)/20, scape.Activity{
-				Working: true, Level: 0.55, TimeOfDay: tod, ContextUsed: 0.3})
+				Working: true, Level: 0.55, TimeOfDay: tod, ContextUsed: 0.3,
+				TodoDone: 3, TodoTotal: 5})
 		}
 		drawScene(c, sh, cat, lay,
 			reduce.State{Pose: companion.Working, Tail: tail}, 3.7, seed, c.H-2-chh)

@@ -126,6 +126,8 @@ type Reducer struct {
 	ctx    float64
 	ctxSet bool
 
+	todoDone, todoOf int
+
 	tail    tail
 	session string
 	last    time.Time
@@ -255,6 +257,16 @@ func (r *Reducer) Apply(e event.Event, now time.Time) {
 		}
 
 	case event.Todo:
+		// A todo list that shrinks to nothing is a list that was CLEARED, not
+		// one that was finished, and the difference matters: the stars would
+		// blink out at the moment the work completed. So a zero total leaves
+		// the last real reading standing, and only a new list replaces it.
+		if e.Of > 0 {
+			r.todoDone, r.todoOf = e.N, e.Of
+			if r.todoDone > r.todoOf {
+				r.todoDone = r.todoOf
+			}
+		}
 		r.heat += Impulse
 	}
 }
@@ -321,6 +333,8 @@ func (r *Reducer) State(now time.Time) State {
 			Working:     working,
 			Level:       clamp01(lvl),
 			ContextUsed: r.ctx,
+			TodoDone:    r.todoDone,
+			TodoTotal:   r.todoOf,
 		},
 		Pose:      r.pose(now),
 		Kittens:   len(r.subs),

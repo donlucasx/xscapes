@@ -52,6 +52,7 @@ func main() {
 		reelAt  = flag.Int("reel-from", 0, "first frame of the reel strip")
 		reelN   = flag.Int("reel-count", 40, "how many frames of the reel strip")
 		tod     = flag.Float64("tod", 0, "time of day: 0 midnight, .25 dawn, .5 noon, .75 dusk")
+		todo    = flag.String("todo", "", "checklist as done/total, e.g. -todo 3/5 (lights the constellation)")
 		live    = flag.Bool("live", false, "paint the scape in THIS terminal until Ctrl-C")
 		ctxUsed = flag.Float64("ctx", 0, "context used, 0..1 (moon phase and altitude)")
 		mode    = flag.String("mode", "working", "strip mode: resting|working|needsyou|walk")
@@ -79,6 +80,12 @@ func main() {
 	}
 
 	act := scape.Activity{Working: *working, TimeOfDay: *tod, ContextUsed: *ctxUsed}
+	if *todo != "" {
+		if _, err := fmt.Sscanf(*todo, "%d/%d", &act.TodoDone, &act.TodoTotal); err != nil {
+			fmt.Fprintln(os.Stderr, "asciiscapes: -todo wants done/total, e.g. 3/5")
+			os.Exit(2)
+		}
+	}
 	switch {
 	case *level >= 0:
 		act.Level = *level

@@ -267,7 +267,8 @@ func demoState(t, ctxUsed, tod float64) reduce.State {
 		Act:  scape.Activity{Working: true, Level: 0.65, ContextUsed: ctxUsed, TimeOfDay: tod},
 		Pose: companion.Working,
 	}
-	switch int(t/8) % 4 {
+	phase := int(t/8) % 4
+	switch phase {
 	case 1:
 		st.Act = scape.Activity{ContextUsed: ctxUsed, TimeOfDay: tod}
 		st.Pose = companion.Resting
@@ -278,6 +279,15 @@ func demoState(t, ctxUsed, tod float64) reduce.State {
 		st.Act = scape.Activity{Level: 0.3, ContextUsed: ctxUsed, TimeOfDay: tod}
 		st.Pose = companion.Done
 		st.Bubble = "tests passed"
+	}
+	// A five-item checklist filling up as the cycle runs, so the newest channel
+	// is in the demo rather than only in a live session. It matters more here
+	// than the others: TodoWrite has been called ZERO times in the whole
+	// recorded history, so for now this is the only place the stars light.
+	st.Act.TodoTotal = 5
+	st.Act.TodoDone = phase + 1
+	if phase == 3 {
+		st.Act.TodoDone = 5
 	}
 	return st
 }
