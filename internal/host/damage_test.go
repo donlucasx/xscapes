@@ -56,3 +56,27 @@ func TestADifferentRowCountRepaintsEverything(t *testing.T) {
 		t.Errorf("repainted %v when the row count changed, want all four", got)
 	}
 }
+
+// Damage tracking has one failure mode that never heals: if a cell on screen
+// stops matching what the tracker believes is there -- anything at all wrote
+// over it -- that row is skipped for as long as its content does not change,
+// and the wrong pixels stay wrong. The sky and the beach can sit unchanged for
+// minutes at a time, so "until it changes" can mean "forever".
+//
+// So the tracker forgets everything periodically and repaints in full.
+func TestDamageForgetsPeriodicallySoStaleCellsHeal(t *testing.T) {
+	var d damage
+	rows := []string{"sky", "sea", "sand"}
+	full := 0
+	for i := 0; i < 200; i++ {
+		if len(d.changed(rows)) == len(rows) {
+			full++
+		}
+	}
+	if full < 2 {
+		t.Errorf("in 200 identical frames the tracker repainted in full %d times: stale cells would never heal", full)
+	}
+	if full > 20 {
+		t.Errorf("repainted in full %d times in 200 frames: that is most of what damage tracking was meant to save", full)
+	}
+}
