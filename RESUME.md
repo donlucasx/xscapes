@@ -335,15 +335,22 @@ Demo flags: `-wired -mockup -anim -compare -layout -context -day -busy -kittens 
      and rejected. Dawn and dusk DID move off grey: between luma 40 and 80 there
      are violets and blues (`#5f00af`, `#005faf`) the earlier survey missed
      because it only looked below luma 40.
-2. **Re-tune the reducer against a real recording.** Still never done.
-   `~/.config/asciiscapes/run/*.jsonl` is a real day now; `xscapes replay` folds
-   it. `TauFall=12s`, `TurnFloor=0.30`, `FlightFloor=0.45` are all unverified.
+2. **Re-tune the reducer against a real recording.** Still never done, and the
+   data is there: **46 spool files, 16,465 events** as of 2026-09-02. Mix:
+   6,889 `tool_start` / 6,793 `tool_end`, 1,894 `context`, 377 `sub_end`,
+   133 `sub_start`, 129 `prompt`, 119 `done`, 91 `error`, and **only 4
+   `needs_input` in the whole record** -- worth knowing before building a demo
+   around the cue that is 30% of the rubric. `xscapes replay <file>` folds one. `TauFall=12s`, `TurnFloor=0.30`, `FlightFloor=0.45` are all unverified.
    ⚠ `reduce.TailLen` is still a hard 4 while the scape's write band now scales
    with height.
 3. **The 45-60s demo video.** Entries close 2026-09-17. Record on Terminal.app
    now, not a truecolor terminal -- that follows from the ruling.
-4. **Watch the kitten accounting.** 122 `sub_start` against 233 `sub_end` across
-   all his sessions. Kittens may linger or the count may drift over a long run.
+4. ~~**Watch the kitten accounting.**~~ **CHECKED 2026-09-02 and it is FINE.**
+   Across all 46 spools, 16,465 events: 133 `sub_start` against 377 `sub_end`,
+   which looks alarming and is not. 127 of the 133 starts match an end by agent
+   id; the 6 that do not are sessions that ended mid-subagent. The 250 unmatched
+   ends delete a key that is not in the map, which is a no-op. `r.subs` is a map
+   keyed by agent id, not a counter, so it cannot drift or go negative.
 
 ## How to look at things (additions)
 
