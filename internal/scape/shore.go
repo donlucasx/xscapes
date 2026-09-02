@@ -178,28 +178,50 @@ func (s *Shore) Update(c *canvas.Canvas, t float64, act Activity) {
 	// off the band, so every trough of the swell hit the same row and the sea
 	// met the sand along a ruled line. Give the swell the room above the band
 	// instead and the waterline gets its shape back.
+	// The writing band scales with the scene.
+	//
+	// Four rows is right in a tall scape and swamps a short one: at seventeen
+	// rows -- which is what a 43-row window gives the scape -- four rows of
+	// writing plus its wash is 41% of the picture, and the sea is squeezed to
+	// three rows. WriteRows is the ceiling, a sixth of the height is the rule,
+	// and two lines is the least worth reserving a band for.
+	wr := s.WriteRows
+	if m := c.H / 6; wr > m {
+		wr = m
+	}
+	if wr < 2 {
+		wr = 0
+	}
 	writeTop := c.H
-	if s.WriteRows > 0 && c.H > s.WriteRows+4 {
-		writeTop = c.H - s.WriteRows
+	if wr > 0 && c.H > wr+4 {
+		writeTop = c.H - wr
 	}
 
-	// Mean waterline. Eight tenths down is right in a tall window and
-	// collapses the beach in a short one -- at fourteen rows it left a single
-	// row of sand, so three of the four lines of writing had nowhere to go.
-	// Keep it proportional, but never let fewer than five rows of beach
-	// survive.
-	sy := writeTop - 5
-	if p := writeTop / 5; p > 5 {
-		sy = writeTop - p
+	// Mean waterline. The beach is a proportional share of the scene, and the
+	// writing band is INSIDE that share, not added to it.
+	//
+	// Added to it is what went wrong: the band took four rows off the bottom
+	// and the beach was then laid out in what was left, so the sand grew by the
+	// whole band and the sea lost it -- "now we have a lot of beach and not
+	// enough sea. Did u have to eat into the sea to extend the beach?" Yes, and
+	// this is where. The floor is the band plus a few rows for the wash to run
+	// up and back, which is the least that still reads as a shore.
+	beach := c.H / 5
+	if min := wr + 3; wr > 0 && beach < min {
+		beach = min
+	}
+	if beach < 4 {
+		beach = 4
 	}
 	if s.SandRows > 0 {
-		sy = writeTop - s.SandRows
+		beach = s.SandRows
 	}
+	sy := c.H - beach
 	if sy <= hy+1 {
 		sy = hy + 2
 	}
-	if sy > writeTop-2 {
-		sy = writeTop - 2
+	if sy > writeTop-1 {
+		sy = writeTop - 1
 	}
 
 	// Everything sized in rows has to scale, or the scene that is composed at
@@ -220,9 +242,28 @@ func (s *Shore) Update(c *canvas.Canvas, t float64, act Activity) {
 	s.phase += dt * (0.55 + act.Level*1.45)
 	tt := s.phase
 	edge := s.waterline(c.W, sy, tt, act, scale)
-	for i := range edge {
-		if edge[i] > float64(writeTop)-1 {
-			edge[i] = float64(writeTop) - 1
+	// Scale the swell to the room it has instead of clipping it.
+	//
+	// Clipping is what drew the ruled shoreline: every trough that reached past
+	// the writing band landed on the same row. Scaling keeps the shape -- the
+	// crests and hollows stay where they are, just shallower -- so the water
+	// still runs up the sand and back, and never touches the writing.
+	if writeTop < c.H {
+		room := float64(writeTop-1) - float64(sy)
+		if room < 0.5 {
+			room = 0.5
+		}
+		dev := 0.0
+		for _, e := range edge {
+			if d := math.Abs(e - float64(sy)); d > dev {
+				dev = d
+			}
+		}
+		if dev > room {
+			k := room / dev
+			for i := range edge {
+				edge[i] = float64(sy) + (edge[i]-float64(sy))*k
+			}
 		}
 	}
 	s.lastEdge = edge
