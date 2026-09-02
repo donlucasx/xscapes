@@ -285,19 +285,46 @@ const sandFadeStart = 0.30
 // rows are kept dry for them.
 const DefaultWriteRows = 4
 
-// writeBandMix is how far the writing band sits toward the void from the dry
-// sand. Full, and that was measured rather than chosen.
+// The writing band's three sand tones, and why they are these exact numbers.
 //
-// Swept 0.72 / 0.85 / 0.92 / 1.00 against the contrast each of the four lines
-// gets from the background it is actually painted on. Full wins on every line
-// at every hour, and wins the same amount at every hour -- 98 / 133 / 168 / 204
-// oldest to newest, midnight and noon alike. Against the old beach that was
-// 53 / 69 / 120 / 204 at noon: the newest line, which the locked sand fade was
-// chosen to protect, keeps its 204 exactly, and the oldest line nearly doubles.
+// They are cube-exact: each is a colour the xterm-256 palette contains
+// outright, so it survives quantisation unchanged and looks the same on a
+// 256-colour terminal as it does in truecolor.
 //
-// It also keeps the property the fade was locked at full for: a true black
-// bottom merges with the agent's own black background instead of leaving a seam.
-const writeBandMix = 1.00
+// That is not fussiness. The cube has six levels per channel and almost no
+// browns, so a sand tone chosen for how it looks in truecolor gets snapped to
+// whatever is nearest -- measured across the day, the band landed on olive at
+// dawn, dusty rose at nine, dusty red at dusk and flat grey at night. Four
+// different wrong colours, which is exactly why the sand did not read as sand.
+// Choosing from what the palette actually holds is the only way to get a brown
+// that stays brown.
+//
+// An earlier version made this band black. It measured beautifully and was
+// wrong: "it should be sand, not black". Legibility comes from the ink, which
+// flips light or dark against whatever the band is. The band's job is to be a
+// beach.
+var (
+	sandDay   = term.RGB{R: 215, G: 175, B: 135} // 256 index 180
+	sandLow   = term.RGB{R: 175, G: 135, B: 95}  // 256 index 137
+	sandNight = term.RGB{R: 135, G: 95, B: 0}    // 256 index 94
+)
+
+// writeBandColor picks by how bright the beach is at this hour, so the page
+// darkens with the day without ever leaving those three tones.
+func writeBandColor(p Palette) term.RGB {
+	switch l := bandLuma(p.SandNear); {
+	case l >= 160:
+		return sandDay
+	case l >= 100:
+		return sandLow
+	default:
+		return sandNight
+	}
+}
+
+func bandLuma(c term.RGB) float64 {
+	return 0.299*float64(c.R) + 0.587*float64(c.G) + 0.114*float64(c.B)
+}
 
 func (s *Shore) paintBG(c *canvas.Canvas, hy int, edge []float64) {
 	fh := math.Max(1, float64(hy))
@@ -348,7 +375,7 @@ func (s *Shore) paintBG(c *canvas.Canvas, hy int, edge []float64) {
 			case s.writeTop > 0 && y >= s.writeTop:
 				// One flat tone, all the way across and all the way down. This
 				// is the page, not the picture.
-				col = term.Lerp(s.pal.SandNear, voidCol, writeBandMix)
+				col = writeBandColor(s.pal)
 			default:
 				f := (fy - mean) / math.Max(1, float64(c.H-1)-mean)
 				if f < 0 {
