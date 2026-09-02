@@ -184,14 +184,22 @@ func (h *Host) Run() error {
 			if nc != cols || nr != rows {
 				cols, rows = nc, nr
 				agentRows, scapeRows = Band(rows)
-				p.SetSize(cols, agentRows)
-				// The agent repaints itself from SIGWINCH. The band has to be
-				// re-stated because the region is in screen coordinates, and
-				// the rows below it cleared because the old scape is still
-				// sitting wherever the last size put it.
-				h.write(clearRows(agentRows+1, rows) + EnterBand(agentRows))
+				// Clear the WHOLE screen and re-pin the band BEFORE the child
+				// is told its new size. Two reasons, both measured:
+				//
+				// Growing the window moves rows that were scape into the
+				// agent's band. Clearing only below the new band left the old
+				// sea sitting inside the agent's screen, which is what made a
+				// resized session show two prompts and no obvious cursor.
+				//
+				// And the child repaints from SIGWINCH by homing the cursor and
+				// clearing downward -- its only absolute move -- so the region
+				// has to be correct before the signal arrives. Sizing the pty
+				// first let it repaint against the region it was leaving.
+				h.write(clearRows(1, rows) + EnterBand(agentRows))
 				// The screen was just touched behind the tracker's back.
 				dmg.reset()
+				p.SetSize(cols, agentRows)
 			}
 			if scapeRows <= 0 || h.Paint == nil {
 				continue
