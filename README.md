@@ -134,6 +134,8 @@ Claude Code is.
 ```sh
 xscapes inside <command>   # host any command inside the scape, not just claude
 xscapes claude -beside     # the older side by side layout, in tmux
+xscapes claude -scape 24   # give the shoreline more rows (default: two fifths)
+xscapes claude -fps 8      # slow the scape down
 xscapes -live              # the scape in this terminal, Ctrl-C to quit
 xscapes -info              # colour profile, size, which sound player
 xscapes notify             # hear both knocks

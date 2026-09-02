@@ -78,13 +78,51 @@ func TestShortWindowDropsTheScapeRatherThanTheAgent(t *testing.T) {
 
 func TestTypicalWindows(t *testing.T) {
 	for _, c := range []struct{ h, agent, scape int }{
-		{24, 16, 8},
-		{43, 29, 14},
-		{60, 40, 20},
+		{24, 15, 9},
+		{30, 18, 12},
+		{52, 32, 20},
+		{79, 51, 28},
 	} {
 		a, s := Band(c.h)
 		if a != c.agent || s != c.scape {
 			t.Errorf("Band(%d) = %d/%d, want %d/%d", c.h, a, s, c.agent, c.scape)
 		}
+	}
+}
+
+// BandWith lets the split be set by hand: he asked for more scape than two
+// fifths gives, and the right number is a matter of taste, not measurement.
+
+func TestBandWithZeroIsTheAutomaticSplit(t *testing.T) {
+	wa, ws := BandWith(51, 0)
+	a, sc := Band(51)
+	if wa != a || ws != sc {
+		t.Errorf("BandWith(51,0) = %d/%d, want the automatic %d/%d", wa, ws, a, sc)
+	}
+}
+
+func TestBandWithHonoursTheRequestedRows(t *testing.T) {
+	a, s := BandWith(51, 30)
+	if s != 30 || a != 21 {
+		t.Errorf("BandWith(51,30) = %d/%d, want 21/30", a, s)
+	}
+}
+
+// A request that would squeeze the agent out is capped, not obeyed. The agent
+// is the thing being used.
+func TestBandWithNeverStarvesTheAgent(t *testing.T) {
+	a, s := BandWith(51, 48)
+	if a < MinAgentRows {
+		t.Errorf("BandWith(51,48) left the agent %d rows, want at least %d", a, MinAgentRows)
+	}
+	if a+s != 51 {
+		t.Errorf("rows do not sum: %d + %d != 51", a, s)
+	}
+}
+
+func TestBandWithRaisesATinyRequestToSomethingReadable(t *testing.T) {
+	_, s := BandWith(51, 3)
+	if s != MinScapeRows {
+		t.Errorf("BandWith(51,3) gave the scape %d rows, want %d", s, MinScapeRows)
 	}
 }

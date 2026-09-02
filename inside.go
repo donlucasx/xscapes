@@ -54,6 +54,7 @@ func runInside(args []string, agent string) {
 	tod := fs.Float64("tod", 0, "pin the time of day, 0..1 (0 = the wall clock)")
 	ctxUsed := fs.Float64("ctx", 0, "pin context used, 0..1 (0 = the session's own)")
 	dry := fs.Bool("print", false, "print what would run and how the window splits, then exit")
+	scapeH := fs.Int("scape", 0, "rows to give the scape (0 = two fifths of the window)")
 	fs.Usage = func() {
 		if agent != "" {
 			fmt.Fprintf(os.Stderr, `xscapes claude [flags] [%s arguments ...]
@@ -82,7 +83,7 @@ With no command, runs claude.
 	}
 
 	cols, rows := termSize()
-	agentRows, scapeRows := host.Band(rows)
+	agentRows, scapeRows := host.BandWith(rows, *scapeH)
 	if *dry {
 		fmt.Printf("window   %dx%d\n", cols, rows)
 		fmt.Printf("agent    rows 1-%d   %s\n", agentRows, strings.Join(argv, " "))
@@ -114,9 +115,10 @@ With no command, runs claude.
 	var nextBind time.Time
 
 	h := &host.Host{
-		Cmd:  exec.Command(argv[0], argv[1:]...),
-		Size: termSize,
-		FPS:  *fps,
+		Cmd:       exec.Command(argv[0], argv[1:]...),
+		Size:      termSize,
+		FPS:       *fps,
+		ScapeRows: *scapeH,
 		Paint: func(cols, rows int) []string {
 			now := time.Now()
 			if w, hh := fr.size(); w != cols || hh != rows {

@@ -37,6 +37,8 @@ type Host struct {
 	// FPS is how often the scape repaints. The agent's output is never held
 	// up by it; it goes out the moment it arrives.
 	FPS float64
+	// ScapeRows fixes the scape's height. Zero takes the automatic split.
+	ScapeRows int
 	// In and Out default to os.Stdin and os.Stdout. Overridable for tests.
 	In  *os.File
 	Out *os.File
@@ -68,7 +70,7 @@ func (h *Host) Run() error {
 	h.out = out
 
 	cols, rows := h.Size()
-	agentRows, scapeRows := Band(rows)
+	agentRows, scapeRows := BandWith(rows, h.ScapeRows)
 
 	p, err := openPTY()
 	if err != nil {
@@ -182,21 +184,25 @@ func (h *Host) Run() error {
 		case <-tick.C:
 			nc, nr := h.Size()
 			if nc != cols || nr != rows {
+				oldAgent, oldRows := agentRows, rows
 				cols, rows = nc, nr
-				agentRows, scapeRows = Band(rows)
-				// Clear the WHOLE screen and re-pin the band BEFORE the child
-				// is told its new size. Two reasons, both measured:
+				agentRows, scapeRows = BandWith(rows, h.ScapeRows)
+
+				// Clear exactly the rows that changed hands: the ones that
+				// were scape and are now inside the agent's band. Nothing
+				// else.
 				//
-				// Growing the window moves rows that were scape into the
-				// agent's band. Clearing only below the new band left the old
-				// sea sitting inside the agent's screen, which is what made a
-				// resized session show two prompts and no obvious cursor.
+				// Not the whole screen. Claude Code repaints from SIGWINCH by
+				// homing and clearing downward, but it can only redraw what it
+				// still holds -- a transcript that has scrolled is gone, and
+				// clearing the lot wiped the session's history off the screen
+				// until the next turn happened to redraw it. Measured both
+				// ways: whole-screen loses the transcript, this does not.
 				//
-				// And the child repaints from SIGWINCH by homing the cursor and
-				// clearing downward -- its only absolute move -- so the region
-				// has to be correct before the signal arrives. Sizing the pty
-				// first let it repaint against the region it was leaving.
-				h.write(clearRows(1, rows) + EnterBand(agentRows))
+				// The band is re-pinned BEFORE the pty is resized, because the
+				// child's repaint arrives with the SIGWINCH and has to land in
+				// the new region rather than the one it is leaving.
+				h.write(clearRows(oldAgent+1, min(oldRows, agentRows)) + EnterBand(agentRows))
 				// The screen was just touched behind the tracker's back.
 				dmg.reset()
 				p.SetSize(cols, agentRows)

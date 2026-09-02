@@ -20,22 +20,24 @@ const (
 	// below six rows, and wants a couple more before the beach can hold a
 	// line of work history.
 	MinScapeRows = 8
-	// MaxScapeRows caps the scape. Past twenty rows more beach stops buying
-	// anything and the agent should have the room instead.
-	MaxScapeRows = 20
+	// MaxScapeRows caps the scape. Past twenty-eight rows more beach stops
+	// buying anything and the agent should have the room instead.
+	MaxScapeRows = 28
 )
 
 // Band divides h rows between the agent and the scape. They always sum to h.
 //
-// A third of the window, which is the fraction that keeps the beach growing
-// with the window the way he asked -- 8 rows of scape at 24, 14 at 43, 20 at
-// 60 -- without ever taking the majority. A window too short to hold both gets
-// no scape rather than a broken one.
+// Two fifths of the window: 12 rows of scape at 30, 20 at 52, the 28-row cap
+// from 70 up. It was a third, which he found cramped in use -- "the art gets
+// cramped" -- and a third of a short window is not enough rows for a sky, a
+// sea and a beach to read as three things. Never the majority, though: the
+// agent is what is being used. A window too short to hold both gets no scape
+// rather than a broken one.
 func Band(h int) (agent, scape int) {
 	if h < MinAgentRows+MinScapeRows {
 		return h, 0
 	}
-	s := h / 3
+	s := h * 2 / 5
 	if s < MinScapeRows {
 		s = MinScapeRows
 	}
@@ -46,4 +48,25 @@ func Band(h int) (agent, scape int) {
 		s = h - MinAgentRows
 	}
 	return h - s, s
+}
+
+// BandWith is Band with the scape's rows set by hand. Zero means automatic.
+//
+// The right number here is taste, not measurement: how much shoreline you want
+// beside your work is a preference, so -scape exists rather than another
+// constant argued into place.
+func BandWith(h, want int) (agent, scape int) {
+	if want <= 0 {
+		return Band(h)
+	}
+	if h < MinAgentRows+MinScapeRows {
+		return h, 0
+	}
+	if want < MinScapeRows {
+		want = MinScapeRows
+	}
+	if h-want < MinAgentRows {
+		want = h - MinAgentRows
+	}
+	return h - want, want
 }
