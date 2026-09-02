@@ -252,6 +252,26 @@ const sandFadeStart = 0.30
 
 func (s *Shore) paintBG(c *canvas.Canvas, hy int, edge []float64) {
 	fh := math.Max(1, float64(hy))
+	// The DRY beach is measured from the mean waterline, not from each
+	// column's own crest.
+	//
+	// Measured: with a per-column anchor a single beach row carried 87
+	// distinct colours across 120 cells, because every column got its own
+	// ramp -- and the anchor moves with the swell, so the whole beach
+	// re-coloured every frame. On a 256-colour terminal those near-identical
+	// browns quantise apart into olive, dusty red and grey, which is why it
+	// read as blotches rather than sand and would not sit still.
+	//
+	// The water keeps its per-column edge: the tide has to move, and the wet
+	// cell at the waterline still straddles sea and sand. It is only the page
+	// the agent's work is written on that holds still.
+	mean := 0.0
+	for _, e := range edge {
+		mean += e
+	}
+	if len(edge) > 0 {
+		mean /= float64(len(edge))
+	}
 	for x := 0; x < c.W; x++ {
 		ex := edge[x]
 		for y := 0; y < c.H; y++ {
@@ -261,13 +281,26 @@ func (s *Shore) paintBG(c *canvas.Canvas, hy int, edge []float64) {
 			case y <= hy:
 				col = term.Lerp(s.pal.SkyTop, s.pal.SkyHorizon, fy/fh)
 			case fy < ex-0.5:
-				col = term.Lerp(s.pal.SeaFar, s.pal.SeaNear, (fy-float64(hy))/math.Max(1, ex-float64(hy)))
+				// Depth, from the mean waterline for the same reason the beach
+				// is: this ramp says how far out the water is, which is a
+				// property of the row, not of whichever crest happens to be in
+				// this column. Per-column it stretched and squashed frame to
+				// frame and put dozens of near-identical blues in a single row,
+				// which 256 colours then pulled apart into bands.
+				//
+				// The wave motion did not live here anyway. It lives in the
+				// glyphs and in the waterline cell below, which keeps its own
+				// per-column edge.
+				col = term.Lerp(s.pal.SeaFar, s.pal.SeaNear, (fy-float64(hy))/math.Max(1, mean-float64(hy)))
 			case fy < ex+0.5:
 				// The waterline cell straddles sea and sand. Mix by how much of
 				// the cell the water actually covers.
 				col = term.Lerp(s.pal.WetSand, s.pal.SeaNear, ex-fy+0.5)
 			default:
-				f := (fy - ex) / math.Max(1, float64(c.H-1)-ex)
+				f := (fy - mean) / math.Max(1, float64(c.H-1)-mean)
+				if f < 0 {
+					f = 0
+				}
 				col = term.Lerp(s.pal.WetSand, s.pal.SandNear, math.Min(1, f*1.3))
 				// The beach can fall away into the terminal's own black.
 				//
