@@ -16,9 +16,15 @@
 > **⭐ TARGET IS TERMINAL.APP, his ruling 2026-09-02** — *"at this point I want to
 > optimize the experience for terminal.app which should be the most used?"* This
 > REVERSES the standing advice to install a truecolor terminal. Consequence:
-> cube-exact colour is the general rule for the whole scape. Only the sand and
-> the sun follow it today; the sea and sky are still chosen for truecolor and
-> quantise badly. That is ▶ NEXT #1 in RESUME.md.
+> cube-exact colour is the general rule for the whole scape.
+> **DONE for the sky and the sea, 2026-09-02 (session 11).** Both are now chosen
+> from colours the xterm-256 palette actually holds. The defect was worse than
+> "the gradient bands": measured across 48 half-hours, the far sea landed on the
+> GREYSCALE ramp at 40 of them and the sky zenith at 36, so for most of a working
+> day the two biggest regions on screen had no colour at all on his terminal.
+> Zero of the 25 daylight half-hours now do. `./xscapes -cube <file>.html` is the
+> before/after, and it is the first study in this repo that renders through the
+> real quantiser — every other one shows true RGB, which is why this went unseen.
 > **The statusline is chained**, so the context moon has a live feed at last.
 
 **Name: `xscapes`** (decided 2026-09-01 with the repo; asciiscapes and iixscapes are out). The working directory and these docs still say asciiscapes. A cozy ASCII "thinking screen" for terminal AI agents. While Claude Code (or any agent) works, a small living scene runs WITH it — a shoreline whose sea rises with the work, and a companion animal — and nudges the user, visually and with a sound, when the agent finishes or needs input.
@@ -59,7 +65,7 @@ Judges **to be announced**. Their framing line, verbatim: *"The biggest opportun
 - Code mode is chat-based (`/chat/new`); no sandbox or terminal observed. GitHub `donlucasx` is connected to the account.
 
 ### Demo video
-Highest-leverage deliverable: 45–60s real screen recording, no narration — prompt in Claude Code → scene reacts → companion knocks → Enter → back in the agent. Record in iTerm2 or Ghostty (truecolor), **not** Terminal.app.
+Highest-leverage deliverable: 45–60s real screen recording, no narration — prompt in Claude Code → scene reacts → companion knocks → Enter → back in the agent. **Record in Terminal.app** — that follows from his 2026-09-02 ruling, and it reverses what this line said before. The scape is now built for the 256-colour cube, so a truecolor terminal would show a picture no user gets.
 
 ## Locked decisions
 

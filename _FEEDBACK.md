@@ -391,3 +391,27 @@ Never paraphrase. Read the relevant section before editing anything it covers.
     truecolor terminal. He is targeting Terminal.app instead. That makes the cube-exact colour
     approach — used so far only for the sand and the sun — the GENERAL rule for the whole scape,
     not a special case. See ▶ NEXT.
+
+## 2026-09-02 -- session 11, verbatim
+
+- *"resume work on asciiscapes"*
+  ⇒ Picked up ▶ NEXT #1, the cube-exact colour work that follows from his Terminal.app ruling.
+    No new steer from him this session; everything below is mine and is waiting on his eye.
+
+  **The note I started from was wrong about the size of the problem, and I only found that by
+  measuring instead of trusting it.** It said the sea's depth gradient collapsed onto one teal.
+  True, and beside the point: across 48 half-hours of the day `SeaFar` landed on the GREYSCALE
+  ramp at 40 of them and `SkyTop` at 36. The sea and the sky had no colour at all for most of a
+  working day on his terminal. Daylight is 0/25 now.
+
+  **Why nobody saw it, and this is the reusable part**: every HTML study in the repo renders true
+  RGB. The previews have always shown a blue sea his terminal never painted. A preview that cannot
+  produce the target's colours is not a preview of the target.
+
+  **The moon test caught me.** A first pass put the dusk zenith at luma 116 and the sun's contrast
+  fell to +37.9 against a floor of 40 -- the disc is painted INTO the sky, so every point of luma
+  spent up there comes off the context readout. Fixed by taking the twilight zeniths dark again and
+  lifting daylight `MoonVis` to 0.85; floor is +61.3 against +64.4 before.
+
+  ⚠ **For him to judge: daylight is brighter and the sea is more turquoise.** Forced, not chosen --
+  the cube keeps no blue below luma 60 except the electric pure-blue column already rejected.

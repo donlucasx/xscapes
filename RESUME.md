@@ -12,7 +12,46 @@ is parked. Tell me where we left off, then pick up from ▶ NEXT — starting wi
 the decision at the top of it, which is mine to make, not yours.
 ```
 
-## Where we left off (2026-09-02, session 10, last code change `0e7f265`, `main`, pushed)
+## Where we left off (2026-09-02, session 11, `main`, NOT yet pushed)
+
+**⭐ THE SKY AND THE SEA ARE CHOSEN FROM THE 256 CUBE NOW** -- ▶ NEXT #1, done.
+The note this session started from was half right and the half it got wrong was
+the important half. The complaint on record was that the sea's depth gradient
+collapsed onto one teal. It does, but that is a detail: **measured across 48
+half-hours of the day, `SeaFar` landed on the GREYSCALE ramp at 40 of them and
+`SkyTop` at 36.** For most of a working day the two biggest regions on screen
+had no colour at all on the terminal he uses. Across the 25 daylight half-hours
+the count is now **zero** for all four background colours.
+
+It went unseen because **every HTML study in this repo renders true RGB**,
+`-day` included, so the previews have always shown a blue sea that his terminal
+never painted. `./xscapes -cube <file>.html` is the first one that goes through
+the real quantiser; `assets/frames/cube-study.html` is the before/after.
+
+Two regression tests now hold it, both proven RED against the old palette:
+`TestSkyAndSeaKeepTheirColourThroughTheWorkingDay` (13 daylight samples grey on
+the old palette, 0 on this one) and `TestTheSeaShowsItsDepthOn256` (11 of 18 sea
+rows were one colour at noon; the cap is half).
+
+**⚠ TWO THINGS FOR HIS EYE, both one constant away from being changed.**
+
+1. **Dusk reads magenta.** `skyDusk` is `#5f00af`, a real violet, and the ramp
+   from it to the orange horizon crosses pink because green stays at 0 the whole
+   way. Violet overhead at dusk is true to life and it is the most distinct sky
+   in the set, but it is loud. The tamer option is `#005faf`, which is what dawn
+   uses -- then dawn and dusk differ only by their horizon and by the stars.
+2. **Daylight is brighter and the sea is more turquoise.** That one is not a style choice, it is the cube's
+   shape -- below luma 60 it holds no blue except the electric `#0000xx` column
+   that `Shore.BlueSky` already documents as rejected, so a sea that keeps its
+   blue has to sit above luma 70. If it reads too tropical the dial is
+   `seaDeep`/`seaShallow`, and the constraint is that the pair stays at least TWO
+   cube steps apart in some channel or the ramp shows two bands and nothing
+   between.
+
+Every colour named above is in `internal/scape/palette.go`, in one `var` block
+at the top, each with its xterm index in a trailing comment.
+
+## Earlier (2026-09-02, session 10, last code change `0e7f265`, `main`, pushed)
 
 **Live: https://github.com/donlucasx/xscapes** (public, MIT, tagged `v0.2.1`).
 Milestone 1 COMPLETE. The agent runs inside the scape, on the **alternate
@@ -226,6 +265,7 @@ go build -o xscapes . && ./xscapes claude     # THE REAL THING: agent inside the
 ./xscapes -live                               # the scape alone, Ctrl-C to quit
 ./xscapes -faces  assets/frames/companion-study.html   # THE OPEN QUESTION
 ./xscapes -colors assets/frames/color-study.html       # 256 vs truecolor
+./xscapes -cube   assets/frames/cube-study.html        # WHAT TERMINAL.APP ACTUALLY PAINTS
 ./xscapes -wired  assets/frames/wired.html             # a turn through the REAL reducer
 ./xscapes -info                                        # profile, size, chroma
 ./xscapes -mockup assets/frames/composition-study.html   # left vs mirrored, every terminal shape
@@ -240,16 +280,22 @@ Demo flags: `-wired -mockup -anim -compare -layout -context -day -busy -kittens 
 
 ## ▶ NEXT
 
-1. **⭐ Make the whole scape cube-exact, per his Terminal.app ruling.** The sand
-   and the sun already are, and they are the two regions he stopped complaining
-   about. Everything else is picked for truecolor and quantised badly:
-   - sea depth: `rgb(30,79,118)` / `(41,96,132)` / `(46,105,139)` all land on
-     `rgb(0,95,135)` -- the gradient is gone and the hue is off (errors 38-47).
-   - sky: `rgb(78,110,163)` -> `rgb(95,95,175)`, blue reads purple.
-   The method that worked: pick colours the xterm-256 palette actually holds, so
-   they survive quantisation unchanged and look the same in both profiles. The
-   cube has six levels per channel and almost no browns, which is why every
-   free-chosen sand landed on olive, dusty rose, dusty red or grey.
+1. ~~**Make the whole scape cube-exact.**~~ **SKY AND SEA DONE 2026-09-02
+   (session 11)** -- see "Where we left off". What is left of it, and it is
+   smaller than it sounds:
+   - **The GLYPHS have never been checked this way.** Only backgrounds were
+     measured. Glyph colours take the `GlyphBoost` chroma lift before
+     quantisation, so they are a different problem with a different answer, and
+     `Foam`, `Grain`, `Star` and `WetSand` are all still free-chosen RGB.
+   - **`-day`, `-wired`, `-mockup`, `-faces` and `-colors` all still render true
+     RGB** except where `-colors` explicitly asks for 256. They flatter every
+     palette they show. `HTMLFragmentAs(px, term.Profile256)` is the fix and it
+     is one argument per call site.
+   - The night stays monochrome and that is still the right answer; the cube has
+     nothing dark and coloured except the pure-blue column, which was rendered
+     and rejected. Dawn and dusk DID move off grey: between luma 40 and 80 there
+     are violets and blues (`#5f00af`, `#005faf`) the earlier survey missed
+     because it only looked below luma 40.
 2. **Re-tune the reducer against a real recording.** Still never done.
    `~/.config/asciiscapes/run/*.jsonl` is a real day now; `xscapes replay` folds
    it. `TauFall=12s`, `TurnFloor=0.30`, `FlightFloor=0.45` are all unverified.
