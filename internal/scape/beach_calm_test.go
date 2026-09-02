@@ -62,13 +62,28 @@ func TestNoRowIsAConfettiOfNearIdenticalTones(t *testing.T) {
 	}
 }
 
+// openSea returns the rows that are pure depth: below the horizon, above the
+// band the swell moves through. Derived from the shore's own geometry rather
+// than hardcoded, because the layout moves when the writing band changes size
+// and a test pinned to row numbers starts measuring the wrong thing.
+func openSea(sh *Shore, c *canvas.Canvas) (from, to int) {
+	lo := c.H
+	for _, e := range sh.lastEdge {
+		if int(e) < lo {
+			lo = int(e)
+		}
+	}
+	return int(float64(c.H)*0.42) + 1, lo - 2
+}
+
 func TestTheSeaBandsAreFlatAcrossARow(t *testing.T) {
-	c := scapeFrames(1)[0]
+	sh := NewShore(7, false)
+	c := canvas.New(120, 26, canvas.AlphaFar, canvas.AlphaMid, canvas.AlphaNear)
+	sh.Update(c, 0.1, Activity{Level: 0.7, TimeOfDay: 0.3868})
 	tones := rowTones(c)
-	// The open sea sits between the horizon and the waterline band. Those rows
-	// are pure depth and should be one colour each.
+	from, to := openSea(sh, c)
 	busy := 0
-	for y := 11; y <= 17; y++ {
+	for y := from; y <= to; y++ {
 		if tones[y] > 2 {
 			busy++
 			t.Logf("sea row %d has %d tones", y, tones[y])
@@ -80,10 +95,17 @@ func TestTheSeaBandsAreFlatAcrossARow(t *testing.T) {
 }
 
 func TestTheBackdropHoldsStillBetweenFrames(t *testing.T) {
-	fr := scapeFrames(24)
+	sh := NewShore(7, false)
+	var fr []*canvas.Canvas
+	for i := 0; i < 24; i++ {
+		c := canvas.New(120, 26, canvas.AlphaFar, canvas.AlphaMid, canvas.AlphaNear)
+		sh.Update(c, float64(i)*0.1, Activity{Level: 0.7, TimeOfDay: 0.3868})
+		fr = append(fr, c)
+	}
+	from, to := openSea(sh, fr[0])
 	changed, total := 0, 0
 	for i := 1; i < len(fr); i++ {
-		for y := 11; y <= 17; y++ { // open sea, above the tide
+		for y := from; y <= to; y++ { // open sea, above the tide
 			for x := 0; x < fr[i].W; x++ {
 				total++
 				if fr[i].BGAt(x, y) != fr[i-1].BGAt(x, y) {
@@ -149,5 +171,33 @@ func TestTheWaterNeverReachesTheWritingBand(t *testing.T) {
 				}
 			}
 		}
+	}
+}
+
+// The sea has to meet the sand along a ragged line, not a ruled one.
+//
+// Carving the writing band off the bottom BEFORE laying out the beach is what
+// buys this: the mean waterline sits high enough that the whole swell fits
+// above the band. Clamping it off the band afterwards put every trough on the
+// same row -- "The line between ocean and sand beach is fully straight, while
+// before it was more organic and you could see the waves crashing on the sand."
+func TestTheShorelineIsRaggedWhenTheAgentIsWorking(t *testing.T) {
+	sh := NewShore(7, false)
+	c := canvas.New(120, 26, canvas.AlphaFar, canvas.AlphaMid, canvas.AlphaNear)
+	for i := 0; i < 40; i++ {
+		sh.Update(c, float64(i)*0.1, Activity{Working: true, Level: 0.8, TimeOfDay: 0.3868})
+	}
+	lo, hi := 999.0, -999.0
+	for _, e := range sh.lastEdge {
+		if e < lo {
+			lo = e
+		}
+		if e > hi {
+			hi = e
+		}
+	}
+	t.Logf("waterline spans rows %.2f to %.2f (%.2f rows of relief)", lo, hi, hi-lo)
+	if hi-lo < 1.5 {
+		t.Errorf("shoreline spans only %.2f rows: it is a ruled line, not a shore", hi-lo)
 	}
 }

@@ -170,24 +170,36 @@ func (s *Shore) Update(c *canvas.Canvas, t float64, act Activity) {
 	if s.SkyRows > 0 {
 		hy = s.SkyRows
 	}
+	// The writing band is carved off the bottom FIRST, and everything else is
+	// laid out in what is left.
+	//
+	// Doing it the other way round is what flattened the shoreline: the mean
+	// waterline was placed against the bottom of the canvas and then clamped
+	// off the band, so every trough of the swell hit the same row and the sea
+	// met the sand along a ruled line. Give the swell the room above the band
+	// instead and the waterline gets its shape back.
+	writeTop := c.H
+	if s.WriteRows > 0 && c.H > s.WriteRows+4 {
+		writeTop = c.H - s.WriteRows
+	}
+
 	// Mean waterline. Eight tenths down is right in a tall window and
 	// collapses the beach in a short one -- at fourteen rows it left a single
 	// row of sand, so three of the four lines of writing had nowhere to go.
 	// Keep it proportional, but never let fewer than five rows of beach
-	// survive. At 24 rows and above this computes exactly the number it always
-	// did; it only bites on a short pane.
-	sy := c.H - 5
-	if p := c.H / 5; p > 5 {
-		sy = c.H - p
+	// survive.
+	sy := writeTop - 5
+	if p := writeTop / 5; p > 5 {
+		sy = writeTop - p
 	}
 	if s.SandRows > 0 {
-		sy = c.H - s.SandRows
+		sy = writeTop - s.SandRows
 	}
 	if sy <= hy+1 {
 		sy = hy + 2
 	}
-	if sy > c.H-2 {
-		sy = c.H - 2
+	if sy > writeTop-2 {
+		sy = writeTop - 2
 	}
 
 	// Everything sized in rows has to scale, or the scene that is composed at
@@ -207,15 +219,6 @@ func (s *Shore) Update(c *canvas.Canvas, t float64, act Activity) {
 	s.lastT = t
 	s.phase += dt * (0.55 + act.Level*1.45)
 	tt := s.phase
-	// Hold the water out of the writing band. The swell may not reach the rows
-	// the agent's work is written on, or the text ends up on waves.
-	writeTop := c.H
-	if s.WriteRows > 0 && c.H > s.WriteRows+4 {
-		writeTop = c.H - s.WriteRows
-		if sy > writeTop-1 {
-			sy = writeTop - 1
-		}
-	}
 	edge := s.waterline(c.W, sy, tt, act, scale)
 	for i := range edge {
 		if edge[i] > float64(writeTop)-1 {
@@ -377,7 +380,11 @@ func (s *Shore) paintBG(c *canvas.Canvas, hy int, edge []float64) {
 				// is the page, not the picture.
 				col = writeBandColor(s.pal)
 			default:
-				f := (fy - mean) / math.Max(1, float64(c.H-1)-mean)
+				bottom := float64(c.H - 1)
+				if s.writeTop > 0 && s.writeTop < c.H {
+					bottom = float64(s.writeTop - 1)
+				}
+				f := (fy - mean) / math.Max(1, bottom-mean)
 				if f < 0 {
 					f = 0
 				}
