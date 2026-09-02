@@ -67,3 +67,16 @@ func LeaveTo(row int) string {
 	}
 	return LeaveBand() + "\x1b[0m" + fmt.Sprintf("\x1b[%d;1H", row)
 }
+
+// Rebind moves the band to a new geometry after the window changed size,
+// clearing the rows that changed hands, and leaves the agent's cursor exactly
+// where it found it.
+//
+// The cursor is the whole point. DECSTBM homes it, so re-stating the region
+// dropped the cursor on row 1 while the agent still believed it was in its
+// input box -- and everything typed after a resize echoed onto row 1, on top
+// of the transcript. Same rule as LeaveTo, from the other side: save before
+// touching the region, restore after the last time you touch it.
+func Rebind(clearFrom, clearTo, agentRows int) string {
+	return saveCursor + clearRowsBare(clearFrom, clearTo) + EnterBand(agentRows) + restoreCursor
+}

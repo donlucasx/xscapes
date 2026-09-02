@@ -101,3 +101,35 @@ func TestLeaveToStillGivesTheWholeScreenBack(t *testing.T) {
 	idx(t, got, "\x1b[r", "scroll region reset")
 	idx(t, got, "\x1b[?6l", "origin mode off")
 }
+
+// Re-pinning the band on a resize must not move the agent's cursor.
+//
+// DECSTBM homes the cursor, so re-stating the region left it at row 1 while the
+// agent still believed it was in its input box. Everything typed after a resize
+// then echoed onto row 1, on top of the transcript -- which is exactly what he
+// saw: "PeHello claude lets get to work" written over "Permission allow rule".
+func TestRebindLeavesTheCursorWhereItFoundIt(t *testing.T) {
+	got := Rebind(21, 30, 48)
+	save := idx(t, got, "\x1b7", "cursor save")
+	restore := strings.LastIndex(got, "\x1b8")
+	if restore < 0 {
+		t.Fatalf("no cursor restore in %q", got)
+	}
+	lastRegion := strings.LastIndex(got, "r\x1b[?6h") // the end of EnterBand
+	if save != 0 {
+		t.Errorf("cursor saved at %d, want first: %q", save, got)
+	}
+	if restore < lastRegion {
+		t.Errorf("cursor restored at %d, before the last region change at %d: %q", restore, lastRegion, got)
+	}
+}
+
+func TestRebindClearsTheRowsItIsToldTo(t *testing.T) {
+	got := Rebind(21, 23, 48)
+	for _, row := range []string{"\x1b[21;1H", "\x1b[22;1H", "\x1b[23;1H"} {
+		idx(t, got, row+"\x1b[2K", "clear of row "+row)
+	}
+	if strings.Contains(got, "\x1b[24;1H\x1b[2K") {
+		t.Error("cleared a row outside the range it was given")
+	}
+}

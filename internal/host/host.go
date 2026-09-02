@@ -202,7 +202,7 @@ func (h *Host) Run() error {
 				// The band is re-pinned BEFORE the pty is resized, because the
 				// child's repaint arrives with the SIGWINCH and has to land in
 				// the new region rather than the one it is leaving.
-				h.write(clearRows(oldAgent+1, min(oldRows, agentRows)) + EnterBand(agentRows))
+				h.write(Rebind(oldAgent+1, min(oldRows, agentRows), agentRows))
 				// The screen was just touched behind the tracker's back.
 				dmg.reset()
 				p.SetSize(cols, agentRows)
@@ -235,18 +235,27 @@ func (h *Host) Run() error {
 	}
 }
 
-// clearRows blanks rows first..last inclusive, in screen coordinates. Used
-// outside the band, so it is only ever called between BeginPaint's region
-// reset and EndPaint -- or before the band exists at all.
+// clearRows blanks rows first..last inclusive, in screen coordinates, and puts
+// the cursor back where it was.
 func clearRows(first, last int) string {
 	if first > last {
 		return ""
 	}
+	return saveCursor + clearRowsBare(first, last) + restoreCursor
+}
+
+// clearRowsBare is clearRows without the save and restore, for callers that
+// own the cursor themselves. It still drops origin mode and the region,
+// because rows outside the band cannot be addressed otherwise, and it leaves
+// the cursor on the last row it cleared.
+func clearRowsBare(first, last int) string {
+	if first > last {
+		return ""
+	}
 	var b strings.Builder
-	b.WriteString(saveCursor + originOff + regionReset)
+	b.WriteString(originOff + regionReset)
 	for r := first; r <= last; r++ {
 		fmt.Fprintf(&b, "\x1b[%d;1H\x1b[2K", r)
 	}
-	b.WriteString(restoreCursor)
 	return b.String()
 }
