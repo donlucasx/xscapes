@@ -133,3 +133,53 @@ func TestRebindClearsTheRowsItIsToldTo(t *testing.T) {
 		t.Error("cleared a row outside the range it was given")
 	}
 }
+
+// The alternate screen exists to remove the reflow entirely.
+//
+// Measured: growing a window makes the terminal pull scrolled-off lines back in
+// from history, which pushes the agent's UI down and out of its band -- and the
+// agent never notices, because it emits nothing at all on a resize and places
+// its input purely by relative moves. The alternate screen has no history, so
+// there is nothing to pull back and nothing moves.
+
+func TestAltScreenIsTakenBeforeTheBandIsPinned(t *testing.T) {
+	got := Open(true, 44, 72)
+	screen := idx(t, got, "\x1b[?1049h", "switch to the alternate screen")
+	region := idx(t, got, "\x1b[1;44r", "band pinned")
+	if screen > region {
+		t.Errorf("screen switched at %d, after the band was pinned at %d: switching resets the scroll region, so it has to come first", screen, region)
+	}
+}
+
+func TestAltScreenNeedsNoClearingOfTheMainScreen(t *testing.T) {
+	got := Open(true, 44, 72)
+	if strings.Contains(got, "\x1b[2K") {
+		t.Error("cleared rows one at a time on a screen that starts blank")
+	}
+}
+
+func TestMainScreenStillClearsBeforePinning(t *testing.T) {
+	got := Open(false, 20, 30)
+	idx(t, got, "\x1b[1;1H\x1b[2K", "row 1 cleared")
+	idx(t, got, "\x1b[1;20r", "band pinned")
+}
+
+func TestClosingTheAltScreenGivesTheShellItsScreenBack(t *testing.T) {
+	got := Close(true, 44, 72)
+	region := idx(t, got, "\x1b[r", "scroll region released")
+	back := idx(t, got, "\x1b[?1049l", "main screen restored")
+	if back < region {
+		t.Errorf("main screen restored at %d, before the region was released at %d: the region would follow us back", back, region)
+	}
+}
+
+// On the main screen there is no screen to hand back, so the rows have to be
+// cleaned up and the cursor parked below the band instead.
+func TestClosingTheMainScreenClearsTheScapeAndParksTheCursor(t *testing.T) {
+	got := Close(false, 20, 30)
+	idx(t, got, "\x1b[21;1H\x1b[2K", "scape row cleared")
+	idx(t, got, "\x1b[21;1H", "cursor parked below the band")
+	if strings.Contains(got, "\x1b[?1049l") {
+		t.Error("tried to leave an alternate screen it never entered")
+	}
+}

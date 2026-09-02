@@ -55,6 +55,7 @@ func runInside(args []string, agent string) {
 	ctxUsed := fs.Float64("ctx", 0, "pin context used, 0..1 (0 = the session's own)")
 	dry := fs.Bool("print", false, "print what would run and how the window splits, then exit")
 	scapeH := fs.Int("scape", 0, "rows to give the scape (0 = two fifths of the window)")
+	alt := fs.Bool("alt", true, "run on the alternate screen: resize-proof, but the agent's output does not go to your terminal's scrollback")
 	fs.Usage = func() {
 		if agent != "" {
 			fmt.Fprintf(os.Stderr, `xscapes claude [flags] [%s arguments ...]
@@ -87,6 +88,7 @@ With no command, runs claude.
 	if *dry {
 		fmt.Printf("window   %dx%d\n", cols, rows)
 		fmt.Printf("agent    rows 1-%d   %s\n", agentRows, strings.Join(argv, " "))
+		fmt.Printf("screen   %s\n", map[bool]string{true: "alternate (no scrollback; resize-proof)", false: "main (scrollback kept; resize displaces the agent)"}[*alt])
 		if scapeRows > 0 {
 			fmt.Printf("scape    rows %d-%d\n", agentRows+1, rows)
 		} else {
@@ -119,6 +121,7 @@ With no command, runs claude.
 		Size:      termSize,
 		FPS:       *fps,
 		ScapeRows: *scapeH,
+		AltScreen: *alt,
 		Paint: func(cols, rows int) []string {
 			now := time.Now()
 			if w, hh := fr.size(); w != cols || hh != rows {

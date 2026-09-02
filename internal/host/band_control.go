@@ -80,3 +80,45 @@ func LeaveTo(row int) string {
 func Rebind(clearFrom, clearTo, agentRows int) string {
 	return saveCursor + clearRowsBare(clearFrom, clearTo) + EnterBand(agentRows) + restoreCursor
 }
+
+const (
+	altOn  = "\x1b[?1049h"
+	altOff = "\x1b[?1049l"
+)
+
+// Open takes the screen and pins the agent's band to the top of it.
+//
+// The alternate screen is the answer to the one thing the band could not
+// defend against. Growing a window makes the terminal pull scrolled-off lines
+// back in from history, which pushes the agent's UI down and out of its band;
+// the agent never notices, because it emits nothing at all on a resize and
+// places its input purely by relative moves from wherever the cursor happens to
+// be. Measured both ways: plain Claude survives that resize, Claude in a band on
+// the main screen does not. The alternate screen has no history, so there is
+// nothing to pull back and nothing moves.
+//
+// What it costs is the same thing: lines that scroll out of the agent's band
+// are gone rather than going to scrollback. That is the trade, and it is why
+// this is a flag.
+//
+// The switch comes first, because switching buffers resets the scroll region.
+func Open(alt bool, agentRows, rows int) string {
+	if alt {
+		// Nothing to clear: the alternate buffer starts blank.
+		return altOn + EnterBand(agentRows)
+	}
+	return clearRows(1, rows) + EnterBand(agentRows)
+}
+
+// Close gives the screen back.
+//
+// On the alternate screen that is one sequence and the shell's own screen
+// returns untouched, scrollback and all. On the main screen there is nothing to
+// return to, so the scape's rows have to be cleaned up by hand and the cursor
+// parked below the band for whatever prompt comes next.
+func Close(alt bool, agentRows, rows int) string {
+	if alt {
+		return LeaveBand() + "\x1b[0m" + altOff
+	}
+	return clearRows(agentRows+1, rows) + LeaveTo(agentRows+1)
+}

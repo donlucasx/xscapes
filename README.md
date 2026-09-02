@@ -68,6 +68,18 @@ scape reads downward instead -- a strip of sky under the agent, then the sea,
 then the beach -- and a taller window spends its extra rows on beach, where the
 agent's work is written.
 
+It runs on the alternate screen, the way vim or htop do. That is not cosmetic:
+growing a window makes the terminal pull scrolled-off lines back in from
+history, which pushes the agent's UI down and out of its band -- and the agent
+never notices, because it emits nothing at all on a resize and places its input
+purely by relative moves from wherever the cursor is. Measured both ways: plain
+Claude Code survives that resize, Claude Code in a band on the main screen does
+not. The alternate screen has no history, so there is nothing to pull back.
+
+The cost is the other side of the same coin: lines that scroll out of the
+agent's band are gone rather than going to your terminal's scrollback.
+`-alt=false` keeps the scrollback and takes the resize problem back.
+
 What xscapes gives up by not being an emulator: the sea does not show through
 the agent's own blank space. Its band is its own.
 
@@ -136,6 +148,7 @@ xscapes inside <command>   # host any command inside the scape, not just claude
 xscapes claude -beside     # the older side by side layout, in tmux
 xscapes claude -scape 24   # give the shoreline more rows (default: two fifths)
 xscapes claude -fps 8      # slow the scape down
+xscapes claude -alt=false  # keep terminal scrollback, at the cost below
 xscapes -live              # the scape in this terminal, Ctrl-C to quit
 xscapes -info              # colour profile, size, which sound player
 xscapes notify             # hear both knocks

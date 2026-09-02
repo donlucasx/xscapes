@@ -39,6 +39,9 @@ type Host struct {
 	FPS float64
 	// ScapeRows fixes the scape's height. Zero takes the automatic split.
 	ScapeRows int
+	// AltScreen runs on the alternate screen, which has no history for the
+	// terminal to pull back in when the window grows. See Open.
+	AltScreen bool
 	// In and Out default to os.Stdin and os.Stdout. Overridable for tests.
 	In  *os.File
 	Out *os.File
@@ -97,7 +100,7 @@ func (h *Host) Run() error {
 	var leaving sync.Once
 	leave := func() {
 		leaving.Do(func() {
-			h.write(clearRows(agentRows+1, rows) + LeaveTo(agentRows+1))
+			h.write(Close(h.AltScreen, agentRows, rows))
 			restoreTermios(in.Fd(), saved)
 		})
 	}
@@ -127,13 +130,11 @@ func (h *Host) Run() error {
 	p.slave.Close()
 	p.slave = nil
 
-	// Clear the WHOLE screen once, then pin the agent.
-	//
-	// The whole screen, not just the scape's rows: Claude Code never clears the
-	// display (measured -- no ED in anything it emits), so it simply prints over
-	// whatever is already there. Clearing only below the band left the previous
-	// run's output sitting inside the new one's, half-overwritten.
-	h.write(clearRows(1, rows) + EnterBand(agentRows))
+	// Take the screen and pin the band. On the main screen that means clearing
+	// first, because Claude Code never clears the display itself -- measured,
+	// it emits no ED at all -- so it would print over whatever was already
+	// there.
+	h.write(Open(h.AltScreen, agentRows, rows))
 	// Only what moved gets sent. See damage.
 	var dmg damage
 
