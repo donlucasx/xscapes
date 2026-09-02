@@ -42,7 +42,8 @@ Two exceptions, and they are the whole design:
    region to the full screen, so a region set before launch is wiped. A host
    must swallow those three bytes in the pass-through stream (a byte match, not
    a parser) or re-assert its region after startup.
-2. **`ESC[H` on resize.** On SIGWINCH Claude homes the cursor and repaints from
+2. **`ESC[H` on resize -- ONLY ON A FRESH SESSION. See the correction below.**
+   On SIGWINCH Claude homes the cursor and repaints from
    the top with a `ESC[2K` + `ESC[1B` clear-down loop. Absolute home is the only
    absolute move it makes. Origin mode (`ESC[?6h`) makes `ESC[H` land at the
    region's top margin instead of the screen's -- and Claude never touches
@@ -92,3 +93,40 @@ agent's last output was simply gone.
 The rule that falls out of it, and that `internal/host` now encodes in tests:
 **save the cursor before touching the region, and place the cursor after the
 last time you touch it.**
+
+## Correction, 2026-09-02: Claude does NOT repaint on resize
+
+The claim above -- "on SIGWINCH Claude homes the cursor and repaints from the
+top" -- was measured on a session that had only just started, and what it caught
+was the STARTUP draw, not a response to the resize. Generalising it was wrong,
+and a whole resize implementation was built on it.
+
+**Measured again, on a session with a real transcript: Claude Code emits ZERO
+bytes on a resize.** Not a repaint, not a clear, nothing. Confirmed in both the
+hosted case and plain Claude in tmux: strip the host's own frames out of the
+capture and exactly zero bytes remain between the resize and the next keystroke.
+
+**It places its input line purely by relative moves from wherever the cursor is:**
+
+```
+ESC[2D ESC[4B \r ESC[2C ESC[4A  good  ESC[8G  morning
+```
+
+Never a row number. It trusts the cursor completely, which is what makes it
+survive a resize in a normal terminal -- the terminal moves the content and the
+cursor together, so relative moves stay true -- and what makes it fragile inside
+a band.
+
+**And the mechanism that breaks a band: growing a window makes the terminal pull
+scrolled-off lines back in from history**, pushing everything down. Proof: the
+startup banner, long scrolled away, reappears at the band's bottom edge after a
+grow. The agent's UI slides out of its band into the scape's rows, the agent
+never notices, and the scape paints over it.
+
+Controls that isolated it: hosted with no resize works; plain Claude with the
+same resize works; hosted plus resize fails. So it is the band, not the agent.
+
+This is why the host runs on the alternate screen: no history, nothing to pull
+back, nothing moves. The cost is that output scrolling out of the band is gone
+rather than saved, which is the exact trade the row-1 anchoring was made to
+avoid -- and it turned out to be a scrollback that could not survive being used.
