@@ -2,31 +2,24 @@
 
 *(Working directory, env vars and some prose below still say "asciiscapes". Deliberate: renaming live state orphans an installed hook.)*
 
-> **Where we left off — 2026-09-01 (session 9), last code change `d70ff65`, 92 commits, pushed.**
+> **Where we left off — 2026-09-02 (session 10), last code change `0e7f265`, pushed, tagged `v0.2.1`.**
 > **Live: https://github.com/donlucasx/xscapes** (public, MIT). Milestone 1 is
-> COMPLETE: protocol, Claude Code adapter, installer, launcher, distinct
-> done/needs_input cues with two sounds, README + LICENSE. **The hooks are
-> installed and firing against real sessions** — proven end to end in tmux, so
-> "no hook has ever fired into it" is retired.
-> **⭐ THE AGENT NOW RUNS INSIDE THE SCAPE — BUILT, session 8.** Anywhere this
+> COMPLETE and the hooks are installed and firing against real sessions.
+> **⭐ THE AGENT RUNS INSIDE THE SCAPE, ON THE ALTERNATE SCREEN.** Anywhere this
 > brief still says "alongside the agent via tmux", that is the OLD design.
 > `xscapes claude` puts Claude Code in a band pinned to the top rows with the
-> scape painting below it, one window, no tmux; `xscapes claude -beside` is the
-> old layout. It is a pty band held by DECSTBM, **not** a terminal emulator, on
-> purpose: the agent's bytes reach the terminal untouched, so no gap in our
-> parsing can corrupt its display. See `RESUME.md` and
-> `notes/claude-terminal-emissions.md`.
-> **The beach now falls away to black** (`DefaultSandFade` = 1.0): newest-line
-> contrast 132→204 midday, 148→204 night, equal at every hour.
-> **The companion pick is PARKED at his request** — four whisker variants built
-> and waiting; do NOT re-ask, do not default anything.
-> `go build`, `go vet`, `go test` and `-race` clean.
-> **`notes/claude-hooks-verified.md` is the hook payload schema, read out of the
-> Claude Code binary itself — trust it, do not re-derive it.**
-> **`research/prior-art.md` answers "has anyone built this already"** — surveyed
-> 2026-09-01. Four categories, nobody in the overlap. Trust it, do not re-run it.
-> ▶ NEXT is a day of real use on `xscapes inside` plus the demo video (entries
-> close 2026-09-17). See `RESUME.md`.
+> scape below it, one window, no tmux; `-beside` is the old layout; `inside <cmd>`
+> hosts anything. The alternate screen is load-bearing, not cosmetic: on the main
+> screen a resize makes the terminal pull scrollback back in and push the agent's
+> UI out of its band, and the agent never notices because it emits nothing at all
+> on a resize. Cost: no terminal scrollback for the agent. `-alt=false` reverses it.
+> **⭐ TARGET IS TERMINAL.APP, his ruling 2026-09-02** — *"at this point I want to
+> optimize the experience for terminal.app which should be the most used?"* This
+> REVERSES the standing advice to install a truecolor terminal. Consequence:
+> cube-exact colour is the general rule for the whole scape. Only the sand and
+> the sun follow it today; the sea and sky are still chosen for truecolor and
+> quantise badly. That is ▶ NEXT #1 in RESUME.md.
+> **The statusline is chained**, so the context moon has a live feed at last.
 
 **Name: `xscapes`** (decided 2026-09-01 with the repo; asciiscapes and iixscapes are out). The working directory and these docs still say asciiscapes. A cozy ASCII "thinking screen" for terminal AI agents. While Claude Code (or any agent) works, a small living scene runs WITH it — a shoreline whose sea rises with the work, and a companion animal — and nudges the user, visually and with a sound, when the agent finishes or needs input.
 
