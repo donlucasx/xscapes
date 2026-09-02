@@ -145,6 +145,21 @@ func (c RGB) Index256Keeping() int {
 	if c.ordersKept(FromIndex256(plain)) {
 		return plain
 	}
+	// A GREY answer is left alone, and this is the whole safety of the thing.
+	//
+	// Grey has no channel ordering, so it fails ordersKept by definition -- and
+	// without this line the search then goes looking for a cube colour that
+	// does have one, in a region of the cube where the only candidates are the
+	// pure #0000xx column. That is precisely the electric royal blue night
+	// Shore.BlueSky records as rendered and rejected, and it is what this
+	// function shipped as before the check was added: a midnight sky in
+	// saturated navy with a teal sea, nothing like the frame it was quantising.
+	//
+	// Washing out and turning the wrong colour are different failures. This
+	// function is only allowed to fix the second one.
+	if plain >= 232 {
+		return plain
+	}
 	ri, _ := nearestCube(c.R)
 	gi, _ := nearestCube(c.G)
 	bi, _ := nearestCube(c.B)

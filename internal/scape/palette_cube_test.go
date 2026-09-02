@@ -193,3 +193,65 @@ func TestTheSkyNeverGoesViolet(t *testing.T) {
 		}
 	}
 }
+
+// The night must NOT be saturated on 256, and this test exists because the
+// hue-preserving quantiser made it so and it shipped.
+//
+// Grey has no channel ordering, so it fails an ordering check by definition.
+// Index256Keeping saw that, went looking for a cube colour that would pass, and
+// in the dark the only candidates are the pure #0000xx column -- so a midnight
+// sky came out in saturated navy over a teal sea, which is exactly the
+// "electric royal blue that swallows the moon" that Shore.BlueSky records as
+// rendered and rejected. Nothing caught it: every test was about colour being
+// PRESENT, and none about it being absent on purpose.
+//
+// Washing out and turning the wrong colour are different failures, and only one
+// of them is a bug.
+func TestTheNightStaysMonochromeOn256(t *testing.T) {
+	chroma := func(c term.RGB) int {
+		mx, mn := int(c.R), int(c.R)
+		for _, v := range []int{int(c.G), int(c.B)} {
+			if v > mx {
+				mx = v
+			}
+			if v < mn {
+				mn = v
+			}
+		}
+		return mx - mn
+	}
+	for _, tod := range []float64{0.0, 0.02, 0.04, 0.06, 0.92, 0.96, 0.99} {
+		c := canvas.New(80, 26, canvas.AlphaFar, canvas.AlphaMid, canvas.AlphaNear)
+		sh := NewShore(7, false)
+		sh.MoonX = 0.28
+		sh.Update(c, 3.0, Activity{Working: true, Level: 0.5, TimeOfDay: tod, ContextUsed: 0.3})
+
+		// Sky and sea only. The beach below them is a warm brown by design --
+		// sandNight is #875f00, chroma 135 -- and measuring it would fail this
+		// test on the very thing it is meant to protect. The beach is found by
+		// its colour rather than by SandTop(), which sits a row above the dry
+		// sand and let the first brown row in.
+		_, _, floor := c.ResolveAt(2, c.H-1, term.Profile256)
+		beach := c.H
+		for y := c.H - 1; y > 0; y-- {
+			if _, _, bg := c.ResolveAt(2, y, term.Profile256); bg != floor {
+				beach = y + 1
+				break
+			}
+		}
+		worst, at := 0, 0
+		for y := 0; y < beach; y++ {
+			_, _, bg := c.ResolveAt(2, y, term.Profile256)
+			if ch := chroma(bg); ch > worst {
+				worst, at = ch, y
+			}
+		}
+		t.Logf("tod %.2f: the most saturated background row is %d, chroma %d", tod, at, worst)
+		// 60 is comfortably above the greyscale ramp, which is 0, and far below
+		// the pure-blue column, which runs 95 to 255.
+		if worst > 60 {
+			t.Errorf("tod %.2f: a night background row reads chroma %d at row %d -- the night has gone electric",
+				tod, worst, at)
+		}
+	}
+}
