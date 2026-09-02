@@ -351,3 +351,43 @@ Never paraphrase. Read the relevant section before editing anything it covers.
 
 - *"ok save this in a subfolder /research/ and /wrap"*
   ⇒ `research/prior-art.md`, then this wrap.
+
+## 2026-09-02 — session 10, verbatim
+
+- *"1. it should"* (should `xscapes claude` mean the inside layout)
+  ⇒ **SHIPPED.** `claude` hosts the agent inside the scape; `-beside` keeps the tmux layout;
+    `inside <cmd>` hosts anything. `-print` works on all three.
+
+- *"still opens side by side"* / *"what am I doing wrong"* / *"issue persists"*
+  ⇒ Three of mine in a row, each found by him: `~/go/bin` is not on his PATH so my install went
+    nowhere (his only binary is `~/.local/bin/xscapes`); `@latest` resolved to a tag predating the
+    work (fixed by tagging v0.2.0/v0.2.1); and DECSTBM homes the cursor, so re-pinning the band on
+    resize dropped his typing onto row 1.
+
+- *"as we get deeper in the session the scape breaks"* → then the resize forensics
+  ⇒ Root cause was NOT a rendering bug. Claude Code emits **zero bytes on resize** and places its
+    input purely by relative moves; growing a window makes the terminal pull scrollback back in,
+    pushing the agent's UI out of its band. Controls: no-resize works, plain Claude + resize works,
+    hosted + resize fails. ⇒ **the alternate screen**, his call after the pros/cons.
+
+- *"beach now reading like a beach, but its lost its shape/silhouette"* / *"we should be able to see
+  the water receding"* / *"it should be sand, not black"* / *"now we have a lot of beach and not
+  enough sea. Did u have to eat into the sea to extend the beach?"*
+  ⇒ Four separate corrections to the same region, all mine to fix. Ended at: one flat sand tone that
+    varies day to night, a ragged waterline with 2.9-7.5 rows of relief, the writing band INSIDE the
+    beach's share rather than added to it, and no black seam.
+
+- *"what if we use the moon as a sun. Same object, same variable. only thing we gotta change is the
+  color (like the rest of the scape does)"*
+  ⇒ **SHIPPED, and it is the only version that does not break the encoding** — context is carried by
+    phase AND altitude, so a second body would need a second encoding for one variable.
+
+- *"lets make it a tad taller so all the xscape layers can shine"*
+  ⇒ Scape takes 9/20 of the window, was 2/5.
+
+- ⭐ *"at this point I want to optimize the experience for terminal.app which should be the most
+  used?"*
+  ⇒ **RULING, and it reverses my standing recommendation.** I had been telling him to install a
+    truecolor terminal. He is targeting Terminal.app instead. That makes the cube-exact colour
+    approach — used so far only for the sand and the sun — the GENERAL rule for the whole scape,
+    not a special case. See ▶ NEXT.
