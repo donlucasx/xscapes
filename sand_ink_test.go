@@ -22,6 +22,14 @@ import (
 //
 // So this renders a real frame and reads the pixels back: the glyph colour the
 // renderer chose, against the background it actually painted underneath.
+func roundAll(v []float64) []int {
+	out := make([]int, len(v))
+	for i, x := range v {
+		out[i] = int(x + 0.5)
+	}
+	return out
+}
+
 func TestSandWritingStaysReadable(t *testing.T) {
 	const w, h = 92, 40
 	work := []string{
@@ -73,6 +81,8 @@ func TestSandWritingStaysReadable(t *testing.T) {
 			t.Fatalf("tod %.3f: found %d written rows, want %d", tod, len(got), len(work))
 		}
 		got = got[len(got)-len(work):]
+
+		t.Logf("tod %.3f: contrast oldest->newest = %v", tod, roundAll(got))
 
 		// got runs top to bottom, which is oldest to NEWEST: the tail is
 		// painted newest-lowest, nearest the companion and last in the

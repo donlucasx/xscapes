@@ -45,6 +45,19 @@ type Shore struct {
 	// stays settable for the tuner and for tests.
 	SandFade float64
 
+	// WriteRows reserves the bottom rows of the scape for the agent's work.
+	//
+	// Those rows are the page the last few actions are written on, and they
+	// were not a page at all: the swell reached into them, so the text sat on
+	// waves and foam and read against a background that changed under every
+	// character. His words -- "because the sand changes colors its a bit
+	// distracting from the bottom 4 lines".
+	//
+	// So they are held out of the water entirely and painted one flat colour.
+	// Not the whole beach flat, which would throw away the depth the wet sand
+	// carries; just the part that has writing on it.
+	WriteRows int
+
 	// SkyRows and SandRows override the proportional layout, in rows. Zero
 	// means the default fractions.
 	//
@@ -60,6 +73,9 @@ type Shore struct {
 	// goes looking for, and stacking them in one column leaves half the frame
 	// carrying nothing. Zero means the default.
 	MoonX float64
+
+	// writeTop is the first row of the writing band, or c.H when there is none.
+	writeTop int
 
 	// lastEdge is the waterline Update most recently computed. Kept for the
 	// same reason as moonX/moonY: it is the scene's real geometry, and a
@@ -134,7 +150,7 @@ func (s *Shore) SandColor() term.RGB { return s.pal.SandNear }
 func (s *Shore) MoonPos() (x, y int) { return s.moonX, s.moonY }
 
 func NewShore(seed int64, asciiOnly bool) *Shore {
-	return &Shore{Seed: seed, ASCII: asciiOnly, SandFade: DefaultSandFade}
+	return &Shore{Seed: seed, ASCII: asciiOnly, SandFade: DefaultSandFade, WriteRows: DefaultWriteRows}
 }
 
 func (s *Shore) Name() string { return "shore" }
@@ -191,8 +207,23 @@ func (s *Shore) Update(c *canvas.Canvas, t float64, act Activity) {
 	s.lastT = t
 	s.phase += dt * (0.55 + act.Level*1.45)
 	tt := s.phase
+	// Hold the water out of the writing band. The swell may not reach the rows
+	// the agent's work is written on, or the text ends up on waves.
+	writeTop := c.H
+	if s.WriteRows > 0 && c.H > s.WriteRows+4 {
+		writeTop = c.H - s.WriteRows
+		if sy > writeTop-1 {
+			sy = writeTop - 1
+		}
+	}
 	edge := s.waterline(c.W, sy, tt, act, scale)
+	for i := range edge {
+		if edge[i] > float64(writeTop)-1 {
+			edge[i] = float64(writeTop) - 1
+		}
+	}
 	s.lastEdge = edge
+	s.writeTop = writeTop
 
 	s.paintBG(c, hy, edge)
 	s.stars(c, hy, t)
@@ -250,6 +281,24 @@ const DefaultSandFade = 1.0
 // palette already says with WetSand.
 const sandFadeStart = 0.30
 
+// DefaultWriteRows matches reduce.TailLen: the beach holds four lines, so four
+// rows are kept dry for them.
+const DefaultWriteRows = 4
+
+// writeBandMix is how far the writing band sits toward the void from the dry
+// sand. Full, and that was measured rather than chosen.
+//
+// Swept 0.72 / 0.85 / 0.92 / 1.00 against the contrast each of the four lines
+// gets from the background it is actually painted on. Full wins on every line
+// at every hour, and wins the same amount at every hour -- 98 / 133 / 168 / 204
+// oldest to newest, midnight and noon alike. Against the old beach that was
+// 53 / 69 / 120 / 204 at noon: the newest line, which the locked sand fade was
+// chosen to protect, keeps its 204 exactly, and the oldest line nearly doubles.
+//
+// It also keeps the property the fade was locked at full for: a true black
+// bottom merges with the agent's own black background instead of leaving a seam.
+const writeBandMix = 1.00
+
 func (s *Shore) paintBG(c *canvas.Canvas, hy int, edge []float64) {
 	fh := math.Max(1, float64(hy))
 	// The DRY beach is measured from the mean waterline, not from each
@@ -296,6 +345,10 @@ func (s *Shore) paintBG(c *canvas.Canvas, hy int, edge []float64) {
 				// The waterline cell straddles sea and sand. Mix by how much of
 				// the cell the water actually covers.
 				col = term.Lerp(s.pal.WetSand, s.pal.SeaNear, ex-fy+0.5)
+			case s.writeTop > 0 && y >= s.writeTop:
+				// One flat tone, all the way across and all the way down. This
+				// is the page, not the picture.
+				col = term.Lerp(s.pal.SandNear, voidCol, writeBandMix)
 			default:
 				f := (fy - mean) / math.Max(1, float64(c.H-1)-mean)
 				if f < 0 {
@@ -564,8 +617,12 @@ func (s *Shore) sand(c *canvas.Canvas, edge []float64) {
 	if s.ASCII {
 		g = '.'
 	}
+	bottom := c.H
+	if s.writeTop > 0 && s.writeTop < bottom {
+		bottom = s.writeTop
+	}
 	for x := 0; x < c.W; x++ {
-		for y := int(edge[x]) + 2; y < c.H; y++ {
+		for y := int(edge[x]) + 2; y < bottom; y++ {
 			if HashF(x, y, s.Seed+11) > 0.035 {
 				continue
 			}
@@ -587,6 +644,9 @@ func (s *Shore) foam(c *canvas.Canvas, edge []float64, scale float64) {
 		y := int(math.Round(edge[x]))
 		for dy := -1; dy <= 1; dy++ {
 			yy := y + dy
+			if s.writeTop > 0 && yy >= s.writeTop {
+				continue
+			}
 			h := HashF(x, yy, s.Seed+23)
 			cut := 0.25 + 0.30*scale
 			if dy != 0 {

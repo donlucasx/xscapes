@@ -102,3 +102,52 @@ func TestTheBackdropHoldsStillBetweenFrames(t *testing.T) {
 		t.Errorf("the open sea is restless again: %.2f%% of its cells change every frame, want under 8%%", pct)
 	}
 }
+
+// The writing band is the page the agent's work is written on: the bottom rows,
+// held out of the water, one flat tone. Before it existed the swell reached into
+// them and the text sat on waves -- "because the sand changes colors its a bit
+// distracting from the bottom 4 lines".
+
+func TestWritingBandIsOneFlatToneAndHoldsStill(t *testing.T) {
+	fr := scapeFrames(24)
+	c := fr[0]
+	top := c.H - DefaultWriteRows
+
+	tones := map[term.RGB]bool{}
+	for y := top; y < c.H; y++ {
+		for x := 0; x < c.W; x++ {
+			tones[c.BGAt(x, y)] = true
+		}
+	}
+	if len(tones) != 1 {
+		t.Errorf("writing band uses %d tones, want exactly 1", len(tones))
+	}
+
+	for i := 1; i < len(fr); i++ {
+		for y := top; y < c.H; y++ {
+			for x := 0; x < c.W; x++ {
+				if fr[i].BGAt(x, y) != fr[i-1].BGAt(x, y) {
+					t.Fatalf("writing band changed at row %d col %d between frames", y, x)
+				}
+			}
+		}
+	}
+}
+
+// The swell must never reach the writing band, at any activity level -- a busy
+// sea is exactly when the most is being written.
+func TestTheWaterNeverReachesTheWritingBand(t *testing.T) {
+	for _, level := range []float64{0, 0.3, 0.6, 0.9, 1.0} {
+		sh := NewShore(7, false)
+		for i := 0; i < 60; i++ {
+			c := canvas.New(120, 26, canvas.AlphaFar, canvas.AlphaMid, canvas.AlphaNear)
+			sh.Update(c, float64(i)*0.1, Activity{Working: true, Level: level, TimeOfDay: 0.3868})
+			top := c.H - DefaultWriteRows
+			for _, e := range sh.lastEdge {
+				if e > float64(top)-1 {
+					t.Fatalf("level %.1f: waterline reached %.1f, past the writing band at row %d", level, e, top)
+				}
+			}
+		}
+	}
+}
