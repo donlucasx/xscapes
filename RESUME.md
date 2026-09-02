@@ -74,7 +74,23 @@ Two regression tests now hold it, both proven RED against the old palette:
 the old palette, 0 on this one) and `TestTheSeaShowsItsDepthOn256` (11 of 18 sea
 rows were one colour at noon; the cap is half).
 
-**⚠ TWO THINGS FOR HIS EYE, both one constant away from being changed.**
+**⚠ THE OPEN ONE: BANDING IS MUCH WORSE IN A REAL WINDOW THAN IN ANY STUDY.**
+He ran it at **152x57** and the sky came out in four or five hard blocks with a
+grey stripe through the middle. Reproduced and measured: the number of cube
+colours a ramp crosses barely changes with height -- 8 at 68x22, 9 at 152x57 --
+while the sky grows from 10 rows to 24. **So the bands get two and a half times
+fatter and nothing about the palette fixes it.** Every study in this repo, and
+the first version of `xscapes shades`, asked the question at the size where the
+problem is mildest.
+
+Two things follow. `shades` now defaults to the real window and takes
+`-only N` to show one variant at full height. And **the shade-block rejection
+should be re-judged**: he called it "too busy" at 64x14, which is the size where
+banding is least and stipple is most obvious, and that is the opposite of the
+size that matters. A curved sky ramp was tried and is NOT the answer -- it trades
+grey rows for longer flat runs, 5 to 12 at his size.
+
+**⚠ TWO MORE FOR HIS EYE, both one constant away from being changed.**
 
 1. ~~Dusk reads magenta.~~ **GONE**, and it had to go for a reason better than
    taste -- see above. Both twilights are deep blue overhead now with the hour

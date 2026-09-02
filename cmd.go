@@ -92,6 +92,8 @@ func runEmit(args []string) {
 		agent   = fs.String("agent", "", "subagent id")
 		ms      = fs.Int64("ms", 0, "duration in milliseconds")
 		frac    = fs.Float64("frac", -1, "0..1 reading (context used)")
+		n       = fs.Int("n", 0, "todos done, for `emit todo`")
+		of      = fs.Int("of", 0, "todos in total, for `emit todo`")
 		session = fs.String("session", "", "session id (default: $CLAUDE_CODE_SESSION_ID, else current)")
 		quiet   = fs.Bool("q", false, "print nothing")
 	)
@@ -118,6 +120,7 @@ func runEmit(args []string) {
 		Kind: event.Kind(kind), Session: sess, Src: "manual",
 		Tool: *tool, Op: event.Op(*op), Target: *target, Detail: *detail,
 		Text: *text, ID: *id, Agent: *agent, MS: *ms,
+		N: *n, Of: *of,
 	}
 	if *frac >= 0 {
 		f := *frac

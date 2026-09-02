@@ -456,3 +456,21 @@ Never paraphrase. Read the relevant section before editing anything it covers.
 
 - *"6. push!"*
   ⇒ Pushed.
+
+- *"2. I think the split cells approach wins (this is only for 256 right?) option 3 gets too busy."*
+  ⇒ Split cells confirmed as the default; yes, 256 only, and `TestTruecolorIsNeverSplit` holds it.
+    ⚠ BUT he judged option 3 at 64x14, which `shades` defaulted to and which is the size where
+    banding is MILDEST. It now defaults to his real window.
+
+- *[screenshot of `xscapes -live -tod 0` at 152x57]* — hard bands and a grey stripe through the sky
+  ⇒ **Reproduced and measured, and it is the biggest open visual problem.** A ramp crosses about
+    the same number of cube colours whatever the height (8 at 68x22, 9 at 152x57) while the sky
+    grows from 10 rows to 24, so the bands get 2.5x fatter. Every study I built asked the question
+    at the mild size. A curved ramp was tried and rejected: grey rows 5->3, longest run 5->12.
+
+- *"4. can I see the difference?"*
+  ⇒ Added a fifth panel to `-day`: only the glyph cells the 256 pass changed, red for colour lost,
+    amber for hue turned, everything they agree on left dark.
+
+- *[screenshot: `xscapes emit todo -n 3 -of 5` -> flag provided but not defined: -n]*
+  ⇒ **My error: I gave him a command I had never run.** `emit` had no -n/-of. Added.

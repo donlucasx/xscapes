@@ -45,7 +45,7 @@ func dayPage(seed int64) string {
 
 	// render paints one hour and hands back both profiles plus the measurement,
 	// from a single frame so the two panels cannot drift apart.
-	render := func(tod float64) (tc, smooth, raw, blocks string, distinct, worst int) {
+	render := func(tod float64) (tc, smooth, raw, blocks, diff string, distinct, worst int) {
 		c := canvas.New(w, h, canvas.AlphaFar, canvas.AlphaMid, canvas.AlphaNear)
 		sh := scape.NewShore(seed, false)
 		sh.MoonX = lay.MoonX
@@ -99,6 +99,7 @@ func dayPage(seed int64) string {
 				prev = v
 			}
 		}
+		diff = glyphDiff(c, 11)
 		tc = c.HTMLFragmentAs(11, term.ProfileTrueColor)
 		smooth = c.HTMLFragmentAs(11, term.Profile256)
 		sh1, sh2 := term.Shading, term.ShadeBlocks
@@ -108,7 +109,7 @@ func dayPage(seed int64) string {
 		term.Shading = false
 		raw = c.HTMLFragmentAs(11, term.Profile256)
 		term.Shading, term.ShadeBlocks = sh1, sh2
-		return tc, smooth, raw, blocks, len(seen), worst
+		return tc, smooth, raw, blocks, diff, len(seen), worst
 	}
 
 	var b strings.Builder
@@ -146,7 +147,15 @@ func dayPage(seed int64) string {
 		`<b style="color:#c9c9d4">SHADE BLOCKS</b> is the idea that lost. It buys three more ` +
 		`tones between every pair of cube colours &mdash; 11 to 14 in the sky &mdash; and it ` +
 		`still looks worse, because the dot pattern reads as stipple before it reads as tone. ` +
-		`Judge it in a real terminal before believing me: <code>ASCIISCAPES_SHADE_BLOCKS=1</code>.<br>` +
+		`Judge it in a real terminal before believing me: <code>ASCIISCAPES_SHADE_BLOCKS=1</code>, ` +
+		`or <code>xscapes shades</code>, which now uses your own window size.<br>` +
+		`<b style="color:#c9c9d4">GLYPHS THE 256 PASS CHANGED</b> is the last panel: ` +
+		`<span style="color:#ff4d4d">red</span> where a coloured glyph came out grey, ` +
+		`<span style="color:#ffb020">amber</span> where it kept colour and lost hue. ` +
+		`Everything the two profiles agree on is left dark.<br>` +
+		`&#9888; These panels are 68 columns by 22 rows. A real window is taller, and banding ` +
+		`gets WORSE with height &mdash; the ramp crosses about the same number of cube colours ` +
+		`either way, so a 24-row sky has bands two and a half times as fat as a 10-row one.<br>` +
 		`Wave phase is fixed across all 24 hours so the only thing changing is colour. ` +
 		`Drag the slider, press play, or show every hour at once.</div>`)
 
@@ -160,7 +169,7 @@ func dayPage(seed int64) string {
 	b.WriteString(`<div id="reel" class="single">`)
 	for i := 0; i < hours; i++ {
 		tod := float64(i) / float64(hours)
-		tc, smooth, raw, blocks, distinct, worst := render(tod)
+		tc, smooth, raw, blocks, diff, distinct, worst := render(tod)
 		on := ""
 		if i == 12 {
 			on = " on"
@@ -177,6 +186,8 @@ func dayPage(seed int64) string {
 			`<div class="win">%s</div></div>`, raw)
 		fmt.Fprintf(&b, `<div><div class="lv">256 + shade blocks &mdash; rejected</div>`+
 			`<div class="win">%s</div></div>`, blocks)
+		fmt.Fprintf(&b, `<div><div class="lv">glyphs the 256 pass changed</div>`+
+			`<div class="win">%s</div></div>`, diff)
 
 		b.WriteString(`</div>`)
 		p := scape.PaletteAt(tod)
@@ -240,4 +251,77 @@ mode.addEventListener('click',function(){
 show(12);
 </script>`)
 	return canvas.HTMLPage("xscapes - day cycle, truecolor vs 256", b.String())
+}
+
+// glyphDiff draws only the cells whose GLYPH colour the 256 pass changed, so
+// the difference can be looked at instead of quoted as a percentage.
+//
+// Red is a glyph that had real colour and came out grey. Amber is one that kept
+// its colour and lost its hue -- red caught green up, or blue and green swapped
+// order. Everything the two profiles agree on is left dark, so what is left on
+// screen is exactly the disagreement.
+func glyphDiff(c *canvas.Canvas, fontPx int) string {
+	chroma := func(x term.RGB) int {
+		mx, mn := int(x.R), int(x.R)
+		for _, v := range []int{int(x.G), int(x.B)} {
+			if v > mx {
+				mx = v
+			}
+			if v < mn {
+				mn = v
+			}
+		}
+		return mx - mn
+	}
+	flipped := func(src, q term.RGB) bool {
+		pair := func(a, b, qa, qb uint8) bool {
+			switch d := int(a) - int(b); {
+			case d >= 25:
+				return qa > qb
+			case d <= -25:
+				return qa < qb
+			}
+			return true
+		}
+		return !(pair(src.R, src.G, q.R, q.G) && pair(src.G, src.B, q.G, q.B) &&
+			pair(src.R, src.B, q.R, q.B))
+	}
+
+	var b strings.Builder
+	fmt.Fprintf(&b, `<pre style="font-size:%dpx;background:#0b0b0d">`, fontPx)
+	for y := 0; y < c.H; y++ {
+		for x := 0; x < c.W; x++ {
+			ch, src, _ := c.ResolveAt(x, y, term.ProfileTrueColor)
+			if ch == ' ' {
+				b.WriteByte(' ')
+				continue
+			}
+			_, got, _ := c.ResolveAt(x, y, term.Profile256)
+			var col string
+			switch {
+			case chroma(src) >= 40 && chroma(got) < 20:
+				col = "#ff4d4d" // colour lost
+			case chroma(got) >= 20 && flipped(src, got):
+				col = "#ffb020" // hue turned
+			default:
+				b.WriteByte(' ')
+				continue
+			}
+			fmt.Fprintf(&b, `<span style="color:%s">`, col)
+			switch ch {
+			case '<':
+				b.WriteString("&lt;")
+			case '>':
+				b.WriteString("&gt;")
+			case '&':
+				b.WriteString("&amp;")
+			default:
+				b.WriteRune(ch)
+			}
+			b.WriteString(`</span>`)
+		}
+		b.WriteByte('\n')
+	}
+	b.WriteString(`</pre>`)
+	return b.String()
 }
