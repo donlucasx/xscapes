@@ -48,9 +48,25 @@ func main() {
 	band := h * 9 / 20
 	band = h - band // agent rows, the way host.Band does it
 
-	fmt.Print("\x1b[?1049h")                     // alternate screen
-	fmt.Printf("\x1b[1;%dr\x1b[?6h", band)       // the band, and origin mode
-	defer fmt.Print("\x1b[?6l\x1b[r\x1b[?1049l") // hand it all back
+	// -main measures the MAIN screen, which is the one that HAS scrollback.
+	// The alternate screen's behaviour says nothing about it: they were already
+	// measured moving the cursor in opposite directions.
+	alt := true
+	for _, a := range os.Args[1:] {
+		if a == "-main" {
+			alt = false
+		}
+	}
+	if alt {
+		fmt.Print("\x1b[?1049h") // alternate screen
+	}
+	fmt.Printf("\x1b[1;%dr\x1b[?6h", band) // the band, and origin mode
+	defer func() {
+		fmt.Print("\x1b[?6l\x1b[r")
+		if alt {
+			fmt.Print("\x1b[?1049l")
+		}
+	}()
 
 	// Fill every row with its own number, both edges, so the top row is
 	// readable no matter how far the window is dragged.
@@ -66,8 +82,12 @@ func main() {
 	bufio.NewReader(os.Stdin).ReadString('\n')
 
 	_, h2 := termSize()
-	fmt.Print("\x1b[?6l\x1b[r\x1b[?1049l")
-	fmt.Printf("\n  height %d -> %d  (grew by %d)\n\n", h, h2, h2-h)
+	fmt.Print("\x1b[?6l\x1b[r")
+	if alt {
+		fmt.Print("\x1b[?1049l")
+	}
+	fmt.Printf("\n  screen: %s\n  height %d -> %d  (change %+d)\n\n",
+		map[bool]string{true: "ALTERNATE", false: "MAIN (the one with scrollback)"}[alt], h, h2, h2-h)
 	fmt.Println("  Which row number was at the very TOP of the window after you stretched it?")
 	fmt.Println()
 	fmt.Println("    ROW 01           -> content did NOT move. I am wrong again.")

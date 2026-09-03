@@ -283,3 +283,29 @@ Consequences, both now implemented in `host.go`:
    same day on the strength of the CURSOR reading; that change was wrong and is reverted. The rows
    the terminal destroyed are gone either way -- what `drop` does is clear the scape that slid up
    into the band without blanking the agent rows that survived.
+
+## MEASURED, 2026-09-03: the MAIN screen, both axes. Height is easy; WIDTH is fatal.
+
+Measured because scrollback matters to the owner and only the main screen has any. `notes/contentprobe
+-main`, numbered rows, read by eye.
+
+**Height, 120x30 -> 120x47 (+17): ANCHORED TOP.** `ROW 01` stayed at the top and the blank rows
+appeared at the BOTTOM. The opposite of the alternate screen, and it needs no correction at all.
+
+⚠ Measured on a screen with almost no scrollback above it. The 2026-09-02 note says a grow pulls
+scrolled-off lines back in from history; with nothing in history there is nothing to pull. **This
+result is for an empty-scrollback screen and may not hold in a long session.** Do not generalise it
+without re-measuring against real history.
+
+**Width, 120x47 -> 78x47: TOTAL REFLOW, and it is not correctable.** Every full-width row re-wrapped
+into TWO rows -- `ROW 08 ----` on one line, `---- ROW 08` on the next -- and the view shifted so the
+top showed row 07's tail. Claude Code's UI is made of full-width lines (the input box borders, the
+status line), so any narrowing doubles them.
+
+**The host cannot undo this.** Everything it can do moves whole ROWS; reflow changes how many rows a
+logical LINE occupies. There is no row-move that inverts it, and the host does not model logical
+lines. The alternate screen never reflows, which is the property that makes the band possible at all.
+
+⇒ **"Put the band back on the main screen to get scrollback" is dead.** Height would be easier there,
+but width is unfixable, and windows get narrowed. Scrollback and the band cannot both come from
+Terminal.app; if xscapes wants scrollback it has to own it.
