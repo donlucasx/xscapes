@@ -521,3 +521,41 @@ Never paraphrase. Read the relevant section before editing anything it covers.
 
 - *"ok, lets /wrap and resume fresh"*
   ⇒ This wrap. Sixteen commits, all pushed, tree clean at `e886b7e`.
+
+## Session 12 — 2026-09-03
+
+- *"resume work on asciiscapes- first thing I want to do is a full project rename/rebrand to
+  'xscapes' - can you do that? be thorough, I want to change the folder name and anything else
+  relevant"*
+  ⇒ **DONE, and it closes the migration the last three sessions deferred.** The 09-01 rename had
+    stopped at the module path on purpose: going further meant touching live state. Folder
+    `~/Documents/claude/asciiscapes/` → `xscapes/` · `ASCIISCAPES_*` → `XSCAPES_*` (8 vars) ·
+    `~/.config/asciiscapes/` → `~/.config/xscapes/` (53 spools, 17 backups) · hook marker
+    `# asciiscapes:v1` → `# xscapes:v1` on 12 live hooks · memory anchor and its
+    `project_asciiscapes.md` · CLAUDE.md, RESUME.md, README, and 33 source files.
+
+  Two calls were his, asked before anything moved:
+  - **Back-compat: "accept old, warn loudly."** `internal/envx` reads `XSCAPES_*` first and falls
+    back to `ASCIISCAPES_*`, naming it on stderr. Chosen over a hard cut because a renamed knob
+    that nothing reads is the exact failure he has been burned by -- the value looks applied and
+    the measurement is silently wrong. Warning fires from the top of `main`, the last moment
+    certainly safe to write before `-live`/`claude`/`inside` take the alternate screen; `hook` and
+    `statusline` exempt.
+  - **Live state: move it.** So the tune corpus came along -- verified after the move:
+    12 sessions, 19,904 events, 155h52m.
+
+  ⚠ **The marker was the whole risk, and it is why the migration was deferred in the first place.**
+    A marker is uninstall's only handle on its own work. Changing the constant alone leaves twelve
+    hooks nothing can see: uninstall reports zero, install adds a second copy beside each, and he is
+    editing JSON by hand to remove a tool that said it had gone. `install.go` now WRITES the new
+    marker and RECOGNISES the old one. Proven by emptying `legacyMarkers`: the tests go red and the
+    failure shows the orphan exactly -- Stop ends up with two hooks. The applied diff on his
+    settings.json was **24 lines, all marker, nothing else touched**; his Funk.aiff hooks, the
+    VERCEL_TOKEN guard, the statusLine and 747 permission rules all byte-identical.
+
+  Left saying asciiscapes ON PURPOSE, not leftovers: `legacyMarkers`, envx's `legacyPrefix`, the
+  verbatim quotes above, `origin-chat.md`'s decision pass, and the superseded bullets in RESUME.md.
+  Rewriting a record of what was true then would only make it lie.
+
+  ⚠ **The two running scapes went deaf and need a restart** -- told to him up front. Their sockets
+  are under the old path; the hooks now write to the new one. `xscapes claude` in a fresh window.

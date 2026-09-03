@@ -14,7 +14,38 @@ build the instrument before trusting the picture, and check what the RENDERED
 frame does rather than what the source says it should.
 ```
 
-## Where we left off (2026-09-02 → 09-03, session 11, HEAD `e886b7e`, pushed)
+## Where we left off (2026-09-03, session 12, HEAD `c9a019e`, pushed)
+
+**The rename is finished.** `~/Documents/claude/xscapes/`, `XSCAPES_*`,
+`~/.config/xscapes/`, and the `# xscapes:v1` marker on the twelve installed
+hooks. This closes the migration sessions 8-11 deferred on purpose.
+
+The risk was never the strings, it was the **marker**: it is uninstall's only
+handle on its own work, so changing the constant alone would have left twelve
+hooks nothing could see -- uninstall reporting zero, install adding a second
+copy beside each. `install.go` now writes `# xscapes:v1` and RECOGNISES
+`# asciiscapes:v1`; emptying `legacyMarkers` turns the tests red and the failure
+shows the orphan exactly. The applied diff on his settings.json was 24 lines,
+all marker; the Funk.aiff hooks, the VERCEL_TOKEN guard, the statusLine and 747
+permission rules came through byte-identical.
+
+`ASCIISCAPES_*` still WORKS and says so on stderr (`internal/envx`) -- his call,
+over a hard cut, because a renamed knob nothing reads is the failure where the
+value looks applied and the measurement is silently wrong. Live state moved
+with it, so `xscapes tune` still folds the corpus: 12 sessions, 19,904 events,
+155h52m, verified after the move.
+
+Still saying asciiscapes on purpose: `legacyMarkers`, envx's `legacyPrefix`, the
+verbatim quotes in `_FEEDBACK.md`, `origin-chat.md`, and the superseded bullets
+below. They are the record, not leftovers.
+
+⚠ **Two `xscapes claude` scapes were running through the migration and are now
+deaf** -- their sockets are under the old path. Restart with `xscapes claude`.
+
+⚠ Nothing else changed. **The three things still waiting on him are unchanged**:
+submit the entry, the worry trigger, the banding decision. See ▶ NEXT.
+
+## Session 11 (2026-09-02 → 09-03, HEAD `e886b7e`, pushed)
 
 **Live: https://github.com/donlucasx/xscapes** (public, MIT). Sixteen commits.
 Everything below is pushed and the tree is clean.

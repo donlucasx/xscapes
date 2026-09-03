@@ -2,7 +2,16 @@
 
 *(Renamed end to end on 2026-09-03: directory, env vars, state path and hook marker. Two names are kept on purpose and are not leftovers -- `internal/envx` still reads `ASCIISCAPES_*` and warns, and `install.go` still RECOGNISES the `# asciiscapes:v1` marker so the hooks it wrote before the rename can be found and removed.)*
 
-> **Where we left off — 2026-09-03 (session 11), HEAD `e886b7e`, pushed, tree clean.**
+> **Where we left off — 2026-09-03 (session 12), HEAD `c9a019e`, pushed, tree clean.**
+> **Session 12 was the rename**, finished end to end: directory
+> `~/Documents/claude/xscapes/`, `XSCAPES_*` env vars, `~/.config/xscapes/`, and
+> the `# xscapes:v1` marker on the twelve installed hooks. `ASCIISCAPES_*` still
+> works and warns (`internal/envx`); `install.go` still RECOGNISES the old marker
+> so pre-rename hooks can be found and removed. ⚠ Two running scapes went deaf in
+> the move and need `xscapes claude` again. Nothing else about the project changed
+> — session 11's findings below still stand, as do the three things waiting on him.
+>
+> **Session 11:**
 > **Live: https://github.com/donlucasx/xscapes** (public, MIT). Milestone 1 is
 > COMPLETE, the hooks are installed and firing, and the agent runs INSIDE the
 > scape on the alternate screen (`xscapes claude`; `-beside` is the old tmux
