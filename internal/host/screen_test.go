@@ -443,14 +443,42 @@ func TestReplayTrace(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
+	// The sidecar says which size was in force from which byte offset, so the
+	// replay resizes exactly where the real terminal did. Feeding the whole
+	// stream into one fixed-size screen would misreconstruct everything
+	// written before the resize, which is the part under investigation.
+	type mark struct{ off, cols, rows, agent int }
+	var marks []mark
+	if lb, err := os.ReadFile(path + ".log"); err == nil {
+		for _, ln := range strings.Split(strings.TrimSpace(string(lb)), "\n") {
+			var m mark
+			if _, err := fmt.Sscanf(ln, "%d %d %d %d", &m.off, &m.cols, &m.rows, &m.agent); err == nil {
+				marks = append(marks, m)
+			}
+		}
+	}
 	w, h := 120, 59
 	if s := os.Getenv("TRACE_SIZE"); s != "" {
 		if _, err := fmt.Sscanf(s, "%dx%d", &w, &h); err != nil {
 			t.Fatalf("TRACE_SIZE=%q: want WxH", s)
 		}
 	}
+	if len(marks) > 0 {
+		w, h = marks[0].cols, marks[0].rows
+	}
 	sc := newScreen(w, h)
-	sc.feed(string(b))
+	fed := 0
+	for i, m := range marks {
+		if i > 0 {
+			sc.feed(string(b[fed:min(m.off, len(b))]))
+			fed = min(m.off, len(b))
+			// Measured 2026-09-03: the alternate screen is anchored-top in
+			// BOTH directions, which is what resize does.
+			sc.resize(m.cols, m.rows)
+			t.Logf("-- resize at byte %d -> %dx%d (band 1..%d)", m.off, m.cols, m.rows, m.agent)
+		}
+	}
+	sc.feed(string(b[fed:]))
 
 	t.Logf("replayed %d bytes at %dx%d; scroll region rows %d..%d, cursor r%d c%d, alt=%v",
 		len(b), w, h, sc.top+1, sc.bot+1, sc.y+1, sc.x+1, sc.alt)

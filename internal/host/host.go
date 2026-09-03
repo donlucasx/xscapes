@@ -45,8 +45,12 @@ type Host struct {
 	// terminal to pull back in when the window grows. See Open.
 	AltScreen bool
 
-	// trace, when XSCAPES_TRACE is set, records every byte sent to the terminal.
-	trace *os.File
+	// trace, when XSCAPES_TRACE is set, records every byte sent to the
+	// terminal; traceLog records size changes against byte offsets so a replay
+	// can resize where the real terminal did.
+	trace    *os.File
+	traceLog *os.File
+	traceN   int64
 	// In and Out default to os.Stdin and os.Stdout. Overridable for tests.
 	In  *os.File
 	Out *os.File
@@ -65,9 +69,32 @@ func (h *Host) write(s string) {
 	h.mu.Lock()
 	io.WriteString(h.out, s)
 	if h.trace != nil {
-		h.trace.Write([]byte(s))
+		n, _ := h.trace.Write([]byte(s))
+		h.traceN += int64(n)
 	}
 	h.mu.Unlock()
+}
+
+// traceSize records a window size against the byte offset it took effect at.
+//
+// Without it a replay has to feed the whole stream into one fixed-size screen,
+// which misreconstructs everything written BEFORE the resize -- and the resize
+// is the thing under investigation. The sidecar keeps the trace itself a pure
+// byte stream, so it stays replayable by anything.
+func (h *Host) traceSize(cols, rows, agentRows int) {
+	if h.trace == nil {
+		return
+	}
+	h.mu.Lock()
+	defer h.mu.Unlock()
+	if h.traceLog == nil {
+		f, err := os.OpenFile(h.trace.Name()+".log", os.O_CREATE|os.O_WRONLY|os.O_TRUNC, 0o600)
+		if err != nil {
+			return
+		}
+		h.traceLog = f
+	}
+	fmt.Fprintf(h.traceLog, "%d %d %d %d\n", h.traceN, cols, rows, agentRows)
 }
 
 // openTrace tees everything the host sends the terminal into a file, when
@@ -106,10 +133,16 @@ func (h *Host) Run() error {
 	h.openTrace()
 	if h.trace != nil {
 		defer h.trace.Close()
+		defer func() {
+			if h.traceLog != nil {
+				h.traceLog.Close()
+			}
+		}()
 	}
 
 	cols, rows := h.Size()
 	agentRows, scapeRows := BandWith(rows, h.ScapeRows)
+	h.traceSize(cols, rows, agentRows)
 
 	p, err := openPTY()
 	if err != nil {
@@ -276,6 +309,7 @@ func (h *Host) Run() error {
 					from = 1
 				}
 				to := min(agentRows, oldRows-drop)
+				h.traceSize(cols, rows, agentRows)
 				h.write(Rebind(from, to, agentRows))
 				// The screen was just touched behind the tracker's back.
 				dmg.reset()
