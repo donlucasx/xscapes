@@ -130,3 +130,39 @@ This is why the host runs on the alternate screen: no history, nothing to pull
 back, nothing moves. The cost is that output scrolling out of the band is gone
 rather than saved, which is the exact trade the row-1 anchoring was made to
 avoid -- and it turned out to be a scrollback that could not survive being used.
+
+## Measurement, 2026-09-03: the two screen buffers resize DIFFERENTLY
+
+The correction above ends "this is why the host runs on the alternate screen:
+no history, nothing to pull back, nothing moves." That is right, and the host
+then went on to apply a MAIN-screen rule to the alternate screen anyway.
+
+Measured with `notes/anchorprobe`, which parks the cursor mid-screen, emits
+nothing at all while the window is resized from outside (AppleScript, so the
+drag is repeatable), and reads the cursor back with DSR. A terminal moves the
+cursor with the content it moves, so the cursor answers the question without
+anyone having to eyeball a row number mid-drag.
+
+Same window, same 11-row shrink, cursor parked on row 21 of 43:
+
+| screen | cursor after | meaning |
+|---|---|---|
+| **main** | row 10 (= 21 − 11) | keeps the **BOTTOM**; every row slides up by the rows lost |
+| **alternate** | row 21 (unmoved) | keeps the **TOP**; content is truncated and nothing slides |
+
+Run it both ways yourself: `go run ./notes/anchorprobe` and
+`go run ./notes/anchorprobe -main`, resizing the window within four seconds.
+A first run answered "KEPT TOP" only because the parked row was clamped to the
+new height; the shrink was made gentler so no clamping is involved and the two
+predictions are 21 vs 10, and the main-screen control gives the opposite answer
+from the identical drag. One reading with a control beats three without.
+
+**Consequence.** `drop` in the resize branch of `host.go` is a MAIN-screen
+correction. On the alternate screen it subtracts rows that never moved, which
+walks the clear up into the agent's transcript -- and at a big enough shrink it
+reaches row 1 and takes the input box with it.
+
+⚠ **The instrument that missed this ran `AltScreen: false`.** Every resize test
+in the package did. A harness that never enters the mode production runs in
+cannot see that mode's defects, and it was on that harness's word that the
+resize damage was written off as Claude Code's to fix.

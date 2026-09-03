@@ -41,6 +41,16 @@ type screen struct {
 	sTop, sBot int
 	sOrigin    bool
 
+	// alt and mainCells model the alternate screen. It is not decoration: the
+	// two buffers behave DIFFERENTLY on a resize, measured in Terminal.app on
+	// 2026-09-03 with the cursor parked mid-screen and read back with DSR --
+	// the main screen keeps the BOTTOM and slides content up by the rows lost,
+	// the alternate screen keeps the TOP and truncates. The host shipped one
+	// rule for both.
+	alt          bool
+	mainCells    [][]cell
+	mainX, mainY int
+
 	// pending holds a trailing partial escape sequence. Reads off a pipe split
 	// wherever they like, and a parser that discards an incomplete sequence
 	// silently drops everything after it -- which is how the first version of
@@ -299,9 +309,23 @@ func (s *screen) csi(params string, final rune) {
 	case priv && final == 'l' && arg(0, 0) == 6:
 		s.origin = false
 		s.move(0, 0)
+	case priv && (arg(0, 0) == 1049 || arg(0, 0) == 47) && final == 'h':
+		// Take the alternate screen: a blank buffer, the main one kept aside.
+		s.mainCells, s.mainX, s.mainY = s.cells, s.x, s.y
+		s.alt = true
+		s.cells = make([][]cell, s.h)
+		for i := range s.cells {
+			s.cells[i] = blankRow(s.w)
+		}
+		s.x, s.y = 0, 0
+	case priv && (arg(0, 0) == 1049 || arg(0, 0) == 47) && final == 'l':
+		if s.mainCells != nil {
+			s.cells, s.x, s.y = s.mainCells, s.mainX, s.mainY
+			s.mainCells = nil
+		}
+		s.alt = false
 	case priv:
-		// 1049 and friends: not modelled, and not needed -- these tests run
-		// the host with AltScreen off.
+		// Everything else private is not modelled and not needed here.
 	case final == 'H' || final == 'f':
 		s.move(arg(0, 1)-1, arg(1, 1)-1)
 	case final == 'r':

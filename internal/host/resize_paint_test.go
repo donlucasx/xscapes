@@ -35,6 +35,13 @@ func runHosted(t *testing.T, w1, h1, w2, h2 int, mode string) *screen {
 // that the host then has to survive.
 func runHostedChild(t *testing.T, w1, h1, w2, h2 int, mode, child string) *screen {
 	t.Helper()
+	return runHostedAlt(t, w1, h1, w2, h2, mode, child, false)
+}
+
+// runHostedAlt is runHostedChild with the screen buffer chosen, because the two
+// resize DIFFERENTLY and the host has to know which one it is on.
+func runHostedAlt(t *testing.T, w1, h1, w2, h2 int, mode, child string, alt bool) *screen {
+	t.Helper()
 	pr, pw, err := os.Pipe()
 	if err != nil {
 		t.Fatal(err)
@@ -81,7 +88,7 @@ func runHostedChild(t *testing.T, w1, h1, w2, h2 int, mode, child string) *scree
 	h := &Host{
 		Cmd:       exec.Command("sh", "-c", child),
 		FPS:       60,
-		AltScreen: false,
+		AltScreen: alt,
 		In:        tty.slave,
 		Out:       pw,
 		Size: func() (int, int) {
@@ -268,5 +275,56 @@ func TestTheModelCanSeeABackgroundAtAll(t *testing.T) {
 	sc.feed("\x1b[0m\x1b[2;1H\x1b[2K")
 	if painted := sc.paintedRows(2, 2); len(painted) != 0 {
 		t.Errorf("an erase after a reset still reads as painted: %v", painted)
+	}
+}
+
+// agentLines is a child that fills the band with numbered, recognisable rows,
+// then holds the terminal open while the resize happens.
+const agentLines = `i=1; while [ $i -le 24 ]; do printf 'AGENTLINE%02d\r\n' $i; i=$((i+1)); done; sleep 0.8`
+
+// countAgentLines reports how many rows in [from,to] still hold the child's text.
+func countAgentLines(sc *screen, from, to int) int {
+	n := 0
+	for y := from - 1; y <= to-1 && y < sc.h; y++ {
+		if y >= 0 && strings.Contains(sc.rowAt(y), "AGENTLINE") {
+			n++
+		}
+	}
+	return n
+}
+
+// On the ALTERNATE screen a shrink keeps the TOP: content is truncated and
+// nothing slides up. Measured in Terminal.app 2026-09-03, cursor parked
+// mid-screen and read back with DSR, against a main-screen control that gave
+// the opposite answer from the identical drag.
+//
+// The host applied ONE rule to both, subtracting the rows lost from the start
+// of its clear as though the scape had slid up into the band. On the alternate
+// screen nothing slid, so that subtraction walks the clear UP into the agent's
+// transcript -- and at a big enough shrink it reaches row 1 and eats the input
+// box, which is what he photographed.
+func TestAltScreenShrinkDoesNotEatTheAgentsTranscript(t *testing.T) {
+	sc := runHostedAlt(t, 80, 44, 80, 22, "", agentLines, true)
+
+	newAgent, _ := Band(22)
+	oldAgent, _ := Band(44)
+	safe := min(oldAgent, newAgent) // agent band before AND after: never ours to clear
+
+	if got := countAgentLines(sc, 1, safe); got < safe {
+		t.Errorf("after an alt-screen shrink only %d of the top %d rows still hold the agent's text;\n"+
+			"the host cleared rows that were the agent's band both before and after the resize", got, safe)
+	}
+}
+
+// The main screen is the control, and it must keep working: there a shrink
+// really does slide the scape up into the band, and those rows must be cleared.
+func TestMainScreenShrinkStillClearsTheScapeThatSlidUp(t *testing.T) {
+	sc := runHosted(t, 80, 44, 80, 22, "scroll")
+
+	agentRows, _ := Band(22)
+	for row := 1; row <= agentRows; row++ {
+		if r := sc.rowAt(row - 1); strings.ContainsRune(r, 'A') || strings.ContainsRune(r, 'B') {
+			t.Errorf("row %d is inside the agent's band and still holds scape: %q", row, r)
+		}
 	}
 }
