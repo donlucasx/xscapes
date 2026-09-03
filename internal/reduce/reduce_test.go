@@ -1,6 +1,7 @@
 package reduce
 
 import (
+	"fmt"
 	"testing"
 	"time"
 
@@ -375,5 +376,46 @@ func TestToolTrafficAloneOpensATurn(t *testing.T) {
 	r.Apply(event.Event{Kind: event.ToolStart, ID: "t1"}, at(0))
 	if st := r.State(at(1)); !st.Act.Working {
 		t.Error("tool traffic with no prompt must still read as working")
+	}
+}
+
+// A floor must LIFT the sea, not flatten it.
+//
+// Clamping to a floor throws away every distinction BELOW it, and the floors
+// are 0.30 and 0.45 -- so a quiet turn and one that has just done twenty things
+// read exactly the same until the heat clears the floor. Measured on 11 real
+// sessions, 18,919 events: 77% of all working time sat in two bins between 0.30
+// and 0.50.
+//
+// ⚠ The first version of this test compared one event against six and passed on
+// the clamp, because six events clear 0.30 on their own -- it was measuring the
+// region where clamping does no harm. The comparison has to sit INSIDE the
+// flattened region, which means reading after enough decay that both are under
+// the floor.
+func TestAFloorLiftsTheSeaRatherThanFlatteningIt(t *testing.T) {
+	base := time.Now()
+	at := func(s float64) time.Time { return base.Add(time.Duration(s * float64(time.Second))) }
+
+	// Both readings are taken well after the work, so raw heat is under the
+	// floor in both cases and only the floor's behaviour separates them.
+	level := func(n int) float64 {
+		r := New("floors")
+		r.Apply(event.Event{Kind: event.Prompt}, at(0))
+		for i := 0; i < n; i++ {
+			r.Apply(event.Event{Kind: event.ToolEnd, ID: fmt.Sprint(i), Op: event.OpRead},
+				at(0.1+float64(i)*0.05))
+		}
+		return r.State(at(30)).Act.Level
+	}
+	quiet, busy := level(1), level(10)
+	t.Logf("thirty seconds on: after 1 tool event %.3f, after 10 %.3f (TurnFloor %.2f)",
+		quiet, busy, TurnFloor)
+
+	if quiet < TurnFloor {
+		t.Errorf("an open turn reads %.3f, below the floor of %.2f", quiet, TurnFloor)
+	}
+	if busy-quiet < 0.10 {
+		t.Errorf("ten tool events read %.3f against one event's %.3f -- the floor has flattened "+
+			"the sea, and a glance cannot tell a busy turn from a quiet one", busy, quiet)
 	}
 }

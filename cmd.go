@@ -45,6 +45,8 @@ func dispatch(args []string) bool {
 		runInside(args[1:], "")
 	case "shades":
 		runShades(args[1:])
+	case "tune":
+		runTune(args[1:])
 	case "help", "-h", "--help":
 		usage()
 	default:
@@ -61,6 +63,8 @@ func usage() {
   asciiscapes claude          run Claude Code INSIDE the scape, in this window
   asciiscapes claude -beside  the older layout: agent in its own tmux pane
   asciiscapes shades          one frame three ways, to judge the 256 smoothing here
+  asciiscapes tune            fold real recordings through the reducer and report
+  asciiscapes tune            fold real recordings through the reducer and report
   asciiscapes inside <cmd>    host any command inside the scape
   asciiscapes                 render one frame
   asciiscapes -live           run the scape in this terminal

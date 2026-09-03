@@ -20,7 +20,13 @@ import (
 // The time constants. Every one of these is a claim about how a person glances
 // at a screen, so each is written down with its reason rather than tuned until
 // it looked nice.
-const (
+//
+// Vars rather than consts, and that is not a style choice. They had gone
+// unverified for the whole project partly because there was no way to ask what
+// a different value would have LOOKED like without editing the source and
+// rebuilding -- so nobody ever did. `xscapes tune -sweep` folds every real
+// recording again for each candidate, which needs to set them.
+var (
 	// TauFall is the sea's decay. After the last tool event the swells fall
 	// to 37% in this long and read as flat at roughly three times it. Long
 	// enough that the two-second pause between tool calls does not flatten
@@ -320,12 +326,30 @@ func (r *Reducer) State(now time.Time) State {
 	// events a minute or six hundred. Linear would put every real session in
 	// the bottom tenth of the range and then clip the one time it mattered.
 	lvl := 1 - math.Exp(-r.heat)
-	if len(r.flight) > 0 && lvl < FlightFloor {
-		lvl = FlightFloor
+
+	// The floors LIFT the range rather than clamping it, and that is worth
+	// more than it sounds.
+	//
+	// Clamping was the obvious way to write this and it spent the sea's whole
+	// dynamic range below the point where the sea actually lives. Folded from
+	// 11 real sessions, 18,919 events: 77% of all working time sat in two bins
+	// between 0.30 and 0.50, because the floors ARE 0.30 and 0.45 and heat only
+	// modulated what was above them. The swells carry how hard the agent is
+	// working and they were carrying it across a fifth of their range.
+	//
+	// Lifting instead -- floor + (1-floor)*heat -- keeps every promise the
+	// floors were added for (a running tool never reads idle, thinking time
+	// never reads idle) and gives the whole range back above it. Same data:
+	// the bins go 18/24/21/17/9/5/5 instead of 45/32/8/5/4/2/4, and saturation
+	// moves 3.1% to 3.5%.
+	floor := 0.0
+	if r.turnOpn && floor < TurnFloor {
+		floor = TurnFloor
 	}
-	if r.turnOpn && lvl < TurnFloor {
-		lvl = TurnFloor
+	if len(r.flight) > 0 && floor < FlightFloor {
+		floor = FlightFloor
 	}
+	lvl = floor + (1-floor)*lvl
 	working := r.turnOpn || len(r.flight) > 0
 
 	st := State{

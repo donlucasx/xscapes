@@ -361,6 +361,9 @@ go build -o xscapes . && ./xscapes claude     # THE REAL THING: agent inside the
 ./xscapes -faces  assets/frames/companion-study.html   # THE OPEN QUESTION
 ./xscapes -colors assets/frames/color-study.html       # 256 vs truecolor
 ./xscapes -day    assets/frames/day-cycle.html         # ALL 24 HOURS, TRUECOLOR vs 256, with a slider
+./xscapes tune                                        # FOLD THE REAL SPOOLS THROUGH THE REDUCER
+./xscapes tune -sweep                                 # ... and re-fold them for each candidate setting
+./xscapes shades -only 2                              # judge the 256 smoothing at the real window size
 ./xscapes -wired  assets/frames/wired.html             # a turn through the REAL reducer
 ./xscapes -info                                        # profile, size, chroma
 ./xscapes -mockup assets/frames/composition-study.html   # left vs mirrored, every terminal shape
@@ -391,8 +394,25 @@ Demo flags: `-wired -mockup -anim -compare -layout -context -day -busy -kittens 
      and rejected. Dawn and dusk DID move off grey: between luma 40 and 80 there
      are violets and blues (`#5f00af`, `#005faf`) the earlier survey missed
      because it only looked below luma 40.
-2. **Re-tune the reducer against a real recording.** Still never done, and the
-   data is there: **46 spool files, 16,465 events** as of 2026-09-02. Mix:
+2. **Re-tune the reducer against a real recording.** ⭐ **THE INSTRUMENT NOW
+   EXISTS AND IT FOUND SOMETHING: `xscapes tune`.** It folds every spool through
+   the real reducer offline, samples the level once a second and prints the
+   distribution; `-sweep` re-folds the lot for each candidate setting. `replay`
+   was never the tool for this -- it plays a spool into a live scape at
+   wall-clock speed, so checking one value meant watching an afternoon.
+
+   **What it found, from 11 sessions and 18,919 events: the floors were spending
+   the sea's whole dynamic range.** 77% of all working time sat in two bins
+   between 0.30 and 0.50, because `TurnFloor` is 0.30 and `FlightFloor` 0.45 and
+   the level was CLAMPED to them. A quiet turn and one that had just done ten
+   things read 0.300 and 0.300 -- identical. Fixed: the floors LIFT the range
+   now (`floor + (1-floor)*heat`), which keeps every promise they were added for
+   and gives the range back. Bins go 18/24/21/17/9/5/5 instead of
+   45/32/8/5/4/2/4; saturation 3.1% to 3.5%.
+
+   **Still unverified, and now cheap to check**: `TauFall`, `Impulse`,
+   `TurnFloor`, `FlightFloor` are vars now so `-sweep` can move them. The
+   remaining data: **46 spool files, 16,465 events** as of 2026-09-02. Mix:
    6,889 `tool_start` / 6,793 `tool_end`, 1,894 `context`, 377 `sub_end`,
    133 `sub_start`, 129 `prompt`, 119 `done`, 91 `error`, and **only 4
    `needs_input` in the whole record** -- worth knowing before building a demo
