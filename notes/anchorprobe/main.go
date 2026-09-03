@@ -88,7 +88,17 @@ func cursorRow() (int, error) {
 func main() {
 	out := "/tmp/anchorprobe.verdict"
 	useAlt := true
+	region := false
 	for _, a := range os.Args[1:] {
+		if a == "-region" {
+			// ⚠ THE CONFIGURATION PRODUCTION ACTUALLY RUNS IN: a DECSTBM
+			// scroll region pinned to the top of the screen plus origin mode.
+			// A resize with an active region is a different path in a terminal
+			// -- the region has to be remapped across it -- so a measurement
+			// taken without one says nothing about this case.
+			region = true
+			continue
+		}
 		if a == "-main" {
 			// The control: the MAIN screen has scrollback, so if the two
 			// differ this is where the difference shows.
@@ -130,7 +140,15 @@ func main() {
 
 	// Park mid-screen. The last row is useless (both hypotheses predict the
 	// new bottom) and so is row 1 (both predict 1); the middle separates them.
+	band := h * 2 / 3
+	if region {
+		// Pin the band exactly the way internal/host does.
+		fmt.Printf("\x1b[1;%dr\x1b[?6h", band)
+	}
 	parked := h / 2
+	if region && parked > band {
+		parked = band / 2
+	}
 	fmt.Printf("\x1b[%d;1H\x1b[7m  CURSOR PARKED ON ROW %02d -- measuring, do not touch  \x1b[0m", parked, parked)
 	fmt.Printf("\x1b[%d;1H", parked)
 
@@ -140,6 +158,9 @@ func main() {
 	w2, h2 := termSize()
 	row, cerr := cursorRow()
 
+	if region {
+		fmt.Print("\x1b[?6l\x1b[r")
+	}
 	if useAlt {
 		fmt.Print("\x1b[?1049l")
 	}
@@ -150,36 +171,39 @@ func main() {
 		os.Exit(1)
 	}
 
-	lost := h - h2
-	predBottom := parked - lost
-	if predBottom < 1 {
-		predBottom = 1
-	}
-	predTop := mini(parked, h2)
+	// delta is signed: negative shrank, positive grew. Both directions have to
+	// be measured. They are NOT mirror images -- a terminal can truncate the
+	// bottom on a shrink and still push content DOWN on a grow.
+	delta := h2 - h
+	clampRow := func(v int) int { return maxi(1, mini(v, h2)) }
+	predBottom := clampRow(parked + delta) // content anchored to the BOTTOM: moves with the edge
+	predTop := clampRow(parked)            // content anchored to the TOP: stays put
 
 	var verdict string
 	switch {
-	case lost <= 0:
-		verdict = "INCONCLUSIVE: the window did not get shorter"
+	case delta == 0:
+		verdict = "INCONCLUSIVE: the window did not change height"
 	case predBottom == predTop:
 		verdict = "AMBIGUOUS: both hypotheses predict the same row; use a different shrink"
 	case row == predTop:
-		verdict = "KEPT TOP -- content truncated, nothing slid up"
+		verdict = "ANCHORED TOP -- content stayed put; blank rows appear at the BOTTOM"
 	case row == predBottom:
-		verdict = "KEPT BOTTOM -- content scrolled up by the rows lost"
+		verdict = "ANCHORED BOTTOM -- content moved with the bottom edge by " + strconv.Itoa(delta) + " row(s)"
 	default:
 		verdict = "NEITHER -- the terminal did something else"
 	}
 
 	report(fmt.Sprintf(
 		"screen    %s\n"+
-			"size      %dx%d -> %dx%d   (rows lost: %d)\n"+
+			"region    %s\n"+
+			"size      %dx%d -> %dx%d   (delta: %+d rows)\n"+
 			"parked    row %d of %d\n"+
 			"cursor    row %d after the resize\n"+
-			"predicts  KEPT TOP -> %d   |   KEPT BOTTOM -> %d\n"+
+			"predicts  ANCHORED TOP -> %d   |   ANCHORED BOTTOM -> %d\n"+
 			"VERDICT   %s\n",
 		map[bool]string{true: "ALTERNATE", false: "MAIN"}[useAlt],
-		w, h, w2, h2, lost, parked, h, row, predTop, predBottom, verdict))
+		map[bool]string{true: fmt.Sprintf("DECSTBM 1..%d + DECOM  (what production runs)", band), false: "none"}[region],
+		w, h, w2, h2, delta, parked, h, row, predTop, predBottom, verdict))
 }
 
 func maxi(a, b int) int {

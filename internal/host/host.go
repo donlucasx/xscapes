@@ -369,6 +369,16 @@ func clearRows(first, last int) string {
 //
 // Safe inside Rebind and clearRows because both bracket this with DECSC/DECRC,
 // and DECRC restores the agent's SGR along with its cursor.
+//
+// That last clause was challenged as an unmeasured assumption about
+// Terminal.app, and it cannot be measured directly -- Terminal.app does not
+// answer DECRQSS (probed 2026-09-03; the probe's control asked with a known
+// rendition in force and got nothing back, so this is "unsupported", not
+// "default"). But the running system already settles it: BeginPaint/EndPaint
+// bracket the scape's own writes the same way, and every scape line ends in
+// ESC[0m, twelve times a second. If DECRC did not restore SGR, the agent's
+// rendition would be reset 12x/s and Claude Code's UI would be colourless.
+// It is not. The inference is from behaviour in hand rather than a spec.
 func clearRowsBare(first, last int) string {
 	if first > last {
 		return ""

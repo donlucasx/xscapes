@@ -166,3 +166,32 @@ reaches row 1 and takes the input box with it.
 in the package did. A harness that never enters the mode production runs in
 cannot see that mode's defects, and it was on that harness's word that the
 resize damage was written off as Claude Code's to fix.
+
+## Measurement, 2026-09-03 (second pass): the anchoring holds WITH a scroll region
+
+An external audit made the sharp objection that the anchoring above was measured in the wrong
+configuration: `notes/anchorprobe` set no scroll region and no origin mode, while production runs
+DECSTBM 1..N + DECOM. A resize with an active region is a different path in a terminal -- the
+region has to be remapped across it -- so the first result was a fact about the region-free case
+only. That objection was correct and the gap is now closed.
+
+Re-measured with `go run ./notes/anchorprobe -region`, which pins `ESC[1;Nr` + `ESC[?6h` exactly as
+`band_control.go` does and parks the cursor inside the region:
+
+| config | change | parked | cursor after | verdict |
+|---|---|---|---|---|
+| ALT + DECSTBM + DECOM | 24 -> 54 (**+30**) | row 12 | **row 12** | ANCHORED TOP |
+| ALT + DECSTBM + DECOM | 54 -> 24 (**-30**) | row 27 | **row 24** (clamped) | ANCHORED TOP |
+
+Anchored-bottom would have predicted row 42 and row 1. **The scroll region does not change the
+anchoring**: the alternate screen is anchored-top in both directions, region or no region. So the
+terminal does not move the hosted agent's content on a resize, and anything that moved it is ours
+or the agent's.
+
+## Terminal.app does not support DECRQSS (2026-09-03)
+
+`ESC P $ q m ESC \` gets no reply even with a known rendition in force (the control). So the current
+SGR cannot be read back from this terminal, and "does DECRC restore SGR" cannot be measured
+directly. It is settled by the running system instead: the scape paint brackets its writes with
+DECSC/DECRC and every scape line ends in `ESC[0m`, twelve times a second. If DECRC did not restore
+SGR, Claude Code's UI would be colourless. It is not.
