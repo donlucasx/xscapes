@@ -518,3 +518,6 @@ Never paraphrase. Read the relevant section before editing anything it covers.
     screen being moved by the terminal. It emits nothing on a resize, so it stays where the terminal
     left it until a keystroke. The host cannot repaint a UI it does not model; the only real fix is
     the emulator that was decided against on 09-01. ⏸ His call whether that reopens.
+
+- *"ok, lets /wrap and resume fresh"*
+  ⇒ This wrap. Sixteen commits, all pushed, tree clean at `e886b7e`.

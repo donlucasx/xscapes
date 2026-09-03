@@ -8,167 +8,89 @@ and RESUME.md before responding. The project is named xscapes now; the directory
 and the ASCIISCAPES_* env vars still say asciiscapes on purpose.
 notes/claude-hooks-verified.md is the Claude Code hook schema — trust it, do not
 re-derive it. Skim origin-chat.md only if you need the why; ignore ideas.md — it
-is parked. Tell me where we left off, then pick up from ▶ NEXT — starting with
-the decision at the top of it, which is mine to make, not yours.
+is parked. Tell me where we left off, then pick up from ▶ NEXT — item 0 is a
+question for me, not work for you.
+
+Two things about how to work on this, learned the hard way in session 11:
+build the instrument before trusting the picture, and check what the RENDERED
+frame does rather than what the source says it should.
 ```
 
-## Where we left off (2026-09-02, session 11, `main`, NOT yet pushed)
+## Where we left off (2026-09-02 → 09-03, session 11, HEAD `e886b7e`, pushed)
 
-**⭐ SECOND PASS: the 256 sky was not just banded, it was the WRONG HUE.** He
-looked at the day page and said the gradients did not read as smooth. Chasing
-that found something better than smoothing: **independent per-channel rounding
-was turning blues into violets.** rgb(48,112,170) is a mid blue with green
-sixty-four clear of red; the quantiser rounds red UP to 95 and green DOWN to 95
-and hands back rgb(95,95,175), a lavender. Six rows of sky a day, worst around
-five in the afternoon. `Index256Keeping` now keeps any channel ordering the
-source states clearly, for BACKGROUNDS only -- glyphs keep the old path, since
-the chroma boost has already moved them on purpose. It costs about 3% of
-distance and buys the hue.
+**Live: https://github.com/donlucasx/xscapes** (public, MIT). Sixteen commits.
+Everything below is pushed and the tree is clean.
 
-**Three smoothing ideas, one kept.** Splitting a cell with U+2580 so a band edge
-can fall mid-cell: kept, 5% closer to the true ramp, no texture. Shade blocks
-(U+2591/2/3) between two cube colours: measured a real gain -- 11 tones to 14 --
-and rejected on sight, the dot pattern reads as stipple before it reads as tone.
-Stacking the two bracketing colours as a 1x2 dither: rejected, worse on
-measurement AND the averaging assumption fails, since half a cell is three or
-four pixels and the eye resolves it. `ASCIISCAPES_SHADE_BLOCKS=1` renders the
-rejected one in a real terminal if he wants to overrule me.
+**The session in one line: nothing that was marked done actually was, and the
+way that got found was building instruments rather than looking at pictures.**
 
-**Endpoints re-picked by search, then re-picked again.** A band appears wherever
-the ramp crosses a quantisation boundary in ANY channel, so the smoothest
-gradient is the one whose channels travel furthest -- `#005fd7` to `#afd7ff`
-looks like the better noon sky and renders worse than `#005faf` to `#afd7ff`.
-⚠ The first search ranked on band count alone and picked a horizon that put a
-lavender stripe across the sky: **ten bands, one of them wrong.**
-`TestTheSkyNeverGoesViolet` exists because of that, and it reads the RENDERED
-frame -- the first version recomputed the ramp and was blind to the fix.
+Seven defects in shipped features, every one invisible in every study:
+the sea and sky had **no colour at all** on Terminal.app for most of a working
+day · the 256 sky was the wrong HUE, not just banded · **an electric night that
+I shipped AND pushed** before catching it · the sun had a grey fringe · the moon
+became a blob (my own regression) · a resize left sky sitting in the agent's
+transcript · kittens lost an eye to their neighbour's seam. Plus two channels
+measured for the first time and both found broken: the sea's dynamic range was
+collapsed into a fifth of itself, and **the companion's alarm is on 37% of the
+time.**
 
-**Sea endpoints are held by a second constraint the search cannot see**: a longer
-ramp repaints more cells when the mean waterline moves, and the open sea holding
-still is his. Of the pairs giving ten bands, `#005f5f` to `#87afff` is the only
-one under the 8% churn `TestTheBackdropHoldsStillBetweenFrames` allows.
+### The instruments, which are the durable part
 
-**Dusk is no longer violet** -- not on taste, on measurement. A deep-blue-to-violet
-zenith leg passes through rgb(48,48,175), which has plenty of chroma and no home
-in the cube, and lands on grey 58 at half past four.
+- **`xscapes tune`** — folds every real spool through the reducer OFFLINE,
+  samples once a second, prints distributions; `-sweep` re-folds for each
+  candidate setting. `replay` was never this: it plays into a live scape at
+  wall-clock speed, so checking one value meant watching an afternoon.
+- **`internal/host/screen_test.go`** — a small terminal (CUP/EL/ED/DECSTBM/
+  DECOM/save-restore/autowrap/region scroll, plus two resize behaviours). Drives
+  a REAL Host with a real pty and replays every byte. Eleven resize modes.
+- **`xscapes shades`** — one frame three ways in HIS terminal, at his window
+  size, for the smoothing question a browser cannot answer.
+- **`-day`** — five panels an hour: truecolor · 256 smoothed · 256 raw · the
+  rejected shade blocks · the glyph cells the 256 pass changed.
 
-**⭐ THE SKY AND THE SEA ARE CHOSEN FROM THE 256 CUBE NOW** -- ▶ NEXT #1, done.
-The note this session started from was half right and the half it got wrong was
-the important half. The complaint on record was that the sea's depth gradient
-collapsed onto one teal. It does, but that is a detail: **measured across 48
-half-hours of the day, `SeaFar` landed on the GREYSCALE ramp at 40 of them and
-`SkyTop` at 36.** For most of a working day the two biggest regions on screen
-had no colour at all on the terminal he uses. Across the 25 daylight half-hours
-the count is now **zero** for all four background colours.
+### What shipped
 
-It went unseen because **every HTML study in this repo renders true RGB**,
-`-day` included, so the previews have always shown a blue sea that his terminal
-never painted. **`./xscapes -day <file>.html` is now the honest one**: every hour
-rendered TWICE from the same frame, truecolor beside 256, with a slider, a play
-button and a show-every-hour grid. `assets/frames/cube-study.png` is the
-before/after against the old palette, and it cannot be regenerated -- it needed
-two binaries.
+- **Sky and sea chosen from what the cube holds.** Daylight colour loss 40/48
+  half-hours → 0/25. Six day keyframes, not four.
+- **`Index256Keeping`** — hue-preserving background quantisation, weighted
+  (`hueWeight` 8) so a ramp cannot wander into cyan and back. Greys are left
+  ALONE, which is the guard that stops it forcing an electric night.
+- **Cell splitting (U+2580)** for gradients; shade blocks built, measured
+  (11→14 tones) and REJECTED as stipple, kept behind
+  `ASCIISCAPES_SHADE_BLOCKS=1`.
+- **Stars for completed todos** — the last unbuilt channel in the locked table.
+  The hook now emits a real `todo` event; it had classified TodoWrite as an op
+  and stopped, so `n`/`of` were never filled.
+- **The floors LIFT the sea instead of clamping it.** Bins went 45/32/8/5/4/2/4
+  to 18/24/21/17/9/5/5.
+- Resize clear allows for the terminal moving things; kitten faces draw after
+  every body; sun solid, moon at `rr`; `emit -n/-of`.
 
-Two regression tests now hold it, both proven RED against the old palette:
-`TestSkyAndSeaKeepTheirColourThroughTheWorkingDay` (13 daylight samples grey on
-the old palette, 0 on this one) and `TestTheSeaShowsItsDepthOn256` (11 of 18 sea
-rows were one colour at noon; the cap is half).
+### ⚠ Three things waiting on him
 
-**⚠ THE OPEN ITEM HE IS STILL HITTING: A RESIZE SCRAMBLES THE AGENT'S OWN TEXT.**
-Reported twice, second time on 2026-09-03 at 120x62: blank rows above and the
-Claude Code banner pushed to the bottom of its band. **The scape's half is now
-provably right in every resize mode that can be modelled** -- eleven cases,
-including the terminal keeping the bottom on a shrink and pushing content down
-on a grow. What is left is Claude Code's OWN screen being moved by the terminal,
-and **the host cannot repaint a UI it does not model.** Claude emits nothing at
-all on a resize, so wherever the terminal leaves its transcript is where it
-stays until the next keystroke, which heals it.
-The only real fix is becoming a terminal emulator, which was decided against on
-2026-09-01 with the reasoning still standing: days of work, and a parser bug
-corrupts the agent's UI rather than just the picture. **The practical answer is
-that any keypress redraws it.** If that is not good enough for the demo, the
-decision to revisit is the emulator, not the clear.
+1. **Submit the entry.** Nothing in any doc records it and the plan said ~Sep 1.
+   Editable until the 17th, so a rough submission costs nothing.
+2. **The worry trigger.** The cat is alarmed 37% of active time — 31 episodes,
+   median 15m27s, longest 2h02m, **65% raised by a SINGLE error**. `worried` is
+   set by any error and cleared only by his next prompt. The clear rule is sound
+   ("hooks can tell us a command failed, never that the code is fixed"); the
+   TRIGGER is too loose. **The brief locks this channel, so raising the bar is
+   his call.** Recommended: require two errors in a window, or one the agent does
+   not recover from.
+3. **The banding call** — `xscapes shades -only 2` against `-only 3` at full
+   window size. I have judged it wrong twice by judging it small.
 
-**⭐ THE RESIZE BUG IS FOUND, AND IT WAS THE TERMINAL MOVING THINGS.**
-He photographed a fragment of sky above the band and a strip down the right
-after resizing. **Terminal.app keeps the BOTTOM of the screen when a window
-shrinks**, so every row slides up by the difference -- and the scape is painted
-at the bottom, so its rows slide straight into the agent's band. Neither side
-cleans them up: the host cleared only the rows that changed hands, assuming
-nothing moved, and Claude Code emits nothing at all on a resize. The clear now
-starts where the old scape's first row LANDS rather than where it was.
+### ⚠ The limitation that is not a bug
 
-**`internal/host/screen_test.go` is a small terminal**, and it is what found
-this. Reading the escape sequences tells you what was SENT; only replaying them
-tells you what is on screen. It models CUP/EL/ED/DECSTBM/DECOM/save-restore,
-autowrap and region scrolling, plus `resizeScrolling` for what Terminal.app does
-on a shrink. `TestEveryBandRowIsRepaintedAfterAResize` drives a REAL Host through
-nine resizes and is proven red on seven rows without the fix.
-⚠ Two instrument bugs to know about if you extend it: it must buffer a partial
-escape sequence across reads, and the snapshot must be taken BEFORE `Run()`
-returns, because the close path legitimately blanks the band.
+**A resize scrambles the AGENT's own text, and the host cannot fix it.** The
+scape's half is provably right in eleven resize modes. What is left is Claude
+Code's screen being moved by the terminal — and it emits nothing at all on a
+resize, so it stays where the terminal left it until a keystroke heals it.
+Repainting it means modelling it, which is the emulator decided against on
+09-01. His call whether that reopens; with the deadline where it is, it should
+not.
 
-**⚠ THREE DEFECTS HE FOUND BY RUNNING IT, ALL NOW FIXED.**
-
-0. **Kittens were losing an eye** (reported 2026-09-03). `plotRim` clears a
-   one-cell ring around each sprite so overlapping kittens read as separate --
-   and drawn inline, the ring of kitten k+1 landed on the EYES of kitten k,
-   which had already been plotted. Measured: twelve kittens, twenty eyes. Fixed
-   by putting every face in a second pass after every body; a body that
-   genuinely covers another's face still hides it, which is occlusion and right.
-   `TestEveryKittenKeepsBothEyes` sweeps counts, widths, seeds and times.
-1. **The moon became a blob** -- my own regression from the fix below. Making
-   the disc solid, I left the cutoff at `rr+rim`, where `rim` had been the width
-   of a FADE from `rr-rim` outward. Every cell that used to be falling away got
-   painted at full strength and the disc came out nearly twice its radius. It
-   ends at `rr` now.
-2. **The sun had a grey fringe.** Its rim faded into the sky, and the alpha
-   where its red and green cross -- 0.667 at noon -- makes a colour of chroma 20
-   to 40, which is where the greyscale ramp wins. Measured on his frame:
-   `rgb(193,188,151)` painted as grey 188. **The disc is solid now**; softness is
-   not available on this palette, so a clean edge is the honest version.
-3. **A cyan stripe across the sky.** The cube's first step is 95 wide and the
-   rest are 40, so red, starting at 0, always crosses its levels later than
-   green does -- and for three rows the sky went cyan and came back. Fixed by
-   weighing HUE as well as distance in the background quantiser
-   (`hueWeight`, 8, `ASCIISCAPES_HUE_WEIGHT` to try another). The alternative was
-   starting red at 95, which removes the wobble and more than half the bands
-   with it: 9 down to 4.
-4. **Banding, which is NOT fixed and may not be fixable.** ↓
-
-**⚠ THE OPEN ONE: BANDING IS MUCH WORSE IN A REAL WINDOW THAN IN ANY STUDY.**
-He ran it at **152x57** and the sky came out in four or five hard blocks with a
-grey stripe through the middle. Reproduced and measured: the number of cube
-colours a ramp crosses barely changes with height -- 8 at 68x22, 9 at 152x57 --
-while the sky grows from 10 rows to 24. **So the bands get two and a half times
-fatter and nothing about the palette fixes it.** Every study in this repo, and
-the first version of `xscapes shades`, asked the question at the size where the
-problem is mildest.
-
-Two things follow. `shades` now defaults to the real window and takes
-`-only N` to show one variant at full height. And **the shade-block rejection
-should be re-judged**: he called it "too busy" at 64x14, which is the size where
-banding is least and stipple is most obvious, and that is the opposite of the
-size that matters. A curved sky ramp was tried and is NOT the answer -- it trades
-grey rows for longer flat runs, 5 to 12 at his size.
-
-**⚠ TWO MORE FOR HIS EYE, both one constant away from being changed.**
-
-1. ~~Dusk reads magenta.~~ **GONE**, and it had to go for a reason better than
-   taste -- see above. Both twilights are deep blue overhead now with the hour
-   in the horizon.
-2. **Daylight is brighter and the sea is more turquoise.** That one is not a style choice, it is the cube's
-   shape -- below luma 60 it holds no blue except the electric `#0000xx` column
-   that `Shore.BlueSky` already documents as rejected, so a sea that keeps its
-   blue has to sit above luma 70. If it reads too tropical the dial is
-   `seaDeep`/`seaShallow`, and the constraint is that the pair stays at least TWO
-   cube steps apart in some channel or the ramp shows two bands and nothing
-   between.
-
-Every colour named above is in `internal/scape/palette.go`, in one `var` block
-at the top, each with its xterm index in a trailing comment.
-
-## Earlier (2026-09-02, session 10, last code change `0e7f265`, `main`, pushed)
+## Earlier (2026-09-02, session 10, `0e7f265`)
 
 **Live: https://github.com/donlucasx/xscapes** (public, MIT, tagged `v0.2.1`).
 Milestone 1 COMPLETE. The agent runs inside the scape, on the **alternate
@@ -386,6 +308,9 @@ go build -o xscapes . && ./xscapes claude     # THE REAL THING: agent inside the
 ./xscapes tune                                        # FOLD THE REAL SPOOLS THROUGH THE REDUCER
 ./xscapes tune -sweep                                 # ... and re-fold them for each candidate setting
 ./xscapes shades -only 2                              # judge the 256 smoothing at the real window size
+./xscapes -todo 3/5 -tod 0.5 -working                 # the checklist constellation
+./xscapes emit todo -n 3 -of 5                        # drive it in a live scape
+go test ./internal/host/ -run Resize -v               # replay the host through 11 resize modes
 ./xscapes -wired  assets/frames/wired.html             # a turn through the REAL reducer
 ./xscapes -info                                        # profile, size, chroma
 ./xscapes -mockup assets/frames/composition-study.html   # left vs mirrored, every terminal shape
@@ -399,6 +324,32 @@ Demo flags: `-wired -mockup -anim -compare -layout -context -day -busy -kittens 
 ⚠ `-plain` is blind to the moon and the shoreline — both live in the background colour.
 
 ## ▶ NEXT
+
+**Order for a fresh session, 14 days to the deadline (closes 2026-09-17):**
+
+0. **⭐ SUBMIT THE ENTRY.** Not recorded anywhere as done, and the plan said
+   ~Sep 1. Editable until the 17th, so a rough one costs nothing and removes the
+   only failure mode that cannot be recovered from. Ask him first -- he may have
+   done it and not written it down.
+1. **The worry trigger** (see "waiting on him" above). Biggest signal defect in
+   the project and the cheapest real fix left.
+2. **Dial `TauFall`.** `xscapes tune -sweep` answers it in a second now. 12s
+   gives median 0.54 / p90 0.80 / 3.5% saturated; 20s gives 0.64 / 0.90 / 6.0%.
+   40s pins the sea and should not ship.
+3. **The 45-60s demo video**, Terminal.app. ⚠ Before recording: **only 4
+   `needs_input` events exist in the entire 18,919-event record.** The cue the
+   30%-weighted Waiting Experience is built on essentially never fires on its
+   own, so the video either drives it deliberately or leads with `done` (119)
+   and the worried pose (91 errors).
+4. **Waves in the sea** -- his idea, and there is no encoding conflict: the
+   swells already ARE the activity channel, so making them look like waves is a
+   rendering upgrade, not a new variable. Two constraints: keep the SPEED
+   constant (coverage/count, never rate) and watch occlusion of the swimming
+   kittens (16 at once at the peak, water empty 57% of the time). Milestone 2,
+   after the video. **He asked whether to lock in first; the answer was yes and
+   it still is.**
+
+### Older items, still true
 
 1. ~~**Make the whole scape cube-exact.**~~ **SKY AND SEA DONE 2026-09-02
    (session 11)** -- see "Where we left off". What is left of it, and it is

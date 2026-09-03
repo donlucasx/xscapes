@@ -2,38 +2,42 @@
 
 *(Working directory, env vars and some prose below still say "asciiscapes". Deliberate: renaming live state orphans an installed hook.)*
 
-> **Where we left off — 2026-09-02 (session 10), last code change `0e7f265`, pushed, tagged `v0.2.1`.**
+> **Where we left off — 2026-09-03 (session 11), HEAD `e886b7e`, pushed, tree clean.**
 > **Live: https://github.com/donlucasx/xscapes** (public, MIT). Milestone 1 is
-> COMPLETE and the hooks are installed and firing against real sessions.
-> **⭐ THE AGENT RUNS INSIDE THE SCAPE, ON THE ALTERNATE SCREEN.** Anywhere this
-> brief still says "alongside the agent via tmux", that is the OLD design.
-> `xscapes claude` puts Claude Code in a band pinned to the top rows with the
-> scape below it, one window, no tmux; `-beside` is the old layout; `inside <cmd>`
-> hosts anything. The alternate screen is load-bearing, not cosmetic: on the main
-> screen a resize makes the terminal pull scrollback back in and push the agent's
-> UI out of its band, and the agent never notices because it emits nothing at all
-> on a resize. Cost: no terminal scrollback for the agent. `-alt=false` reverses it.
-> **⭐ TARGET IS TERMINAL.APP, his ruling 2026-09-02** — *"at this point I want to
-> optimize the experience for terminal.app which should be the most used?"* This
-> REVERSES the standing advice to install a truecolor terminal. Consequence:
-> cube-exact colour is the general rule for the whole scape.
-> **DONE for the sky and the sea, 2026-09-02 (session 11).** Both are now chosen
-> from colours the xterm-256 palette actually holds. The defect was worse than
-> "the gradient bands": measured across 48 half-hours, the far sea landed on the
-> GREYSCALE ramp at 40 of them and the sky zenith at 36, so for most of a working
-> day the two biggest regions on screen had no colour at all on his terminal.
-> Zero of the 25 daylight half-hours now do. **`./xscapes -day <file>.html` renders
-> every hour twice, truecolor beside 256** — it is the first study here that goes
-> through the real quantiser, and every other one still shows true RGB, which is
-> why this went unseen for a month. `assets/frames/cube-study.png` is the
-> before/after against the old palette.
-> **⭐ AND THE 256 SKY WAS THE WRONG HUE, not just banded.** Per-channel rounding
-> turns a mid blue into a lavender; `term.Index256Keeping` preserves any channel
-> ordering the source states clearly, for backgrounds only. Cells are also split
-> with U+2580 so a band edge can fall mid-cell. Shade-block tone blending was
-> built, measured (11 tones to 14) and REJECTED — it reads as stipple;
-> `ASCIISCAPES_SHADE_BLOCKS=1` to judge it in a real terminal.
-> **The statusline is chained**, so the context moon has a live feed at last.
+> COMPLETE, the hooks are installed and firing, and the agent runs INSIDE the
+> scape on the alternate screen (`xscapes claude`; `-beside` is the old tmux
+> layout, `inside <cmd>` hosts anything, `-alt=false` reverses the alt screen).
+>
+> **⭐ SESSION 11 FOUND THAT NOTHING MARKED DONE ACTUALLY WAS.** Seven defects in
+> shipped features, none visible in any study, all fixed: the sea and sky had NO
+> COLOUR on Terminal.app for most of a working day · the 256 sky was the wrong
+> HUE, not just banded · an electric night that shipped AND was pushed · a
+> grey-fringed sun · a blob moon · a resize leaving sky in the agent's transcript
+> · kittens losing an eye to their neighbour's seam. Two channels were measured
+> for the first time and both were broken: the sea's dynamic range was collapsed
+> into a fifth of itself (the floors CLAMPED instead of lifting), and the
+> companion's alarm is on **37% of active time**.
+>
+> **The durable part is the instruments**, and the rule they teach: build the
+> instrument before trusting the picture, and measure the RENDERED frame rather
+> than what the source says it should do.
+> `xscapes tune` folds real recordings through the reducer offline (`-sweep` for
+> settings) · `internal/host/screen_test.go` is a small terminal that replays the
+> host's real bytes through eleven resize modes · `xscapes shades` asks the
+> smoothing question in HIS terminal at HIS window size · `-day` shows five
+> panels an hour including the glyph cells 256 changed.
+>
+> **⭐ TARGET IS TERMINAL.APP, his ruling 2026-09-02.** Cube-exact colour is the
+> general rule; `term.Index256Keeping` preserves hue for backgrounds and leaves
+> GREYS ALONE, which is the guard that stops it forcing an electric night.
+>
+> ⚠ **Three things wait on him**: submit the entry (no record it is done, plan
+> said ~Sep 1) · the worry trigger (a locked channel, so raising the bar is his
+> call) · the banding decision at full window size.
+> ⚠ **One limitation that is not a bug**: a resize scrambles the AGENT's own
+> text. The scape is provably right; Claude Code emits nothing on a resize, so
+> its screen stays where the terminal left it until a keystroke. Fixing it means
+> the emulator decided against on 09-01.
 
 **Name: `xscapes`** (decided 2026-09-01 with the repo; asciiscapes and iixscapes are out). The working directory and these docs still say asciiscapes. A cozy ASCII "thinking screen" for terminal AI agents. While Claude Code (or any agent) works, a small living scene runs WITH it — a shoreline whose sea rises with the work, and a companion animal — and nudges the user, visually and with a sound, when the agent finishes or needs input.
 
