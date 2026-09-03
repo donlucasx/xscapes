@@ -355,6 +355,66 @@ func (s *screen) csi(params string, final rune) {
 		// this project the most afternoons; the model has to have it or the
 		// tests would bless the bug.
 		s.move(0, 0)
+	// The cursor motions Claude Code actually uses. The notes record it placing
+	// its input "purely by RELATIVE moves from wherever the cursor is" and give
+	// the exact shape: ESC[2D ESC[4B \r ESC[2C ESC[4A ... ESC[8G. The model
+	// implemented NONE of them, so every reconstruction of the agent's own band
+	// was fiction -- it only ever modelled the sequences the HOST emits.
+	case final == 'A':
+		s.y = clamp(s.y-arg(0, 1), s.regionTop(), s.h-1)
+		s.wrapNext = false
+	case final == 'B':
+		s.y = clamp(s.y+arg(0, 1), 0, s.regionBot())
+		s.wrapNext = false
+	case final == 'C':
+		s.x = clamp(s.x+arg(0, 1), 0, s.w-1)
+		s.wrapNext = false
+	case final == 'D':
+		s.x = clamp(s.x-arg(0, 1), 0, s.w-1)
+		s.wrapNext = false
+	case final == 'E':
+		s.y, s.x = clamp(s.y+arg(0, 1), 0, s.regionBot()), 0
+		s.wrapNext = false
+	case final == 'F':
+		s.y, s.x = clamp(s.y-arg(0, 1), s.regionTop(), s.h-1), 0
+		s.wrapNext = false
+	case final == 'G':
+		s.x = clamp(arg(0, 1)-1, 0, s.w-1)
+		s.wrapNext = false
+	case final == 'd':
+		s.move(arg(0, 1)-1, s.x)
+	case final == 'X': // ECH: erase n cells, BCE like the others
+		n := arg(0, 1)
+		for i := 0; i < n && s.x+i < s.w; i++ {
+			s.cells[s.y][s.x+i] = cell{' ', s.curBG}
+		}
+	case final == '@': // ICH: open n cells, shifting the rest right
+		n := arg(0, 1)
+		row := s.cells[s.y]
+		for x := s.w - 1; x >= s.x+n; x-- {
+			row[x] = row[x-n]
+		}
+		for i := 0; i < n && s.x+i < s.w; i++ {
+			row[s.x+i] = cell{' ', s.curBG}
+		}
+	case final == 'P': // DCH: delete n cells, pulling the rest left
+		n := arg(0, 1)
+		row := s.cells[s.y]
+		for x := s.x; x < s.w; x++ {
+			if x+n < s.w {
+				row[x] = row[x+n]
+			} else {
+				row[x] = cell{' ', s.curBG}
+			}
+		}
+	case final == 'L': // IL: insert n blank lines at the cursor, within the region
+		s.scrollRegionDown(s.y, arg(0, 1))
+	case final == 'M': // DL: delete n lines at the cursor, within the region
+		s.scrollRegionUp(s.y, arg(0, 1))
+	case final == 'S':
+		s.scrollRegionUp(s.top, arg(0, 1))
+	case final == 'T':
+		s.scrollRegionDown(s.top, arg(0, 1))
 	case final == 'm':
 		s.sgr(nums, body)
 	case final == 'K':
@@ -423,6 +483,50 @@ func (s *screen) sgr(nums []int, body string) {
 	}
 }
 
+// regionTop and regionBot are the limits relative motion respects. Outside the
+// region the whole screen is the limit, which is what a real terminal does.
+func (s *screen) regionTop() int {
+	if s.y >= s.top && s.y <= s.bot {
+		return s.top
+	}
+	return 0
+}
+
+func (s *screen) regionBot() int {
+	if s.y >= s.top && s.y <= s.bot {
+		return s.bot
+	}
+	return s.h - 1
+}
+
+// scrollRegionUp deletes n lines at row `at`, pulling the rest of the region up
+// and opening blanks at the bottom margin.
+func (s *screen) scrollRegionUp(at, n int) {
+	if at < s.top || at > s.bot {
+		return
+	}
+	for i := 0; i < n; i++ {
+		for y := at; y < s.bot; y++ {
+			s.cells[y] = s.cells[y+1]
+		}
+		s.cells[s.bot] = bgRow(s.w, s.curBG)
+	}
+}
+
+// scrollRegionDown inserts n blank lines at row `at`, pushing the rest of the
+// region down and losing what falls past the bottom margin.
+func (s *screen) scrollRegionDown(at, n int) {
+	if at < s.top || at > s.bot {
+		return
+	}
+	for i := 0; i < n; i++ {
+		for y := s.bot; y > at; y-- {
+			s.cells[y] = s.cells[y-1]
+		}
+		s.cells[at] = bgRow(s.w, s.curBG)
+	}
+}
+
 // clone is a deep copy, for snapshotting the screen mid-run.
 func (s *screen) clone() *screen {
 	c := *s
@@ -483,7 +587,16 @@ func TestReplayTrace(t *testing.T) {
 			t.Logf("-- resize at byte %d -> %dx%d (band 1..%d)", m.off, m.cols, m.rows, m.agent)
 		}
 	}
-	sc.feed(string(b[fed:]))
+	// Stop before the host hands the terminal back: Close emits ESC[?1049l,
+	// which swaps away the alternate buffer -- the one everything under
+	// investigation was drawn on. Replaying past it shows a blank screen and
+	// looks exactly like "everything was erased".
+	tail := string(b[fed:])
+	if i := strings.LastIndex(tail, "\x1b[?1049l"); i >= 0 {
+		tail = tail[:i]
+		t.Logf("-- stopping before the host's exit (ESC[?1049l)")
+	}
+	sc.feed(tail)
 
 	t.Logf("replayed %d bytes at %dx%d; scroll region rows %d..%d, cursor r%d c%d, alt=%v",
 		len(b), w, h, sc.top+1, sc.bot+1, sc.y+1, sc.x+1, sc.alt)
