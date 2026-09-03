@@ -126,6 +126,8 @@ func runHostedAlt(t *testing.T, w1, h1, w2, h2 int, mode, child string, alt bool
 			sc.resizeScrolling(w2, h2)
 		case "anchor":
 			sc.resizeAnchoredBottom(w2, h2)
+		case "alt":
+			sc.resizeAlt(w2, h2)
 		default:
 			sc.resize(w2, h2)
 		}
@@ -293,26 +295,32 @@ func countAgentLines(sc *screen, from, to int) int {
 	return n
 }
 
-// On the ALTERNATE screen a shrink keeps the TOP: content is truncated and
-// nothing slides up. Measured in Terminal.app 2026-09-03, cursor parked
-// mid-screen and read back with DSR, against a main-screen control that gave
-// the opposite answer from the identical drag.
+// On an alternate-screen SHRINK the terminal pulls every row UP by the rows
+// lost and the top ones are gone -- measured by eye with notes/contentprobe,
+// 2026-09-03. The host cannot save those; they were destroyed before it ran.
 //
-// The host applied ONE rule to both, subtracting the rows lost from the start
-// of its clear as though the scape had slid up into the band. On the alternate
-// screen nothing slid, so that subtraction walks the clear UP into the agent's
-// transcript -- and at a big enough shrink it reaches row 1 and eats the input
-// box, which is what he photographed.
-func TestAltScreenShrinkDoesNotEatTheAgentsTranscript(t *testing.T) {
-	sc := runHostedAlt(t, 80, 44, 80, 22, "", agentLines, true)
+// What it IS responsible for is the two halves of the aftermath: the scape
+// slides up into the band and must be cleared, and the agent rows that SURVIVED
+// the slide must not be blanked along with it. That is what `drop` computes,
+// and it is why `drop` belongs on this screen after all -- it was made
+// main-screen-only earlier the same day on the strength of a cursor reading
+// that did not describe the content.
+func TestAltScreenShrinkClearsTheScapeButKeepsWhatSurvived(t *testing.T) {
+	sc := runHostedAlt(t, 80, 44, 80, 22, "alt", agentLines, true)
 
 	newAgent, _ := Band(22)
-	oldAgent, _ := Band(44)
-	safe := min(oldAgent, newAgent) // agent band before AND after: never ours to clear
 
-	if got := countAgentLines(sc, 1, safe); got < safe {
-		t.Errorf("after an alt-screen shrink only %d of the top %d rows still hold the agent's text;\n"+
-			"the host cleared rows that were the agent's band both before and after the resize", got, safe)
+	// The scape rows carry a repeated tag; none may remain inside the band.
+	for row := 1; row <= newAgent; row++ {
+		if r := sc.rowAt(row - 1); strings.Count(r, "AAAA") > 0 || strings.Count(r, "BBBB") > 0 {
+			t.Errorf("row %d is inside the band and still holds scape: %q", row, r)
+		}
+	}
+	// And the agent rows the terminal did NOT destroy must still be there.
+	if got := countAgentLines(sc, 1, newAgent); got == 0 {
+		t.Error("every surviving row of the agent's text was blanked by the host")
+	} else {
+		t.Logf("%d agent row(s) survived the shrink and were left alone", got)
 	}
 }
 
@@ -338,7 +346,7 @@ func TestMainScreenShrinkStillClearsTheScapeThatSlidUp(t *testing.T) {
 // He photographed the opposite: a fresh session's banner sitting at the BOTTOM
 // of the band with everything above it blank, after nothing but a stretch.
 func TestAltScreenGrowLeavesTheAgentsTextWhereItWas(t *testing.T) {
-	sc := runHostedAlt(t, 80, 30, 80, 59, "", agentLines, true)
+	sc := runHostedAlt(t, 80, 30, 80, 59, "alt", agentLines, true)
 
 	newAgent, _ := Band(59)
 	oldAgent, _ := Band(30)
@@ -354,4 +362,43 @@ func TestAltScreenGrowLeavesTheAgentsTextWhereItWas(t *testing.T) {
 	}
 	t.Logf("agent rows in old band 1..%d: %d | in new band 1..%d: %d | below band: %d",
 		oldAgent, countAgentLines(sc, 1, oldAgent), newAgent, countAgentLines(sc, 1, newAgent), below)
+}
+
+// The defect he photographed, stated directly.
+//
+// Measured 2026-09-03 with notes/contentprobe: an alternate-screen GROW pushes
+// the whole screen DOWN by the delta. So the agent's text slides out of the top
+// of the band, and whatever crosses the band's bottom edge is painted over by
+// the scape on the very next frame. A small grow leaves the startup banner
+// stranded just above the scape; a big one leaves nothing at all.
+//
+// The host has to undo the push before it paints. It can: a scroll of the whole
+// screen moves rows, and moving rows needs no model of the UI living in them.
+func TestAltScreenGrowRestoresTheAgentsTextToTheTopOfTheBand(t *testing.T) {
+	sc := runHostedAlt(t, 80, 30, 80, 59, "alt", agentLines, true)
+
+	newAgent, _ := Band(59)
+
+	// The child writes AGENTLINE01 first, so it is the topmost row of its
+	// output and the one a downward push loses first.
+	top := 0
+	for y := 0; y < sc.h; y++ {
+		if strings.Contains(sc.rowAt(y), "AGENTLINE") {
+			top = y + 1
+			break
+		}
+	}
+	if top == 0 {
+		t.Fatal("none of the agent's text is on screen at all after a grow")
+	}
+	if top > 4 {
+		t.Errorf("the agent's first row is at screen row %d after a grow; the terminal pushed it down"+
+			" and the host did not undo it", top)
+	}
+	if below := countAgentLines(sc, newAgent+1, sc.h); below > 0 {
+		t.Errorf("%d row(s) of the agent's text are BELOW the band (row >%d), where the scape paints over them",
+			below, newAgent)
+	}
+	t.Logf("agent text starts at screen row %d; %d rows inside the band, %d below it",
+		top, countAgentLines(sc, 1, newAgent), countAgentLines(sc, newAgent+1, sc.h))
 }

@@ -140,6 +140,23 @@ func (s *screen) resizeAnchoredBottom(w, h int) {
 	s.resize(w, h)
 }
 
+// resizeAlt is what Terminal.app's ALTERNATE screen does, measured by eye with
+// notes/contentprobe on 2026-09-03: content is anchored to the BOTTOM edge in
+// both directions. A grow pushes it down by the delta and inserts blank rows at
+// the TOP; a shrink pulls it up and loses the top rows. The CURSOR does not
+// move either way, which is the trap -- notes/anchorprobe measures the cursor
+// and therefore reported "anchored top" for both.
+//
+// This is the behaviour production runs against, so it is the one the resize
+// tests must use.
+func (s *screen) resizeAlt(w, h int) {
+	if h > s.h {
+		s.resizeAnchoredBottom(w, h)
+		return
+	}
+	s.resizeScrolling(w, h)
+}
+
 // resize keeps what fits, which is what a terminal does when it GROWS.
 //
 // It resizes the SAVED main buffer too. A terminal resizes both buffers, and a

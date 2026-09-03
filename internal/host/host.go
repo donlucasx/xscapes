@@ -273,36 +273,38 @@ func (h *Host) Run() error {
 				// child's repaint arrives with the SIGWINCH and has to land in
 				// the new region rather than the one it is leaving.
 				//
-				// ⚠ The clear has to allow for the TERMINAL having moved
-				// things, and THE TWO SCREEN BUFFERS MOVE THEM DIFFERENTLY.
+				// ⚠ The clear has to allow for the TERMINAL having moved things.
 				//
-				// Measured in Terminal.app on 2026-09-03, cursor parked
-				// mid-screen and read back with DSR, the same drag on both:
+				// Measured by eye on 2026-09-03 with notes/contentprobe, in
+				// production's configuration, after two earlier readings got
+				// this backwards: **Terminal.app anchors content to the BOTTOM
+				// edge.** A shrink of N pulls every row UP by N and loses the
+				// top ones; a grow of N pushes every row DOWN by N and inserts
+				// blanks at the top. Both buffers, both directions.
 				//
-				//   main screen       keeps the BOTTOM. Every row slides up by
-				//                     the rows lost, so the scape -- painted at
-				//                     the bottom -- slides into the band, and
-				//                     nothing cleans it up: the host clears only
-				//                     what changed hands and Claude Code emits
-				//                     nothing at all on a resize. That leaves a
-				//                     strip of old sky above the band.
-				//   alternate screen  keeps the TOP. It has no history to pull
-				//                     from, so content is truncated and NOTHING
-				//                     slides.
-				//
-				// The correction was written for the first and applied to both,
-				// while `xscapes claude` runs on the second. Subtracting rows
-				// that never moved walks the clear UP into the agent's
-				// transcript, and at a big enough shrink it reaches row 1 and
-				// takes the input box with it -- which is what he photographed.
+				// The CURSOR does not move either way. That is the trap that
+				// cost this project most of a day: notes/anchorprobe parks the
+				// cursor and reads it back with DSR, so it reported "anchored
+				// top" for a screen whose content was anchored bottom, and an
+				// external audit was told it was wrong when it was right.
+				// Content is read by eye here because nothing reads cells back
+				// from Terminal.app.
 				//
 				// So the range starts where the old scape's first row LANDS.
-				// On the alternate screen that is simply where it was.
-				drop := 0
-				if !h.AltScreen {
-					if d := oldRows - rows; d > 0 {
-						drop = d
-					}
+				drop := oldRows - rows
+				if drop < 0 {
+					drop = 0
+				}
+
+				// And on a GROW the push is undone before anything is painted,
+				// because the rows it pushed down are the agent's and the scape
+				// is about to paint over the ones that crossed the boundary.
+				// Alt screen only: that is where it was measured, and the main
+				// screen's grow pulls real scrollback back in, which is content
+				// a scroll would push away again.
+				grow := 0
+				if h.AltScreen && rows > oldRows {
+					grow = rows - oldRows
 				}
 				from := oldAgent + 1 - drop
 				if from < 1 {
@@ -310,7 +312,7 @@ func (h *Host) Run() error {
 				}
 				to := min(agentRows, oldRows-drop)
 				h.traceSize(cols, rows, agentRows)
-				h.write(Rebind(from, to, agentRows))
+				h.write(Rebind(grow, from, to, agentRows))
 				// The screen was just touched behind the tracker's back.
 				dmg.reset()
 				p.SetSize(cols, agentRows)

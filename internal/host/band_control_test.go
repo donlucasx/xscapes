@@ -109,7 +109,7 @@ func TestLeaveToStillGivesTheWholeScreenBack(t *testing.T) {
 // then echoed onto row 1, on top of the transcript -- which is exactly what he
 // saw: "PeHello claude lets get to work" written over "Permission allow rule".
 func TestRebindLeavesTheCursorWhereItFoundIt(t *testing.T) {
-	got := Rebind(21, 30, 48)
+	got := Rebind(0, 21, 30, 48)
 	save := idx(t, got, "\x1b7", "cursor save")
 	restore := strings.LastIndex(got, "\x1b8")
 	if restore < 0 {
@@ -125,7 +125,7 @@ func TestRebindLeavesTheCursorWhereItFoundIt(t *testing.T) {
 }
 
 func TestRebindClearsTheRowsItIsToldTo(t *testing.T) {
-	got := Rebind(21, 23, 48)
+	got := Rebind(0, 21, 23, 48)
 	for _, row := range []string{"\x1b[21;1H", "\x1b[22;1H", "\x1b[23;1H"} {
 		idx(t, got, row+"\x1b[2K", "clear of row "+row)
 	}
@@ -181,5 +181,41 @@ func TestClosingTheMainScreenClearsTheScapeAndParksTheCursor(t *testing.T) {
 	idx(t, got, "\x1b[21;1H", "cursor parked below the band")
 	if strings.Contains(got, "\x1b[?1049l") {
 		t.Error("tried to leave an alternate screen it never entered")
+	}
+}
+
+// A grow has to undo the terminal's downward push BEFORE the rows are cleared,
+// or the clear is computed against a screen whose content is still displaced.
+func TestRebindScrollsBackUpBeforeClearing(t *testing.T) {
+	got := Rebind(12, 21, 30, 48)
+	su := idx(t, got, "\x1b[12S", "scroll up")
+	firstClear := strings.Index(got, "\x1b[2K")
+	if firstClear < 0 {
+		t.Fatal("no erase in the rebind at all")
+	}
+	if su > firstClear {
+		t.Errorf("scroll-up at %d comes AFTER the first erase at %d: %q", su, firstClear, got)
+	}
+	region := strings.Index(got, regionReset)
+	if region > su {
+		t.Errorf("the region is reset at %d, after the scroll at %d -- the scroll would be confined to the band", region, su)
+	}
+	// And the cursor bracket still holds.
+	if !strings.HasPrefix(got, saveCursor) || !strings.HasSuffix(got, restoreCursor) {
+		t.Errorf("the cursor save/restore no longer brackets the sequence: %q", got)
+	}
+}
+
+// Zero means no push to undo, and must emit no scroll at all: a stray SU on
+// every shrink would throw away a row of the agent's screen each time.
+func TestRebindWithoutAGrowEmitsNoScroll(t *testing.T) {
+	got := Rebind(0, 21, 30, 48)
+	if strings.Contains(got, "S") && strings.Contains(got, "\x1b[0S") {
+		t.Errorf("emitted a zero scroll: %q", got)
+	}
+	for _, n := range []string{"\x1b[1S", "\x1b[2S", "\x1b[12S"} {
+		if strings.Contains(got, n) {
+			t.Errorf("emitted %q with no grow: %q", n, got)
+		}
 	}
 }

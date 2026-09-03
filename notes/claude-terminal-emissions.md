@@ -258,3 +258,28 @@ the last rows of the band with everything above it blank, and on a bigger grow, 
 slides UP on a shrink, which is what the `drop` correction in host.go was originally written for --
 and `drop` was made main-screen-only on 2026-09-03 on the strength of the CURSOR measurement. That
 change may be wrong. Measure before touching it again.
+
+## MEASURED, 2026-09-03: the shrink direction too. Anchored BOTTOM, both ways.
+
+Same probe, same configuration, window made SHORTER: a higher row number at the top -- content slid
+UP by the rows lost, and the top rows are gone.
+
+**So Terminal.app's alternate screen anchors content to the BOTTOM edge in BOTH directions, and the
+cursor moves with NEITHER.** That is the whole fact this cost a day to establish:
+
+| direction | content | cursor |
+|---|---|---|
+| grow by N | pushed DOWN by N, blanks inserted at the top | stays on its absolute row |
+| shrink by N | pulled UP by N, the top N rows destroyed | stays on its absolute row |
+
+Consequences, both now implemented in `host.go`:
+
+1. **Grow.** The push has to be UNDONE before anything is painted, or the agent's UI is left sitting
+   below the band where the scape paints over it. `Rebind` takes a scroll-up count and emits SU over
+   the full screen. Moving rows needs no model of the UI in them, which is why the host is allowed
+   to do it. The cursor needs no adjustment: the terminal moved the content and not the cursor, and
+   SU moves the content back and not the cursor, so they end where they began.
+2. **Shrink.** `drop` belongs on this screen after all. It was made main-screen-only earlier the
+   same day on the strength of the CURSOR reading; that change was wrong and is reverted. The rows
+   the terminal destroyed are gone either way -- what `drop` does is clear the scape that slid up
+   into the band without blanking the agent rows that survived.

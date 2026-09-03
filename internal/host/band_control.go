@@ -1,6 +1,9 @@
 package host
 
-import "fmt"
+import (
+	"fmt"
+	"strings"
+)
 
 // The escape sequences that hold the agent in its band.
 //
@@ -69,16 +72,38 @@ func LeaveTo(row int) string {
 }
 
 // Rebind moves the band to a new geometry after the window changed size,
-// clearing the rows that changed hands, and leaves the agent's cursor exactly
-// where it found it.
+// undoing any downward push the terminal applied, clearing the rows that
+// changed hands, and leaving the agent's cursor exactly where it found it.
 //
 // The cursor is the whole point. DECSTBM homes it, so re-stating the region
 // dropped the cursor on row 1 while the agent still believed it was in its
 // input box -- and everything typed after a resize echoed onto row 1, on top
 // of the transcript. Same rule as LeaveTo, from the other side: save before
 // touching the region, restore after the last time you touch it.
-func Rebind(clearFrom, clearTo, agentRows int) string {
-	return saveCursor + clearRowsBare(clearFrom, clearTo) + EnterBand(agentRows) + restoreCursor
+//
+// scrollUp undoes the terminal's own doing. Measured by eye on 2026-09-03
+// (notes/contentprobe): Terminal.app's ALTERNATE screen anchors content to the
+// BOTTOM edge, so a grow of N rows pushes the whole screen DOWN by N and
+// inserts N blank rows at the top. The agent never notices -- it emits nothing
+// at all on a resize -- so its UI simply slides out of the band, and whatever
+// crosses the bottom edge is painted over by the scape on the next frame. SU
+// over the full screen puts it back. This moves ROWS, which is something the
+// host can do without modelling the UI living in them.
+//
+// The cursor needs no adjustment: the terminal moved the content and left the
+// cursor on its absolute row, and SU moves the content back without moving the
+// cursor, so the two end up in the same relationship they started in.
+func Rebind(scrollUp, clearFrom, clearTo, agentRows int) string {
+	var b strings.Builder
+	b.WriteString(saveCursor)
+	b.WriteString(originOff + regionReset)
+	if scrollUp > 0 {
+		fmt.Fprintf(&b, "\x1b[%dS", scrollUp)
+	}
+	b.WriteString(clearRowsBare(clearFrom, clearTo))
+	b.WriteString(EnterBand(agentRows))
+	b.WriteString(restoreCursor)
+	return b.String()
 }
 
 const (
