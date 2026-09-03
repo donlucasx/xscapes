@@ -328,3 +328,30 @@ func TestMainScreenShrinkStillClearsTheScapeThatSlidUp(t *testing.T) {
 		}
 	}
 }
+
+// A GROW on the alternate screen. Measured 2026-09-03 with notes/anchorprobe:
+// the alternate screen is ANCHORED TOP in BOTH directions -- on a grow the
+// content stays exactly where it is and the blank rows appear at the BOTTOM.
+// So after growing, the agent's text must still be at the top of the band,
+// untouched, and the band is simply taller.
+//
+// He photographed the opposite: a fresh session's banner sitting at the BOTTOM
+// of the band with everything above it blank, after nothing but a stretch.
+func TestAltScreenGrowLeavesTheAgentsTextWhereItWas(t *testing.T) {
+	sc := runHostedAlt(t, 80, 30, 80, 59, "", agentLines, true)
+
+	newAgent, _ := Band(59)
+	oldAgent, _ := Band(30)
+	if got := countAgentLines(sc, 1, oldAgent); got == 0 {
+		t.Fatalf("no agent text anywhere in the old band (rows 1..%d) after a grow", oldAgent)
+	}
+	// Every line the child wrote must still be inside the band, not below it
+	// where the scape paints.
+	below := countAgentLines(sc, newAgent+1, sc.h)
+	if below > 0 {
+		t.Errorf("%d row(s) of the agent's text ended up BELOW the band (row >%d), where the scape paints over them",
+			below, newAgent)
+	}
+	t.Logf("agent rows in old band 1..%d: %d | in new band 1..%d: %d | below band: %d",
+		oldAgent, countAgentLines(sc, 1, oldAgent), newAgent, countAgentLines(sc, 1, newAgent), below)
+}

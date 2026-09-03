@@ -1,8 +1,11 @@
 package host
 
 import (
+	"fmt"
+	"os"
 	"strconv"
 	"strings"
+	"testing"
 )
 
 // screen is the smallest terminal that can answer "what would this look like".
@@ -414,4 +417,56 @@ func (s *screen) clone() *screen {
 		c.cells[i] = append([]cell(nil), s.cells[i]...)
 	}
 	return &c
+}
+
+// TestReplayTrace reconstructs a real session's screen from a trace file.
+//
+// Not a test of anything: an instrument, skipped unless pointed at a trace by
+// XSCAPES_TRACE. A screenshot shows what a screen LOOKED like; it cannot say
+// whether the terminal moved the content or the host erased it. Replaying the
+// exact bytes the host sent, through the same model the resize tests use,
+// answers that.
+//
+//	XSCAPES_TRACE=/tmp/t.bin xscapes claude     # in a real window, then resize
+//	XSCAPES_TRACE=/tmp/t.bin go test ./internal/host -run TestReplayTrace -v
+//
+// TRACE_SIZE=WxH gives the window size to model; TRACE_ALT=0 replays on the
+// main screen. Both resize directions on the alternate screen are ANCHORED TOP
+// (measured 2026-09-03, notes/anchorprobe), so a size change is applied here as
+// "keep what fits", which is what the model's resize does.
+func TestReplayTrace(t *testing.T) {
+	path := os.Getenv("XSCAPES_TRACE")
+	if path == "" {
+		t.Skip("set XSCAPES_TRACE to a trace file to replay it")
+	}
+	b, err := os.ReadFile(path)
+	if err != nil {
+		t.Fatal(err)
+	}
+	w, h := 120, 59
+	if s := os.Getenv("TRACE_SIZE"); s != "" {
+		if _, err := fmt.Sscanf(s, "%dx%d", &w, &h); err != nil {
+			t.Fatalf("TRACE_SIZE=%q: want WxH", s)
+		}
+	}
+	sc := newScreen(w, h)
+	sc.feed(string(b))
+
+	t.Logf("replayed %d bytes at %dx%d; scroll region rows %d..%d, cursor r%d c%d, alt=%v",
+		len(b), w, h, sc.top+1, sc.bot+1, sc.y+1, sc.x+1, sc.alt)
+	for y := 0; y < sc.h; y++ {
+		row := sc.rowAt(y)
+		bg, uniform := sc.bgRunAt(y)
+		mark := "  "
+		switch {
+		case uniform && bg != defaultBG:
+			mark = "##" // erased under a colour: a solid band on the real screen
+		case row == "":
+			mark = ".." // genuinely empty
+		}
+		if len(row) > 100 {
+			row = row[:100] + "…"
+		}
+		t.Logf("%s row %2d | %s", mark, y+1, row)
+	}
 }

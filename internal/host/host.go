@@ -11,6 +11,8 @@ import (
 	"sync"
 	"syscall"
 	"time"
+
+	"github.com/donlucasx/xscapes/internal/envx"
 )
 
 // Host runs an agent inside the top rows of this terminal and paints the scape
@@ -42,6 +44,9 @@ type Host struct {
 	// AltScreen runs on the alternate screen, which has no history for the
 	// terminal to pull back in when the window grows. See Open.
 	AltScreen bool
+
+	// trace, when XSCAPES_TRACE is set, records every byte sent to the terminal.
+	trace *os.File
 	// In and Out default to os.Stdin and os.Stdout. Overridable for tests.
 	In  *os.File
 	Out *os.File
@@ -59,7 +64,34 @@ func (h *Host) write(s string) {
 	}
 	h.mu.Lock()
 	io.WriteString(h.out, s)
+	if h.trace != nil {
+		h.trace.Write([]byte(s))
+	}
 	h.mu.Unlock()
+}
+
+// openTrace tees everything the host sends the terminal into a file, when
+// XSCAPES_TRACE names one.
+//
+// It exists because a screenshot is not evidence of what was SENT, and the
+// difference between "the terminal moved it" and "we erased it" is not visible
+// in a photograph. Replaying a trace through internal/host's screen model
+// reconstructs the exact screen, which is the only way to argue about a
+// resize that happened on someone else's machine.
+//
+// The agent's own bytes are in here too -- they pass through write on their
+// way out -- so a trace CAN contain whatever the agent had on screen. It is a
+// debugging tool that must be pointed at a file deliberately, never a default.
+func (h *Host) openTrace() {
+	path := envx.Lookup("TRACE")
+	if path == "" {
+		return
+	}
+	f, err := os.OpenFile(path, os.O_CREATE|os.O_WRONLY|os.O_TRUNC, 0o600)
+	if err != nil {
+		return
+	}
+	h.trace = f
 }
 
 func (h *Host) Run() error {
@@ -71,6 +103,10 @@ func (h *Host) Run() error {
 		out = os.Stdout
 	}
 	h.out = out
+	h.openTrace()
+	if h.trace != nil {
+		defer h.trace.Close()
+	}
 
 	cols, rows := h.Size()
 	agentRows, scapeRows := BandWith(rows, h.ScapeRows)
