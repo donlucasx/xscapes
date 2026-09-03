@@ -276,12 +276,25 @@ func clearRows(first, last int) string {
 // own the cursor themselves. It still drops origin mode and the region,
 // because rows outside the band cannot be addressed otherwise, and it leaves
 // the cursor on the last row it cleared.
+//
+// ⚠ The SGR reset is not tidiness, it is the erase's argument. EL does not
+// write spaces; it fills with the CURRENT background (BCE), and under reverse
+// video that is the foreground. Every caller here clears on a timer -- the
+// resize tick -- which fires with no relation to where the agent is in its
+// output, and Claude Code paints backgrounds constantly: its input box, the
+// context bar, a selection. So the colour in force is not the host's to assume,
+// and a clear that inherited it turned the rows it touched into a solid band of
+// whatever Claude happened to be drawing. Those rows then scroll out of the
+// band into scrollback, which is the wall of black he hit scrolling up.
+//
+// Safe inside Rebind and clearRows because both bracket this with DECSC/DECRC,
+// and DECRC restores the agent's SGR along with its cursor.
 func clearRowsBare(first, last int) string {
 	if first > last {
 		return ""
 	}
 	var b strings.Builder
-	b.WriteString(originOff + regionReset)
+	b.WriteString(originOff + regionReset + "\x1b[0m")
 	for r := first; r <= last; r++ {
 		fmt.Fprintf(&b, "\x1b[%d;1H\x1b[2K", r)
 	}

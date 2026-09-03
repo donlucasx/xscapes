@@ -16,9 +16,23 @@ import (
 // CUP, EL, ED, DECSTBM, DECOM, DECSC/DECRC, autowrap and scrolling within the
 // region. SGR is parsed and discarded -- colour is not what these tests are
 // about, and keeping it would make every expectation unreadable.
+// cell is a glyph and the background it was painted on. The background is the
+// whole point: an erase does not write spaces, it fills with the CURRENT
+// background (BCE), so a row cleared while some other colour was in force comes
+// out as a solid band of that colour. A model that stores only runes shows that
+// row as blank and calls the host innocent.
+type cell struct {
+	r  rune
+	bg int // -1 is the terminal's default
+}
+
+const defaultBG = -1
+
 type screen struct {
 	w, h       int
-	cells      [][]rune
+	curBG      int
+	sBG        int
+	cells      [][]cell
 	x, y       int // 0-based, screen coordinates
 	top, bot   int // scroll region, 0-based inclusive
 	origin     bool
@@ -35,8 +49,8 @@ type screen struct {
 }
 
 func newScreen(w, h int) *screen {
-	s := &screen{w: w, h: h}
-	s.cells = make([][]rune, h)
+	s := &screen{w: w, h: h, curBG: defaultBG, sBG: defaultBG}
+	s.cells = make([][]cell, h)
 	for i := range s.cells {
 		s.cells[i] = blankRow(w)
 	}
@@ -44,10 +58,14 @@ func newScreen(w, h int) *screen {
 	return s
 }
 
-func blankRow(w int) []rune {
-	r := make([]rune, w)
+// blankRow is an erase to the DEFAULT background: what a fresh screen holds.
+func blankRow(w int) []cell { return bgRow(w, defaultBG) }
+
+// bgRow is an erase to a given background, which is what EL and ED actually do.
+func bgRow(w, bg int) []cell {
+	r := make([]cell, w)
 	for i := range r {
-		r[i] = ' '
+		r[i] = cell{' ', bg}
 	}
 	return r
 }
@@ -65,7 +83,7 @@ func blankRow(w int) []rune {
 func (s *screen) resizeScrolling(w, h int) {
 	if delta := s.h - h; delta > 0 {
 		kept := s.cells[delta:]
-		s.cells = append([][]rune{}, kept...)
+		s.cells = append([][]cell{}, kept...)
 		s.h = h
 		for i := range s.cells {
 			row := blankRow(w)
@@ -94,7 +112,7 @@ func (s *screen) resizeScrolling(w, h int) {
 // with eyes open.
 func (s *screen) resizeAnchoredBottom(w, h int) {
 	if grow := h - s.h; grow > 0 {
-		rows := make([][]rune, h)
+		rows := make([][]cell, h)
 		for i := range rows {
 			rows[i] = blankRow(w)
 		}
@@ -112,7 +130,7 @@ func (s *screen) resizeAnchoredBottom(w, h int) {
 // resize keeps what fits, which is what a terminal does when it GROWS.
 func (s *screen) resize(w, h int) {
 	old := s.cells
-	s.cells = make([][]rune, h)
+	s.cells = make([][]cell, h)
 	for i := range s.cells {
 		s.cells[i] = blankRow(w)
 		if i < len(old) {
@@ -129,7 +147,44 @@ func (s *screen) resize(w, h int) {
 	}
 }
 
-func (s *screen) rowAt(y int) string { return strings.TrimRight(string(s.cells[y]), " ") }
+func (s *screen) rowAt(y int) string {
+	r := make([]rune, len(s.cells[y]))
+	for i, c := range s.cells[y] {
+		r[i] = c.r
+	}
+	return strings.TrimRight(string(r), " ")
+}
+
+// bgRunAt reports the background filling row y, and whether the WHOLE row
+// carries it. A row erased under a stray colour is uniform in that colour,
+// which is exactly the signature being hunted.
+func (s *screen) bgRunAt(y int) (bg int, uniform bool) {
+	if len(s.cells[y]) == 0 {
+		return defaultBG, true
+	}
+	bg = s.cells[y][0].bg
+	for _, c := range s.cells[y] {
+		if c.bg != bg {
+			return bg, false
+		}
+	}
+	return bg, true
+}
+
+// paintedRows lists the rows in [from,to] (1-based, inclusive) left holding a
+// non-default background across their whole width.
+func (s *screen) paintedRows(from, to int) []int {
+	var out []int
+	for y := from - 1; y <= to-1 && y < s.h; y++ {
+		if y < 0 {
+			continue
+		}
+		if bg, uniform := s.bgRunAt(y); uniform && bg != defaultBG {
+			out = append(out, y+1)
+		}
+	}
+	return out
+}
 
 func (s *screen) scrollUp() {
 	for y := s.top; y < s.bot; y++ {
@@ -149,7 +204,7 @@ func (s *screen) put(r rune) {
 		s.wrapNext = false
 	}
 	if s.y >= 0 && s.y < s.h && s.x >= 0 && s.x < s.w {
-		s.cells[s.y][s.x] = r
+		s.cells[s.y][s.x] = cell{r, s.curBG}
 	}
 	if s.x == s.w-1 {
 		s.wrapNext = true
@@ -188,10 +243,10 @@ func (s *screen) feed(in string) {
 			s.pending = string(r[i:])
 			return
 		case c == '\x1b' && i+1 < len(r) && r[i+1] == '7':
-			s.sx, s.sy, s.sTop, s.sBot, s.sOrigin = s.x, s.y, s.top, s.bot, s.origin
+			s.sx, s.sy, s.sTop, s.sBot, s.sOrigin, s.sBG = s.x, s.y, s.top, s.bot, s.origin, s.curBG
 			i++
 		case c == '\x1b' && i+1 < len(r) && r[i+1] == '8':
-			s.x, s.y, s.origin = s.sx, s.sy, s.sOrigin
+			s.x, s.y, s.origin, s.curBG = s.sx, s.sy, s.sOrigin, s.sBG
 			s.wrapNext = false
 			i++
 		case c == '\x1b' && i+1 < len(r) && r[i+1] == '[':
@@ -259,32 +314,70 @@ func (s *screen) csi(params string, final rune) {
 		// this project the most afternoons; the model has to have it or the
 		// tests would bless the bug.
 		s.move(0, 0)
+	case final == 'm':
+		s.sgr(nums, body)
 	case final == 'K':
 		switch arg(0, 0) {
 		case 1:
 			for x := 0; x <= s.x && x < s.w; x++ {
-				s.cells[s.y][x] = ' '
+				s.cells[s.y][x] = cell{' ', s.curBG}
 			}
 		case 2:
-			s.cells[s.y] = blankRow(s.w)
+			s.cells[s.y] = bgRow(s.w, s.curBG)
 		default:
 			for x := s.x; x < s.w; x++ {
-				s.cells[s.y][x] = ' '
+				s.cells[s.y][x] = cell{' ', s.curBG}
 			}
 		}
 	case final == 'J':
 		switch arg(0, 0) {
 		case 2:
 			for y := 0; y < s.h; y++ {
-				s.cells[y] = blankRow(s.w)
+				s.cells[y] = bgRow(s.w, s.curBG)
 			}
 		default:
 			for x := s.x; x < s.w; x++ {
-				s.cells[s.y][x] = ' '
+				s.cells[s.y][x] = cell{' ', s.curBG}
 			}
 			for y := s.y + 1; y < s.h; y++ {
-				s.cells[y] = blankRow(s.w)
+				s.cells[y] = bgRow(s.w, s.curBG)
 			}
+		}
+	}
+}
+
+// sgr tracks the background colour, and nothing else.
+//
+// Background only, deliberately: an erase fills with the background, so that is
+// the one attribute that can turn a cleared row into a visible band. Tracking
+// the foreground too would double the model's size and answer no question these
+// tests ask.
+func (s *screen) sgr(nums []int, body string) {
+	if body == "" {
+		s.curBG = defaultBG
+		return
+	}
+	for i := 0; i < len(nums); i++ {
+		n := nums[i]
+		switch {
+		case n == 0:
+			s.curBG = defaultBG
+		case n >= 40 && n <= 47:
+			s.curBG = n - 40
+		case n >= 100 && n <= 107:
+			s.curBG = n - 100 + 8
+		case n == 49:
+			s.curBG = defaultBG
+		case n == 48 && i+1 < len(nums) && nums[i+1] == 5:
+			if i+2 < len(nums) {
+				s.curBG = nums[i+2]
+			}
+			i += 2
+		case n == 48 && i+1 < len(nums) && nums[i+1] == 2:
+			// Truecolor: collapsed to a single sentinel. These tests ask
+			// "default or not", never "which shade".
+			s.curBG = 1 << 20
+			i += 4
 		}
 	}
 }
@@ -292,9 +385,9 @@ func (s *screen) csi(params string, final rune) {
 // clone is a deep copy, for snapshotting the screen mid-run.
 func (s *screen) clone() *screen {
 	c := *s
-	c.cells = make([][]rune, len(s.cells))
+	c.cells = make([][]cell, len(s.cells))
 	for i := range s.cells {
-		c.cells[i] = append([]rune(nil), s.cells[i]...)
+		c.cells[i] = append([]cell(nil), s.cells[i]...)
 	}
 	return &c
 }
