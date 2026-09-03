@@ -195,3 +195,34 @@ SGR cannot be read back from this terminal, and "does DECRC restore SGR" cannot 
 directly. It is settled by the running system instead: the scape paint brackets its writes with
 DECSC/DECRC and every scape line ends in `ESC[0m`, twelve times a second. If DECRC did not restore
 SGR, Claude Code's UI would be colourless. It is not.
+
+## ⚠ CORRECTION, 2026-09-03 (third pass): the anchoring measurement measured the CURSOR, not the CONTENT
+
+Both anchoring sections above are measured with `notes/anchorprobe`, which parks the cursor, resizes,
+and reads the cursor back with DSR. Its stated premise is "a terminal moves the cursor with the
+content it moves". **That premise is an inference, and on Terminal.app's alternate screen it is
+false.** The probe therefore measured cursor behaviour and the conclusion was written up as content
+behaviour.
+
+What the evidence actually says, from a trace of the real failure (`XSCAPES_TRACE`):
+
+- The agent drew its startup screen at byte 184918 and emitted **NOTHING** from the first resize
+  (byte 422004) until Ctrl-C (byte 825233) -- 400KB of host frames spanning six resizes with zero
+  agent output. So the agent did not redraw, and did not move its own text.
+- The trace contains **no ED at all**, and the host's clear ranges never reach the rows holding the
+  agent's text (verified per-resize against `Band()`). So the host did not erase it.
+- Both other writers eliminated, the text still moved. Only the terminal is left.
+- And the owner's screenshots show WHERE it went: after a stretch, the startup banner sits on the
+  LAST rows of the band with the whole band blank above it, i.e. pushed DOWN by the grow, with
+  everything past the band's bottom painted over by the scape.
+
+**So on the alternate screen Terminal.app pushes CONTENT down on a grow while leaving the CURSOR at
+its absolute row.** The two move independently, which is why the cursor probe reported "anchored
+top" for a screen whose content was anchored bottom.
+
+This is the third instrument in one day that returned a clean answer to the wrong question, and the
+external audit called this one before the measurement did. Its objection was that the probe ran in
+the wrong CONFIGURATION; the deeper fault was that it measured the wrong OBSERVABLE.
+
+⚠ **Do not quote the anchoring tables above for content.** They are valid for the cursor only. A
+content measurement needs the numbered rows read off the screen by eye, which no probe here does.
