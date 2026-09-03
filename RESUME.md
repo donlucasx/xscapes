@@ -14,6 +14,40 @@ build the instrument before trusting the picture, and check what the RENDERED
 frame does rather than what the source says it should.
 ```
 
+## Where we left off (2026-09-03, session 13, HEAD `a0e9a83`, pushed)
+
+**He reported the resize damage a third time, and this time it was ours --
+both halves of it.** Session 11 had written it off as Claude Code's screen
+being moved by the terminal. That verdict came from an instrument that could
+not see either defect.
+
+1. **The clear was painting.** `clearRowsBare` emitted `ESC[2K` with no SGR of
+   its own. An erase does not write spaces, it fills with the CURRENT
+   background -- and it runs off the resize TICK, a timer with no relation to
+   where the agent is in its output. Claude paints backgrounds constantly, so
+   the cleared rows came out solid in whatever it was mid-draw, then scrolled
+   into scrollback. That is the wall of black he hit scrolling up. Red before
+   the fix at 5 rows on a shrink, 9 on a grow.
+2. **`drop` is a MAIN-screen correction, applied to both screens.** Measured
+   with `notes/anchorprobe` (cursor parked mid-screen, window resized from
+   outside, read back with DSR): on the same 11-row shrink the main screen
+   comes back on row 10 and the ALTERNATE screen on row 21. Main keeps the
+   bottom and slides everything up; alternate has no history, keeps the top,
+   truncates. `xscapes claude` runs on the alternate screen, so the correction
+   subtracted rows that never moved and walked the clear up into the
+   transcript -- at a big enough shrink, into the input box. Red before the
+   fix: 3 of the top 13 rows survived.
+
+**Why eleven resize tests passed through all of it:** `screen` stored runes and
+discarded SGR, so a coloured row read as blank; and every resize test ran
+`AltScreen: false`. The model now carries a background per cell and can take
+the alternate screen. Both fixes are mutation-proven in both directions -- the
+main-screen control goes red if `drop` is merely deleted.
+
+⚠ **The general lesson, worth more than the fixes:** a harness that no-ops a
+platform behaviour, or never enters the mode production runs in, keeps
+returning a clean bill of health. Two sessions trusted it.
+
 ## Where we left off (2026-09-03, session 12, HEAD `c9a019e`, pushed)
 
 **The rename is finished.** `~/Documents/claude/xscapes/`, `XSCAPES_*`,

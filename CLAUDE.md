@@ -43,10 +43,25 @@
 > ⚠ **Three things wait on him**: submit the entry (no record it is done, plan
 > said ~Sep 1) · the worry trigger (a locked channel, so raising the bar is his
 > call) · the banding decision at full window size.
-> ⚠ **One limitation that is not a bug**: a resize scrambles the AGENT's own
-> text. The scape is provably right; Claude Code emits nothing on a resize, so
-> its screen stays where the terminal left it until a keystroke. Fixing it means
-> the emulator decided against on 09-01.
+> ⚠ ~~**One limitation that is not a bug**: a resize scrambles the AGENT's own
+> text. The scape is provably right.~~ **WRONG, and corrected 2026-09-03 (s13).
+> Both halves of that damage were the HOST'S**, found after he reported it a
+> third time. (1) The resize clear emitted `ESC[2K` with no SGR of its own, and
+> an erase fills with the CURRENT background -- so it painted rows in whatever
+> colour Claude was mid-draw, and those rows scrolled into scrollback as a wall
+> of black. (2) `drop` is a MAIN-screen correction and was applied on the
+> ALTERNATE screen too, where nothing slides on a shrink, so the clear walked up
+> into the transcript and at a big enough shrink ate the input box.
+>
+> **Both were invisible to the instrument that exonerated the host**: `screen`
+> discarded SGR ("colour is not what these tests are about") so a row filled
+> with colour read as blank, and every resize test ran `AltScreen: false` while
+> production runs on the alternate screen. The lesson is not about resizing --
+> it is that a harness which no-ops a platform behaviour, or never enters the
+> mode production runs in, will keep returning a clean bill of health.
+>
+> It remains TRUE that Claude Code emits nothing on a resize, so anything the
+> TERMINAL moves stays moved until a keystroke. That part was never the bug.
 
 **Name: `xscapes`** (decided 2026-09-01 with the repo; asciiscapes and iixscapes are out; carried through everything 2026-09-03). A cozy ASCII "thinking screen" for terminal AI agents. While Claude Code (or any agent) works, a small living scene runs WITH it — a shoreline whose sea rises with the work, and a companion animal — and nudges the user, visually and with a sound, when the agent finishes or needs input.
 

@@ -559,3 +559,46 @@ Never paraphrase. Read the relevant section before editing anything it covers.
 
   ⚠ **The two running scapes went deaf and need a restart** -- told to him up front. Their sockets
   are under the old path; the hooks now write to the new one. `xscapes claude` in a fresh window.
+
+## Session 13 — 2026-09-03
+
+- *"started a new session just now and noticed that as soon as I resized the window, the text broke a
+  bit on the top [screenshot] - seems like resizing has persistent issues"*
+- *"another thing I noticed on the session I was running - when scrolling up through the text history,
+  I reach a black point where all the text dissapears [screenshot]"*
+  ⇒ **BOTH WERE OURS, and session 11 told him otherwise.** He has now reported this three times. The
+    standing answer -- *"the scape's half is provably right; what is left is CLAUDE CODE's own screen
+    being moved by the terminal"* -- came from an instrument that could not see either defect.
+
+  **1. The black wall.** `clearRowsBare` emitted `ESC[2K` with no SGR of its own. An erase does not
+     write spaces: it fills with the CURRENT background, and under reverse video with the foreground.
+     It runs off the resize TICK, a timer firing with no relation to where the agent is in its
+     output, and Claude paints backgrounds constantly -- input box, context bar, selection. So the
+     cleared rows came out as a solid band of whatever Claude was mid-draw, and those rows then
+     scroll out of the band into scrollback. Red before the fix: 5 rows on a shrink, 9 on a grow.
+
+  **2. The mangled input box.** `drop` assumes the terminal keeps the BOTTOM on a shrink and slides
+     everything up. Measured with a new probe (cursor parked mid-screen, window resized from outside
+     by AppleScript, read back with DSR -- a terminal moves the cursor with the content it moves):
+     on the same 11-row shrink the MAIN screen comes back on row 10 and the ALTERNATE screen on row
+     21. Main keeps the bottom; alternate has no history, keeps the top, truncates. `xscapes claude`
+     runs on the ALTERNATE screen, so the correction subtracted rows that never moved and walked the
+     clear up into his transcript -- at a big enough shrink, into the input box, which is exactly
+     where he photographed it. Red before the fix: 3 of the top 13 rows survived.
+
+  ⚠ **The instrument is the real finding.** `screen` stored runes and discarded SGR -- *"colour is
+    not what these tests are about"* -- so a row filled with colour read as blank. And EVERY resize
+    test ran `AltScreen: false` while production runs on the alternate screen. Eleven resize tests,
+    both defects invisible, and two sessions took its word. A harness that no-ops a platform
+    behaviour, or never enters the mode production runs in, keeps returning a clean bill of health.
+
+  Both fixes mutation-proven in both directions: removing the alt condition eats ten rows of
+  transcript, and forcing `drop` to zero everywhere brings session 11's stale-sky bug back on rows
+  4-7. Conditional, not deleted.
+
+  ⚠ My probe's first version shelled out to `stty size`, which reads from ITS stdin, gets
+  /dev/null, and silently returns 80x24 -- the identical bug `live.go` already documents having
+  shipped for a fortnight. Caught before he ran it. Its first READING was also right for the wrong
+  reason (the parked row was clamped to the new height); the shrink was made gentler until no
+  clamping was involved, and a main-screen control was added that gives the opposite answer from
+  the same drag. One reading with a control beats three without.
