@@ -9,6 +9,7 @@ import (
 	"sort"
 	"time"
 
+	"github.com/donlucasx/xscapes/internal/companion"
 	"github.com/donlucasx/xscapes/internal/event"
 	"github.com/donlucasx/xscapes/internal/reduce"
 )
@@ -86,11 +87,26 @@ type run struct {
 	samples []lvlSample
 	span    time.Duration
 	settle  []time.Duration // from the last tool event of a turn to level < 0.1
+	worry   []worryEpisode
+}
+
+// worryEpisode is one unbroken stretch of the worried pose: how long the alarm
+// stayed on, and how many errors it was actually reporting.
+//
+// The distinction matters. An alarm that reports a genuine break and stays on
+// until it is looked at is the design. An alarm that reports ONE non-zero exit
+// and then stays on for an hour because nothing cleared it is alarm fatigue,
+// and the two are indistinguishable in a share-of-time figure.
+type worryEpisode struct {
+	dur    time.Duration
+	errors int
 }
 
 type lvlSample struct {
 	lvl     float64
 	working bool
+	pose    companion.State
+	kittens int
 }
 
 // fold replays one file. Sampling is at one second, which is the rate a glance
@@ -128,6 +144,8 @@ func fold(path string, minEvents int) (run, bool) {
 	i := 0
 	var lastBusy time.Time
 	settling := false
+	var worryFrom time.Time
+	worryErrs := 0
 	for t := start; !t.After(end); t = t.Add(time.Second) {
 		for i < len(evs) && !at(evs[i].TS).After(t) {
 			e := evs[i]
@@ -135,10 +153,20 @@ func fold(path string, minEvents int) (run, bool) {
 			if e.Kind == event.ToolStart || e.Kind == event.ToolEnd {
 				lastBusy, settling = at(e.TS), true
 			}
+			if e.Kind == event.Error || e.Kind == event.TestFail {
+				if worryFrom.IsZero() {
+					worryFrom = at(e.TS)
+				}
+				worryErrs++
+			}
+			if e.Kind == event.Prompt && !worryFrom.IsZero() {
+				out.worry = append(out.worry, worryEpisode{at(e.TS).Sub(worryFrom), worryErrs})
+				worryFrom, worryErrs = time.Time{}, 0
+			}
 			i++
 		}
 		st := r.State(t)
-		out.samples = append(out.samples, lvlSample{st.Act.Level, st.Act.Working})
+		out.samples = append(out.samples, lvlSample{st.Act.Level, st.Act.Working, st.Pose, st.Kittens})
 		if settling && st.Act.Level < 0.1 {
 			out.settle = append(out.settle, t.Sub(lastBusy))
 			settling = false
@@ -156,6 +184,7 @@ func fold(path string, minEvents int) (run, bool) {
 func report(files []string, minEvents int) {
 	var all []lvlSample
 	var settle []time.Duration
+	var worry []worryEpisode
 	runs, evs := 0, 0
 	var span time.Duration
 	for _, f := range files {
@@ -168,6 +197,7 @@ func report(files []string, minEvents int) {
 		span += r.span
 		all = append(all, r.samples...)
 		settle = append(settle, r.settle...)
+		worry = append(worry, r.worry...)
 	}
 	if len(all) == 0 {
 		fmt.Println("no sessions large enough to say anything about")
@@ -212,6 +242,62 @@ func report(files []string, minEvents int) {
 	// latter would make the scape look far busier than it is.
 	fmt.Printf("  working at all:                  %5.1f%% of active time (gaps over %s skipped)\n",
 		100*float64(len(busy))/float64(len(all)), maxGapLabel)
+
+	// The companion is a channel too, and it has never been measured. Its four
+	// states are supposed to divide a session; if one of them is nearly all of
+	// it, the cat is decoration rather than a readout.
+	fmt.Println("\n  THE COMPANION, share of active time:")
+	poses := map[companion.State]int{}
+	for _, s := range all {
+		poses[s.pose]++
+	}
+	for _, p := range []struct {
+		s    companion.State
+		name string
+		why  string
+	}{
+		{companion.Resting, "resting", "nothing is happening"},
+		{companion.Working, "working", "a turn is open or a tool is running"},
+		{companion.Done, "done", "the finish knock, bounded by DoneHold"},
+		{companion.NeedsYou, "needs you", "blocked on the user"},
+		{companion.Worried, "worried", "something is broken, until it clears"},
+	} {
+		n := poses[p.s]
+		bar := n * 40 / len(all)
+		fmt.Printf("    %-10s |%-40s| %5.1f%%   %s\n", p.name, barOf(bar),
+			100*float64(n)/float64(len(all)), p.why)
+	}
+
+	if len(worry) > 0 {
+		sort.Slice(worry, func(i, j int) bool { return worry[i].dur < worry[j].dur })
+		one, tot := 0, time.Duration(0)
+		for _, w := range worry {
+			tot += w.dur
+			if w.errors == 1 {
+				one++
+			}
+		}
+		fmt.Printf("\n  WORRY EPISODES (error -> the next prompt, which is the only thing that clears it):\n")
+		fmt.Printf("    %d episodes, median %s, 90th %s, longest %s\n",
+			len(worry), worry[len(worry)/2].dur.Round(time.Second),
+			worry[len(worry)*9/10].dur.Round(time.Second),
+			worry[len(worry)-1].dur.Round(time.Second))
+		fmt.Printf("    %d of them (%.0f%%) were raised by a SINGLE error\n",
+			one, 100*float64(one)/float64(len(worry)))
+	}
+
+	kit := map[int]int{}
+	maxKit := 0
+	for _, s := range all {
+		kit[s.kittens]++
+		if s.kittens > maxKit {
+			maxKit = s.kittens
+		}
+	}
+	if maxKit > 0 {
+		fmt.Printf("\n  KITTENS in the water: none %.1f%% of the time, most at once %d\n",
+			100*float64(kit[0])/float64(len(all)), maxKit)
+	}
 
 	if len(settle) > 0 {
 		sort.Slice(settle, func(i, j int) bool { return settle[i] < settle[j] })

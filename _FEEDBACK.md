@@ -499,3 +499,10 @@ Never paraphrase. Read the relevant section before editing anything it covers.
   ⇒ **No, and it was my regression from an hour earlier.** Making the disc solid I left the cutoff at
     rr+rim, where rim had been the width of a fade; every cell that used to be falling away got
     painted at full strength, so the moon came out nearly twice its radius. Ends at rr now.
+
+- *"how do we test for the cats active time?"*
+  ⇒ Same offline fold, now reporting the POSE distribution. It had never been measured and it found
+    the worst signal defect in the project: **the cat is WORRIED 37% of active time**, 31 episodes,
+    median 15m27s, longest 2h02m, and **65% raised by a single error**. An alarm on a third of the
+    time is not an alarm. The clear rule (next prompt) is sound; the trigger is too loose.
+    ⏸ Raising the bar is HIS call -- the brief locks the worried pose as a locked channel.

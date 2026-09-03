@@ -410,6 +410,21 @@ Demo flags: `-wired -mockup -anim -compare -layout -context -day -busy -kittens 
    and gives the range back. Bins go 18/24/21/17/9/5/5 instead of
    45/32/8/5/4/2/4; saturation 3.1% to 3.5%.
 
+   **⭐ AND IT FOUND A SECOND ONE, IN THE COMPANION: THE CAT IS WORRIED 37% OF
+   ACTIVE TIME.** Its five states divide a session 3.5 resting / 58 working /
+   1.2 done / 0.1 needs-you / **37 worried**, so the alarm is on for more than a
+   third of the record and two states carry everything. Worse, the episodes:
+   **31 of them, median 15m27s, 90th 58m, longest 2h02m -- and 65% were raised
+   by a SINGLE error.** `worried` is set by any Error/TestFail and cleared ONLY
+   by the next `Prompt`. The reasoning for that clear rule is sound and written
+   down ("hooks can tell us a command failed, never that the code is fixed"); it
+   is the TRIGGER that is too loose. In auto mode one grep with no match sets
+   the alarm for a quarter of an hour.
+   ⚠ **HIS CALL, because the brief locks "something is broken -> the companion,
+   persists until it clears".** The recommendation is to keep the clear rule and
+   require corroboration to raise it: two errors inside a window, or one error
+   the agent does not recover from within ~30s of successful tool events.
+
    **Still unverified, and now cheap to check**: `TauFall`, `Impulse`,
    `TurnFloor`, `FlightFloor` are vars now so `-sweep` can move them. The
    remaining data: **46 spool files, 16,465 events** as of 2026-09-02. Mix:
