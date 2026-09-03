@@ -397,8 +397,15 @@ Demo flags: `-wired -mockup -anim -compare -layout -context -day -busy -kittens 
    133 `sub_start`, 129 `prompt`, 119 `done`, 91 `error`, and **only 4
    `needs_input` in the whole record** -- worth knowing before building a demo
    around the cue that is 30% of the rubric. `xscapes replay <file>` folds one. `TauFall=12s`, `TurnFloor=0.30`, `FlightFloor=0.45` are all unverified.
-   ⚠ `reduce.TailLen` is still a hard 4 while the scape's write band now scales
-   with height.
+   ⚠ **Correction to a note that was here and was wrong**: it said `TailLen` is
+   a hard 4 while the write band scales with height. The band only ever scales
+   DOWN -- `WriteRows` starts at 4 and is clamped by `H/6` -- so the two agree
+   at 4 and there is no mismatch. What IS true is the other way round: **a tall
+   window gets more beach but still only four lines of history**, which is not
+   what the s8 note ("4 lines at 24 rows, 9 at 43, 16 at 60") describes. That
+   was about `SandRows`, not about how much gets written. Growing the tail with
+   the window is unbuilt, and it is the cheapest way to make a big window feel
+   like it is using its space.
 3. **The 45-60s demo video.** Entries close 2026-09-17. Record on Terminal.app
    now, not a truecolor terminal -- that follows from the ruling.
 4. ~~**Watch the kitten accounting.**~~ **CHECKED 2026-09-02 and it is FINE.**
