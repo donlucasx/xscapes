@@ -226,3 +226,35 @@ the wrong CONFIGURATION; the deeper fault was that it measured the wrong OBSERVA
 
 ⚠ **Do not quote the anchoring tables above for content.** They are valid for the cursor only. A
 content measurement needs the numbered rows read off the screen by eye, which no probe here does.
+
+## MEASURED, 2026-09-03 (fourth pass): the alternate screen is ANCHORED BOTTOM on a grow
+
+Read off the screen by eye with `notes/contentprobe`, in production's configuration (alternate
+screen, DECSTBM band, origin mode), because no escape sequence reads cells back from Terminal.app
+and every attempt to infer content from something else has been wrong.
+
+Every row painted with its own number, then the window stretched:
+
+| | top of window | ROW 01 sits at | cursor |
+|---|---|---|---|
+| before, 120x30 | `ROW 01` | screen row 1 | row 1 |
+| after, 120x51 (**+21**) | **blank** | **screen row 22** | **row 1** |
+
+`1 + 21 = 22`. **Content moved down by exactly the grow delta. The cursor did not move at all.**
+
+That is the whole story of this bug and of three wrong answers:
+
+1. Terminal.app pushes CONTENT down on an alternate-screen grow, inserting blank rows at the top.
+2. It leaves the CURSOR at its absolute row.
+3. `notes/anchorprobe` measures the cursor, so it reported "anchored top" for a screen whose content
+   was anchored bottom -- and that reading was written into this file twice as a fact about content.
+
+**Consequence for the host.** On a grow the agent's text slides down by the delta; whatever crosses
+the band's bottom edge is painted over by the scape on the next frame, and only the fragment still
+inside the band survives. That is exactly what the owner photographed: a startup banner sitting on
+the last rows of the band with everything above it blank, and on a bigger grow, nothing at all.
+
+⚠ **The shrink direction is NOT yet measured for content.** If it is anchored-bottom too, content
+slides UP on a shrink, which is what the `drop` correction in host.go was originally written for --
+and `drop` was made main-screen-only on 2026-09-03 on the strength of the CURSOR measurement. That
+change may be wrong. Measure before touching it again.
