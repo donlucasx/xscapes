@@ -6,6 +6,8 @@ import (
 	"os"
 	"strconv"
 	"strings"
+
+	"github.com/donlucasx/xscapes/internal/envx"
 )
 
 type RGB struct{ R, G, B uint8 }
@@ -56,9 +58,9 @@ func (p Profile) String() string {
 // Deliberately does NOT trust COLORTERM on its own. Measured 2026-08-29: inside
 // a Claude Code session in Terminal.app the environment carries
 // COLORTERM=truecolor while Terminal.app renders 256 at most, and that is
-// exactly the environment asciiscapes launches into. Gate on the program.
+// exactly the environment xscapes launches into. Gate on the program.
 func DetectProfile() Profile {
-	switch strings.ToLower(os.Getenv("ASCIISCAPES_COLOR")) {
+	switch strings.ToLower(envx.Lookup("COLOR")) {
 	case "truecolor", "24bit", "full":
 		return ProfileTrueColor
 	case "256", "ansi256":
@@ -327,20 +329,20 @@ var GlyphBoost = 2.6
 func init() {
 	// Tunable without a rebuild, because the right value is a judgement made
 	// by looking at a real terminal, not by reading a number.
-	if v := os.Getenv("ASCIISCAPES_CHROMA"); v != "" {
+	if v := envx.Lookup("CHROMA"); v != "" {
 		if f, err := strconv.ParseFloat(v, 64); err == nil && f >= 1 && f <= 6 {
 			GlyphBoost = f
 		}
 	}
-	switch os.Getenv("ASCIISCAPES_SHADE") {
+	switch envx.Lookup("SHADE") {
 	case "0", "off", "no":
 		Shading = false
 	}
-	switch os.Getenv("ASCIISCAPES_SHADE_BLOCKS") {
+	switch envx.Lookup("SHADE_BLOCKS") {
 	case "1", "on", "yes":
 		ShadeBlocks = true
 	}
-	if v := os.Getenv("ASCIISCAPES_HUE_WEIGHT"); v != "" {
+	if v := envx.Lookup("HUE_WEIGHT"); v != "" {
 		if n, err := strconv.Atoi(v); err == nil && n >= 0 && n <= 64 {
 			hueWeight = n
 		}
@@ -359,7 +361,7 @@ func init() {
 // the same colours, placed twice as finely -- and it is what actually made the
 // gradients look smoother. See ShadeBlocks for the idea that did not.
 //
-// Off for ASCII-only output, and ASCIISCAPES_SHADE=0 turns it off everywhere.
+// Off for ASCII-only output, and XSCAPES_SHADE=0 turns it off everywhere.
 var Shading = true
 
 // ShadeBlocks is the tone-blending half of the smoothing, and it is OFF.
@@ -374,7 +376,7 @@ var Shading = true
 //
 // Kept rather than deleted for one reason: that judgement was made from a
 // browser render at 11px, and shade blocks are exactly the kind of glyph a real
-// terminal at a real font size may resolve differently. ASCIISCAPES_SHADE_BLOCKS=1
+// terminal at a real font size may resolve differently. XSCAPES_SHADE_BLOCKS=1
 // turns it on so the question can be settled where it matters.
 var ShadeBlocks = false
 

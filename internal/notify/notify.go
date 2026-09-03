@@ -17,6 +17,8 @@ import (
 	"os"
 	"os/exec"
 	"runtime"
+
+	"github.com/donlucasx/xscapes/internal/envx"
 )
 
 // Kind is which of the two knocks happened.
@@ -47,12 +49,13 @@ type Player struct {
 }
 
 // SilentEnv mutes the notification when set to anything but an empty string.
-const SilentEnv = "ASCIISCAPES_SILENT"
+// The pre-rename XSCAPES_SILENT still works; see internal/envx.
+const SilentEnv = "XSCAPES_SILENT"
 
 // New picks a player for this machine. Sound is on by default -- ambient audio
 // is the thing the brief keeps off, not the notification.
 func New() *Player {
-	if os.Getenv(SilentEnv) != "" {
+	if envx.Lookup("SILENT") != "" {
 		return &Player{}
 	}
 	switch runtime.GOOS {

@@ -31,7 +31,7 @@ func animPage(seed int64, frames int, fps float64) string {
 		`.stage{position:relative}.fr{display:none}.fr:first-child{display:block}` +
 		`.row{display:flex;gap:26px;align-items:center}` +
 		`</style>`)
-	b.WriteString(`<h1>asciiscapes &mdash; companion, animated</h1>`)
+	b.WriteString(`<h1>xscapes &mdash; companion, animated</h1>`)
 
 	for _, s := range states {
 		var st strings.Builder
@@ -103,5 +103,5 @@ document.querySelectorAll('.stage').forEach(function(st){
   }, %d);
 });
 </script>`, int(1000/fps))
-	return canvas.HTMLPage("asciiscapes — companion animated", b.String())
+	return canvas.HTMLPage("xscapes — companion animated", b.String())
 }

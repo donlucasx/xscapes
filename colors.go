@@ -74,7 +74,7 @@ func colorPage(seed int64) string {
 	.lbl{font:11px ui-monospace,monospace;color:#8a8a99}
 	h2{font:600 13px ui-monospace,monospace;color:#d8d8e0;margin:30px 0 10px}
 	</style>`)
-	b.WriteString(`<h1>asciiscapes &mdash; what 256 colours can and cannot do</h1>`)
+	b.WriteString(`<h1>xscapes &mdash; what 256 colours can and cannot do</h1>`)
 	b.WriteString(`<p class="nt">The same frame, same reducer, same seed. The 256 panels are put ` +
 		`through the real quantiser, so they show what Terminal.app will actually paint.</p>`)
 
@@ -117,5 +117,5 @@ func colorPage(seed int64) string {
 		frame(0, false, term.Profile256, true, 1.0),
 		frame(0, false, term.Profile256, true, 2.0))
 
-	return canvas.HTMLPage("asciiscapes — colour study", b.String())
+	return canvas.HTMLPage("xscapes — colour study", b.String())
 }

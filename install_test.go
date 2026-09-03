@@ -47,7 +47,7 @@ const sample = `{
 `
 
 func TestInstallIsPurelyAdditive(t *testing.T) {
-	out, actions, err := addHooks([]byte(sample), "/usr/local/bin/asciiscapes")
+	out, actions, err := addHooks([]byte(sample), "/usr/local/bin/xscapes")
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -75,7 +75,7 @@ func TestInstallIsPurelyAdditive(t *testing.T) {
 }
 
 func TestExistingHooksSurvive(t *testing.T) {
-	out, _, err := addHooks([]byte(sample), "/usr/local/bin/asciiscapes")
+	out, _, err := addHooks([]byte(sample), "/usr/local/bin/xscapes")
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -127,7 +127,7 @@ func TestExistingHooksSurvive(t *testing.T) {
 }
 
 func TestInstallUninstallIsAByteForByteNoOp(t *testing.T) {
-	installed, _, err := addHooks([]byte(sample), "/usr/local/bin/asciiscapes")
+	installed, _, err := addHooks([]byte(sample), "/usr/local/bin/xscapes")
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -147,11 +147,11 @@ func TestInstallUninstallIsAByteForByteNoOp(t *testing.T) {
 }
 
 func TestInstallIsIdempotent(t *testing.T) {
-	once, _, err := addHooks([]byte(sample), "/usr/local/bin/asciiscapes")
+	once, _, err := addHooks([]byte(sample), "/usr/local/bin/xscapes")
 	if err != nil {
 		t.Fatal(err)
 	}
-	twice, actions, err := addHooks(once, "/usr/local/bin/asciiscapes")
+	twice, actions, err := addHooks(once, "/usr/local/bin/xscapes")
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -180,7 +180,7 @@ func TestSafetyCheckCatchesDamage(t *testing.T) {
 		}
 	}
 	// And it must not cry wolf on the real, correct edit.
-	good, _, err := addHooks([]byte(sample), "/usr/local/bin/asciiscapes")
+	good, _, err := addHooks([]byte(sample), "/usr/local/bin/xscapes")
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -191,7 +191,7 @@ func TestSafetyCheckCatchesDamage(t *testing.T) {
 
 func TestWorksOnAFileWithNoHooksAtAll(t *testing.T) {
 	for _, src := range []string{`{}`, `{"model":"opus"}`, "{\n  \"model\": \"opus\"\n}\n"} {
-		out, _, err := addHooks([]byte(src), "/usr/local/bin/asciiscapes")
+		out, _, err := addHooks([]byte(src), "/usr/local/bin/xscapes")
 		if err != nil {
 			t.Fatalf("%q: %v", src, err)
 		}
@@ -214,26 +214,26 @@ func TestWorksOnAFileWithNoHooksAtAll(t *testing.T) {
 
 // The recorded path ends up inside a shell command inside a JSON string.
 func TestRefusesAShellMetacharacterInTheBinaryPath(t *testing.T) {
-	for _, bad := range []string{"/tmp/a`whoami`/asciiscapes", "/tmp/a$HOME/x", `/tmp/a"b/x`} {
+	for _, bad := range []string{"/tmp/a`whoami`/xscapes", "/tmp/a$HOME/x", `/tmp/a"b/x`} {
 		if _, err := binPath(bad); err == nil {
 			t.Errorf("binPath(%q) was accepted", bad)
 		}
 	}
-	if _, err := binPath("/usr/local/bin/asciiscapes"); err != nil {
+	if _, err := binPath("/usr/local/bin/xscapes"); err != nil {
 		t.Errorf("a normal path was refused: %v", err)
 	}
 }
 
 // The command must be readable by the person asked to approve it.
 func TestCommandIsNotHTMLEscaped(t *testing.T) {
-	out, _, err := addHooks([]byte(sample), "/usr/local/bin/asciiscapes")
+	out, _, err := addHooks([]byte(sample), "/usr/local/bin/xscapes")
 	if err != nil {
 		t.Fatal(err)
 	}
 	if bytes.Contains(out, []byte(`\u003e`)) || bytes.Contains(out, []byte(`\u0026`)) {
 		t.Error("the hook command is HTML-escaped; >/dev/null 2>&1 should be legible")
 	}
-	if !bytes.Contains(out, []byte(`>/dev/null 2>&1 || true # asciiscapes:v1`)) {
+	if !bytes.Contains(out, []byte(`>/dev/null 2>&1 || true # xscapes:v1`)) {
 		t.Error("the hook command does not have the expected shape")
 	}
 }
@@ -273,4 +273,100 @@ func min(a, b int) int {
 		return a
 	}
 	return b
+}
+
+// legacySample is a settings file as it was left by the pre-rename build: the
+// hooks are already installed, at the right binary, but carrying the marker
+// this program used to write.
+const legacySample = `{
+  "model": "opus",
+  "hooks": {
+    "Stop": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "\"/usr/local/bin/xscapes\" hook Stop >/dev/null 2>&1 || true # asciiscapes:v1",
+            "async": true
+          }
+        ]
+      }
+    ]
+  }
+}
+`
+
+// The rename's whole risk lives here. A marker is uninstall's only handle on
+// its own work, so a constant changed without legacyMarkers leaves entries
+// nothing can see: uninstall reports none, install adds a second copy beside
+// each, and the user is editing JSON by hand.
+func TestLegacyMarkerIsRecognised(t *testing.T) {
+	yes, err := hasOurEntry([]byte(legacySample), "Stop")
+	if err != nil {
+		t.Fatal(err)
+	}
+	if !yes {
+		t.Fatal("a pre-rename hook is invisible to hasOurEntry -- it would be orphaned")
+	}
+}
+
+func TestLegacyMarkerIsRemovedByUninstall(t *testing.T) {
+	out, n, err := removeHooks([]byte(legacySample))
+	if err != nil {
+		t.Fatal(err)
+	}
+	if n != 1 {
+		t.Fatalf("uninstall removed %d entries, want 1 -- a pre-rename hook was orphaned", n)
+	}
+	if bytes.Contains(out, []byte("asciiscapes:v1")) {
+		t.Errorf("the pre-rename hook survived uninstall:\n%s", out)
+	}
+}
+
+// Install must REPLACE the old entry, not sit beside it. Two hooks on one
+// event is two execs per turn and two events into the same spool.
+func TestLegacyMarkerIsMigratedNotDuplicated(t *testing.T) {
+	out, actions, err := addHooks([]byte(legacySample), "/usr/local/bin/xscapes")
+	if err != nil {
+		t.Fatal(err)
+	}
+	if got := bytes.Count(out, []byte("hook Stop >/dev/null")); got != 1 {
+		t.Errorf("Stop has %d xscapes hooks after install, want 1:\n%s", got, out)
+	}
+	if bytes.Contains(out, []byte("asciiscapes:v1")) {
+		t.Errorf("the pre-rename marker survived install:\n%s", out)
+	}
+	if !bytes.Contains(out, []byte("# xscapes:v1")) {
+		t.Error("the current marker was not written")
+	}
+	var said bool
+	for _, a := range actions {
+		if strings.Contains(a, "Stop") && strings.Contains(a, "migrated from asciiscapes:v1") {
+			said = true
+		}
+	}
+	if !said {
+		t.Errorf("the plan does not say the entry was migrated, so nobody reviewing it would know: %q", actions)
+	}
+}
+
+// The positive control. Without it the three tests above pass for an `ours`
+// that returns true for every entry it is shown, which would make uninstall
+// delete the user's own hooks.
+func TestForeignMarkerIsNotOurs(t *testing.T) {
+	foreign := strings.Replace(legacySample, "# asciiscapes:v1", "# someoneelse:v1", 1)
+	yes, err := hasOurEntry([]byte(foreign), "Stop")
+	if err != nil {
+		t.Fatal(err)
+	}
+	if yes {
+		t.Fatal("claimed a stranger's hook as ours")
+	}
+	out, removed, err := removeHooks([]byte(foreign))
+	if err != nil {
+		t.Fatal(err)
+	}
+	if removed != 0 || !bytes.Contains(out, []byte("someoneelse:v1")) {
+		t.Error("uninstall deleted a hook that is not ours")
+	}
 }

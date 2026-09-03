@@ -19,7 +19,7 @@ func tmpHome(t *testing.T) {
 		t.Fatal(err)
 	}
 	t.Cleanup(func() { os.RemoveAll(d) })
-	t.Setenv("ASCIISCAPES_HOME", d)
+	t.Setenv("XSCAPES_HOME", d)
 }
 
 func TestRoundTripOverSocket(t *testing.T) {

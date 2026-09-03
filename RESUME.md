@@ -1,12 +1,10 @@
-# Resume — xscapes (directory still `asciiscapes/`)
+# Resume — xscapes
 
 **Copy-paste this prompt into a fresh session:**
 
 ```
-cd ~/Documents/claude/asciiscapes/ and read CLAUDE.md (the brief, authoritative)
-and RESUME.md before responding. The project is named xscapes now; the directory
-and the ASCIISCAPES_* env vars still say asciiscapes on purpose.
-notes/claude-hooks-verified.md is the Claude Code hook schema — trust it, do not
+cd ~/Documents/claude/xscapes/ and read CLAUDE.md (the brief, authoritative)
+and RESUME.md before responding. notes/claude-hooks-verified.md is the Claude Code hook schema — trust it, do not
 re-derive it. Skim origin-chat.md only if you need the why; ignore ideas.md — it
 is parked. Tell me where we left off, then pick up from ▶ NEXT — item 0 is a
 question for me, not work for you.
@@ -57,7 +55,7 @@ time.**
   ALONE, which is the guard that stops it forcing an electric night.
 - **Cell splitting (U+2580)** for gradients; shade blocks built, measured
   (11→14 tones) and REJECTED as stipple, kept behind
-  `ASCIISCAPES_SHADE_BLOCKS=1`.
+  `XSCAPES_SHADE_BLOCKS=1`.
 - **Stars for completed todos** — the last unbuilt channel in the locked table.
   The hook now emits a real `todo` event; it had classified TodoWrite as an op
   and stopped, so `n`/`of` were never filled.
@@ -187,7 +185,7 @@ binary is `~/.local/bin/xscapes`. Build straight to it:
   deep sonar note = it finished. Keyed off the BUBBLE, not the pose (a broken
   build outranks a question in the pose, so a pose-driven sound would go silent
   on the one event that needs answering), and edge-detected so Claude's
-  60-second nag rings once. Silent when following nothing, `ASCIISCAPES_SILENT`
+  60-second nag rings once. Silent when following nothing, `XSCAPES_SILENT`
   to mute, `xscapes notify` to audition.
 - **`xscapes claude`** — the launcher. Bootstraps tmux, or joins the window
   it is already in, or falls back to a second Terminal via osascript. Agent
@@ -200,9 +198,10 @@ binary is `~/.local/bin/xscapes`. Build straight to it:
   The Go module path had to follow the repo URL (Go resolves modules by URL, so
   a mismatch breaks install for everyone), renamed across 37 files, which also
   makes the binary `xscapes`. Clone-and-build verified from the public repo.
-  ⚠ NOT renamed, deliberately: `ASCIISCAPES_*` env vars and
+  ⚠ NOT renamed at the time, deliberately: `ASCIISCAPES_*` env vars,
   `~/.config/asciiscapes/` (live state; a rename orphans an installed hook),
-  the working directory, and these docs. That migration is his call.
+  the working directory, and these docs. **Superseded 2026-09-03 — session 12
+  did the migration; see the top of this file.**
 - **README + MIT LICENSE.** Leads with the protocol, then the encoding table.
   Every command was run before being written down; three first-draft claims
   were wrong and were fixed (event names are `sub_start`/`sub_end`; the process
@@ -226,13 +225,13 @@ binary is `~/.local/bin/xscapes`. Build straight to it:
 - **⭐ INSTALLED FOR REAL, and the whole chain works.** `xscapes install claude
   --apply` on 2026-09-01, with his say-so. His four existing hooks survived
   byte-for-byte (the VERCEL_TOKEN secret guard included), statusLine untouched,
-  backup in `~/.config/asciiscapes/backups/`. Real events arrived within seconds
+  backup in `~/.config/xscapes/backups/`. Real events arrived within seconds
   on THREE live sessions at once, no restart needed. Proven in tmux: his own
   commands written into the sand, whitecaps on the sea, cat in the working pose.
   This retires "no hook has ever fired into it", which had been true all project.
 - **The test suite was writing the user's live session pointer.** adapter_test
   feeds real payloads through `translate()`, which records the session as
-  current — into `~/.config/asciiscapes/run/current` with no override. `TestMain`
+  current — into `~/.config/xscapes/run/current` with no override. `TestMain`
   now points the main package at a temp dir.
 
 ## Earlier in session 7 (2026-08-31)
@@ -429,7 +428,7 @@ Demo flags: `-wired -mockup -anim -compare -layout -context -day -busy -kittens 
 ./xscapes claude -print          # the launcher's plan, writes nothing
 ./xscapes claude                 # agent left, scape right, one command
 ./xscapes notify                 # hear both knocks
-ASCIISCAPES_SILENT=1 ./xscapes … # mute
+XSCAPES_SILENT=1 ./xscapes … # mute
 ```
 
 ## Open threads for Lucas
@@ -452,7 +451,7 @@ ASCIISCAPES_SILENT=1 ./xscapes … # mute
 
 - **The companion pick** — coat + whisker revision + toes. Full study is in
   his hands now; waiting on his steer.
-- ~~Name~~ **DECIDED 2026-09-01: `xscapes`**, with the repo. The dir and these docs still say asciiscapes; renaming those (plus `ASCIISCAPES_*` and `~/.config/asciiscapes/`) is a migration he has not asked for.
+- ~~Name~~ **DECIDED 2026-09-01: `xscapes`**, with the repo. ~~The dir and docs still say asciiscapes~~ **MIGRATED 2026-09-03**: directory, docs, env vars, `~/.config/xscapes/`, and the hook marker. Closed.
 - **Charcoal is a bet on the terminal.** It looks best in truecolor and worst in
   256, where it goes grey. Slate is the safe pick if Terminal.app stays the
   daily driver; charcoal wins if Ghostty or iTerm2 gets installed. **No

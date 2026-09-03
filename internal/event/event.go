@@ -57,7 +57,7 @@ const (
 type Event struct {
 	// V is the protocol major. It moves only when an existing key changes
 	// meaning; adding keys and kinds is not a break. Absent reads as 1, so
-	// `echo '{"kind":"done"}' | asciiscapes emit -` works by hand.
+	// `echo '{"kind":"done"}' | xscapes emit -` works by hand.
 	V int `json:"v,omitempty"`
 
 	// TS is Unix milliseconds at the emitter. The engine timestamps arrival

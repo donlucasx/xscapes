@@ -43,7 +43,7 @@ func compareSheet(seed int64) string {
 	}
 
 	var b strings.Builder
-	b.WriteString(`<h1>asciiscapes &mdash; one drawing, three renderings</h1>`)
+	b.WriteString(`<h1>xscapes &mdash; one drawing, three renderings</h1>`)
 
 	// The source, so it is clear all three come from the same 24x28 art.
 	src := canvas.New(bm.W+2, bm.H+2, canvas.AlphaFar, canvas.AlphaMid, canvas.AlphaNear)
@@ -65,7 +65,7 @@ func compareSheet(seed int64) string {
 		b.WriteString(card(v.name, v.note, v.rows, warm, seed))
 	}
 	b.WriteString(card(meowCat.Name+" (hand-drawn)", meowCat.Note, meowCat.Rows, warm, seed))
-	return canvas.HTMLPage("asciiscapes — rendering comparison", b.String())
+	return canvas.HTMLPage("xscapes — rendering comparison", b.String())
 }
 
 func card(name, note string, rows []string, col term.RGB, seed int64) string {

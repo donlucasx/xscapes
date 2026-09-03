@@ -27,7 +27,7 @@ func kittenPage(seed int64) string {
 
 	var b strings.Builder
 	b.WriteString(`<style>.win{border:1px solid #2a2a32;border-radius:6px;overflow:hidden}</style>`)
-	b.WriteString(`<h1>asciiscapes &mdash; the kitten ladder</h1>`)
+	b.WriteString(`<h1>xscapes &mdash; the kitten ladder</h1>`)
 
 	for _, cc := range counts {
 		var row strings.Builder
@@ -52,5 +52,5 @@ func kittenPage(seed int64) string {
 			`<div style="display:flex;gap:12px">%s</div></div>`,
 			cc.n, fit, cc.note, short, row.String())
 	}
-	return canvas.HTMLPage("asciiscapes — kitten ladder", b.String())
+	return canvas.HTMLPage("xscapes — kitten ladder", b.String())
 }

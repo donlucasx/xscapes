@@ -143,11 +143,11 @@ func dayPage(seed int64) string {
 		`<b style="color:#c9c9d4">SMOOTHED</b> is the default now: on 256 a cell can carry ` +
 		`two colours, so where a band edge falls inside a cell it is split with U+2580 and ` +
 		`the ramp gets twice the vertical resolution. No extra texture, same colours, placed ` +
-		`more finely. <code>ASCIISCAPES_SHADE=0</code> is the panel beside it.<br>` +
+		`more finely. <code>XSCAPES_SHADE=0</code> is the panel beside it.<br>` +
 		`<b style="color:#c9c9d4">SHADE BLOCKS</b> is the idea that lost. It buys three more ` +
 		`tones between every pair of cube colours &mdash; 11 to 14 in the sky &mdash; and it ` +
 		`still looks worse, because the dot pattern reads as stipple before it reads as tone. ` +
-		`Judge it in a real terminal before believing me: <code>ASCIISCAPES_SHADE_BLOCKS=1</code>, ` +
+		`Judge it in a real terminal before believing me: <code>XSCAPES_SHADE_BLOCKS=1</code>, ` +
 		`or <code>xscapes shades</code>, which now uses your own window size.<br>` +
 		`<b style="color:#c9c9d4">GLYPHS THE 256 PASS CHANGED</b> is the last panel: ` +
 		`<span style="color:#ff4d4d">red</span> where a coloured glyph came out grey, ` +

@@ -11,7 +11,7 @@ import (
 )
 
 // ErrBusy means another engine already serves this session.
-var ErrBusy = errors.New("another asciiscapes is already listening for this session")
+var ErrBusy = errors.New("another xscapes is already listening for this session")
 
 // readBuffer sizes the kernel's receive queue.
 //
@@ -85,7 +85,7 @@ func Listen(session string) (*Bus, error) {
 			// Start at the end. Everything already in the file was written
 			// while no engine was listening, which makes it history, not
 			// news -- replaying it would rewrite the last hour of weather
-			// into the next two seconds. `asciiscapes replay` exists for
+			// into the next two seconds. `xscapes replay` exists for
 			// when you actually want the history.
 			if off, err := f.Seek(0, io.SeekEnd); err == nil {
 				b.spool, b.off = f, off

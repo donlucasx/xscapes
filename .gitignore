@@ -1,6 +1,7 @@
-# built binary
-/asciiscapes
+# built binary (asciiscapes is the pre-2026-09-03 name; an old checkout
+# still builds one, and it must not be committed either)
 /xscapes
+/asciiscapes
 
 # generated frames — regenerable with `go run . -html=...`
 # the PNG references are kept deliberately as a visual record
@@ -8,8 +9,6 @@
 
 # macOS
 .DS_Store
-asciiscapes
-xscapes
 
 # scratch build from the mirror branch
 /as

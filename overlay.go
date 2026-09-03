@@ -30,7 +30,7 @@ import (
 func overlayPage(seed int64, paneFile string) string {
 	raw, err := os.ReadFile(paneFile)
 	if err != nil {
-		fmt.Fprintln(os.Stderr, "asciiscapes:", err)
+		fmt.Fprintln(os.Stderr, "xscapes:", err)
 		os.Exit(1)
 	}
 	pane := strings.Split(strings.TrimRight(string(raw), "\n"), "\n")
@@ -47,7 +47,7 @@ func overlayPage(seed int64, paneFile string) string {
 	h2{font:600 13px ui-monospace,monospace;color:#d8d8e0;margin:26px 0 6px}
 	.cap{font:11px ui-monospace,monospace;color:#8a8a99;margin:0 0 8px}
 	</style>`)
-	b.WriteString(`<h1>asciiscapes &mdash; the agent inside the scape</h1>`)
+	b.WriteString(`<h1>xscapes &mdash; the agent inside the scape</h1>`)
 	b.WriteString(`<p class="nt">A real Claude Code pane composited over a real scape frame: the ` +
 		`agent's glyphs win, and every cell it left blank shows the sea. No split, no second pane. ` +
 		`Below that, the same thing at three window heights with the layout Lucas asked for &mdash; ` +
@@ -128,7 +128,7 @@ func overlayPage(seed int64, paneFile string) string {
 			frame(84, s.h, 10, s.sand, 0.366, 0.85, tail(s.lines), false))
 	}
 
-	return canvas.HTMLPage("asciiscapes — agent inside the scape", b.String())
+	return canvas.HTMLPage("xscapes — agent inside the scape", b.String())
 }
 
 // paintPane draws the captured agent screen into the near layer. A space is

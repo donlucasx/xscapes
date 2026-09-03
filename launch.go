@@ -9,7 +9,7 @@ import (
 	"syscall"
 )
 
-// The launcher. `asciiscapes claude` is the one command that has to work on a
+// The launcher. `xscapes claude` is the one command that has to work on a
 // machine where nothing is set up, because it is the whole product from the
 // user's side: agent on the left, scape on the right, one line to start.
 //
@@ -38,12 +38,12 @@ func runClaudeLauncher(args []string) {
 
 	self, err := os.Executable()
 	if err != nil {
-		fmt.Fprintln(os.Stderr, "asciiscapes: cannot find my own binary:", err)
+		fmt.Fprintln(os.Stderr, "xscapes: cannot find my own binary:", err)
 		os.Exit(1)
 	}
 
 	if _, err := exec.LookPath(*agent); err != nil {
-		fmt.Fprintf(os.Stderr, "asciiscapes: %s is not on your PATH\n", *agent)
+		fmt.Fprintf(os.Stderr, "xscapes: %s is not on your PATH\n", *agent)
 		os.Exit(1)
 	}
 
@@ -69,7 +69,7 @@ func runClaudeLauncher(args []string) {
 			return
 		}
 		if out, err := exec.Command(split[0], split[1:]...).CombinedOutput(); err != nil {
-			fmt.Fprintf(os.Stderr, "asciiscapes: tmux split failed: %v\n%s", err, out)
+			fmt.Fprintf(os.Stderr, "xscapes: tmux split failed: %v\n%s", err, out)
 			os.Exit(1)
 		}
 		// Replace this process with the agent so it owns the pane outright --
@@ -80,7 +80,7 @@ func runClaudeLauncher(args []string) {
 
 	// No tmux session yet: build one. The agent goes in the first pane
 	// because that is the pane the user will be typing into.
-	name := "asciiscapes"
+	name := "xscapes"
 	newSess := []string{tmux, "new-session", "-d", "-s", name}
 	newSess = append(newSess, *agent)
 	newSess = append(newSess, agentArgs...)
@@ -117,7 +117,7 @@ func runClaudeLauncher(args []string) {
 
 	for _, c := range [][]string{newSess, split, focus} {
 		if out, err := exec.Command(c[0], c[1:]...).CombinedOutput(); err != nil {
-			fmt.Fprintf(os.Stderr, "asciiscapes: %s failed: %v\n%s", c[1], err, out)
+			fmt.Fprintf(os.Stderr, "xscapes: %s failed: %v\n%s", c[1], err, out)
 			os.Exit(1)
 		}
 	}
@@ -132,13 +132,13 @@ func runClaudeLauncher(args []string) {
 // anywhere else it says what to install.
 func noTmux(self, agent string, agentArgs []string, print bool) {
 	if _, err := exec.LookPath("osascript"); err != nil {
-		fmt.Fprintln(os.Stderr, `asciiscapes: tmux is not installed.
+		fmt.Fprintln(os.Stderr, `xscapes: tmux is not installed.
 
   brew install tmux
 
 Or run the two halves in two terminals yourself:
 
-  asciiscapes -live -await`)
+  xscapes -live -await`)
 		os.Exit(1)
 	}
 
@@ -153,7 +153,7 @@ end tell`, strings.ReplaceAll(self, `"`, `\"`))
 		return
 	}
 	if out, err := exec.Command("osascript", "-e", script).CombinedOutput(); err != nil {
-		fmt.Fprintf(os.Stderr, "asciiscapes: could not open a second Terminal window: %v\n%s", err, out)
+		fmt.Fprintf(os.Stderr, "xscapes: could not open a second Terminal window: %v\n%s", err, out)
 		fmt.Fprintln(os.Stderr, "\nInstall tmux for the side-by-side layout:\n\n  brew install tmux")
 		os.Exit(1)
 	}
@@ -167,12 +167,12 @@ end tell`, strings.ReplaceAll(self, `"`, `\"`))
 func execAgent(name string, args []string) {
 	path, err := exec.LookPath(name)
 	if err != nil {
-		fmt.Fprintf(os.Stderr, "asciiscapes: %s is not on your PATH\n", name)
+		fmt.Fprintf(os.Stderr, "xscapes: %s is not on your PATH\n", name)
 		os.Exit(1)
 	}
 	argv := append([]string{name}, args...)
 	if err := syscall.Exec(path, argv, os.Environ()); err != nil {
-		fmt.Fprintf(os.Stderr, "asciiscapes: could not start %s: %v\n", name, err)
+		fmt.Fprintf(os.Stderr, "xscapes: could not start %s: %v\n", name, err)
 		os.Exit(1)
 	}
 }

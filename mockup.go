@@ -28,7 +28,7 @@ func mockupPage(seed int64) string {
 	.col{display:flex;flex-direction:column}
 	h2{font:600 13px ui-monospace,monospace;color:#d8d8e0;margin:26px 0 8px}
 	</style>`)
-	b.WriteString(`<h1>asciiscapes &mdash; which side does the companion sit on?</h1>`)
+	b.WriteString(`<h1>xscapes &mdash; which side does the companion sit on?</h1>`)
 	b.WriteString(`<p class="nt">Left column is what ships today. Right column is the mirror: ` +
 		`companion on the right, litter growing leftward, tail written from the left margin, ` +
 		`moon moved to 0.28 so the two things a glance looks for are not stacked in one column. ` +
@@ -147,5 +147,5 @@ func mockupPage(seed int64) string {
 		card(fmt.Sprintf("%d&times;%d", d.w, d.h), d.note,
 			fmt.Sprintf(`<div class="pair"><div class="win">%s</div></div>`, frame(d.w, d.h, st, true, 4)))
 	}
-	return canvas.HTMLPage("asciiscapes — composition study", b.String())
+	return canvas.HTMLPage("xscapes — composition study", b.String())
 }

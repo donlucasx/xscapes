@@ -21,7 +21,7 @@ var bubbleAskCol = term.RGB{R: 244, G: 198, B: 122}
 // A companion shown only enlarged always looks better than it is.
 func contactSheet(seed int64) string {
 	var b strings.Builder
-	b.WriteString(`<h1>asciiscapes &mdash; references translated onto the canvas</h1>`)
+	b.WriteString(`<h1>xscapes &mdash; references translated onto the canvas</h1>`)
 
 	for i := range companion.Candidates {
 		s := &companion.Candidates[i]
@@ -54,5 +54,5 @@ func contactSheet(seed int64) string {
 			s.Name, sh, s.Source, s.Note,
 			big.HTMLFragment(26), live.HTMLFragment(10))
 	}
-	return canvas.HTMLPage("asciiscapes — translated references", b.String())
+	return canvas.HTMLPage("xscapes — translated references", b.String())
 }

@@ -105,12 +105,12 @@ func runLive(seed int64, fps float64, wIn, hIn int, ctxUsed, tod float64, ascii 
 		b, err := event.Listen(session)
 		switch {
 		case err == event.ErrBusy:
-			fmt.Fprintf(os.Stderr, "asciiscapes: a scape is already following session %s\n", event.Short(session))
+			fmt.Fprintf(os.Stderr, "xscapes: a scape is already following session %s\n", event.Short(session))
 			os.Exit(1)
 		case err != nil:
 			// Not fatal. A scape that cannot bind is still a scape; it just
 			// runs the demo instead of going dark, and says why.
-			fmt.Fprintln(os.Stderr, "asciiscapes:", err)
+			fmt.Fprintln(os.Stderr, "xscapes:", err)
 			return false
 		}
 		f.follow(b, reduce.New(session))

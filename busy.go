@@ -31,7 +31,7 @@ func busyPage(seed int64) string {
 	var b strings.Builder
 	b.WriteString(`<style>.win{border:1px solid #2a2a32;border-radius:6px;overflow:hidden}` +
 		`.lv{font-size:10px;color:#55555f;letter-spacing:.1em;margin-bottom:5px}</style>`)
-	b.WriteString(`<h1>asciiscapes &mdash; how hard is it working?</h1>`)
+	b.WriteString(`<h1>xscapes &mdash; how hard is it working?</h1>`)
 
 	for _, l := range levels {
 		st := companion.Working
@@ -53,5 +53,5 @@ func busyPage(seed int64) string {
 			`<div style="display:flex;gap:12px">%s</div></div>`,
 			l.name, l.lv, l.note, row.String())
 	}
-	return canvas.HTMLPage("asciiscapes — activity level", b.String())
+	return canvas.HTMLPage("xscapes — activity level", b.String())
 }

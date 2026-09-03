@@ -73,7 +73,7 @@ func sandFadePage(seed int64) string {
 	#sl{width:520px}
 	.bar{margin:14px 0 18px;font:12px ui-monospace,monospace;color:#d8d8e0}
 	</style>`)
-	b.WriteString(`<h1>asciiscapes &mdash; how far should the beach fall away?</h1>`)
+	b.WriteString(`<h1>xscapes &mdash; how far should the beach fall away?</h1>`)
 	b.WriteString(`<p class="nt">The lower beach sinks toward the terminal's own near-black, squared ` +
 		`so the sand stays sand for most of its depth and only lets go near the bottom. Drag the ` +
 		`slider. Watch the newest line, at the very bottom: that is the one the mid-tone sand was ` +
@@ -109,7 +109,7 @@ sl.addEventListener('input', function(){
 });
 </script>`, floatsJS(steps))
 
-	return canvas.HTMLPage("asciiscapes — sand fade", b.String())
+	return canvas.HTMLPage("xscapes — sand fade", b.String())
 }
 
 func floatsJS(v []float64) string {

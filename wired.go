@@ -89,7 +89,7 @@ func wiredPage(seed int64) string {
 	var b strings.Builder
 	b.WriteString(`<style>.win{border:1px solid #2a2a32;border-radius:6px;overflow:hidden}
 	.rowline{display:flex;gap:12px;flex-wrap:wrap}</style>`)
-	b.WriteString(`<h1>asciiscapes &mdash; driven by real events</h1>`)
+	b.WriteString(`<h1>xscapes &mdash; driven by real events</h1>`)
 	b.WriteString(`<p class="nt">One simulated Claude Code turn, folded by the same reducer the live ` +
 		`loop uses. Nothing here is posed.</p>`)
 
@@ -119,7 +119,7 @@ func wiredPage(seed int64) string {
 			bt.at, st.Pose, st.Act.Level, poseWord(st.Pose), st.Kittens, len(st.Tail),
 			bt.note, row.String())
 	}
-	return canvas.HTMLPage("asciiscapes — wired", b.String())
+	return canvas.HTMLPage("xscapes — wired", b.String())
 }
 
 func poseWord(p companion.State) string { return p.String() }

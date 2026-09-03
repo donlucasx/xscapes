@@ -120,7 +120,7 @@ func layoutPage(seed int64) string {
 		`.tty .you{color:#e6e6ea}.tty .act{color:#8fc7a8}.tty .dim{color:#6e747a}` +
 		`.win{border:1px solid #2a2a32;border-radius:6px;overflow:hidden;display:inline-block}` +
 		`</style>`)
-	b.WriteString(`<h1>asciiscapes &mdash; where does the agent's work appear?</h1>`)
+	b.WriteString(`<h1>xscapes &mdash; where does the agent's work appear?</h1>`)
 
 	fmt.Fprintf(&b, `<div class="card"><div class="meta"><div class="nm">A &middot; strip below</div>`+
 		`<div class="rg">scape 80&times;16 + activity 80&times;7</div>`+
@@ -141,5 +141,5 @@ func layoutPage(seed int64) string {
 		`The log writes itself by physics.</div></div>`+
 		`<div><div class="win">%s</div></div></div>`, drift.HTMLFragment(13))
 
-	return canvas.HTMLPage("asciiscapes — layout", b.String())
+	return canvas.HTMLPage("xscapes — layout", b.String())
 }

@@ -7,27 +7,29 @@ import (
 	"os"
 	"path/filepath"
 	"strings"
+
+	"github.com/donlucasx/xscapes/internal/envx"
 )
 
 // Home is where everything lives. The brief locks this to
-// ~/.config/asciiscapes/, and the real argument for honouring it exactly is
+// ~/.config/xscapes/, and the real argument for honouring it exactly is
 // not convention: the emitter and the engine are separate processes that
 // share no context but the environment, so the path has to be derivable from
 // $HOME alone by both. Two derivation rules that can disagree is a silent,
 // undebuggable failure -- the hook writes somewhere the scape is not reading
 // and the scene simply never moves.
 func Home() (string, error) {
-	if v := os.Getenv("ASCIISCAPES_HOME"); v != "" {
+	if v := envx.Lookup("HOME"); v != "" {
 		return v, nil
 	}
 	if v := os.Getenv("XDG_CONFIG_HOME"); v != "" {
-		return filepath.Join(v, "asciiscapes"), nil
+		return filepath.Join(v, "xscapes"), nil
 	}
 	h, err := os.UserHomeDir()
 	if err != nil {
 		return "", err
 	}
-	return filepath.Join(h, ".config", "asciiscapes"), nil
+	return filepath.Join(h, ".config", "xscapes"), nil
 }
 
 // RunDir holds the per-session sockets and spool files.
@@ -57,7 +59,7 @@ func EnsureRunDir() (string, error) {
 const maxSunPath = 103
 
 // ErrPathTooLong means the socket path will not fit in sockaddr_un.
-var ErrPathTooLong = errors.New("socket path too long for sockaddr_un; set ASCIISCAPES_HOME to something shorter")
+var ErrPathTooLong = errors.New("socket path too long for sockaddr_un; set XSCAPES_HOME to something shorter")
 
 // Tag reduces a session id to the short, filesystem-safe token that names its
 // socket and spool.
@@ -149,10 +151,11 @@ func Current() string {
 // 2026-08-30: Claude Code exports CLAUDE_CODE_SESSION_ID to every child, and
 // its value equals the transcript's basename.
 func SessionFromEnv() string {
-	for _, k := range []string{"ASCIISCAPES_SESSION", "CLAUDE_CODE_SESSION_ID"} {
-		if v := strings.TrimSpace(os.Getenv(k)); v != "" {
-			return v
-		}
+	if v := strings.TrimSpace(envx.Lookup("SESSION")); v != "" {
+		return v
+	}
+	if v := strings.TrimSpace(os.Getenv("CLAUDE_CODE_SESSION_ID")); v != "" {
+		return v
 	}
 	return ""
 }

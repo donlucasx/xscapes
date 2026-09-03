@@ -58,7 +58,7 @@ func runShades(args []string) {
 	if term.DetectProfile() != term.Profile256 {
 		fmt.Fprintf(os.Stderr,
 			"note: this terminal reports %s, where all three panels are identical.\n"+
-				"      run it with ASCIISCAPES_COLOR=256 to see what Terminal.app gets.\n\n",
+				"      run it with XSCAPES_COLOR=256 to see what Terminal.app gets.\n\n",
 			term.DetectProfile())
 	}
 
@@ -115,6 +115,6 @@ func runShades(args []string) {
 		return
 	}
 	fmt.Printf("\n\x1b[2m%dx%d each, same frame and wave phase, %02d:00. Only the smoothing differs.\n"+
-		"If 3 looks better than 2 in THIS terminal, say so -- ASCIISCAPES_SHADE_BLOCKS=1 makes it the default.\n"+
+		"If 3 looks better than 2 in THIS terminal, say so -- XSCAPES_SHADE_BLOCKS=1 makes it the default.\n"+
 		"xscapes shades -tod 0.75 for dusk, -tod 0 for midnight, -w/-h to force a size.\x1b[0m\n", *w, *h, int(*tod*24+0.5)%24)
 }

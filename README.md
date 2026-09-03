@@ -125,10 +125,10 @@ xscapes emit tool_end -tool Read -target internal/auth/handler.go -detail "142 l
 xscapes emit needs_input -text "allow Bash?"
 ```
 
-Events reach a running scape over a unix socket in `~/.config/asciiscapes/run/`,
+Events reach a running scape over a unix socket in `~/.config/xscapes/run/`,
 and spool to a file when nothing is listening, so a scape started late still
-picks up the session. (State paths and the `ASCIISCAPES_*` variables still carry
-the project's older working name.)
+picks up the session. Settings are read from `XSCAPES_*`; the pre-rename
+`ASCIISCAPES_*` names still work and say so on stderr.
 
 **Adapter 1: Claude Code**, via hooks. `xscapes install claude` writes them.
 The payload schema was read out of the Claude Code binary rather than guessed;
@@ -153,7 +153,7 @@ xscapes -live              # the scape in this terminal, Ctrl-C to quit
 xscapes -info              # colour profile, size, which sound player
 xscapes notify             # hear both knocks
 xscapes replay session.jsonl   # feed a recorded session back through the engine
-ASCIISCAPES_SILENT=1 …         # mute
+XSCAPES_SILENT=1 …         # mute
 ```
 
 `xscapes claude -print` shows you how the window will be split and what will be
@@ -171,7 +171,7 @@ live:
 - **256 colours are not greyscale.** A dark palette collapses to grey because
   the xterm cube has almost no resolution below luma 25. The fix is to keep the
   darkness in the backgrounds and push the colour into the glyphs, which are the
-  bright part of the frame. `ASCIISCAPES_CHROMA` tunes it.
+  bright part of the frame. `XSCAPES_CHROMA` tunes it.
 - **Activity is encoded in coverage, count and position, never in rate.** A
   glance is the whole budget and a screenshot has no motion at all. The first
   version mapped activity to wave speed and idle looked identical to flat out.

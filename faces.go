@@ -48,7 +48,7 @@ func facePage(seed int64) string {
 	   text-transform:uppercase;margin:14px 0 6px}
 	h2+p{margin-top:4px}
 	</style>`)
-	b.WriteString(`<h1>asciiscapes &mdash; whiskers, off the float</h1>`)
+	b.WriteString(`<h1>xscapes &mdash; whiskers, off the float</h1>`)
 	b.WriteString(`<p class="nt">The float was real: both pairs hung off the NOSE ROW's fur span, ` +
 		`but the block under the muzzle is two cells narrower, so the bottom pair reached past it ` +
 		`into open air. Three fixes to compare, plus the current one for reference. ` +
@@ -112,5 +112,5 @@ func facePage(seed int64) string {
 	}
 	b.WriteString(`</div>`)
 
-	return canvas.HTMLPage("asciiscapes — companion study", b.String())
+	return canvas.HTMLPage("xscapes — companion study", b.String())
 }

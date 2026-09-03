@@ -16,7 +16,34 @@ import (
 // string as a shell comment rather than as a sibling JSON field, because a
 // comment survives anything that re-marshals the file, and because a person
 // reading their own settings.json should be able to see who put it there.
-const marker = "# asciiscapes:v1"
+const marker = "# xscapes:v1"
+
+// legacyMarkers are markers this program used to write and must still
+// RECOGNISE. It never writes one again.
+//
+// The project was renamed from asciiscapes on 2026-09-03, and a marker is the
+// only handle uninstall has on its own work. Changing the constant without
+// this list would have left twelve hooks in a live settings.json that nothing
+// could see any more: uninstall would report zero entries and remove nothing,
+// install would add a second copy beside each one, and the user would be
+// editing JSON by hand to get rid of a tool that claimed to have gone. A
+// rename is exactly when an identifier has to grow a memory.
+var legacyMarkers = []string{"# asciiscapes:v1"}
+
+// markerOf returns the marker an entry's command line ends with, and whether
+// it is one of ours at all.
+func markerOf(cmd string) (string, bool) {
+	c := strings.TrimSpace(cmd)
+	if strings.HasSuffix(c, marker) {
+		return marker, true
+	}
+	for _, m := range legacyMarkers {
+		if strings.HasSuffix(c, m) {
+			return m, true
+		}
+	}
+	return "", false
+}
 
 // ours reports whether a matcher-group is an entry this program wrote.
 //
@@ -41,8 +68,7 @@ func ours(raw json.RawMessage) (cmd string, yes bool) {
 	if g.Matcher != "" || len(g.Hooks) != 1 || g.Hooks[0].Type != "command" {
 		return "", false
 	}
-	c := strings.TrimSpace(g.Hooks[0].Command)
-	if !strings.HasSuffix(c, marker) {
+	if _, yes := markerOf(g.Hooks[0].Command); !yes {
 		return "", false
 	}
 	return g.Hooks[0].Command, true
@@ -161,7 +187,7 @@ func runUninstall(args []string) {
 	if err != nil {
 		die(err)
 	}
-	fmt.Printf("settings  %s\n%d asciiscapes entries found\n", path, n)
+	fmt.Printf("settings  %s\n%d xscapes entries found\n", path, n)
 	if n == 0 {
 		return
 	}
@@ -179,7 +205,7 @@ func runUninstall(args []string) {
 func takeTarget(args []string) []string {
 	if len(args) > 0 && !strings.HasPrefix(args[0], "-") {
 		if args[0] != "claude" {
-			fmt.Fprintf(os.Stderr, "asciiscapes: only `claude` is supported, got %q\n", args[0])
+			fmt.Fprintf(os.Stderr, "xscapes: only `claude` is supported, got %q\n", args[0])
 			os.Exit(2)
 		}
 		return args[1:]
@@ -282,9 +308,14 @@ func addHooks(src []byte, bin string) ([]byte, []string, error) {
 			// The recorded path is stale -- a moved binary, a dev build, a
 			// reinstall from a different directory. Every hook is quietly
 			// firing `|| true` on a path that no longer exists, and the old
-			// code called that "already installed".
+			// code called that "already installed". A pre-rename marker lands
+			// here too, and is rewritten to the current one.
 			out = splice(cutSpan(out, *span), span.start, entry(bin, ev, "      "))
-			actions = append(actions, "update  "+ev+"  (re-pointed at "+bin+")")
+			why := "re-pointed at " + bin
+			if m, _ := markerOf(cur); m != marker {
+				why = "migrated from " + strings.TrimPrefix(m, "# ")
+			}
+			actions = append(actions, "update  "+ev+"  ("+why+")")
 			continue
 		}
 		next, where, err := insertEntry(out, ev, bin)
@@ -449,7 +480,7 @@ func splice(src []byte, at int, ins string) []byte {
 	return append(out, src[at:]...)
 }
 
-// ourEntry finds this event's asciiscapes entry, if any, returning the command
+// ourEntry finds this event's xscapes entry, if any, returning the command
 // it currently records and the byte span of the whole matcher-group.
 func ourEntry(src []byte, ev string) (string, *span, error) {
 	hooksSpan, err := valueSpan(src, nil, "hooks")
@@ -479,7 +510,7 @@ func cutSpan(src []byte, sp span) []byte {
 	return append(out, src[sp.end:]...)
 }
 
-// hasOurEntry reports whether an asciiscapes entry is already registered for
+// hasOurEntry reports whether an xscapes entry is already registered for
 // this event, so a second install is a no-op instead of a duplicate.
 func hasOurEntry(src []byte, ev string) (bool, error) {
 	hooksSpan, err := valueSpan(src, nil, "hooks")
@@ -749,7 +780,7 @@ func writeSettings(path string, orig, out []byte) error {
 	if err != nil {
 		return err
 	}
-	dir := filepath.Join(home, ".config", "asciiscapes", "backups")
+	dir := filepath.Join(home, ".config", "xscapes", "backups")
 	if err := os.MkdirAll(dir, 0o700); err != nil {
 		return err
 	}
@@ -763,7 +794,7 @@ func writeSettings(path string, orig, out []byte) error {
 	// Temp file in the same directory so the rename is atomic: a crash mid
 	// write must leave the old settings intact, not a half-written file that
 	// Claude Code cannot parse.
-	tmp, err := os.CreateTemp(filepath.Dir(path), ".asciiscapes-settings-*")
+	tmp, err := os.CreateTemp(filepath.Dir(path), ".xscapes-settings-*")
 	if err != nil {
 		return err
 	}
@@ -868,7 +899,7 @@ func verifyPreserved(orig, out []byte) error {
 				continue
 			}
 			if !containsEqual(ah[ev], e) {
-				return fmt.Errorf("refusing to write: the edit added a %s hook that is not an asciiscapes entry", ev)
+				return fmt.Errorf("refusing to write: the edit added a %s hook that is not an xscapes entry", ev)
 			}
 		}
 	}
@@ -896,6 +927,6 @@ func containsEqual(list []json.RawMessage, want json.RawMessage) bool {
 func changed(a, b []byte) bool { return !bytes.Equal(a, b) }
 
 func die(err error) {
-	fmt.Fprintln(os.Stderr, "asciiscapes:", err)
+	fmt.Fprintln(os.Stderr, "xscapes:", err)
 	os.Exit(1)
 }

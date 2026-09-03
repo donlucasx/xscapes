@@ -1,6 +1,6 @@
 # xscapes — project brief for Claude Code
 
-*(Working directory, env vars and some prose below still say "asciiscapes". Deliberate: renaming live state orphans an installed hook.)*
+*(Renamed end to end on 2026-09-03: directory, env vars, state path and hook marker. Two names are kept on purpose and are not leftovers -- `internal/envx` still reads `ASCIISCAPES_*` and warns, and `install.go` still RECOGNISES the `# asciiscapes:v1` marker so the hooks it wrote before the rename can be found and removed.)*
 
 > **Where we left off — 2026-09-03 (session 11), HEAD `e886b7e`, pushed, tree clean.**
 > **Live: https://github.com/donlucasx/xscapes** (public, MIT). Milestone 1 is
@@ -39,7 +39,7 @@
 > its screen stays where the terminal left it until a keystroke. Fixing it means
 > the emulator decided against on 09-01.
 
-**Name: `xscapes`** (decided 2026-09-01 with the repo; asciiscapes and iixscapes are out). The working directory and these docs still say asciiscapes. A cozy ASCII "thinking screen" for terminal AI agents. While Claude Code (or any agent) works, a small living scene runs WITH it — a shoreline whose sea rises with the work, and a companion animal — and nudges the user, visually and with a sound, when the agent finishes or needs input.
+**Name: `xscapes`** (decided 2026-09-01 with the repo; asciiscapes and iixscapes are out; carried through everything 2026-09-03). A cozy ASCII "thinking screen" for terminal AI agents. While Claude Code (or any agent) works, a small living scene runs WITH it — a shoreline whose sea rises with the work, and a companion animal — and nudges the user, visually and with a sound, when the agent finishes or needs input.
 
 Owner: Lucas (cinematographer + solo dev, LA). Solo build, AI-assisted. Start from this file; do not re-derive decisions already made here.
 
@@ -65,7 +65,7 @@ Judges **to be announced**. Their framing line, verbatim: *"The biggest opportun
 **What the rubric implies, and it should drive every tradeoff:**
 - **Execution is only 10%.** Polish is nearly worthless. A rough scene that lands the idea beats a smooth one that doesn't. Never trade scope for finish.
 - **Originality + Fit = 45%, and both favour the terminal build.** "Native to using AI agents" is precisely what a scene living in tmux beside Claude Code *is*; a browser tab is a worse answer. On a vibe-coding platform, near every rival entry will be a web app — a Go binary in a terminal is the only one of its kind in the pile. This is the moat.
-- **Lead the submission with the layer, not the landscape.** The event protocol + pluggable adapters *is* "the waiting layer for AI" they say they want to fund. Most entries will be one clever screen. Frame asciiscapes as the protocol with a reference implementation, and the cozy scene as what it looks like.
+- **Lead the submission with the layer, not the landscape.** The event protocol + pluggable adapters *is* "the waiting layer for AI" they say they want to fund. Most entries will be one clever screen. Frame xscapes as the protocol with a reference implementation, and the cozy scene as what it looks like.
 - 30% Waiting Experience is the notification doing its job: the nudge has to genuinely beat a terminal bell.
 
 ### Building on Commons' platform — resolved
@@ -149,7 +149,7 @@ pane, where 80% used to leave a single row.
 
 **Placement**
 - Lives alongside the agent via tmux: popup (`display-popup`) on think by default, split pane as an option. Zellij floating pane later.
-- Lucas uses Terminal.app with no tmux. `asciiscapes claude` must bootstrap tmux itself (claude in main pane, scape beside). Only dependency: tmux via brew. No-tmux fallback: second Terminal window via `osascript`. Never seize the agent's TTY.
+- Lucas uses Terminal.app with no tmux. `xscapes claude` must bootstrap tmux itself (claude in main pane, scape beside). Only dependency: tmux via brew. No-tmux fallback: second Terminal window via `osascript`. Never seize the agent's TTY.
 
 **Stack**
 - Go + bubbletea/lipgloss, single static binary. No Node, no Python.
@@ -159,7 +159,7 @@ pane, where 80% used to leave a single row.
   collapses to grey because the colour cube has almost no resolution below luma
   25 (4 entries, all pure blue) against 108 above 150. So the darkness lives in
   the BACKGROUNDS and the colour lives in the GLYPHS, which are the bright part
-  of the frame. `term.GlyphBoost` (2.6, `ASCIISCAPES_CHROMA` to override) lifts
+  of the frame. `term.GlyphBoost` (2.6, `XSCAPES_CHROMA` to override) lifts
   glyph chroma toward a target of 100 before quantising; near-neutrals below
   chroma 30 are left alone so the companion does not turn orange.
 - **Never emit an ANSI index below 16.** Those sixteen are the only colours a
@@ -215,7 +215,7 @@ pane, where 80% used to leave a single row.
 
 **Shipping**
 - GitHub release binaries + brew tap. MIT, public from day one.
-- State in `~/.config/asciiscapes/`.
+- State in `~/.config/xscapes/`.
 
 ## Open questions
 1. ~~Name~~ **ANSWERED 2026-09-01: `xscapes`.**
@@ -228,9 +228,9 @@ pane, where 80% used to leave a single row.
 ## Milestone 1 (target: ~Sep 1, submittable) — status 2026-09-01
 1. ✅ Go module, 80×24 canvas, layer/alpha renderer with truecolor→256 fallback. (No bubbletea; stdlib only.)
 2. ✅ Shore scape, three layers, working/resting states.
-3. ✅ Event protocol (socket + file), `asciiscapes emit <event>` CLI for testing.
-4. ✅ Claude Code hook adapter + `asciiscapes install claude`.
-5. ✅ `asciiscapes claude` launcher — bootstraps tmux, joins an existing session,
+3. ✅ Event protocol (socket + file), `xscapes emit <event>` CLI for testing.
+4. ✅ Claude Code hook adapter + `xscapes install claude`.
+5. ✅ `xscapes claude` launcher — bootstraps tmux, joins an existing session,
    osascript fallback, `-print` dry run. Verified in a real tmux.
 6. ◑ needs_input/done cues ✅ (distinct: warm solid ask box vs cool dotted knock, and
    two sounds via `internal/notify`, edge-detected so a 60s nag rings once).

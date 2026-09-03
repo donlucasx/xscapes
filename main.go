@@ -1,4 +1,4 @@
-// Command asciiscapes renders the thinking scene.
+// Command xscapes renders the thinking scene.
 //
 // Without flags it prints one frame, which is what you want in a pipe. The
 // live TUI is a thin wrapper over exactly this renderer.
@@ -10,12 +10,15 @@ import (
 	"os"
 
 	"github.com/donlucasx/xscapes/internal/canvas"
+	"github.com/donlucasx/xscapes/internal/envx"
 	"github.com/donlucasx/xscapes/internal/notify"
 	"github.com/donlucasx/xscapes/internal/scape"
 	"github.com/donlucasx/xscapes/internal/term"
 )
 
 func main() {
+	warnLegacyEnv(os.Args[1:])
+
 	// Subcommands are checked before the flag set is parsed. The renderer has
 	// twenty demo flags and the adapters have their own; keeping them in
 	// separate flag sets is what stops `emit -tool` from colliding with a
@@ -82,7 +85,7 @@ func main() {
 	act := scape.Activity{Working: *working, TimeOfDay: *tod, ContextUsed: *ctxUsed}
 	if *todo != "" {
 		if _, err := fmt.Sscanf(*todo, "%d/%d", &act.TodoDone, &act.TodoTotal); err != nil {
-			fmt.Fprintln(os.Stderr, "asciiscapes: -todo wants done/total, e.g. 3/5")
+			fmt.Fprintln(os.Stderr, "xscapes: -todo wants done/total, e.g. 3/5")
 			os.Exit(2)
 		}
 	}
@@ -111,7 +114,7 @@ func main() {
 
 	if *sandfd != "" {
 		if err := os.WriteFile(*sandfd, []byte(sandFadePage(*seed)), 0o644); err != nil {
-			fmt.Fprintln(os.Stderr, "asciiscapes:", err)
+			fmt.Fprintln(os.Stderr, "xscapes:", err)
 			os.Exit(1)
 		}
 		for _, ln := range sandFadeContrast(*seed, *tod) {
@@ -123,11 +126,11 @@ func main() {
 
 	if *overlay != "" {
 		if flag.NArg() < 1 {
-			fmt.Fprintln(os.Stderr, "asciiscapes: -overlay needs a captured pane file, e.g. -overlay out.html pane.txt")
+			fmt.Fprintln(os.Stderr, "xscapes: -overlay needs a captured pane file, e.g. -overlay out.html pane.txt")
 			os.Exit(2)
 		}
 		if err := os.WriteFile(*overlay, []byte(overlayPage(*seed, flag.Arg(0))), 0o644); err != nil {
-			fmt.Fprintln(os.Stderr, "asciiscapes:", err)
+			fmt.Fprintln(os.Stderr, "xscapes:", err)
 			os.Exit(1)
 		}
 		fmt.Println(*overlay)
@@ -136,7 +139,7 @@ func main() {
 
 	if *mockup != "" {
 		if err := os.WriteFile(*mockup, []byte(mockupPage(*seed)), 0o644); err != nil {
-			fmt.Fprintln(os.Stderr, "asciiscapes:", err)
+			fmt.Fprintln(os.Stderr, "xscapes:", err)
 			os.Exit(1)
 		}
 		fmt.Println(*mockup)
@@ -145,7 +148,7 @@ func main() {
 
 	if *facesHT != "" {
 		if err := os.WriteFile(*facesHT, []byte(facePage(*seed)), 0o644); err != nil {
-			fmt.Fprintln(os.Stderr, "asciiscapes:", err)
+			fmt.Fprintln(os.Stderr, "xscapes:", err)
 			os.Exit(1)
 		}
 		fmt.Println(*facesHT)
@@ -154,7 +157,7 @@ func main() {
 
 	if *colors != "" {
 		if err := os.WriteFile(*colors, []byte(colorPage(*seed)), 0o644); err != nil {
-			fmt.Fprintln(os.Stderr, "asciiscapes:", err)
+			fmt.Fprintln(os.Stderr, "xscapes:", err)
 			os.Exit(1)
 		}
 		fmt.Println(*colors)
@@ -163,7 +166,7 @@ func main() {
 
 	if *reel != "" {
 		if err := os.WriteFile(*reel, []byte(reelPage(*seed, *reelAt, *reelN, *fps)), 0o644); err != nil {
-			fmt.Fprintln(os.Stderr, "asciiscapes:", err)
+			fmt.Fprintln(os.Stderr, "xscapes:", err)
 			os.Exit(1)
 		}
 		fmt.Println(*reel)
@@ -172,7 +175,7 @@ func main() {
 
 	if *wired != "" {
 		if err := os.WriteFile(*wired, []byte(wiredPage(*seed)), 0o644); err != nil {
-			fmt.Fprintln(os.Stderr, "asciiscapes:", err)
+			fmt.Fprintln(os.Stderr, "xscapes:", err)
 			os.Exit(1)
 		}
 		fmt.Println(*wired)
@@ -181,7 +184,7 @@ func main() {
 
 	if *kits != "" {
 		if err := os.WriteFile(*kits, []byte(kittenPage(*seed)), 0o644); err != nil {
-			fmt.Fprintln(os.Stderr, "asciiscapes:", err)
+			fmt.Fprintln(os.Stderr, "xscapes:", err)
 			os.Exit(1)
 		}
 		fmt.Println(*kits)
@@ -190,7 +193,7 @@ func main() {
 
 	if *busy != "" {
 		if err := os.WriteFile(*busy, []byte(busyPage(*seed)), 0o644); err != nil {
-			fmt.Fprintln(os.Stderr, "asciiscapes:", err)
+			fmt.Fprintln(os.Stderr, "xscapes:", err)
 			os.Exit(1)
 		}
 		fmt.Println(*busy)
@@ -199,7 +202,7 @@ func main() {
 
 	if *dayHTML != "" {
 		if err := os.WriteFile(*dayHTML, []byte(dayPage(*seed)), 0o644); err != nil {
-			fmt.Fprintln(os.Stderr, "asciiscapes:", err)
+			fmt.Fprintln(os.Stderr, "xscapes:", err)
 			os.Exit(1)
 		}
 		fmt.Println(*dayHTML)
@@ -208,7 +211,7 @@ func main() {
 
 	if *ctxdemo != "" {
 		if err := os.WriteFile(*ctxdemo, []byte(contextPage(*seed)), 0o644); err != nil {
-			fmt.Fprintln(os.Stderr, "asciiscapes:", err)
+			fmt.Fprintln(os.Stderr, "xscapes:", err)
 			os.Exit(1)
 		}
 		fmt.Println(*ctxdemo)
@@ -217,7 +220,7 @@ func main() {
 
 	if *layout != "" {
 		if err := os.WriteFile(*layout, []byte(layoutPage(*seed)), 0o644); err != nil {
-			fmt.Fprintln(os.Stderr, "asciiscapes:", err)
+			fmt.Fprintln(os.Stderr, "xscapes:", err)
 			os.Exit(1)
 		}
 		fmt.Println(*layout)
@@ -226,7 +229,7 @@ func main() {
 
 	if *strip != "" {
 		if err := os.WriteFile(*strip, []byte(stripPage(*seed, *frames, *fps, *mode)), 0o644); err != nil {
-			fmt.Fprintln(os.Stderr, "asciiscapes:", err)
+			fmt.Fprintln(os.Stderr, "xscapes:", err)
 			os.Exit(1)
 		}
 		fmt.Println(*strip)
@@ -235,7 +238,7 @@ func main() {
 
 	if *anim != "" {
 		if err := os.WriteFile(*anim, []byte(animPage(*seed, 36, 12)), 0o644); err != nil {
-			fmt.Fprintln(os.Stderr, "asciiscapes:", err)
+			fmt.Fprintln(os.Stderr, "xscapes:", err)
 			os.Exit(1)
 		}
 		fmt.Println(*anim)
@@ -244,7 +247,7 @@ func main() {
 
 	if *compare != "" {
 		if err := os.WriteFile(*compare, []byte(compareSheet(*seed)), 0o644); err != nil {
-			fmt.Fprintln(os.Stderr, "asciiscapes:", err)
+			fmt.Fprintln(os.Stderr, "xscapes:", err)
 			os.Exit(1)
 		}
 		fmt.Println(*compare)
@@ -253,7 +256,7 @@ func main() {
 
 	if *sheet != "" {
 		if err := os.WriteFile(*sheet, []byte(contactSheet(*seed)), 0o644); err != nil {
-			fmt.Fprintln(os.Stderr, "asciiscapes:", err)
+			fmt.Fprintln(os.Stderr, "xscapes:", err)
 			os.Exit(1)
 		}
 		fmt.Println(*sheet)
@@ -262,8 +265,8 @@ func main() {
 
 	if *html != "" {
 		sc.Update(c, float64(*frames-1)/(*fps), act)
-		if err := os.WriteFile(*html, []byte(c.RenderHTML("asciiscapes — "+sc.Name())), 0o644); err != nil {
-			fmt.Fprintln(os.Stderr, "asciiscapes:", err)
+		if err := os.WriteFile(*html, []byte(c.RenderHTML("xscapes — "+sc.Name())), 0o644); err != nil {
+			fmt.Fprintln(os.Stderr, "xscapes:", err)
 			os.Exit(1)
 		}
 		fmt.Println(*html)
@@ -293,4 +296,25 @@ func isSet(name string) bool {
 		}
 	})
 	return found
+}
+
+// warnLegacyEnv names any pre-rename ASCIISCAPES_* variable still in the
+// environment. They keep working -- see internal/envx -- but a setting whose
+// name has moved is the easiest way there is to end up measuring nothing, so
+// the program says which ones it saw rather than letting them pass.
+//
+// Here, at the top of main, because this is the last moment that is certainly
+// safe to write to the terminal: `-live`, `claude` and `inside` take the
+// alternate screen shortly after, and a stray line then lands in the middle of
+// a painted frame. The two adapters are exempt -- `hook` runs on every tool
+// call with its output already sent to /dev/null, and `statusline` owns a line
+// of the agent's chrome that is not ours to scribble on.
+func warnLegacyEnv(args []string) {
+	if len(args) > 0 {
+		switch args[0] {
+		case "hook", "statusline":
+			return
+		}
+	}
+	envx.WarnLegacy(os.Stderr)
 }

@@ -79,7 +79,7 @@ func contextPage(seed int64) string {
 	b.WriteString(`<style>.win{border:1px solid #2a2a32;border-radius:6px;overflow:hidden}` +
 		`.row{display:flex;gap:14px}.row>div{text-align:center}` +
 		`.lv{font-size:10px;color:#55555f;letter-spacing:.1em;margin-bottom:5px}</style>`)
-	b.WriteString(`<h1>asciiscapes &mdash; context: how much number is too much?</h1>`)
+	b.WriteString(`<h1>xscapes &mdash; context: how much number is too much?</h1>`)
 
 	for _, v := range variants {
 		var row strings.Builder
@@ -92,5 +92,5 @@ func contextPage(seed int64) string {
 			`<div class="nt">%s</div></div><div class="row">%s</div></div>`,
 			v.name, v.note, row.String())
 	}
-	return canvas.HTMLPage("asciiscapes — context meter", b.String())
+	return canvas.HTMLPage("xscapes — context meter", b.String())
 }

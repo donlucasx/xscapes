@@ -1,4 +1,4 @@
-# asciiscapes — feedback log
+# xscapes — feedback log
 
 Lucas's feedback, **verbatim**, newest section at the bottom. One section per session.
 Never paraphrase. Read the relevant section before editing anything it covers.

@@ -16,7 +16,7 @@ import (
 )
 
 // dispatch handles the subcommands. They are checked before flag.Parse so that
-// `asciiscapes emit tool_start -tool Read` can have its own flag set without
+// `xscapes emit tool_start -tool Read` can have its own flag set without
 // colliding with the renderer's twenty demo flags.
 //
 // Returns true if it handled the call.
@@ -50,7 +50,7 @@ func dispatch(args []string) bool {
 	case "help", "-h", "--help":
 		usage()
 	default:
-		fmt.Fprintf(os.Stderr, "asciiscapes: unknown command %q\n\n", args[0])
+		fmt.Fprintf(os.Stderr, "xscapes: unknown command %q\n\n", args[0])
 		usage()
 		os.Exit(2)
 	}
@@ -58,24 +58,23 @@ func dispatch(args []string) bool {
 }
 
 func usage() {
-	fmt.Fprint(os.Stderr, `asciiscapes — a thinking screen for terminal agents
+	fmt.Fprint(os.Stderr, `xscapes — a thinking screen for terminal agents
 
-  asciiscapes claude          run Claude Code INSIDE the scape, in this window
-  asciiscapes claude -beside  the older layout: agent in its own tmux pane
-  asciiscapes shades          one frame three ways, to judge the 256 smoothing here
-  asciiscapes tune            fold real recordings through the reducer and report
-  asciiscapes tune            fold real recordings through the reducer and report
-  asciiscapes inside <cmd>    host any command inside the scape
-  asciiscapes                 render one frame
-  asciiscapes -live           run the scape in this terminal
+  xscapes claude          run Claude Code INSIDE the scape, in this window
+  xscapes claude -beside  the older layout: agent in its own tmux pane
+  xscapes shades          one frame three ways, to judge the 256 smoothing here
+  xscapes tune            fold real recordings through the reducer and report
+  xscapes inside <cmd>    host any command inside the scape
+  xscapes                 render one frame
+  xscapes -live           run the scape in this terminal
 
-  asciiscapes install claude  add the hooks to Claude Code (prints a plan; --apply to write)
-  asciiscapes uninstall claude
-  asciiscapes emit <kind>     send one event by hand (for testing)
-  asciiscapes replay <file>   feed a recorded event log to a running scape
-  asciiscapes notify [kind]   play the knock sounds (ask, done, or both)
-  asciiscapes hook [Event]    adapter; reads a Claude Code hook payload on stdin
-  asciiscapes statusline      adapter for the context moon; chains to your statusline
+  xscapes install claude  add the hooks to Claude Code (prints a plan; --apply to write)
+  xscapes uninstall claude
+  xscapes emit <kind>     send one event by hand (for testing)
+  xscapes replay <file>   feed a recorded event log to a running scape
+  xscapes notify [kind]   play the knock sounds (ask, done, or both)
+  xscapes hook [Event]    adapter; reads a Claude Code hook payload on stdin
+  xscapes statusline      adapter for the context moon; chains to your statusline
 
 Run with -h for the renderer's flags.
 `)
@@ -106,7 +105,7 @@ func runEmit(args []string) {
 	// in the help and the README -- silently dropped every flag and emitted an
 	// empty event. Split the kind off before parsing.
 	if len(args) == 0 || strings.HasPrefix(args[0], "-") {
-		fmt.Fprintln(os.Stderr, "asciiscapes emit: need a kind, e.g. `asciiscapes emit tool_start -tool Read`")
+		fmt.Fprintln(os.Stderr, "xscapes emit: need a kind, e.g. `xscapes emit tool_start -tool Read`")
 		os.Exit(2)
 	}
 	kind := args[0]
@@ -137,7 +136,7 @@ func runEmit(args []string) {
 	}
 	switch {
 	case err != nil:
-		fmt.Fprintln(os.Stderr, "asciiscapes:", err)
+		fmt.Fprintln(os.Stderr, "xscapes:", err)
 		os.Exit(1)
 	case viaSock:
 		fmt.Printf("sent %s to session %s\n", e.Kind, event.Short(sess))
@@ -205,7 +204,7 @@ func runStatusline(args []string) {
 	if err := cmd.Run(); err != nil {
 		// stdout here IS the statusline, so a silent failure leaves a blank
 		// bar and no clue why. Say something short in the space it owns.
-		fmt.Printf("asciiscapes: statusline chain failed: %v", err)
+		fmt.Printf("xscapes: statusline chain failed: %v", err)
 	}
 }
 
@@ -225,7 +224,7 @@ func runNotify(args []string) {
 		case "done", "finish":
 			kinds = []notify.Kind{notify.Done}
 		default:
-			fmt.Fprintf(os.Stderr, "asciiscapes notify: unknown kind %q (ask, done)\n", args[0])
+			fmt.Fprintf(os.Stderr, "xscapes notify: unknown kind %q (ask, done)\n", args[0])
 			os.Exit(2)
 		}
 	}
@@ -250,12 +249,12 @@ func runReplay(args []string) {
 	fs.Parse(args)
 
 	if fs.NArg() < 1 {
-		fmt.Fprintln(os.Stderr, "asciiscapes replay: need a file")
+		fmt.Fprintln(os.Stderr, "xscapes replay: need a file")
 		os.Exit(2)
 	}
 	b, err := os.ReadFile(fs.Arg(0))
 	if err != nil {
-		fmt.Fprintln(os.Stderr, "asciiscapes:", err)
+		fmt.Fprintln(os.Stderr, "xscapes:", err)
 		os.Exit(1)
 	}
 	sess := *session

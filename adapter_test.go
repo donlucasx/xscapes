@@ -24,7 +24,7 @@ func shortHome(t *testing.T) {
 		t.Fatal(err)
 	}
 	t.Cleanup(func() { os.RemoveAll(d) })
-	t.Setenv("ASCIISCAPES_HOME", d)
+	t.Setenv("XSCAPES_HOME", d)
 }
 
 // TestTheIdleNagIsInvisible is the single most important test in the project.
