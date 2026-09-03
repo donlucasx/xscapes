@@ -81,6 +81,34 @@ func (s *screen) resizeScrolling(w, h int) {
 	s.resize(w, h)
 }
 
+// resizeAnchoredBottom is the other thing a terminal can do on a resize: keep
+// the BOTTOM and push everything DOWN when the window grows, so blank rows
+// appear at the top instead of at the bottom.
+//
+// It is here to mark the boundary of what the host can fix. The scape repaints
+// itself either way, so its rows are always right. The AGENT's screen is a
+// different matter: Claude Code emits nothing at all on a resize, so wherever
+// the terminal puts its transcript is where it stays until the next keystroke.
+// No amount of clearing helps, because the host cannot redraw a UI it does not
+// model. That is the cost of not being a terminal emulator, and it was decided
+// with eyes open.
+func (s *screen) resizeAnchoredBottom(w, h int) {
+	if grow := h - s.h; grow > 0 {
+		rows := make([][]rune, h)
+		for i := range rows {
+			rows[i] = blankRow(w)
+		}
+		for i := range s.cells {
+			copy(rows[i+grow], s.cells[i])
+		}
+		s.cells, s.w, s.h = rows, w, h
+		s.top, s.bot = 0, h-1
+		s.y = clamp(s.y+grow, 0, h-1)
+		return
+	}
+	s.resize(w, h)
+}
+
 // resize keeps what fits, which is what a terminal does when it GROWS.
 func (s *screen) resize(w, h int) {
 	old := s.cells

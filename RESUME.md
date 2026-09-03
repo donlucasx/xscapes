@@ -74,6 +74,21 @@ Two regression tests now hold it, both proven RED against the old palette:
 the old palette, 0 on this one) and `TestTheSeaShowsItsDepthOn256` (11 of 18 sea
 rows were one colour at noon; the cap is half).
 
+**⚠ THE OPEN ITEM HE IS STILL HITTING: A RESIZE SCRAMBLES THE AGENT'S OWN TEXT.**
+Reported twice, second time on 2026-09-03 at 120x62: blank rows above and the
+Claude Code banner pushed to the bottom of its band. **The scape's half is now
+provably right in every resize mode that can be modelled** -- eleven cases,
+including the terminal keeping the bottom on a shrink and pushing content down
+on a grow. What is left is Claude Code's OWN screen being moved by the terminal,
+and **the host cannot repaint a UI it does not model.** Claude emits nothing at
+all on a resize, so wherever the terminal leaves its transcript is where it
+stays until the next keystroke, which heals it.
+The only real fix is becoming a terminal emulator, which was decided against on
+2026-09-01 with the reasoning still standing: days of work, and a parser bug
+corrupts the agent's UI rather than just the picture. **The practical answer is
+that any keypress redraws it.** If that is not good enough for the demo, the
+decision to revisit is the emulator, not the clear.
+
 **⭐ THE RESIZE BUG IS FOUND, AND IT WAS THE TERMINAL MOVING THINGS.**
 He photographed a fragment of sky above the band and a strip down the right
 after resizing. **Terminal.app keeps the BOTTOM of the screen when a window
@@ -95,24 +110,31 @@ returns, because the close path legitimately blanks the band.
 
 **⚠ THREE DEFECTS HE FOUND BY RUNNING IT, ALL NOW FIXED.**
 
-0. **The moon became a blob** -- my own regression from the fix below. Making
+0. **Kittens were losing an eye** (reported 2026-09-03). `plotRim` clears a
+   one-cell ring around each sprite so overlapping kittens read as separate --
+   and drawn inline, the ring of kitten k+1 landed on the EYES of kitten k,
+   which had already been plotted. Measured: twelve kittens, twenty eyes. Fixed
+   by putting every face in a second pass after every body; a body that
+   genuinely covers another's face still hides it, which is occlusion and right.
+   `TestEveryKittenKeepsBothEyes` sweeps counts, widths, seeds and times.
+1. **The moon became a blob** -- my own regression from the fix below. Making
    the disc solid, I left the cutoff at `rr+rim`, where `rim` had been the width
    of a FADE from `rr-rim` outward. Every cell that used to be falling away got
    painted at full strength and the disc came out nearly twice its radius. It
    ends at `rr` now.
-1. **The sun had a grey fringe.** Its rim faded into the sky, and the alpha
+2. **The sun had a grey fringe.** Its rim faded into the sky, and the alpha
    where its red and green cross -- 0.667 at noon -- makes a colour of chroma 20
    to 40, which is where the greyscale ramp wins. Measured on his frame:
    `rgb(193,188,151)` painted as grey 188. **The disc is solid now**; softness is
    not available on this palette, so a clean edge is the honest version.
-2. **A cyan stripe across the sky.** The cube's first step is 95 wide and the
+3. **A cyan stripe across the sky.** The cube's first step is 95 wide and the
    rest are 40, so red, starting at 0, always crosses its levels later than
    green does -- and for three rows the sky went cyan and came back. Fixed by
    weighing HUE as well as distance in the background quantiser
    (`hueWeight`, 8, `ASCIISCAPES_HUE_WEIGHT` to try another). The alternative was
    starting red at 95, which removes the wobble and more than half the bands
    with it: 9 down to 4.
-3. **Banding, which is NOT fixed and may not be fixable.** ↓
+4. **Banding, which is NOT fixed and may not be fixable.** ↓
 
 **⚠ THE OPEN ONE: BANDING IS MUCH WORSE IN A REAL WINDOW THAN IN ANY STUDY.**
 He ran it at **152x57** and the sky came out in four or five hard blocks with a

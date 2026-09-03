@@ -506,3 +506,15 @@ Never paraphrase. Read the relevant section before editing anything it covers.
     median 15m27s, longest 2h02m, and **65% raised by a single error**. An alarm on a third of the
     time is not an alarm. The clear rule (next prompt) is sound; the trigger is too loose.
     ⏸ Raising the bar is HIS call -- the brief locks the worried pose as a locked channel.
+
+- *"a) notice some of the sub agents in the water- they are missing an eye"*
+  ⇒ **FIXED.** `plotRim` clears a ring around each sprite so overlaps read as separate; drawn inline,
+    kitten k+1's ring landed on kitten k's already-plotted EYES. Twelve kittens, twenty eyes. Faces
+    now go in a second pass after every body. Proven red across counts, widths, seeds and times.
+
+- *"b) just started a new session, resized the window and it broke the text above again"*
+  ⇒ **The scape's half is provably right now** -- eleven resize modes, including the terminal keeping
+    the bottom on a shrink and pushing content down on a grow. What is left is CLAUDE CODE's own
+    screen being moved by the terminal. It emits nothing on a resize, so it stays where the terminal
+    left it until a keystroke. The host cannot repaint a UI it does not model; the only real fix is
+    the emulator that was decided against on 09-01. ⏸ His call whether that reopens.

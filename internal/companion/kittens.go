@@ -122,6 +122,7 @@ func (c *Cat) DrawKittens(near, mid *canvas.Layer, px, py, n, w, seaTop int, t f
 	if c.mirror {
 		x = px - 1
 	}
+	var pend []pendingEyes
 	for _, i := range sitters {
 		bm := c.kitBitmap(ti)
 		kw, kh := bm.W/2, bm.H/4
@@ -176,8 +177,18 @@ func (c *Cat) DrawKittens(near, mid *canvas.Layer, px, py, n, w, seaTop int, t f
 		if math.Mod(t+phase, blinkT) < 0.17 {
 			glyph = '-'
 		}
-		layer.Plot(e1, ky+1, glyph, kittenEye, spec.alpha)
-		layer.Plot(e2, ky+1, glyph, kittenEye, spec.alpha)
+		// The eyes go in a SECOND pass, after every body is down.
+		//
+		// plotRim clears a ring around each sprite so overlapping kittens read
+		// as separate rather than as one malformed shape -- and drawn inline,
+		// the ring of kitten k+1 was landing on the EYES of kitten k, which had
+		// already been plotted. Measured: twelve kittens, twenty eyes. A face
+		// with one eye does not read as a face, and the litter is the subagent
+		// count, so a litter nobody can read is a channel that is not there.
+		//
+		// A body that genuinely covers another's face still hides it, which is
+		// occlusion and correct. Only the one-cell seam stops eating them.
+		pend = append(pend, pendingEyes{e1, e2, ky + 1, glyph, spec.alpha, layer})
 
 		if c.mirror {
 			x -= 1 // the width was already taken off before drawing
@@ -186,7 +197,24 @@ func (c *Cat) DrawKittens(near, mid *canvas.Layer, px, py, n, w, seaTop int, t f
 		}
 		drawn++
 	}
+	for _, p := range pend {
+		p.draw()
+	}
 	return drawn
+}
+
+// pendingEyes is one kitten's face, held back until every body in its group is
+// on the layer. See the comment where they are queued.
+type pendingEyes struct {
+	x1, x2, y int
+	glyph     rune
+	alpha     float64
+	layer     *canvas.Layer
+}
+
+func (p pendingEyes) draw() {
+	p.layer.Plot(p.x1, p.y, p.glyph, kittenEye, p.alpha)
+	p.layer.Plot(p.x2, p.y, p.glyph, kittenEye, p.alpha)
 }
 
 // kitTail scales the parent's tail down to whatever the tier can carry. At four
@@ -257,6 +285,7 @@ func (c *Cat) drawSwimmers(l *canvas.Layer, idx []int, px, py, w, seaTop int, t 
 		return 0
 	}
 	drawn := 0
+	var pend []pendingEyes
 
 	for ln := 0; ln < lanes; ln++ {
 		members := byLane[ln]
@@ -312,12 +341,15 @@ func (c *Cat) drawSwimmers(l *canvas.Layer, idx []int, px, py, w, seaTop int, t 
 			if math.Mod(t+phase, 4.2+HashF(i, 16, seed)*3) < 0.17 {
 				glyph = '-'
 			}
-			l.Plot(x+e[0], y+1, glyph, kittenEye, 1)
-			l.Plot(x+e[1], y+1, glyph, kittenEye, 1)
 			l.Plot(x-1, y+kh-1, '~', furCol, 0.5)
 			l.Plot(x+kw, y+kh-1, '~', furCol, 0.5)
+			pend = append(pend, pendingEyes{x + e[0], x + e[1], y + 1, glyph, 1, l})
 			drawn++
 		}
+	}
+	// Bodies first, faces after: a neighbour's seam must not take an eye.
+	for _, p := range pend {
+		p.draw()
 	}
 	return drawn
 }

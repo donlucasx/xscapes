@@ -25,7 +25,7 @@ func scapeRow(cols, i int, tag rune) string {
 
 // runHosted drives a real Host through a size change and returns the screen as
 // the terminal would have it.
-func runHosted(t *testing.T, w1, h1, w2, h2 int, scrolling bool) *screen {
+func runHosted(t *testing.T, w1, h1, w2, h2 int, mode string) *screen {
 	t.Helper()
 	pr, pw, err := os.Pipe()
 	if err != nil {
@@ -106,9 +106,12 @@ func runHosted(t *testing.T, w1, h1, w2, h2 int, scrolling bool) *screen {
 		// The model has to learn about the resize too, the way a real terminal
 		// would: it keeps what fits and exposes blank rows where it grew.
 		mu.Lock()
-		if scrolling {
+		switch mode {
+		case "scroll":
 			sc.resizeScrolling(w2, h2)
-		} else {
+		case "anchor":
+			sc.resizeAnchoredBottom(w2, h2)
+		default:
 			sc.resize(w2, h2)
 		}
 		mu.Unlock()
@@ -146,22 +149,26 @@ func TestEveryBandRowIsRepaintedAfterAResize(t *testing.T) {
 	for _, tc := range []struct {
 		name           string
 		w1, h1, w2, h2 int
-		scrolling      bool
+		mode           string
 	}{
-		{"wider", 100, 40, 120, 40, false},
-		{"narrower", 120, 40, 100, 40, false},
-		{"taller", 100, 40, 100, 50, false},
-		{"shorter", 100, 50, 100, 40, false},
-		{"wider and shorter", 100, 50, 128, 44, false},
-		{"his window", 120, 46, 128, 51, false},
+		{"wider", 100, 40, 120, 40, ""},
+		{"narrower", 120, 40, 100, 40, ""},
+		{"taller", 100, 40, 100, 50, ""},
+		{"shorter", 100, 50, 100, 40, ""},
+		{"wider and shorter", 100, 50, 128, 44, ""},
+		{"his window", 120, 46, 128, 51, ""},
 		// The ones that matter: a terminal that keeps the BOTTOM when it
 		// shrinks, which is what Terminal.app does.
-		{"shorter, terminal scrolls", 100, 50, 100, 40, true},
-		{"his window, shrunk", 128, 51, 120, 44, true},
-		{"one row shorter", 128, 51, 128, 50, true},
+		{"shorter, terminal scrolls", 100, 50, 100, 40, "scroll"},
+		{"his window, shrunk", 128, 51, 120, 44, "scroll"},
+		{"one row shorter", 128, 51, 128, 50, "scroll"},
+		// The terminal pushing content DOWN when it grows. The scape must
+		// still be right; the agent's own screen is not the host's to fix.
+		{"taller, terminal anchors to the bottom", 100, 40, 100, 50, "anchor"},
+		{"his window, grown", 120, 62, 120, 66, "anchor"},
 	} {
 		t.Run(tc.name, func(t *testing.T) {
-			sc := runHosted(t, tc.w1, tc.h1, tc.w2, tc.h2, tc.scrolling)
+			sc := runHosted(t, tc.w1, tc.h1, tc.w2, tc.h2, tc.mode)
 			agent, scape := BandWith(tc.h2, 0)
 			if scape <= 0 {
 				t.Skip("no scape at this size")
