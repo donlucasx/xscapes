@@ -74,6 +74,22 @@ Two regression tests now hold it, both proven RED against the old palette:
 the old palette, 0 on this one) and `TestTheSeaShowsItsDepthOn256` (11 of 18 sea
 rows were one colour at noon; the cap is half).
 
+**⚠ THREE DEFECTS HE FOUND BY RUNNING IT, TWO NOW FIXED.**
+
+1. **The sun had a grey fringe.** Its rim faded into the sky, and the alpha
+   where its red and green cross -- 0.667 at noon -- makes a colour of chroma 20
+   to 40, which is where the greyscale ramp wins. Measured on his frame:
+   `rgb(193,188,151)` painted as grey 188. **The disc is solid now**; softness is
+   not available on this palette, so a clean edge is the honest version.
+2. **A cyan stripe across the sky.** The cube's first step is 95 wide and the
+   rest are 40, so red, starting at 0, always crosses its levels later than
+   green does -- and for three rows the sky went cyan and came back. Fixed by
+   weighing HUE as well as distance in the background quantiser
+   (`hueWeight`, 8, `ASCIISCAPES_HUE_WEIGHT` to try another). The alternative was
+   starting red at 95, which removes the wobble and more than half the bands
+   with it: 9 down to 4.
+3. **Banding, which is NOT fixed and may not be fixable.** ↓
+
 **⚠ THE OPEN ONE: BANDING IS MUCH WORSE IN A REAL WINDOW THAN IN ANY STUDY.**
 He ran it at **152x57** and the sky came out in four or five hard blocks with a
 grey stripe through the middle. Reproduced and measured: the number of cube

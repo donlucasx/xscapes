@@ -142,9 +142,6 @@ func (c RGB) Index256() int {
 // relationship the boost has already changed.
 func (c RGB) Index256Keeping() int {
 	plain := c.Index256()
-	if c.ordersKept(FromIndex256(plain)) {
-		return plain
-	}
 	// A GREY answer is left alone, and this is the whole safety of the thing.
 	//
 	// Grey has no channel ordering, so it fails ordersKept by definition -- and
@@ -160,10 +157,14 @@ func (c RGB) Index256Keeping() int {
 	if plain >= 232 {
 		return plain
 	}
+
 	ri, _ := nearestCube(c.R)
 	gi, _ := nearestCube(c.G)
 	bi, _ := nearestCube(c.B)
-	best, bestD := plain, 1<<62
+	best, bestScore := plain, 1<<62
+	if c.ordersKept(FromIndex256(plain)) {
+		bestScore = c.hueScore(FromIndex256(plain))
+	}
 	for _, dr := range [2]int{0, -1} {
 		for _, dg := range [2]int{0, -1} {
 			for _, db := range [2]int{0, -1} {
@@ -175,8 +176,8 @@ func (c RGB) Index256Keeping() int {
 							if !c.ordersKept(cand) {
 								continue
 							}
-							if d := dist(c, cand); d < bestD {
-								bestD, best = d, 16+36*rr+6*gg+bb
+							if sc := c.hueScore(cand); sc < bestScore {
+								bestScore, best = sc, 16+36*rr+6*gg+bb
 							}
 						}
 					}
@@ -185,6 +186,33 @@ func (c RGB) Index256Keeping() int {
 		}
 	}
 	return best
+}
+
+// hueWeight is how much a wrong HUE costs against a wrong distance.
+//
+// Nearest-by-distance is not good enough on a ramp, and the failure is a stripe
+// rather than a shade. Down a noon sky the greenness of the painted colour ran
+// 95, 95, 135, 40, 40, 80, 40... -- it climbed into a cyan for one row and came
+// straight back to blue, because red starts at 0 where the cube's first step is
+// 95 wide while green starts at 95 where the steps are 40. Green advances a
+// level before red does, and that one row is a cyan band across the whole sky.
+//
+// No band count can see it: the cyan band is exactly as distinct as the good
+// ones. Weighing the hue instead makes the run monotonic, and it does it
+// without giving up the deep zenith -- the alternative was lightening the sky
+// until red starts at 95 too, which removed the wobble and more than half the
+// bands with it, 9 down to 4.
+//
+// 8 is the smallest weight that fixes the measured case; the cost of picking
+// rgb(0,95,175) over rgb(0,135,175) there is 26% more distance for 20 times
+// less hue error.
+var hueWeight = 8
+
+// hueScore is distance with the two hue relationships weighted in.
+func (c RGB) hueScore(q RGB) int {
+	dgr := (int(c.G) - int(c.R)) - (int(q.G) - int(q.R))
+	dbg := (int(c.B) - int(c.G)) - (int(q.B) - int(q.G))
+	return dist(c, q) + hueWeight*(dgr*dgr+dbg*dbg)
 }
 
 func clampIdx(i int) int {
@@ -311,6 +339,11 @@ func init() {
 	switch os.Getenv("ASCIISCAPES_SHADE_BLOCKS") {
 	case "1", "on", "yes":
 		ShadeBlocks = true
+	}
+	if v := os.Getenv("ASCIISCAPES_HUE_WEIGHT"); v != "" {
+		if n, err := strconv.Atoi(v); err == nil && n >= 0 && n <= 64 {
+			hueWeight = n
+		}
 	}
 }
 

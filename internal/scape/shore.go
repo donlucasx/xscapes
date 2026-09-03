@@ -581,10 +581,21 @@ func (s *Shore) moon(c *canvas.Canvas, hy int, scale, lit, vis float64) {
 			if d > rr+rim {
 				continue
 			}
+			// The disc is SOLID, and the soft rim it used to have is gone.
+			//
+			// A fading rim has nowhere to land on 256. Blending the sun into
+			// the sky passes through the alpha where its red and green cross --
+			// 0.667 at noon for this pair -- and the colours either side of that
+			// carry chroma in the twenties and thirties, which is where the
+			// greyscale ramp wins. Measured on the frame he sent: the rim cells
+			// were rgb(193,188,151) and rgb(141,163,158), painted as grey 188
+			// and grey 158. A warm disc with a grey fringe, which reads as a
+			// broken sprite rather than as a soft edge.
+			//
+			// Softness is not available here, so the honest version is a clean
+			// edge: the rim still decides the SHAPE of the ellipse, it just no
+			// longer fades what falls inside it.
 			a := 0.92 * vis
-			if d > rr-rim {
-				a *= (rr + rim - d) / (2 * rim)
-			}
 			if a <= 0 {
 				continue
 			}

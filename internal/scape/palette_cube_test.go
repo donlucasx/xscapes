@@ -255,3 +255,48 @@ func TestTheNightStaysMonochromeOn256(t *testing.T) {
 		}
 	}
 }
+
+// The sky's hue must not wander back and forth on the way down.
+//
+// A ramp can be perfectly monotonic in luma and still stripe: down a noon sky
+// the greenness of the painted colour ran 95, 95, 95, 95, 135, 135, 135, 40,
+// 40... -- three rows of cyan in the middle of a blue sky, then back to blue.
+// It happens because the cube's first step is 95 wide and the rest are 40, so
+// red, starting at 0, always crosses its levels later than green does. No band
+// count can see it: the cyan band is exactly as distinct as the good ones.
+//
+// Perfect monotonicity is not available -- it would need red to start at 95,
+// which measured as a paler sky with fewer than half the bands. So this bounds
+// the wandering rather than forbidding it, and it is proven red against the
+// unweighted quantiser, which scores 5 reversals at his window size.
+func TestTheSkyHueDoesNotWander(t *testing.T) {
+	const rows = 24 // a real window, not the 10 rows a study panel gives
+	for i := 0; i < 48; i++ {
+		tod := float64(i) / 48
+		if !daylight(tod) {
+			continue
+		}
+		p := PaletteAt(tod)
+		prev, dir, dips := -999, 0, 0
+		for r := 0; r < rows; r++ {
+			want := term.Lerp(p.SkyTop, p.SkyHorizon, float64(r)/float64(rows-1))
+			q := term.FromIndex256(want.Index256Keeping())
+			green := int(q.G) - int(q.R)
+			if prev != -999 && green != prev {
+				d := 1
+				if green < prev {
+					d = -1
+				}
+				if dir != 0 && d != dir {
+					dips++
+				}
+				dir = d
+			}
+			prev = green
+		}
+		if dips > 3 {
+			t.Errorf("%05.2f: the sky's hue reverses %d times down 24 rows -- that is a stripe, not a gradient",
+				tod*24, dips)
+		}
+	}
+}

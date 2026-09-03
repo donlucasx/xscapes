@@ -474,3 +474,13 @@ Never paraphrase. Read the relevant section before editing anything it covers.
 
 - *[screenshot: `xscapes emit todo -n 3 -of 5` -> flag provided but not defined: -n]*
   ⇒ **My error: I gave him a command I had never run.** `emit` had no -n/-of. Added.
+
+- *[screenshot: `xscapes -todo 3/5 -tod 0.5 -working` at 138x36]* "ran it and got this"
+  ⇒ The todo stars worked. Two defects I had not seen, both found by reading the CELLS rather than
+    looking at the picture:
+    **The sun had a grey fringe.** Its rim faded into the sky and the alpha where red and green
+    cross (0.667 at noon) gives chroma 20-40, where the grey ramp wins -- rgb(193,188,151) painted
+    as grey 188. The disc is solid now.
+    **A cyan stripe across the sky.** The cube's first step is 95 wide and the rest are 40, so red
+    starting at 0 always crosses its levels after green. Fixed by weighing hue as well as distance.
+    The alternative -- start red at 95 -- kills the wobble and 5 of 9 bands with it.
