@@ -203,7 +203,34 @@ func (h *Host) Run() error {
 				// The band is re-pinned BEFORE the pty is resized, because the
 				// child's repaint arrives with the SIGWINCH and has to land in
 				// the new region rather than the one it is leaving.
-				h.write(Rebind(oldAgent+1, min(oldRows, agentRows), agentRows))
+				//
+				// ⚠ The clear has to allow for the TERMINAL having moved things.
+				// Terminal.app keeps the BOTTOM of the screen when a window
+				// shrinks, so every row slides up by the difference -- and the
+				// scape is painted at the bottom, so its rows slide straight
+				// into the agent's band. Neither side then cleans them up:
+				// the host used to clear only the rows that changed hands, on
+				// the assumption that nothing moved, and Claude Code emits
+				// nothing at all on a resize. The result is a strip of old sky
+				// sitting above the band until something happens to overwrite
+				// it, which is what he photographed.
+				//
+				// So the range starts where the old scape's first row LANDS,
+				// not where it was, and ends where its last row lands or at the
+				// bottom of the new band, whichever is higher. Rows that turn
+				// out to hold the agent's own text are blanked, and that is the
+				// trade: a gap the agent redraws over beats a picture of the sea
+				// in the middle of a transcript.
+				drop := oldRows - rows
+				if drop < 0 {
+					drop = 0
+				}
+				from := oldAgent + 1 - drop
+				if from < 1 {
+					from = 1
+				}
+				to := min(agentRows, oldRows-drop)
+				h.write(Rebind(from, to, agentRows))
 				// The screen was just touched behind the tracker's back.
 				dmg.reset()
 				p.SetSize(cols, agentRows)

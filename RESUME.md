@@ -74,8 +74,32 @@ Two regression tests now hold it, both proven RED against the old palette:
 the old palette, 0 on this one) and `TestTheSeaShowsItsDepthOn256` (11 of 18 sea
 rows were one colour at noon; the cap is half).
 
-**⚠ THREE DEFECTS HE FOUND BY RUNNING IT, TWO NOW FIXED.**
+**⭐ THE RESIZE BUG IS FOUND, AND IT WAS THE TERMINAL MOVING THINGS.**
+He photographed a fragment of sky above the band and a strip down the right
+after resizing. **Terminal.app keeps the BOTTOM of the screen when a window
+shrinks**, so every row slides up by the difference -- and the scape is painted
+at the bottom, so its rows slide straight into the agent's band. Neither side
+cleans them up: the host cleared only the rows that changed hands, assuming
+nothing moved, and Claude Code emits nothing at all on a resize. The clear now
+starts where the old scape's first row LANDS rather than where it was.
 
+**`internal/host/screen_test.go` is a small terminal**, and it is what found
+this. Reading the escape sequences tells you what was SENT; only replaying them
+tells you what is on screen. It models CUP/EL/ED/DECSTBM/DECOM/save-restore,
+autowrap and region scrolling, plus `resizeScrolling` for what Terminal.app does
+on a shrink. `TestEveryBandRowIsRepaintedAfterAResize` drives a REAL Host through
+nine resizes and is proven red on seven rows without the fix.
+⚠ Two instrument bugs to know about if you extend it: it must buffer a partial
+escape sequence across reads, and the snapshot must be taken BEFORE `Run()`
+returns, because the close path legitimately blanks the band.
+
+**⚠ THREE DEFECTS HE FOUND BY RUNNING IT, ALL NOW FIXED.**
+
+0. **The moon became a blob** -- my own regression from the fix below. Making
+   the disc solid, I left the cutoff at `rr+rim`, where `rim` had been the width
+   of a FADE from `rr-rim` outward. Every cell that used to be falling away got
+   painted at full strength and the disc came out nearly twice its radius. It
+   ends at `rr` now.
 1. **The sun had a grey fringe.** Its rim faded into the sky, and the alpha
    where its red and green cross -- 0.667 at noon -- makes a colour of chroma 20
    to 40, which is where the greyscale ramp wins. Measured on his frame:

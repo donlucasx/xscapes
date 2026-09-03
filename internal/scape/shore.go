@@ -578,7 +578,16 @@ func (s *Shore) moon(c *canvas.Canvas, hy int, scale, lit, vis float64) {
 		for dx := -rx; dx <= rx; dx++ {
 			fx := float64(dx) / 2.0
 			d := math.Hypot(fx, float64(dy))
-			if d > rr+rim {
+			// The disc ends at rr, not at rr+rim.
+			//
+			// rim used to be the width of a FADE from rr-rim out to rr+rim, so
+			// the visually solid part was rr-rim and everything past it was
+			// falling away. Making the disc solid without moving the cutoff
+			// painted every one of those cells at full strength and the moon
+			// came out nearly twice the radius it should be -- a pink blob with
+			// a ragged edge. rr is what "the disc" has always meant; rim now
+			// only says how much of the outside was ever going to be soft.
+			if d > rr {
 				continue
 			}
 			// The disc is SOLID, and the soft rim it used to have is gone.

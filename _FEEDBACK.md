@@ -484,3 +484,18 @@ Never paraphrase. Read the relevant section before editing anything it covers.
     **A cyan stripe across the sky.** The cube's first step is 95 wide and the rest are 40, so red
     starting at 0 always crosses its levels after green. Fixed by weighing hue as well as distance.
     The alternative -- start red at 95 -- kills the wobble and 5 of 9 bands with it.
+
+- *[screenshot after a resize]* "the composition broke a bit. Notice the top left of the scene, and
+  the far right vertical offset"
+  ⇒ **FOUND, and it was the terminal moving things, not the paint.** Terminal.app keeps the BOTTOM of
+    the screen when a window shrinks, so every row slides up by the difference -- and the scape is
+    painted at the bottom, so its rows slide into the agent's band. The host cleared only the rows
+    that changed hands, assuming nothing moved; Claude Code emits nothing on a resize; so the strip
+    sat there. Clear now starts where the old scape's first row LANDS.
+    Found by building a small terminal model and replaying the host's real output through it --
+    reading the bytes said the host was correct, and it was.
+
+- *[screenshot]* "is the moon supposed to look this way?"
+  ⇒ **No, and it was my regression from an hour earlier.** Making the disc solid I left the cutoff at
+    rr+rim, where rim had been the width of a fade; every cell that used to be falling away got
+    painted at full strength, so the moon came out nearly twice its radius. Ends at rr now.
