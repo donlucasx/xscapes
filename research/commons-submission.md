@@ -153,3 +153,43 @@ Every authenticated endpoint returns `{"detail":"Missing Privy token"}`:
 and `criteria ->`, and confirm the text matches section 1 and section 5 above.**
 Until that is done, treat this file as the default copy, not necessarily the copy
 a participant sees.
+
+## 8. Measured 2026-09-04: what a published Commons app can actually do
+
+Playwright, signed out, against live apps. Supersedes the "inferred" parts of §3
+(the platform is more capable than the bundle suggested) and one URL in §2.
+
+- **Apps live at `https://<slug>.vibe.commonsmade.com`.** The `<slug>.commons.app`
+  form in §2 does not resolve (ERR_NAME_NOT_RESOLVED). Server header `cloudflare`.
+- **Apps have a server side.** `/api/*` routes answer GET and POST with
+  `access-control-allow-origin: *` (WAITLAYER `/api/health` reports `hasSql:true`;
+  Thinklings `/api/me`, `/api/time`). A missing route returns JSON 404
+  `{"error":"unknown endpoint"}`, i.e. a Worker, not a static host.
+- **`capability-probe.vibe.commonsmade.com`** (by "OUTIS", 2026-08-29) is another
+  builder's honest platform test. Read live: shared storage PASS, "from Durable
+  Object storage"; scheduled jobs: a 1-minute cron appending timestamps, ticking
+  18:19-18:39 UTC while we watched; **realtime PASS, reproduced by us**: text typed
+  in one Playwright page appeared in a second one within ~2 s over
+  `wss://capability-probe.vibe.commonsmade.com/api/realtime`; runtime AI **FAIL**:
+  "the x402 pay-per-request API requires a paid endpoint plus the
+  COMMONS_X402_API_KEY secret which is not provisioned". So: Durable Objects,
+  WebSockets, cron and SQL yes; free model calls from a deployed app no.
+- **554 public apps.** Keyword scan of every stored prompt: 4 say "claude code"
+  (all pasted specs, none a bridge); "Agent Bridge" is the one-line question "how do
+  i connect commonsmade into my hermes agent or codex/claude cli?"; 32 say
+  "terminal" (all in-page fakes); 23 "websocket". Two aim at browser extensions
+  over claude.ai (Landed HUD, Cache Squirrel). **Nobody has wired a local coding
+  agent into a Commons page.**
+- **A web twin of xscapes is feasible on this platform**: a local hook shim POSTs
+  the event protocol to `/api/event`, a Durable Object fans it out on
+  `/api/realtime`, the page renders. The Go renderer compiles under
+  `GOOS=js GOARCH=wasm` (`canvas`, `term`, `scape`, `companion`, `reduce`, `event`,
+  `envx`, `notify`); a probe binary linking canvas+reduce+scape+term is 3.4 MB,
+  0.96 MB gzipped. Only `internal/host` (pty, termios) cannot, so **"the agent runs
+  inside the scape" has no browser equivalent** - the web version is a tab beside
+  the terminal, the layout ruled out for the TUI on 2026-09-01.
+- **Still unverified (login-gated; the Chrome extension was not connected):** file
+  upload or paste limits in the builder, credits and per-model rates, and whether
+  the builder can be told to write the Durable Object + WebSocket worker (Capability
+  Probe is evidence it can). An endpoint-enumeration probe for the source of
+  `sourceVisible` apps was blocked by tool policy and not retried.
