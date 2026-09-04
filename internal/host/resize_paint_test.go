@@ -54,11 +54,21 @@ func runHostedOpts(t *testing.T, w1, h1, w2, h2 int, mode, child string, alt, hi
 	if err != nil {
 		t.Fatal(err)
 	}
+	// In has to be a real tty: the host puts it in raw mode, and a pipe
+	// cannot do that. A pty's slave is a tty, which is exactly what the host
+	// will be handed in production.
+	tty, err := openPTY()
+	if err != nil {
+		t.Skipf("no pty available: %v", err)
+	}
+	defer tty.Close()
+
 	sc := newScreen(w1, h1)
 	var raw strings.Builder
 	nbytes := 0
 	var mu sync.Mutex
 	done := make(chan struct{})
+	answered := false
 	go func() {
 		defer close(done)
 		buf := make([]byte, 4096)
@@ -69,6 +79,13 @@ func runHostedOpts(t *testing.T, w1, h1, w2, h2 int, mode, child string, alt, hi
 				nbytes += n
 				raw.Write(buf[:n])
 				sc.feed(string(buf[:n]))
+				// Play the terminal: the host asks where the shell's cursor
+				// is, and a terminal answers. Row 7, so a test can see the
+				// transcript begin there and not at the bottom.
+				if history && !answered && strings.Contains(raw.String(), "\x1b[6n") {
+					answered = true
+					tty.master.Write([]byte("\x1b[7;1R"))
+				}
 				mu.Unlock()
 			}
 			if err != nil {
@@ -80,18 +97,9 @@ func runHostedOpts(t *testing.T, w1, h1, w2, h2 int, mode, child string, alt, hi
 	var sz struct {
 		sync.Mutex
 		w, h int
+		tag  rune
 	}
-	sz.w, sz.h = w1, h1
-	tag := 'A'
-
-	// In has to be a real tty: the host puts it in raw mode, and a pipe
-	// cannot do that. A pty's slave is a tty, which is exactly what the host
-	// will be handed in production.
-	tty, err := openPTY()
-	if err != nil {
-		t.Skipf("no pty available: %v", err)
-	}
-	defer tty.Close()
+	sz.w, sz.h, sz.tag = w1, h1, 'A'
 
 	h := &Host{
 		Cmd:       exec.Command("sh", "-c", child),
@@ -106,6 +114,9 @@ func runHostedOpts(t *testing.T, w1, h1, w2, h2 int, mode, child string, alt, hi
 			return sz.w, sz.h
 		},
 		Paint: func(cols, rows int) []string {
+			sz.Lock()
+			tag := sz.tag
+			sz.Unlock()
 			out := make([]string, rows)
 			for i := range out {
 				out[i] = scapeRow(cols, i, tag)
@@ -120,7 +131,7 @@ func runHostedOpts(t *testing.T, w1, h1, w2, h2 int, mode, child string, alt, hi
 	var snap *screen
 	snapAt := 600 * time.Millisecond
 	if history {
-		snapAt += 300 * time.Millisecond // the unanswered cursor query costs its timeout
+		snapAt += 100 * time.Millisecond // the cursor query's round trip
 	}
 	go func() {
 		time.Sleep(snapAt)
@@ -131,6 +142,12 @@ func runHostedOpts(t *testing.T, w1, h1, w2, h2 int, mode, child string, alt, hi
 
 	go func() {
 		time.Sleep(snapAt / 2)
+		if w1 == w2 && h1 == h2 {
+			// No resize: a terminal does nothing, and neither may the model.
+			// Resizing it to the same size would reset its scroll region,
+			// which the host re-pins only on a real size change.
+			return
+		}
 		// The model has to learn about the resize too, the way a real terminal
 		// would: it keeps what fits and exposes blank rows where it grew.
 		mu.Lock()
@@ -145,9 +162,8 @@ func runHostedOpts(t *testing.T, w1, h1, w2, h2 int, mode, child string, alt, hi
 			sc.resize(w2, h2)
 		}
 		mu.Unlock()
-		tag = 'B'
 		sz.Lock()
-		sz.w, sz.h = w2, h2
+		sz.w, sz.h, sz.tag = w2, h2, 'B'
 		sz.Unlock()
 	}()
 

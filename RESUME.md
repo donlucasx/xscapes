@@ -36,16 +36,23 @@ in pixels), the revised plan was built end to end:
   keeps only the oldest few across `1049l`. Gated on `TERM_PROGRAM=Apple_Terminal`.
 - `xscapes claude -history` (default on in Terminal.app, off elsewhere; implies `-alt`).
 - Seen live: 40 lines through a 17-row band → 24 rows above the band during the session,
-  starting right under the command line, and "xscapes: the agent's transcript, 24 rows"
-  after exit. Early in a session the main buffer's unused bottom rows show as blank rows
-  between the transcript and the band until the transcript has filled them; inherent.
+  starting right under the command line. ⚠ The first replay readback I quoted as success
+  carried a defect Kimi round 2 read and I had not: rows written over longer survivors
+  without erasing ("LIVE LINE 80"), and the final screen missing. **Both fixed the same
+  evening** (see the audit note, "Kimi round 2"); the replay now holds the transcript AND
+  the band's final screen, 40 of 40, nothing left over. Early in a session the main
+  buffer's unused bottom rows show as blank rows between the transcript and the band until
+  the transcript has filled them; inherent.
 - Tests: model (capture, host rows skipped, shrink capture, 47 vs 1049, ANSI round trip),
   `MirrorBatch` walk-then-scroll, `takeCPR`, and the hosted end-to-end (24 lines, the
   eight that left are in the snapshot model's main buffer in order; a control with the
   mirror off finds nothing there). `go test ./...` green.
 
-**Not yet**: a real `xscapes claude` session lived in with the mirror on (his day), and
-Kimi round 2 on the shipped code if he wants it. Known limits: wide glyphs misalign a
+**Kimi round 2 ran on the shipped code**: REVISE → two MAJORs in the exit replay (overwrite
+without erase; the final screen omitted) plus four minors, ALL FIXED with tests; its one
+speculation (the main buffer moves on a grow with real scrollback) was MEASURED true and the
+write row now follows. `go test -race ./internal/host` is clean. **Not yet**: a real
+`xscapes claude` session lived in with the mirror on (his day). Known limits: wide glyphs misalign a
 mirrored row from that glyph on (the model advances one cell); the replay repeats the
 few rows Terminal.app kept; other terminals get the rows after exit only.
 

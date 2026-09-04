@@ -82,8 +82,11 @@ main buffer behind the alternate screen, through a buffer switch that clears
 nothing, and Terminal.app shows the main buffer above the alternate screen: scroll
 up and the transcript is there, in order, right under the command you typed,
 with the wheel, selection and search you already use. Terminal.app drops most of
-that history when the alternate screen is given back, so the transcript is
-printed once more when the session ends. `-history=false` turns both off.
+that history when the alternate screen is given back, so when the session ends
+the transcript is printed once more, followed by the agent's final screen, the
+way a plain session leaves it. Early in a session there are blank rows between
+the transcript and the band until enough output has filled the buffer.
+`-history=false` turns all of it off.
 `-alt=false` runs on the main screen instead and takes the resize problem back.
 
 What xscapes gives up by not being an emulator: the sea does not show through

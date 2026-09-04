@@ -355,3 +355,10 @@ Terminal.app" (above) is retired. Probes in `notes/histprobe`, `notes/shrinkprob
    into the main buffer's rows above it (screenshot: MIRROR LINE 11-40 with the band scrolled
    out of sight). While a batch of rows lands below, the scrolled view HOLDS its position; only
    the scrollbar thumb moves (two captures five seconds apart, identical rows).
+
+8. **The MAIN buffer on a grow WITH scrollback pulls history back in.** 200 rows of scrollback,
+   30 numbered rows on screen, window grown 30→40: OLD HISTORY 194–200 and a blank row came in at
+   the top and `MAIN ROW 01` moved from row 1 to row 9 -- content pushed DOWN by 8 of the 10 rows
+   grown. The 2026-09-03 "anchored TOP on grow" measurement above was for an EMPTY scrollback and
+   said so; this is the general case. A shrink keeps the bottom (anchorprobe, main). The mirror's
+   write row follows both (`host.go`, the resize branch).

@@ -70,6 +70,10 @@ type Host struct {
 	// wantCPR is set while the host is waiting for the terminal to answer
 	// where the shell's cursor is; the key forwarder keeps that reply.
 	wantCPR atomic.Bool
+	// muted stops every write once the screen has been handed back and the
+	// replay printed: a forwarder that outlived its deadline (a grandchild
+	// holding the pty open) must not write into the shell's screen.
+	muted atomic.Bool
 
 	// trace, when XSCAPES_TRACE is set, records every byte sent to the
 	// terminal; traceLog records size changes against byte offsets so a replay
@@ -89,7 +93,7 @@ type Host struct {
 // landing in the middle of a chunk of the agent's output would split an escape
 // sequence in half and paint garbage into the agent's own window.
 func (h *Host) write(s string) {
-	if s == "" {
+	if s == "" || h.muted.Load() {
 		return
 	}
 	h.mu.Lock()
@@ -224,6 +228,7 @@ func (h *Host) Run() error {
 	// the terminal first and the answer arrives on this fd; the pty buffers
 	// anything typed meanwhile for the child.
 	var cpr chan int
+	waitDone := make(chan struct{})
 	if h.History {
 		h.mu.Lock()
 		h.model = newScreen(cols, rows)
@@ -232,7 +237,7 @@ func (h *Host) Run() error {
 		cpr = make(chan int, 1)
 		h.wantCPR.Store(true)
 	}
-	go h.forwardKeys(in, p.master, cpr)
+	go h.forwardKeys(in, p.master, cpr, waitDone)
 
 	// Where did the shell leave its cursor? That is where the mirrored
 	// transcript begins, right under the command he typed, with no blank
@@ -252,6 +257,9 @@ func (h *Host) Run() error {
 		}
 		h.wantCPR.Store(false)
 	}
+	// Either way the wait is over: anything typed during it goes to the agent
+	// now, not when the next key happens to arrive.
+	close(waitDone)
 
 	h.Cmd.Stdin, h.Cmd.Stdout, h.Cmd.Stderr = p.slave, p.slave, p.slave
 	if h.Cmd.SysProcAttr == nil {
@@ -321,10 +329,18 @@ func (h *Host) Run() error {
 				case <-fwdDone:
 				case <-time.After(500 * time.Millisecond):
 				}
+				// The rows that scrolled since the last tick, then the band
+				// as it stands: the answer he quit to read, and the same UI a
+				// plain session leaves on the screen when it ends.
+				h.mirror(rows, agentRows)
+				h.keepFinalScreen(agentRows)
 			}
 			leave()
 			if h.History && h.Replay {
 				h.write(h.replay())
+				// Nothing may write after this: a forwarder that outlived
+				// its deadline would land in the shell's screen.
+				h.muted.Store(true)
 			}
 			var ee *exec.ExitError
 			if errors.As(err, &ee) {
@@ -350,7 +366,18 @@ func (h *Host) Run() error {
 					}
 				}
 				h.mu.Unlock()
-				if h.mainRow > rows+1 {
+				// The MAIN buffer moves on a resize too, and the mirror's write
+				// row has to follow it. Measured 2026-09-03: with real
+				// scrollback above, a grow pulls history back in and pushes
+				// the rows DOWN by up to the delta (ten rows grown, eight
+				// pulled in); a shrink keeps the bottom and slides them UP by
+				// the rows lost. While the buffer is still filling, move the
+				// write row by the delta: exact when history is long, a gap
+				// rather than an overwrite when it is short. Once the buffer
+				// is full every row goes to the last row anyway.
+				if h.mainRow <= oldRows {
+					h.mainRow = clamp(h.mainRow+rows-oldRows, 1, rows+1)
+				} else {
 					h.mainRow = rows + 1
 				}
 				h.traceSize(cols, rows, agentRows)
@@ -525,27 +552,90 @@ func (h *Host) replay() string {
 	if len(h.mirrored) == 0 {
 		return ""
 	}
+	// Every row is erased before it is written. Terminal.app keeps the rows
+	// that were still on the main screen at 1049l, and the replay starts
+	// where the shell's cursor was restored, which is ON those rows: a
+	// shorter line written over a longer survivor would leave the tail of
+	// the survivor showing (it did, in the first live run: "LIVE LINE 80").
+	// SGR reset first, because the erase fills with the current background.
+	//
+	// The header goes ON the row the cursor was restored to, so no survivor
+	// sits above it, and the screen below the last row is erased, so none
+	// sits under it either: what remains is the shell's own history, the
+	// transcript, the final screen, and then the prompt.
 	var b strings.Builder
-	fmt.Fprintf(&b, "\r\n\x1b[2mxscapes: the agent's transcript, %d rows\x1b[0m\r\n", len(h.mirrored))
+	fmt.Fprintf(&b, "\r\x1b[0m\x1b[2K\x1b[2mxscapes: the agent's transcript, %d rows\x1b[0m\r\n", len(h.mirrored))
 	for _, l := range h.mirrored {
+		b.WriteString("\x1b[0m\x1b[2K")
 		b.WriteString(l)
 		b.WriteString("\r\n")
 	}
+	b.WriteString("\x1b[0m\x1b[J")
 	return b.String()
+}
+
+// keepFinalScreen adds what is still in the band at exit to the rows that
+// will be replayed: the last screenful never left the band by scrolling, so
+// the mirror never saw it, and it is usually the reason he quit. Trailing
+// blank rows are dropped.
+func (h *Host) keepFinalScreen(agentRows int) {
+	if h.model == nil {
+		return
+	}
+	h.mu.Lock()
+	var lines []string
+	if h.model.alt {
+		for y := 0; y < agentRows && y < len(h.model.cells); y++ {
+			lines = append(lines, rowANSI(h.model.cells[y]))
+		}
+	}
+	h.mu.Unlock()
+	for len(lines) > 0 && lines[len(lines)-1] == "" {
+		lines = lines[:len(lines)-1]
+	}
+	h.mirrored = append(h.mirrored, lines...)
+	if len(h.mirrored) > maxMirrored {
+		h.mirrored = h.mirrored[len(h.mirrored)-maxMirrored:]
+	}
 }
 
 // forwardKeys copies the terminal's input to the agent, byte for byte, except
 // for the one reply the host asked for itself: while wantCPR is set, the first
 // cursor position report (ESC [ row ; col R) is taken out of the stream and
-// its row sent on cpr. Everything else, including any reply that arrives after
-// the host stopped waiting, goes to the agent untouched.
-func (h *Host) forwardKeys(in io.Reader, master io.Writer, cpr chan<- int) {
-	buf := make([]byte, 4096)
+// its row sent on cpr. Keys typed during that wait are held, and released the
+// moment the wait ends -- by the report arriving, or by waitDone closing on the
+// timeout -- so a terminal that never answers costs nobody a keystroke.
+// Everything else, including a reply that arrives after the host stopped
+// waiting, goes to the agent untouched.
+func (h *Host) forwardKeys(in io.Reader, master io.Writer, cpr chan<- int, waitDone <-chan struct{}) {
+	reads := make(chan []byte, 8)
+	go func() {
+		defer close(reads)
+		buf := make([]byte, 4096)
+		for {
+			n, err := in.Read(buf)
+			if n > 0 {
+				reads <- append([]byte(nil), buf[:n]...)
+			}
+			if err != nil {
+				return
+			}
+		}
+	}()
 	var held []byte
+	flush := func() {
+		if len(held) > 0 {
+			master.Write(held)
+			held = nil
+		}
+	}
 	for {
-		n, err := in.Read(buf)
-		if n > 0 {
-			data := buf[:n]
+		select {
+		case data, ok := <-reads:
+			if !ok {
+				flush()
+				return
+			}
 			if h.wantCPR.Load() {
 				held = append(held, data...)
 				if row, rest, ok := takeCPR(held); ok {
@@ -554,23 +644,19 @@ func (h *Host) forwardKeys(in io.Reader, master io.Writer, cpr chan<- int) {
 					case cpr <- row:
 					default:
 					}
-					data, held = rest, nil
+					held = rest
+					flush()
 				} else if len(held) > 64 {
 					// Nothing that long is a cursor report. Let it through.
-					data, held = held, nil
-				} else {
-					continue
+					flush()
 				}
+				continue
 			}
-			if len(data) > 0 {
-				master.Write(data)
-			}
-		}
-		if err != nil {
-			if len(held) > 0 {
-				master.Write(held)
-			}
-			return
+			held = append(held, data...)
+			flush()
+		case <-waitDone:
+			waitDone = nil
+			flush()
 		}
 	}
 }

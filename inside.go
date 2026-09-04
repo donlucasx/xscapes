@@ -57,7 +57,7 @@ func runInside(args []string, agent string) {
 	scapeH := fs.Int("scape", 0, "rows to give the scape (0 = two fifths of the window)")
 	alt := fs.Bool("alt", true, "run on the alternate screen: resize-proof, but the agent's output does not go to your terminal's scrollback")
 	appleTerminal := os.Getenv("TERM_PROGRAM") == "Apple_Terminal"
-	history := fs.Bool("history", appleTerminal, "mirror rows that leave the agent's band into the terminal's own scrollback, and print them again on exit (default: on in Terminal.app)")
+	history := fs.Bool("history", appleTerminal, "mirror rows that leave the agent's band into the terminal's own scrollback; in Terminal.app, which drops them at exit, the transcript and the final screen are printed again after the session (default: on in Terminal.app)")
 	fs.Usage = func() {
 		if agent != "" {
 			fmt.Fprintf(os.Stderr, `xscapes claude [flags] [%s arguments ...]

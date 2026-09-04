@@ -250,10 +250,22 @@ func (s *screen) resize(w, h int) {
 	}
 }
 
+// fitScrolled cuts rows kept for the mirror down to the new width. A row kept
+// before a narrowing and mirrored after it would wrap in the real terminal,
+// and the next row's erase would take the wrapped tail with it.
+func (s *screen) fitScrolled(w int) {
+	for i, row := range s.scrolled {
+		if len(row) > w {
+			s.scrolled[i] = row[:w]
+		}
+	}
+}
+
 // resizeOther resizes the buffer kept aside. A terminal resizes both buffers,
 // and a model that does not restores a stale-sized screen on 1049l -- which
 // panicked the first trace analysis with "index out of range [31] with length 30".
 func (s *screen) resizeOther(w, h int) {
+	s.fitScrolled(w)
 	if s.other == nil {
 		return
 	}

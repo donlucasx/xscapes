@@ -237,3 +237,28 @@ any host can do without a model.
   at the same rows, only the scrollbar thumb moved. The view holds under a landing batch.
   Flicker: *"not sure if it flashed"* at 200 switches a second; production does at most twelve.
   **Gate passed 2026-09-03; step 2 is ungated.**
+
+## Kimi round 2 — the SHIPPED code, `~/Documents/kimi/xscapes-scrollback-audit/round2/KIMI-REPORT-2.md`
+
+**`VERDICT: REVISE`** — *"round 1's four gaps are genuinely closed in the shipped code and the
+live mirror is proven in the terminal's own readback and in pixels, but the exit replay corrupts
+the very transcript it exists to preserve ... and silently drops the session's final screenful."*
+Both were in the live evidence I had quoted as success (`live-mirror.txt`: "LIVE LINE 80" is a
+row written over a longer survivor). Dispositions, all closed the same evening:
+
+| # | finding | disposition |
+|---|---|---|
+| F1 MAJOR | the replay wrote rows over survivors without erasing; tails showed through | **FIXED**: SGR reset + EL before every replayed row; header ON the restored cursor row; ED after the last row. `TestReplayErasesTheRowsItWritesOver` |
+| F2 MAJOR | the band's final screen and any rows scrolled since the last tick were in neither the mirror nor the replay | **FIXED, with a ruling I made**: at exit the last kept rows are mirrored and the band's rows are appended to the replay, trailing blanks dropped. A plain session leaves its final screen on the terminal when it ends, UI chrome included; this matches it. `TestExitReplayCarriesTheTranscriptAndTheFinalScreen` (24 lines, one red, exit at once: all 24 in order, the red one still red) |
+| F3 MINOR | keys typed during an unanswered cursor wait were held until the next key | **FIXED**: `forwardKeys` is channel-driven and flushes when the wait ends either way. `TestForwardKeysReleasesHeldKeysWhenTheWaitEnds` |
+| F4 MINOR | a forwarder past its drain deadline could write into the shell's screen after the replay | **FIXED**: `Host.muted` after the replay; `write` drops everything from then on |
+| F5 MINOR | a row kept before a narrowing kept its old width and would wrap | **FIXED**: kept rows are cut to the new width on resize. `TestKeptRowsAreCutToTheNewWidth` |
+| F6 MINOR | the suite was not `-race` clean (the harness's `tag`) | **FIXED**: under the harness lock; `go test -race ./internal/host` passes |
+| F7 NOTE | untested claims | DSR answered end to end by the harness (transcript begins on row 7, asserted); replay tested; exit path tested; SGR through the pipeline asserted. The hosted resize-with-history case is still model-level only |
+| F8 NOTE | flag help promised a replay everywhere; README silent on duplicates and the final screen | help text fixed; README updated below; RESUME corrected (the quoted evidence carried F1) |
+| F9 SPECULATION | `mainRow` assumed the main buffer does not move on a resize | **MEASURED and FIXED**: with 200 rows of scrollback above, a grow of 10 pulled 8 history rows back in and pushed the rows DOWN by 8; a shrink keeps the bottom. While the buffer is filling, the write row now moves by the delta (exact for long history; a gap, never an overwrite, for short); once full, rows go to the last row regardless |
+| F10 NOTE | the DECSC slot is narrower than feared for the measured agent | unchanged: next in line if a split box is photographed after the fix |
+| F11 NOTE | DCS/APC payloads would paint into the model (a hosted sixel program) | documented; Claude emits none; contained to history lines |
+
+Live after the fixes (`live-mirror3.txt`): the header on the row under the command, the 40 rows in
+order (24 mirrored, 16 from the final screen), no tails, nothing below but the prompt.

@@ -147,3 +147,20 @@ func rowTexts(rows [][]cell) []string {
 	}
 	return out
 }
+
+// A row kept before the window narrows is cut to the new width, or it would
+// wrap in the real terminal and the next row's erase would take the tail.
+func TestKeptRowsAreCutToTheNewWidth(t *testing.T) {
+	sc := newScreen(30, 6)
+	sc.capture = true
+	sc.feed(Open(true, 3, 6))
+	sc.feed(strings.Repeat("x", 30) + "\r\n\r\n\r\n") // a full-width row scrolls off
+	sc.resizeAlt(20, 6)
+	kept := sc.takeScrolled()
+	if len(kept) == 0 {
+		t.Fatal("nothing kept")
+	}
+	if len(kept[0]) != 20 {
+		t.Errorf("kept row is %d cells wide after a narrowing to 20", len(kept[0]))
+	}
+}
