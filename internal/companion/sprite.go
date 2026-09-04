@@ -84,8 +84,18 @@ func MirrorTail(rows []string) []string {
 // bubbleInner pads the text into the balloon's middle row. Sized in runes,
 // because a wide rune would make the drawn box narrower than the border it is
 // measured against.
+// MaxBubbleText is the most of a message a balloon will carry. The done knock
+// carries the agent's last message, which can be a paragraph; drawn whole it
+// ran across the entire sea in a dotted box (photographed 2026-09-03). A
+// balloon is a glance, so it gets the first few words and an ellipsis.
+const MaxBubbleText = 44
+
 func bubbleInner(text string) (string, int) {
-	inner := " " + NarrowOnly(text) + " "
+	text = NarrowOnly(text)
+	if r := []rune(text); len(r) > MaxBubbleText {
+		text = strings.TrimRight(string(r[:MaxBubbleText-1]), " ") + "…"
+	}
+	inner := " " + text + " "
 	n := len([]rune(inner))
 	if n < 4 {
 		inner += strings.Repeat(" ", 4-n)

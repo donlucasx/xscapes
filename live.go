@@ -311,8 +311,11 @@ func drawScene(c *canvas.Canvas, sh *scape.Shore, cat *companion.Cat, lay layout
 	st reduce.State, t float64, seed int64, top int) {
 	cat.Draw(c.Near(), lay.CatX, top, t, st.Pose)
 	if st.Kittens > 0 {
+		// Swimmers stay above the shore's mean waterline with a row to spare
+		// for the swell's crests; the waterline moves with activity, so this
+		// is read off the shore every frame rather than derived from height.
 		cat.DrawKittens(c.Near(), c.Mid(), lay.CatX, top, st.Kittens, c.W-1,
-			int(float64(c.H)*0.42)+1, t, seed)
+			int(float64(c.H)*0.42)+1, sh.SandTop()-2, t, seed)
 	}
 	if st.Bubble != "" {
 		rows, col := companion.DoneBubble(st.Bubble), bubbleCol

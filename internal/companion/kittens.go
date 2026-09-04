@@ -92,7 +92,7 @@ func (c *Cat) KittenSize() (w, h int) {
 // Some sit on the sand and some swim. Swimmers use vertical space the beach
 // does not have, so the two together hold far more than either alone, and the
 // sea gives the litter somewhere to spread that still reads as one scene.
-func (c *Cat) DrawKittens(near, mid *canvas.Layer, px, py, n, w, seaTop int, t float64, seed int64) int {
+func (c *Cat) DrawKittens(near, mid *canvas.Layer, px, py, n, w, seaTop, seaBot int, t float64, seed int64) int {
 	_ = mid // every kitten is on the near layer; kept for call-site stability
 	if n <= 0 {
 		return 0
@@ -113,7 +113,7 @@ func (c *Cat) DrawKittens(near, mid *canvas.Layer, px, py, n, w, seaTop int, t f
 	c.kitTier = ti
 	spec := kitTiers[ti]
 
-	drawn += c.drawSwimmers(near, swimmers, px, py, w, seaTop, t, seed)
+	drawn += c.drawSwimmers(near, swimmers, px, py, w, seaTop, seaBot, t, seed)
 
 	// Sitters walk AWAY from the parent: rightward when the companion is on
 	// the left, leftward when it is on the right. Either way the litter grows
@@ -240,7 +240,7 @@ func (c *Cat) kitTail(b *Bitmap, segs, srcW int, wag float64, lift int) {
 // lane the width is divided evenly so every swimmer owns a slot; the waddle is
 // then bounded by whatever slack is left in that slot. Random home columns
 // looked fine at three swimmers and piled them on top of each other at twelve.
-func (c *Cat) drawSwimmers(l *canvas.Layer, idx []int, px, py, w, seaTop int, t float64, seed int64) int {
+func (c *Cat) drawSwimmers(l *canvas.Layer, idx []int, px, py, w, seaTop, seaBot int, t float64, seed int64) int {
 	if len(idx) == 0 {
 		return 0
 	}
@@ -249,10 +249,18 @@ func (c *Cat) drawSwimmers(l *canvas.Layer, idx []int, px, py, w, seaTop int, t 
 	}
 	kw, kh := c.swim.W/2, c.swim.H/4
 	// Open water runs from just under the horizon down to a clear row above the
-	// sand, so a swimmer in the lowest lane cannot touch a sitter's ears.
+	// sand, so a swimmer in the lowest lane cannot touch a sitter's ears -- and
+	// not past the shore's own waterline either. The lanes used to end a fixed
+	// distance above the companion's row, which on a tall scape is BELOW the
+	// water: he photographed a kitten swimming on the wet sand where the tide
+	// meets the shore. seaBot is the last row that is still water everywhere;
+	// the caller takes it from the shore, which knows where its sand starts.
 	_, ph := c.Size()
 	top := seaTop + 1
 	bot := py + ph - 4
+	if seaBot > 0 && seaBot < bot {
+		bot = seaBot
+	}
 	// Lanes must be at least a swimmer tall. At one row apart, any two
 	// swimmers in neighbouring lanes shared a row, and if their columns
 	// crossed they interleaved into one broken shape.

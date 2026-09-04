@@ -72,6 +72,19 @@ func TestReplayTrace(t *testing.T) {
 
 	t.Logf("replayed %d bytes at %dx%d; scroll region rows %d..%d, cursor r%d c%d, alt=%v",
 		len(b), w, h, sc.top+1, sc.bot+1, sc.y+1, sc.x+1, sc.alt)
+	// TRACE_DUMP=dir writes the alternate screen and the main buffer as text,
+	// one row per line, so a real session's readback (`history of tab`) can be
+	// diffed against what the model believes -- the fidelity test for the
+	// mirror, on the agent's real bytes.
+	if dir := os.Getenv("TRACE_DUMP"); dir != "" {
+		var alt, main strings.Builder
+		for y := 0; y < sc.h; y++ {
+			alt.WriteString(sc.rowAt(y) + "\n")
+			main.WriteString(sc.otherRowAt(y) + "\n")
+		}
+		os.WriteFile(dir+"/model-alt.txt", []byte(alt.String()), 0o644)
+		os.WriteFile(dir+"/model-main.txt", []byte(main.String()), 0o644)
+	}
 	for y := 0; y < sc.h; y++ {
 		row := sc.rowAt(y)
 		bg, uniform := sc.bgRunAt(y)

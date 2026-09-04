@@ -1,6 +1,9 @@
 package companion
 
-import "testing"
+import (
+	"strings"
+	"testing"
+)
 
 // Every row of a balloon must be the same width, or the box shears.
 func TestBalloonsDoNotShear(t *testing.T) {
@@ -39,5 +42,20 @@ func TestMirroredTailPointsRight(t *testing.T) {
 	last := []rune(rows[len(rows)-1])
 	if last[len(last)-4] != 'v' {
 		t.Errorf("mirrored pointer not under the right shoulder: %q", string(last))
+	}
+}
+
+// A paragraph-long done message is cut to a glance; a short ask is untouched.
+func TestBubbleTextIsCappedToAGlance(t *testing.T) {
+	long := strings.Repeat("Two agents are running in parallel ", 4)
+	rows := DoneBubble(long)
+	if w := len([]rune(rows[1])); w > MaxBubbleText+4 {
+		t.Errorf("balloon is %d wide for a long message; cap is %d plus the walls", w, MaxBubbleText)
+	}
+	if !strings.Contains(rows[1], "…") {
+		t.Errorf("a cut message must say so: %q", rows[1])
+	}
+	if got := Bubble("allow Bash?")[1]; got != "| allow Bash? |" {
+		t.Errorf("a short ask changed: %q", got)
 	}
 }

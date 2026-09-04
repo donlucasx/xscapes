@@ -431,8 +431,19 @@ func (s *screen) feed(in string) {
 				j++
 			}
 			i = j
+		case c == '\x1b' && strings.ContainsRune("()*+-./#% ", r[i+1]):
+			// Charset designations (ESC ( B), DECDHL and friends: ESC plus an
+			// intermediate plus ONE final byte. Claude Code emits ESC ( B at
+			// startup; a model that took only the intermediate then drew the
+			// 'B' as text and moved the cursor by one -- found by diffing the
+			// model against the terminal's own readback of a real session.
+			if i+2 >= len(r) {
+				s.pending = string(r[i:])
+				return
+			}
+			i += 2
 		case c == '\x1b':
-			// ESC plus one byte that is not modelled (charset, keypad, ...).
+			// ESC plus one byte that is not modelled (keypad, RIS, ...).
 			i++
 		case c == '\n':
 			if s.y == s.bot {

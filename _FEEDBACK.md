@@ -693,3 +693,30 @@ Resumed under Fable. Both ▶ NEXT decisions put to him as a two-question pick; 
     name, and the view held while he was scrolled up. Production batches per tick, so at most
     twelve switches a second. Step 2 (mirroring) is UNGATED. He granted Accessibility to
     Terminal.app so the synthetic wheel/keys can be retried.
+
+- *"ok, tested it. [screenshot: the Validators session at 120x72, scrolled up] chat history looks
+  good on a first impression."*
+- *"[screenshot 124x62] when scrolling back down some of the scape pixel lines broke (look at the top
+  left of the xscape."*  ⇒ a 12-column, 4-row fragment of night sky sitting in the band's blank
+  bottom rows, above the real sky. Reproduce before theorising: display glitch (heals at the
+  50-frame full repaint) or buffer content (`history` readback).
+- *"I also noticed one of the sub agents in the water overlapping with the sand where the tide meets
+  the shore."*  ⇒ a swimmer lane landing on the shoreline at 124x62 (scape 28 rows). ALSO visible in
+  the same grab, unreported by him: the DONE balloon carrying the agent's whole last message across
+  the full width of the sea (": Two agents are running in parallel: one reading through the xscapes
+  repo ... cod? :"). The bubble text has no length cap.
+- *"another screen grab. Does the moon look correct?"*  ⇒ at 20:33 the context body is a salmon/pink
+  block with a tan chin, over a sky that still carries a wide dusk-red band. Part of the palette
+  review below.
+- *"also, Id like to review all the color gradients for the sky and water. Truecolor version mockups
+  look great, but some of the 256 translations on the terminal are abrupt. Id like smoother cleaner
+  gradients. lets review this topic together before any changes. You can look into which times of
+  the day the gradients may need adjusting."*  ⇒ **NO palette/gradient CHANGES until reviewed with
+  him.** Deliverable first: a per-hour measurement of the 256 gradients (distinct colours, biggest
+  adjacent-row jump, sky and sea) plus a visual he can look at, then a discussion of options.
+- *"lastly, the beginning of the session transcript seemed to break but the actual session chat
+  history seemed fine"*  ⇒ the mirrored transcript's start shows Claude Code's startup: permission
+  warnings, then the banner SIX times, two lines garbled ("Sonnct 5 with xhigh efaort"). The
+  repeats are Ink re-rendering its header while the short band scrolls (the warnings push it off);
+  the garbled rows are the MODEL diverging from the terminal on some sequence. Needs a trace of a
+  real startup replayed through the model against the terminal's own readback.

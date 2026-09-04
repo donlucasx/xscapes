@@ -40,7 +40,7 @@ func kittenPage(seed int64) string {
 			top := c.H - 2 - chh
 			kc := companion.NewCat()
 			kc.Draw(c.Near(), 3, top, t, companion.Working)
-			fit = kc.DrawKittens(c.Near(), c.Mid(), 3, top, cc.n, c.W-1, int(float64(c.H)*0.42)+1, t, seed)
+			fit = kc.DrawKittens(c.Near(), c.Mid(), 3, top, cc.n, c.W-1, int(float64(c.H)*0.42)+1, 0, t, seed)
 			fmt.Fprintf(&row, `<div class="win">%s</div>`, c.HTMLFragment(12))
 		}
 		short := ""

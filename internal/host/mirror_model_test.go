@@ -164,3 +164,20 @@ func TestKeptRowsAreCutToTheNewWidth(t *testing.T) {
 		t.Errorf("kept row is %d cells wide after a narrowing to 20", len(kept[0]))
 	}
 }
+
+// ESC ( B designates a charset and draws nothing. Claude Code emits it at
+// startup; the first model drew the 'B'.
+func TestCharsetDesignationDrawsNothing(t *testing.T) {
+	sc := newScreen(20, 3)
+	sc.feed("ab\x1b(Bcd\x1b)0\x1b#8ef")
+	if got := sc.rowAt(0); got != "abcdef" {
+		t.Errorf("row 1 is %q, want abcdef (the designation's final byte was drawn)", got)
+	}
+	// Cut across a read boundary, it must still be one sequence.
+	sc = newScreen(20, 3)
+	sc.feed("x\x1b(")
+	sc.feed("By")
+	if got := sc.rowAt(0); got != "xy" {
+		t.Errorf("split designation: row 1 is %q, want xy", got)
+	}
+}

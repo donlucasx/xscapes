@@ -23,7 +23,7 @@ func TestEveryKittenKeepsBothEyes(t *testing.T) {
 					cat.FaceLeft(true)
 					cw, ch := cat.Size()
 					px, py := w-cw-2, 30-2-ch
-					drawn := cat.DrawKittens(c.Near(), c.Mid(), px, py, n, w, 10, tt, seed)
+					drawn := cat.DrawKittens(c.Near(), c.Mid(), px, py, n, w, 10, 0, tt, seed)
 					if drawn == 0 {
 						continue
 					}
