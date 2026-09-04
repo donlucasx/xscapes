@@ -15,6 +15,39 @@ frame does rather than what the source says it should. And one from session 14:
 do NOT drive Terminal.app (osascript, System Events) without asking me first.
 ```
 
+## Where we left off (2026-09-04 afternoon, session 15 continued, INSTALLED, committed `b9d65e7`, pushed)
+
+**His first run in Ghostty, two reports, both measured, both SHIPPED on his *"proceed w ur
+recommendation to standardize the experience"*.** (1) The sun differed: Ghostty took the truecolor
+profile and painted the palette's raw blend, a flat tan; Terminal.app's cube quantiser turns that
+tan into peach over cream. **Now every terminal gets the cube** (`term.DetectProfile` returns 256
+unless `XSCAPES_COLOR=truecolor`; COLORTERM no longer consulted; `internal/term/profile_test.go`).
+(2) The layout broke on a resize: Ghostty 1.3.1's alternate screen (read from its source) keeps
+content at the TOP on a grow and moves the cursor WITH its row on a shrink, DECRC verbatim, where
+Terminal.app is bottom-anchored with the cursor unmoved. The host's tick encoded Terminal.app only.
+**Now `host.Rules`** (`GrowPushesDown`, `ShrinkKeepsCursor`), picked by `host.RulesFor(TERM_PROGRAM)`:
+Terminal.app keeps its measured sequences byte for byte, everything else gets the xterm-like set
+(no SU on a grow; `RebindShrinkAltFollow` = SD k + CUD k on a shrink). Red-first test
+`internal/host/ghostty_resize_test.go` (Ghostty's rules in the model: `resizeGhostty`,
+`screen.restoreAbsolute`), eight geometries. Also measured from his screenshot's pixels:
+Terminal.app's U+2580 glyph starts 5px below the cell top (12 of 30 px), so every half-block
+edge shows a hairline of the lower colour — the "thin lines through the sun"; Ghostty is
+pixel-exact. Instrument `notes/sunprobe`. `~/.local/bin/xscapes` rebuilt (new inode, `-info`
+verified: profile=256 under ghostty/Apple_Terminal/iTerm.app). Commons research: `research/
+commons-submission.md` §8 — a web twin is feasible (Durable Objects, WebSockets, cron proven live;
+renderer compiles to wasm, 3.4 MB); not started, his call.
+
+**▶ NEXT (afternoon):** he restarts `xscapes claude` in Ghostty and resizes — the fix is proven in
+the model, not yet live · the two fully BLANK sky rows in his screenshot are NOT reproduced offline
+(`XSCAPES_TRACE=/tmp/ghostty.bin xscapes claude` in Ghostty, then resize, would replay them) · the
+sun still reads rough on 256 in both terminals: the disc is quantised cell by cell against the
+sky gradient (peach over cream) — "quantise the disc once" is the small follow-up, his pick ·
+the companion's eyes are HOLES to the scene by day (measured from his 14:00 screengrab: the eye
+cells are the sea's colour; by design the eyes sit in gaps the body bitmap leaves) — fill the two
+eye cells with fur before the glyph, his pick · still his from the morning: solid moon or hue rim ·
+kittens vanish in <7s · the mirror corruption needs a mirror-era trace · publish the page, submit
+the entry (closes 09-17) · the Commons web twin, if wanted (~2-3 days).
+
 ## Where we left off (2026-09-04, session 15, INSTALLED and pushed)
 
 **His four answers at the start** (verbatim in `_FEEDBACK.md`): the submission page is NOT

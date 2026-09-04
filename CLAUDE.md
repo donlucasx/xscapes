@@ -12,6 +12,13 @@
 > look (124x52): the moon was a RECTANGLE — pre-existing, the disc's radius is 1.92 rows there
 > and lost its tips — **FIXED** with half-row sampling (`canvas.SetBGHalves`); the companion's
 > right margin now grows with the width (5 columns at 124, was 2) — **FIXED**. NEXT: live in it.
+> **Afternoon, his first run in Ghostty**: the sun differed (truecolor painted the raw tan blend)
+> and a resize broke the layout (Ghostty's alternate screen anchors content to the TOP on a grow
+> and moves the cursor with its row on a shrink; the host's tick encoded Terminal.app only). Both
+> SHIPPED and installed on *"standardize the experience"*: **the cube on every terminal**
+> (`DetectProfile`), and **`host.Rules` per TERM_PROGRAM** (`RulesFor`; Terminal.app byte-identical,
+> everything else xterm-like). Committed `b9d65e7`, pushed. His last note: the companion's EYES are
+> holes to the sea by day (by design, eyes sit in gaps of the body bitmap) — his pick. Details in `RESUME.md`.
 >
 > **Session 14, the evening.** He lived in it and came back with six reports
 > (`_FEEDBACK.md`): three FIXED (swimmers above the waterline, balloon text
@@ -233,7 +240,7 @@ pane, where 80% used to leave a single row.
 **Stack**
 - Go + bubbletea/lipgloss, single static binary. No Node, no Python.
 - Design target 80×24; must look fine at 40×12.
-- Glyphs: Unicode blocks + braille for water/fire, ASCII fallback. Truecolor with automatic 256-color fallback (Terminal.app is 256 max).
+- Glyphs: Unicode blocks + braille for water/fire, ASCII fallback. **The 256-colour cube on EVERY terminal** (decided 2026-09-04 when Ghostty's truecolor picture differed: the scene is designed for the cube, and indices 16-255 are the same everywhere). `XSCAPES_COLOR=truecolor` opts into the untuned raw palette.
 - **256 is not greyscale** — it is 216 colours plus 24 greys. A dark palette
   collapses to grey because the colour cube has almost no resolution below luma
   25 (4 entries, all pure blue) against 108 above 150. So the darkness lives in

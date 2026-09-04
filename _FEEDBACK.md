@@ -820,3 +820,75 @@ automation, the scroll glitch); his answers:
     Two hypotheses the trace separates: the model diverging over a long session (Ink's diff
     writes landing on a misaligned row), or the mirror's own MirrorBatch bytes fed back through
     the model desyncing its cursor.
+
+### Ghostty test — 2026-09-04 ~12:05 (his first run of `xscapes claude` in Ghostty, truecolor profile)
+
+- *"ok im doing some testing on ghostty and the layout already broke when resizing [Image #1]
+  also noticed that the sun is showing up differently in terminal and ghostty [Image #2]"*
+  (Image 1: Ghostty after a resize — the scape's top rows interleaved with two rows of the
+  terminal's own dark background, the sun split across them, Claude's status lines
+  repeated at the right; the sun a flat tan disc. Image 2: Terminal.app at 120x73 — the sun
+  a peach-over-cream disc with thin sky-blue lines through it; the cat grey-white.)
+  ⇒ Two reports. Diagnosing both with instruments before touching anything.
+  ⇒ **Both DIAGNOSED (12:50), nothing fixed — his call on each.**
+    **The sun.** `notes/sunprobe` renders the noon frame under both profiles: the palette's sun
+    is #ffd787 painted at 0.92×0.85 into a blue sky, and that blend is TAN (#cfc192). Ghostty
+    runs the truecolor profile and paints that tan faithfully (screenshot pixels #bfb384).
+    Terminal.app's cube quantiser (`Index256Keeping`) lands the same tan on peach #d7af87 in the
+    upper rows and cream #d7d7af in the lower ones — the warm two-tone sun he tuned against is
+    an accident of quantisation. Second difference, from the pixels: Terminal.app's U+2580
+    glyph starts 5px below the cell top and is 12px tall in a 30px row, so every mid-row edge
+    (sun and moon tips, sky-ramp edges) shows a hairline of the LOWER colour above it — those
+    are the "thin lines through the sun". Ghostty draws blocks pixel-exact. Options: (1) the
+    truecolor profile emits the cube colours too, so every terminal shows Terminal.app's
+    picture (one switch in `term.Quantise`; recommended); (2) keep truecolor faithful and give
+    the day sun full opacity there; (3) both, with `XSCAPES_COLOR=truecolor` for the faithful one.
+    **The resize.** Ghostty 1.3.1's alternate screen, read from its source
+    (`PageList.zig resizeWithoutReflow`, `Terminal.zig restoreCursor`): a GROW with the cursor
+    above the last row keeps content at the TOP and appends blanks (Terminal.app pushes it
+    down); a SHRINK scrolls rows off the top and the CURSOR FOLLOWS its row (Terminal.app
+    leaves it); DECRC restores the saved row verbatim (Terminal.app homes it to row 1 when the
+    region lost it); DECSTBM homes the cursor in both. The host's `resizeSequence` encodes
+    Terminal.app's rules, so on Ghostty the grow's SU scrolls the transcript up by the tick and
+    the shrink's SD+CUU leaves the text a tick below the cursor. Replayed in the screen model
+    (`internal/host/ghostty_probe_test.go`, Ghostty rules added as `resizeGhostty` +
+    `screen.restoreAbsolute`; instrument, logs only): grow ×4 → old-box ghost rows, transcript
+    rows 1-4 lost, a sky row inside the band; shrink ×6 → the box six rows above the band's
+    bottom; every geometry clean under Terminal.app's rules. The two BLANK sky rows in his
+    screenshot are not reproduced offline (my Claude stand-in is a 3-line box); a Ghostty trace
+    (`XSCAPES_TRACE=/tmp/ghostty.bin xscapes claude`, then resize) would replay them exactly.
+    Fix options: (A) a per-terminal resize profile keyed on TERM_PROGRAM — Ghostty: no SU on a
+    grow, SD k + CUD k on a shrink (small, measured, extend the probe into a red-first test);
+    (B) repaint the whole band from the screen model at the new size and place the cursor
+    absolutely, terminal-independent but leaning on the model's fidelity, which s14 #2 doubts.
+- *"the sun looks smaller on truecolor and abit rough/broken up on 256"* (12:55) — same disc, same
+  nine-column footprint under both profiles (probe); Terminal.app's glyph gap pads each tip row to
+  18 of 30 px in sun colour and the peach has 107 luma over its sky against the tan's 80, so the
+  Terminal.app sun reads about half a row taller and brighter; the roughness is cell-by-cell
+  quantisation against the sky gradient + the hairlines + the unlit sliver quantising to blue.
+- *"proceed w ur recommendation to starndardize the experience wihout overengineering it."* (13:05)
+  ⇒ **SHIPPED and INSTALLED (13:40), not committed.** (1) `term.DetectProfile` returns the cube on
+  every terminal; `XSCAPES_COLOR=truecolor` opts out; `profile_test.go`. (2) `host.Rules` +
+  `RulesFor(TERM_PROGRAM)`: Terminal.app's sequences unchanged byte for byte; Ghostty and
+  everything else get no SU on a grow and `RebindShrinkAltFollow` (SD k + CUD k) on a shrink.
+  Red-first `ghostty_resize_test.go` (eight geometries; the two production-shaped grow tests in
+  `resize_paint_test.go` now name Terminal.app's rules, since their model is Terminal.app's).
+  `-info` verified on the installed binary: profile=256 under ghostty, Apple_Terminal, iTerm.app.
+  He must restart his Ghostty session. Left out on purpose: the one-colour disc (changes the tuned
+  Terminal.app sun) and the blank sky rows (need a Ghostty trace).
+- *"make sure to update the other terminal session on what you are doing (the one that is idle rn)"*
+  (13:45) ⇒ sent to the idle peer `xscapes-aa` over SendMessage (the full change list, what is
+  open, and not to rebuild or commit on his behalf). Standing expectation from here: when two
+  sessions run, the one doing the work keeps the idle one current.
+- *"ok, /wrap this session and make sure the parallel one is up to date on everything"* (13:55)
+  ⇒ wrapped: committed and pushed (SHAs in `RESUME.md`), the peer told again at the end.
+- *"another note before you wrap- look at the companions eyes on the ghostty terminal [Image #3]"*
+  (14:00; the peer session's Ghostty window, idle, still the old binary — tan sun) ⇒ **MEASURED,
+  nothing changed.** From the pixels: each eye cell is `#6799e4`, exactly the sea band behind the
+  head, with a 2px trace of `#6ca1df` at mid-height — the dozing `-` in mint (168,236,176),
+  antialiased to a hairline by Ghostty's font. By design (`cat.go` `eyes`): the eyes are characters
+  plotted in the GAPS the body bitmap leaves for them, so an eye cell's background is the SCENE's —
+  dark water at night, which is the intended socket with a shine, and bright sea by day, which reads
+  as two blue holes in the head. Terminal.app shows the same holes, darker, in his 12:06 screengrab.
+  Option: give the two eye cells the body's own colour (or a darker fur tone) as background before
+  the glyph, so the eye is a mark on fur at every hour. Small. **His pick.**
