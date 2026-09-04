@@ -75,6 +75,11 @@ moon painter in `shore.go`); `TestTheMoonIsRoundAtEveryHeight` holds it at 18–
 22 and 23. **FIXED**: the companion's right margin grows with the width, 2 + w/32 (5 at 124, was
 2; `compose` in `live.go`, `TestTheCompanionKeepsItsDistanceFromTheEdge`). Both installed the same
 night (commit, push, both binaries). His session has to be restarted to show them.
+⚠ **The install itself bit him**: `cp` over the already-executed `~/.local/bin/xscapes` left macOS's
+cached signature stale and the kernel SIGKILLed it (*"zsh: killed"*, exit 137) twice. Fixed by
+replacing through a NEW inode (`rm -f` then `cp`) and verified by RUNNING `-info`. **Install rule
+from now on: `go build -o xscapes . && rm -f ~/.local/bin/xscapes && cp xscapes ~/.local/bin/xscapes
+&& ~/.local/bin/xscapes -info`** — a grep for a marker proves the bytes, not that they run.
 
 **Not done**: a day lived in it with the paths on. The moon at 20:33 is still sun-coloured:
 that was the option he did not pick. `~/.local/bin/xscapes` is a COPY of the repo binary, not
