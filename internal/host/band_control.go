@@ -153,7 +153,60 @@ func RebindShrinkAlt(shrink, bandShrink, agentRows int) string {
 const (
 	altOn  = "\x1b[?1049h"
 	altOff = "\x1b[?1049l"
+	// The no-clear switch. Measured 2026-09-03 (notes/mirrorprobe): DECSET 47
+	// swaps the two buffers and clears nothing, in both directions -- 400
+	// round trips at 5ms with the alternate screen intact. 1049 would save,
+	// clear and discard; it is the wrong tool for a round trip.
+	toMain = "\x1b[?47l"
+	toAlt  = "\x1b[?47h"
 )
+
+// MirrorBatch writes rows that have left the agent's band into the MAIN
+// buffer, where the terminal keeps its scrollback, while the alternate screen
+// stays on display.
+//
+// The alternate screen has no history of its own (notes/histprobe), and
+// Terminal.app's view shows the main buffer ABOVE the alternate screen: scroll
+// up in `xscapes claude` and the shell's last screen is there. So the agent's
+// transcript can be put where the user already looks for it, with the wheel,
+// selection and search that come with it, and nothing has to be built to show
+// it. Rows are appended at mainRow, which starts where the shell left its
+// cursor and walks down to the last row; once past it (rows+1 means full)
+// every row scrolls the main buffer by one -- into history -- and lands on
+// the last row.
+//
+// Bracketed like a paint frame: cursor and rendition saved, origin mode off
+// and the region reset so the main buffer's last row can be addressed, an SGR
+// reset because the erase and the scroll fill with the current background,
+// and the band re-pinned around the restore. One write, so the terminal never
+// sees the main buffer between two of these.
+func MirrorBatch(lines []string, mainRow *int, rows, agentRows int) string {
+	if len(lines) == 0 {
+		return ""
+	}
+	if *mainRow < 1 {
+		*mainRow = 1
+	}
+	if *mainRow > rows+1 {
+		*mainRow = rows + 1
+	}
+	var b strings.Builder
+	b.WriteString(saveCursor + originOff + regionReset + "\x1b[0m" + toMain)
+	for _, l := range lines {
+		// Once the buffer is full (mainRow past the last row) each row scrolls
+		// FIRST and is then written on the last row, so the newest mirrored
+		// row sits directly above the band with no blank row between them.
+		if *mainRow > rows {
+			fmt.Fprintf(&b, "\x1b[%d;1H\r\n", rows)
+		}
+		fmt.Fprintf(&b, "\x1b[%d;1H\x1b[2K%s", min(*mainRow, rows), l)
+		if *mainRow <= rows {
+			*mainRow++
+		}
+	}
+	b.WriteString("\x1b[0m" + toAlt + EnterBand(agentRows) + restoreCursor)
+	return b.String()
+}
 
 // Open takes the screen and pins the agent's band to the top of it.
 //

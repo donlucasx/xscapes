@@ -14,7 +14,42 @@ build the instrument before trusting the picture, and check what the RENDERED
 frame does rather than what the source says it should.
 ```
 
-## Where we left off (2026-09-03, session 14, NOT pushed, tree clean)
+## Where we left off (2026-09-03, session 14 continued, NOT pushed, tree clean)
+
+**⭐ SCROLLBACK SHIPS: the mirror is built, tested and seen working in Terminal.app.**
+After his gate answers (*"not sure if it flashed ... stable when I scroll up"*, then
+Accessibility granted so Shift+Page Up could be sent: the view holds while rows land,
+in pixels), the revised plan was built end to end:
+
+- `internal/host/screen.go` — the model, promoted from the tests: cells carry fg, bg and
+  attributes; two real buffers (47 swaps without clearing, 1049 saves/clears/discards);
+  rows that leave the alternate band by scrolling, or that a shrink destroys, are kept
+  (`capture`); rows the host itself scrolled in and never wrote are not; `rowANSI`
+  writes a row back as bytes (round-trip tested).
+- `Host.History` — every byte the host sends is fed through the model; once a tick the
+  kept rows go to the main buffer in ONE write (`MirrorBatch`: `ESC7 ?6l ESC[r ESC[0m
+  ?47l` · CUP · row · ... · `?47h` · band · `ESC8`), starting on the row the shell left
+  its cursor (DSR asked BEFORE the child starts; the key forwarder keeps that one reply)
+  and, once the buffer is full, scrolling first so the newest row touches the band.
+- `Host.Replay` — after the pty is drained (500ms deadline) and the alternate screen given
+  back, the mirrored rows are printed again under a dim separator, because Terminal.app
+  keeps only the oldest few across `1049l`. Gated on `TERM_PROGRAM=Apple_Terminal`.
+- `xscapes claude -history` (default on in Terminal.app, off elsewhere; implies `-alt`).
+- Seen live: 40 lines through a 17-row band → 24 rows above the band during the session,
+  starting right under the command line, and "xscapes: the agent's transcript, 24 rows"
+  after exit. Early in a session the main buffer's unused bottom rows show as blank rows
+  between the transcript and the band until the transcript has filled them; inherent.
+- Tests: model (capture, host rows skipped, shrink capture, 47 vs 1049, ANSI round trip),
+  `MirrorBatch` walk-then-scroll, `takeCPR`, and the hosted end-to-end (24 lines, the
+  eight that left are in the snapshot model's main buffer in order; a control with the
+  mirror off finds nothing there). `go test ./...` green.
+
+**Not yet**: a real `xscapes claude` session lived in with the mirror on (his day), and
+Kimi round 2 on the shipped code if he wants it. Known limits: wide glyphs misalign a
+mirrored row from that glyph on (the model advances one cell); the replay repeats the
+few rows Terminal.app kept; other terminals get the rows after exit only.
+
+## Earlier in session 14
 
 **Two deliverables and a locked decision.** Resumed under Fable; both ▶ NEXT questions
 were put to him and answered, then he asked for the scrollback plan to be AUDITED before
@@ -477,13 +512,12 @@ Demo flags: `-wired -mockup -anim -compare -layout -context -day -busy -kittens 
    `site/index.html`. His hands only. Until "Entry submitted." is on his screen the entry
    scores zero however good the rest is. Ask whether it happened; do not assume.
 
-1. **⏸ HIS EYES: the flicker gate.** `go run ./notes/mirrorprobe -n 400 -gap 5ms` in a
-   Terminal.app window: does the screen flash during the burst, and if he scrolls up during
-   it, does the view snap back down? Both unmeasured and unmeasurable from here. Step 2 below
-   waits on the answer.
+1. ~~**⏸ HIS EYES: the flicker gate.**~~ **PASSED 2026-09-03** — his eyes, then pixels (see
+   "Where we left off").
 
-2. **BUILD THE MIRRORING (his go, 2026-09-03), per `notes/scrollback-audit.md` "The revised
-   plan" + Kimi's F2/F3/F4:**
+2. ~~**BUILD THE MIRRORING**~~ **BUILT 2026-09-03** — see "Where we left off". What is left of
+   it: **live in it for a day** (`xscapes claude` in Terminal.app, scroll up mid-turn, quit and
+   look at the replay), then decide on Kimi round 2. The plan as it was, for the record:
    - step 1 (not gated): promote `screen` out of `_test.go`; cells carry fg + bg + attributes;
      a real two-buffer pair for 47 vs 1049 (the model aliases them today); serialise a row back
      to ANSI; tee the agent's filtered bytes through it. Then the existing trace tests run on

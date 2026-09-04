@@ -11,7 +11,11 @@
 > (the terminal leaves the cursor, the host restored it into a band that no
 > longer held its row) — Report 1, reproduced and FIXED. His ruling: *"Go:
 > shrink fix, then mirroring."* Plan and measurements in
-> `notes/scrollback-audit.md`; RESUME ▶ NEXT carries the steps and the gate.
+> `notes/scrollback-audit.md`. **Both SHIPPED the same evening**: `RebindShrinkAlt`
+> and `Host.History` (rows leaving the band mirrored into the main buffer
+> through DECSET 47, replayed on exit; `-history`, default on in Terminal.app).
+> The screen model is production now (`internal/host/screen.go`). NEXT: live in
+> it for a day.
 >
 > **Where we left off — 2026-09-03 (session 13), HEAD `9452bc6`, pushed, tree clean.**
 > **Session 13: the resize damage was OURS, twice, and he had to report it four

@@ -76,9 +76,15 @@ purely by relative moves from wherever the cursor is. Measured both ways: plain
 Claude Code survives that resize, Claude Code in a band on the main screen does
 not. The alternate screen has no history, so there is nothing to pull back.
 
-The cost is the other side of the same coin: lines that scroll out of the
-agent's band are gone rather than going to your terminal's scrollback.
-`-alt=false` keeps the scrollback and takes the resize problem back.
+The alternate screen has no scrollback of its own, so xscapes feeds the
+terminal's. Every row that scrolls out of the agent's band is written into the
+main buffer behind the alternate screen, through a buffer switch that clears
+nothing, and Terminal.app shows the main buffer above the alternate screen: scroll
+up and the transcript is there, in order, right under the command you typed,
+with the wheel, selection and search you already use. Terminal.app drops most of
+that history when the alternate screen is given back, so the transcript is
+printed once more when the session ends. `-history=false` turns both off.
+`-alt=false` runs on the main screen instead and takes the resize problem back.
 
 What xscapes gives up by not being an emulator: the sea does not show through
 the agent's own blank space. Its band is its own.
@@ -148,7 +154,8 @@ xscapes inside <command>   # host any command inside the scape, not just claude
 xscapes claude -beside     # the older side by side layout, in tmux
 xscapes claude -scape 24   # give the shoreline more rows (default: two fifths)
 xscapes claude -fps 8      # slow the scape down
-xscapes claude -alt=false  # keep terminal scrollback, at the cost below
+xscapes claude -history=false  # do not mirror the transcript into the terminal's scrollback
+xscapes claude -alt=false  # run on the main screen, at the cost below
 xscapes -live              # the scape in this terminal, Ctrl-C to quit
 xscapes -info              # colour profile, size, which sound player
 xscapes notify             # hear both knocks
@@ -177,6 +184,12 @@ live:
   version mapped activity to wave speed and idle looked identical to flat out.
 - **The renderer is a real three layer alpha compositor**, so occlusion between
   the companion, the kittens and the sea is decided once instead of per sprite.
+- **The host keeps its own copy of the screen.** It is not an emulator for the
+  agent's benefit, the agent's bytes still reach the terminal untouched, but
+  every byte the host sends is also fed through a small terminal model, so the
+  host knows which rows have left the band and what was in them. That is what
+  gets mirrored into the terminal's scrollback, and it is what the resize tests
+  replay a real session's bytes through.
 
 Run the tests with `go test ./...`. The interesting ones assert things that
 looked fine on screen and were not: that whiskers touch fur on their own row,

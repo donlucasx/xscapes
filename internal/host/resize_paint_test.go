@@ -42,6 +42,14 @@ func runHostedChild(t *testing.T, w1, h1, w2, h2 int, mode, child string) *scree
 // resize DIFFERENTLY and the host has to know which one it is on.
 func runHostedAlt(t *testing.T, w1, h1, w2, h2 int, mode, child string, alt bool) *screen {
 	t.Helper()
+	return runHostedOpts(t, w1, h1, w2, h2, mode, child, alt, false)
+}
+
+// runHostedOpts is runHostedAlt with the history mirror switchable. The
+// snapshot's model keeps both buffers, so a test can read the mirrored rows
+// out of its main buffer the way the terminal would hold them.
+func runHostedOpts(t *testing.T, w1, h1, w2, h2 int, mode, child string, alt, history bool) *screen {
+	t.Helper()
 	pr, pw, err := os.Pipe()
 	if err != nil {
 		t.Fatal(err)
@@ -89,6 +97,7 @@ func runHostedAlt(t *testing.T, w1, h1, w2, h2 int, mode, child string, alt bool
 		Cmd:       exec.Command("sh", "-c", child),
 		FPS:       60,
 		AltScreen: alt,
+		History:   history,
 		In:        tty.slave,
 		Out:       pw,
 		Size: func() (int, int) {
@@ -109,15 +118,19 @@ func runHostedAlt(t *testing.T, w1, h1, w2, h2 int, mode, child string, alt bool
 	// empty -- which the first version of this test read as "the host paints
 	// nothing" and blamed the host for.
 	var snap *screen
+	snapAt := 600 * time.Millisecond
+	if history {
+		snapAt += 300 * time.Millisecond // the unanswered cursor query costs its timeout
+	}
 	go func() {
-		time.Sleep(600 * time.Millisecond)
+		time.Sleep(snapAt)
 		mu.Lock()
 		snap = sc.clone()
 		mu.Unlock()
 	}()
 
 	go func() {
-		time.Sleep(300 * time.Millisecond)
+		time.Sleep(snapAt / 2)
 		// The model has to learn about the resize too, the way a real terminal
 		// would: it keeps what fits and exposes blank rows where it grew.
 		mu.Lock()

@@ -9,6 +9,7 @@ import (
 	"os/signal"
 	"strings"
 	"sync"
+	"sync/atomic"
 	"syscall"
 	"time"
 
@@ -44,6 +45,31 @@ type Host struct {
 	// AltScreen runs on the alternate screen, which has no history for the
 	// terminal to pull back in when the window grows. See Open.
 	AltScreen bool
+	// History mirrors every row that leaves the agent's band into the main
+	// buffer, where the terminal keeps its scrollback. See MirrorBatch. It
+	// needs the alternate screen: on the main screen the terminal keeps that
+	// history itself.
+	History bool
+	// Replay prints the mirrored rows once more after the alternate screen is
+	// given back. Terminal.app discards most of what scrolled into the main
+	// buffer while the alternate screen was up (4 of 30 rows survived,
+	// notes/mirrorprobe), so without this the transcript is gone the moment
+	// the session ends. An xterm-like terminal keeps it, and a replay there
+	// would duplicate every line; the launcher gates this on TERM_PROGRAM.
+	Replay bool
+
+	// model is the host's own copy of the screen when History is on: every
+	// byte sent to the terminal is fed through it, so the rows that leave the
+	// band -- by scrolling, or destroyed by a shrink -- are known, cells and
+	// rendition. Guarded by mu.
+	model *screen
+	// mirrored is what has been written to the main buffer so far, for Replay.
+	mirrored []string
+	// mainRow is where the next mirrored row goes in the main buffer.
+	mainRow int
+	// wantCPR is set while the host is waiting for the terminal to answer
+	// where the shell's cursor is; the key forwarder keeps that reply.
+	wantCPR atomic.Bool
 
 	// trace, when XSCAPES_TRACE is set, records every byte sent to the
 	// terminal; traceLog records size changes against byte offsets so a replay
@@ -71,6 +97,9 @@ func (h *Host) write(s string) {
 	if h.trace != nil {
 		n, _ := h.trace.Write([]byte(s))
 		h.traceN += int64(n)
+	}
+	if h.model != nil {
+		h.model.feed(s)
 	}
 	h.mu.Unlock()
 }
@@ -160,6 +189,9 @@ func (h *Host) Run() error {
 	if err != nil {
 		return fmt.Errorf("raw mode: %w", err)
 	}
+	if h.History && !h.AltScreen {
+		h.History = false // the terminal keeps the main screen's history itself
+	}
 	// One exit path, however the host ends: the child exiting, a signal, or an
 	// error. Once, because the signal handler and the deferred call race, and
 	// emitting the sequence twice repaints the shell's prompt over itself.
@@ -185,6 +217,42 @@ func (h *Host) Run() error {
 		os.Exit(1)
 	}()
 
+	// Keystrokes, and the terminal's replies to the agent's startup queries
+	// (device attributes, the kitty keyboard protocol, synchronized output),
+	// which travel the same path and must arrive byte for byte. Started
+	// BEFORE the child, because the host has one question of its own to ask
+	// the terminal first and the answer arrives on this fd; the pty buffers
+	// anything typed meanwhile for the child.
+	var cpr chan int
+	if h.History {
+		h.mu.Lock()
+		h.model = newScreen(cols, rows)
+		h.model.capture = true
+		h.mu.Unlock()
+		cpr = make(chan int, 1)
+		h.wantCPR.Store(true)
+	}
+	go h.forwardKeys(in, p.master, cpr)
+
+	// Where did the shell leave its cursor? That is where the mirrored
+	// transcript begins, right under the command he typed, with no blank
+	// gap. Asked with DSR before the child exists (Kimi F3): once Claude Code
+	// is up it asks the terminal questions of its own, and a reply meant for
+	// it must never be taken for this one. Without an answer the transcript
+	// starts at the bottom, which only costs the gap.
+	h.mainRow = rows
+	if h.History {
+		h.write("\x1b[6n")
+		select {
+		case r := <-cpr:
+			if r >= 1 && r <= rows {
+				h.mainRow = r
+			}
+		case <-time.After(300 * time.Millisecond):
+		}
+		h.wantCPR.Store(false)
+	}
+
 	h.Cmd.Stdin, h.Cmd.Stdout, h.Cmd.Stderr = p.slave, p.slave, p.slave
 	if h.Cmd.SysProcAttr == nil {
 		h.Cmd.SysProcAttr = &syscall.SysProcAttr{}
@@ -208,8 +276,12 @@ func (h *Host) Run() error {
 	var dmg damage
 
 	// The agent's output, filtered and forwarded. Never buffered by the frame
-	// loop: a keystroke echoes at the speed the agent produces it.
+	// loop: a keystroke echoes at the speed the agent produces it. fwdDone
+	// closes when the pty runs dry, which is how the exit path knows the
+	// agent's last bytes are out before anything is printed after them.
+	fwdDone := make(chan struct{})
 	go func() {
+		defer close(fwdDone)
 		var f Filter
 		buf := make([]byte, 8192)
 		for {
@@ -223,11 +295,6 @@ func (h *Host) Run() error {
 			}
 		}
 	}()
-
-	// Keystrokes, and the terminal's replies to the agent's startup queries
-	// (device attributes, the kitty keyboard protocol, synchronized output),
-	// which travel the same path and must arrive byte for byte.
-	go io.Copy(p.master, in)
 
 	done := make(chan error, 1)
 	go func() { done <- h.Cmd.Wait() }()
@@ -245,7 +312,20 @@ func (h *Host) Run() error {
 	for {
 		select {
 		case err := <-done:
+			if h.History && h.Replay {
+				// The forwarder is not joined anywhere else, and the agent's
+				// final bytes can still be in flight when the child's exit is
+				// seen (Kimi F4). Let them land before the screen is handed
+				// back, or they interleave with the replay.
+				select {
+				case <-fwdDone:
+				case <-time.After(500 * time.Millisecond):
+				}
+			}
 			leave()
+			if h.History && h.Replay {
+				h.write(h.replay())
+			}
 			var ee *exec.ExitError
 			if errors.As(err, &ee) {
 				return nil // the agent exiting is not the host failing
@@ -258,12 +338,28 @@ func (h *Host) Run() error {
 				cols, rows = nc, nr
 				agentRows, scapeRows = BandWith(rows, h.ScapeRows)
 
+				// The terminal has already moved the rows; the model follows
+				// it, and on a shrink keeps the rows the terminal destroyed
+				// so they can still be mirrored.
+				h.mu.Lock()
+				if h.model != nil {
+					if h.AltScreen {
+						h.model.resizeAlt(cols, rows)
+					} else {
+						h.model.resize(cols, rows)
+					}
+				}
+				h.mu.Unlock()
+				if h.mainRow > rows+1 {
+					h.mainRow = rows + 1
+				}
 				h.traceSize(cols, rows, agentRows)
 				h.write(resizeSequence(h.AltScreen, oldRows, rows, oldAgent, agentRows))
 				// The screen was just touched behind the tracker's back.
 				dmg.reset()
 				p.SetSize(cols, agentRows)
 			}
+			h.mirror(rows, agentRows)
 			if scapeRows <= 0 || h.Paint == nil {
 				continue
 			}
@@ -390,4 +486,117 @@ func resizeSequence(alt bool, oldRows, rows, oldAgent, agentRows int) string {
 		return RebindShrinkAlt(oldRows-rows, oldAgent-agentRows, agentRows)
 	}
 	return Rebind(grow, from, to, agentRows)
+}
+
+// maxMirrored caps what is kept for the replay. Terminal.app's own scrollback
+// default is ten thousand rows; keeping more than that would replay rows the
+// terminal then drops anyway.
+const maxMirrored = 10000
+
+// mirror sends the rows that left the band since the last tick to the main
+// buffer. One batch per tick, so the screen switches at most FPS times a
+// second; he watched four hundred a second and saw nothing.
+func (h *Host) mirror(rows, agentRows int) {
+	if h.model == nil {
+		return
+	}
+	h.mu.Lock()
+	kept := h.model.takeScrolled()
+	h.mu.Unlock()
+	if len(kept) == 0 {
+		return
+	}
+	lines := make([]string, len(kept))
+	for i, row := range kept {
+		lines[i] = rowANSI(row)
+	}
+	h.mirrored = append(h.mirrored, lines...)
+	if len(h.mirrored) > maxMirrored {
+		h.mirrored = h.mirrored[len(h.mirrored)-maxMirrored:]
+	}
+	h.write(MirrorBatch(lines, &h.mainRow, rows, agentRows))
+}
+
+// replay is the mirrored transcript once more, for after the alternate screen
+// is gone. Terminal.app keeps only the oldest few rows across 1049l, so the
+// first lines here can repeat ones already on screen; a separator makes the
+// seam visible rather than mysterious.
+func (h *Host) replay() string {
+	if len(h.mirrored) == 0 {
+		return ""
+	}
+	var b strings.Builder
+	fmt.Fprintf(&b, "\r\n\x1b[2mxscapes: the agent's transcript, %d rows\x1b[0m\r\n", len(h.mirrored))
+	for _, l := range h.mirrored {
+		b.WriteString(l)
+		b.WriteString("\r\n")
+	}
+	return b.String()
+}
+
+// forwardKeys copies the terminal's input to the agent, byte for byte, except
+// for the one reply the host asked for itself: while wantCPR is set, the first
+// cursor position report (ESC [ row ; col R) is taken out of the stream and
+// its row sent on cpr. Everything else, including any reply that arrives after
+// the host stopped waiting, goes to the agent untouched.
+func (h *Host) forwardKeys(in io.Reader, master io.Writer, cpr chan<- int) {
+	buf := make([]byte, 4096)
+	var held []byte
+	for {
+		n, err := in.Read(buf)
+		if n > 0 {
+			data := buf[:n]
+			if h.wantCPR.Load() {
+				held = append(held, data...)
+				if row, rest, ok := takeCPR(held); ok {
+					h.wantCPR.Store(false)
+					select {
+					case cpr <- row:
+					default:
+					}
+					data, held = rest, nil
+				} else if len(held) > 64 {
+					// Nothing that long is a cursor report. Let it through.
+					data, held = held, nil
+				} else {
+					continue
+				}
+			}
+			if len(data) > 0 {
+				master.Write(data)
+			}
+		}
+		if err != nil {
+			if len(held) > 0 {
+				master.Write(held)
+			}
+			return
+		}
+	}
+}
+
+// takeCPR finds a cursor position report in b and returns its row and the
+// bytes around it, or false if there is none yet.
+func takeCPR(b []byte) (row int, rest []byte, ok bool) {
+	s := string(b)
+	i := strings.Index(s, "\x1b[")
+	for i >= 0 {
+		j := i + 2
+		for j < len(s) && (s[j] >= '0' && s[j] <= '9' || s[j] == ';') {
+			j++
+		}
+		if j < len(s) && s[j] == 'R' {
+			var r, c int
+			if _, err := fmt.Sscanf(s[i+2:j], "%d;%d", &r, &c); err == nil {
+				rest = append([]byte(s[:i]), s[j+1:]...)
+				return r, rest, true
+			}
+		}
+		k := strings.Index(s[i+1:], "\x1b[")
+		if k < 0 {
+			break
+		}
+		i += 1 + k
+	}
+	return 0, nil, false
 }
