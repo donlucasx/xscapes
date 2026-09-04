@@ -210,6 +210,13 @@ func lumaOf(c term.RGB) float64 {
 func (c *Canvas) halves(x, y int) (up, down term.RGB, ok bool) {
 	i := y*c.W + x
 	up, down = c.BG[i], c.BG[i]
+	// A neighbour painted as two halves records the MEAN of them as its
+	// background, which is a bookkeeping value and not a tone anyone sees;
+	// blending toward it split a flat rim cell of the moon into a grey over
+	// an olive. A shape's edge is not part of any ramp.
+	if (y > 0 && c.half[i-c.W].set) || (y < c.H-1 && c.half[i+c.W].set) {
+		return up, down, false
+	}
 	if y > 0 {
 		a := c.BG[i-c.W]
 		if d := lumaOf(a) - lumaOf(c.BG[i]); d > halfStep || d < -halfStep {
@@ -247,10 +254,12 @@ func (c *Canvas) resolve(x, y int, p term.Profile) resolved {
 	i := y*c.W + x
 	ch, fg, set := c.composite(i)
 	bg := c.BG[i]
-	if hf := c.half[i]; hf.set && !set {
+	if hf := c.half[i]; hf.set {
 		// A shape's edge inside the row. Both halves are backgrounds and take
-		// the background quantiser; a glyph over the cell wins and sits on
-		// the mean, like anywhere else.
+		// the background quantiser. The halves win over a glyph: a far star
+		// on the moon's tip was rendering as one flat cell of the mean, a
+		// dark dot on the crown, and a star behind the moon's edge is not a
+		// thing anyone misses.
 		up, down := p.Quantise(hf.up, false), p.Quantise(hf.down, false)
 		if up != down {
 			return resolved{ch: '\u2580', fg: up, bg: down}

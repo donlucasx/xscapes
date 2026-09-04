@@ -81,6 +81,20 @@ replacing through a NEW inode (`rm -f` then `cp`) and verified by RUNNING `-info
 from now on: `go build -o xscapes . && rm -f ~/.local/bin/xscapes && cp xscapes ~/.local/bin/xscapes
 && ~/.local/bin/xscapes -info`** — a grep for a marker proves the bytes, not that they run.
 
+**Morning of 09-04, the moon, four more defects and a study** (`_FEEDBACK.md`, the peer session
+"xscapes-e6" relayed his live 133x61 run; then his own screengrab and *"I liked how the moon/sun
+looked in the original mockup — why changed?"*). FIXED and installed (f3dfe52 and after): the tip
+row's centre cell at exactly the radius counted as inside (a pip at 12 and 6; tie now out) · the
+unlit limb blended into the night sky so a moon one column into its phase looked bitten (earthshine
+lifted) · **`SetBGRamp` never cleared a cell's half-row record, so the moon's tips from the night
+stayed in the sky until morning as grey notches around the sun** — found by sampling his
+screenshot's pixels (26,26,26 over 180,180,180 = night sky over night moon, in a blue sky); two
+red-first tests · the shading split blended a flat moon cell toward a neighbour's half-cell MEAN
+(grey over olive) and a far star over a tip cell replaced the halves (dark dot on the crown) — both
+fixed in the canvas. The mockup question is answered by `notes/moonstudy` → artifact **The Moon's
+Edge**: solid (ships) · a same-hue rim one tone darker (`Shore.MoonRim="hue"`, study-only) · the
+mockup's fade, which is the grey fringe s11 removed. **⏸ HIS PICK: solid or the hue rim.**
+
 **Not done**: a day lived in it with the paths on. The moon at 20:33 is still sun-coloured:
 that was the option he did not pick. `~/.local/bin/xscapes` is a COPY of the repo binary, not
 a symlink; rebuild both after any change.

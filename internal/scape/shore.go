@@ -73,6 +73,11 @@ type Shore struct {
 	// goes looking for, and stacking them in one column leaves half the frame
 	// carrying nothing. Zero means the default.
 	MoonX float64
+	// MoonRim is a STUDY switch for the disc's edge, off in production: ""
+	// (solid, what ships), "hue" (the outer ring one tone darker in the moon's
+	// own hue) or "blend" (the s7 mockup's fade, half toward the sky). Kept so
+	// notes/moonstudy can show him the three side by side on 256.
+	MoonRim string
 
 	// writeTop is the first row of the writing band, or c.H when there is none.
 	writeTop int
@@ -630,11 +635,25 @@ func (s *Shore) moon(c *canvas.Canvas, hy int, scale, lit, vis float64) {
 					continue
 				}
 				col := s.pal.Moon
+				lit := true
 				if math.Hypot(fx-shadow, fy) <= rr {
-					col, a = dark, a*0.6 // earthshine on the unlit face
+					col, a, lit = dark, a*0.6, false // earthshine on the unlit face
+				}
+				rim := lit && s.MoonRim != "" && math.Hypot(fx, fy) > rr-0.55
+				if rim && s.MoonRim == "blend" {
+					a *= 0.5
 				}
 				in[k] = true
 				half[k] = c.BGAt(x, y).Blend(col, a)
+				if rim && s.MoonRim == "hue" {
+					// One tone darker than the FINISHED body, in its hue: the
+					// body as 256 shows it, scaled, and quantised with the
+					// ordering kept. Darkening the moon colour before the
+					// blend was tried first and the blend took the chroma
+					// with it -- an olive and two greys by day.
+					q := term.FromIndex256(half[k].Index256Keeping())
+					half[k] = term.RGB{R: uint8(float64(q.R) * 0.72), G: uint8(float64(q.G) * 0.72), B: uint8(float64(q.B) * 0.72)}
+				}
 			}
 			switch {
 			case in[0] && in[1] && half[0] == half[1]:

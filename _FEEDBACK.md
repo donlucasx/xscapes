@@ -802,3 +802,13 @@ automation, the scroll glitch); his answers:
     also part of the peer's "lumpy potato" at night: their moon moved a row as context grew.
     Installed (new inode, verified running) with the tie and earthshine fixes. Sessions must be
     restarted.
+  ⇒ **The mockup question, answered with a page (11:20)**: the soft rim was removed in s11
+    because on Terminal.app the blend cells between disc and sky quantised to greys/teals ("a warm
+    disc with a grey fringe", measured). Built a study (`notes/moonstudy`, artifact "The Moon's
+    Edge"): the disc three ways × three hours at 133x27 on 256 — solid (ships) · a rim one tone
+    darker in the moon's own hue (one tone: #8a8a8a at night, #af875f by day and dusk) · the
+    mockup's fade (#87afaf teal-grey by day, #6c6c6c/#767676 greys at night). Two more canvas
+    defects found on the way and FIXED: the shading split blended a flat moon cell toward a
+    neighbour's half-cell MEAN (grey over olive in a tan rim), and a far star over a tip cell
+    replaced the halves with one flat mean (a dark dot on the crown). **His pick pending: solid
+    or the hue rim.** The rim switch (`Shore.MoonRim`) is study-only, off in production.
