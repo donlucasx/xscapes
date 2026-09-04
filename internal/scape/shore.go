@@ -393,6 +393,13 @@ func (s *Shore) paintBG(c *canvas.Canvas, hy int, edge []float64) {
 	if len(edge) > 0 {
 		mean /= float64(len(edge))
 	}
+	// The sky and the open sea are each ONE ramp, painted as a path through
+	// the palette on 256 -- see term.Ramp. Each cell is told the span of the
+	// ramp it covers, so a band edge that falls inside a row lands on the
+	// right half of it.
+	sky := term.NewRamp(s.pal.SkyTop, s.pal.SkyHorizon)
+	sea := term.NewRamp(s.pal.SeaFar, s.pal.SeaNear)
+	depth := math.Max(1, mean-float64(hy))
 	for x := 0; x < c.W; x++ {
 		ex := edge[x]
 		for y := 0; y < c.H; y++ {
@@ -400,7 +407,8 @@ func (s *Shore) paintBG(c *canvas.Canvas, hy int, edge []float64) {
 			var col term.RGB
 			switch {
 			case y <= hy:
-				col = term.Lerp(s.pal.SkyTop, s.pal.SkyHorizon, fy/fh)
+				c.SetBGRamp(x, y, sky, (fy-0.5)/fh, (fy+0.5)/fh)
+				continue
 			case fy < ex-0.5:
 				// Depth, from the mean waterline for the same reason the beach
 				// is: this ramp says how far out the water is, which is a
@@ -412,7 +420,8 @@ func (s *Shore) paintBG(c *canvas.Canvas, hy int, edge []float64) {
 				// The wave motion did not live here anyway. It lives in the
 				// glyphs and in the waterline cell below, which keeps its own
 				// per-column edge.
-				col = term.Lerp(s.pal.SeaFar, s.pal.SeaNear, (fy-float64(hy))/math.Max(1, mean-float64(hy)))
+				c.SetBGRamp(x, y, sea, (fy-0.5-float64(hy))/depth, (fy+0.5-float64(hy))/depth)
+				continue
 			case fy < ex+0.5:
 				// The waterline cell straddles sea and sand. Mix by how much of
 				// the cell the water actually covers.

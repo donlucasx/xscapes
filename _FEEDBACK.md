@@ -720,3 +720,31 @@ Resumed under Fable. Both ▶ NEXT decisions put to him as a two-question pick; 
   repeats are Ink re-rendering its header while the short band scrolls (the warnings push it off);
   the garbled rows are the MODEL diverging from the terminal on some sequence. Needs a trace of a
   real startup replayed through the model against the terminal's own readback.
+
+## Session 15 — 2026-09-04
+
+Resumed under Fable. Four questions put to him at the start (submission, gradient pick, Terminal
+automation, the scroll glitch); his answers:
+
+- Submission — *"i glanced over it- we need to work on some of the pending items and update it
+  later"*
+  ⇒ The page is NOT published and NOT submitted. Pending items come first; the page gets updated
+    with what ships, then published. Deadline unchanged, 2026-09-17.
+- Gradients — **"Cube-path gradients (Recommended)"** and ONLY that (re-time the day, the stable
+  moon colour and the grey night were offered alongside and not picked).
+  ⇒ **LOCKED 2026-09-04**: build the chain-through-the-cube interpolation, re-measure with
+    `notes/gradientaudit`, show him the same page before it is installed. Day timing and the moon
+    stay as they are.
+- Terminal automation — *"yes, only for this session"*
+  ⇒ Allowed for session 15 ONLY, under the tty rule: a window the script itself opened, resolved
+    from the `do script` tab's tty, asserted before any keystroke, never `front window`. Off again
+    at the next session unless he says otherwise.
+- Scroll glitch (report #2) — **"Did not check"**
+  ⇒ Left open. He watches for it next time he lives in it.
+- *"we hit session limit. I re logged on with a different claude account, resume"* (23:49, after the
+  suite went green on the chroma-scaled ordering charge; the limit resets 01:30)
+  ⇒ Account switch mid-session. Artifacts published under the earlier account ("Sky and Sea by the
+    Hour") are read-only to this one; the before/after page is a NEW artifact under this account.
+- Gradient paths, after the page (artifact "Sky and Sea Repainted", before/after/truecolor per half
+  hour) — **"Install it (Recommended)"** over "tune it first" and "revert it".
+  ⇒ **INSTALLED 2026-09-04**: committed, pushed, `~/.local/bin/xscapes` rebuilt.

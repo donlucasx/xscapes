@@ -15,6 +15,58 @@ frame does rather than what the source says it should. And one from session 14:
 do NOT drive Terminal.app (osascript, System Events) without asking me first.
 ```
 
+## Where we left off (2026-09-04, session 15, INSTALLED and pushed)
+
+**His four answers at the start** (verbatim in `_FEEDBACK.md`): the submission page is NOT
+published (*"we need to work on some of the pending items and update it later"*) · gradients:
+**cube-path, and ONLY that** (re-timing the day, a stable moon colour and the grey night were
+offered beside it and not picked) · Terminal automation: *"yes, only for this session"*, tty rule ·
+the scroll glitch (report #2): did not check. An account switch at 23:49 (session limit, 6th flip).
+
+**The cube-path gradients are BUILT, MEASURED, and INSTALLED** — he saw the page and said
+*"Install it"*; committed, pushed, `~/.local/bin/xscapes` rebuilt the same night.
+
+- `internal/term/ramp.go`: `term.Ramp`, a gradient as ONE PATH through the 240 fixed palette
+  entries. The cheapest walk from the quantised start to the quantised end: the sum of SQUARED
+  CIE76 steps (two of 15 beat one of 30), plus an off-line charge along the way (a tone's distance
+  from the true ramp, in Lab, against its nearest sample), plus a charge for flattening a channel
+  lead the truth states strongly, scaled by the tone's own chroma (a muted slate is a tint, a
+  saturated violet is a stripe). Cube entries stay inside the box the two ends span; greys by
+  brightness. Knobs: `RampHop` 26 (the grey-ramp entries beside a slate blue sit 24.2–24.7 away;
+  at 24 the walk was refused the one detour that beats the 32-point green step every dawn took),
+  `RampLambda` 1. `XSCAPES_RAMP=0` puts every row back through the row-by-row quantiser.
+- `canvas.SetBGRamp` binds a cell to the span of a ramp it covers; `resolve` on 256 takes the
+  path's tones (both halves of a split cell), the quantiser everywhere else. `BGAt` and truecolor
+  report the true colour, unchanged. A glyph over a ramp gets the path's tone as its background.
+- `shore.paintBG`: the sky and the open sea are painted through ramps. Nothing else moved.
+- Tests, all reading the RENDERED frame at his geometry: `internal/term/ramp_test.go` (ends are
+  the quantiser's, every tone a real entry in the box and never repeated, greys walk the grey
+  ramp one step at a time, the 05:00 sky has fewer hard edges than rounding, equal shares);
+  `internal/scape/gradient_path_test.go` (all 48 half-hours: no tone comes back, at most two
+  grey/colour crossings, at most two steps of 25 or over, largest 33 — the measured floor);
+  `TestTheSkyHueDoesNotWander` moved onto the rendered frame. `go test ./...` green.
+- **Measured** (`notes/gradientaudit`, which now has a `-dump` flag, a `hard` column, and a
+  "256 before" frame per hour): hard edges (ΔE ≥ 20) **sky 84 → 65, sea 120 → 99**; half-hours
+  with a step ≥ 30: **29 → 6**; the largest step is UNCHANGED at 33 (the first green step out of
+  the daylight zenith with blue pinned by a pale horizon, 08:00 and 14:30–15:30; no path through
+  the cube gets under it). Two half-hours got ONE edge worse: 17:00 sea (the path takes `#5f87d7`
+  for one row where rounding did not) and 21:00 sea (grey → teal → blue over two steps where
+  rounding jumped grey → blue in one). Tones per region fell a little (sky 8.3 → 7.4) because a
+  path never revisits a tone. Rejected on the audit before this objective: minimax (smaller steps
+  by leaving the ramp: a dawn through hot pink), a drift bound (cuts the graph where the ramp
+  passes a neutral nothing sits near), a hybrid end rule (4 half-hours changed, 2 better, 1 worse).
+- **Page**: `assets/frames/gradients.html` (ignored; `go run ./notes/gradientaudit -html
+  assets/frames/gradients.html`) and the artifact **Sky and Sea Repainted**, https://claude.ai/code/artifact/3bf5eb42-4096-40d7-b607-ac88b388d2d6
+  (this account's; "Sky and Sea by the Hour" `b465bc20-…` belongs to the prior login, read-only).
+- ⚠ **The audit's first before/after came out IDENTICAL** and was nearly quoted: rendering the
+  "before" frame set `term.Ramps = true` afterwards, so `XSCAPES_RAMP=0` lasted one hour of 48.
+  Fixed (save and restore); the before run now matches the pre-change baseline table on all 48
+  half-hours, which is the check that makes the numbers above quotable.
+
+**Not done**: a day lived in it with the paths on. The moon at 20:33 is still sun-coloured:
+that was the option he did not pick. `~/.local/bin/xscapes` is a COPY of the repo binary, not
+a symlink; rebuild both after any change.
+
 ## Where we left off (2026-09-03, session 14 WRAP, pushed, tree clean)
 
 **He lived in it for an evening and came back with six reports** (verbatim in `_FEEDBACK.md`).
@@ -560,24 +612,27 @@ Demo flags: `-wired -mockup -anim -compare -layout -context -day -busy -kittens 
 **Order for a fresh session, 14 days to the deadline (closes 2026-09-17):**
 
 0. **⭐⭐ PUBLISH THE PAGE AND SUBMIT.** `site/COMMONS-PROMPT.md` has the steps; the page is
-   `site/index.html`. His hands only. Ask whether it happened; do not assume.
+   `site/index.html`. His hands only. **2026-09-04: not yet, by his choice** — *"we need to work
+   on some of the pending items and update it later."* Update the page with what ships, then
+   publish. Deadline 09-17.
 
-1. **Check the incident's aftermath.** Did his "Xscapes status and hackathon news" session survive
-   the stray `/exit` (he was told to press Escape)? If it exited with agents running, that is on
-   this session. Then: is Terminal automation allowed again, and under the tty rule only?
+1. ~~Check the incident's aftermath.~~ Automation: **allowed for session 15 ONLY** (*"yes, only
+   for this session"*), tty rule; off again after unless he says otherwise. Whether his session
+   survived the stray `/exit` was not asked; ask if it matters.
 
-2. **⏸ HIS CALL: the gradient review.** Four options in "Where we left off" #5, page + artifact
-   ready. Nothing about the palette changes until he picks. If he picks cube-path gradients:
-   build the chain-through-the-cube interpolation in `internal/scape/palette.go`/`shore.go`,
-   re-measure with `notes/gradientaudit`, show him the same page again before installing.
+2. ~~HIS LOOK, then the install: the cube-path gradients.~~ **INSTALLED 2026-09-04** on his
+   *"Install it"*. What is left is his eyes on it in a live session; if an hour looks wrong the
+   knobs are `RampHop`/`RampLambda` (env `XSCAPES_RAMP_HOP`/`_LAMBDA`), `XSCAPES_RAMP=0` is the
+   old rounding for a side-by-side, and `go run ./notes/gradientaudit -dump <hours>` shows the
+   tones. Rebuild BOTH binaries after a change (`~/.local/bin/xscapes` is a copy).
 
 3. **The transcript start** (his report #6): redo the frozen comparison PROPERLY -- a window
    addressed by the `do script` tab's tty, `kill -STOP` only a pid on that tty, readback, CONT,
    `TRACE_DUMP` replay, diff aligned on the banner. Expect more model divergences like ESC ( B.
    Only with his OK (#1).
 
-4. **His report #2** (scape lines broken after scrolling): ask whether it healed within ~4s. If it
-   persisted, reproduce with a real Claude session rather than a chatty child.
+4. **His report #2** (scape lines broken after scrolling): *"Did not check"* (2026-09-04). He
+   watches for it next time he lives in it; if it persists, reproduce with a real Claude session.
 
 5. **Live in it another day** with the fixes installed (swimmers, balloon cap, ESC ( B).
 

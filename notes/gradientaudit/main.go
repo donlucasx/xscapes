@@ -26,6 +26,7 @@ func main() {
 	h := flag.Int("h", 27, "scape height (the rows the scape gets at his 62-row window)")
 	out := flag.String("html", "", "write the hour-by-hour page here")
 	steps := flag.Int("steps", 48, "samples across the day (48 = every half hour)")
+	dump := flag.String("dump", "", "print every half-row tone of the sky and sea at these clock hours, e.g. 5,12,16.5,20.5")
 	flag.Parse()
 
 	type hourStat struct {
@@ -37,6 +38,10 @@ func main() {
 		moon               term.RGB
 		moonIdx            int
 		frame256, frameTC  string
+		frameBefore        string
+		skyHard, seaHard   int // steps of 20 or over, half-row to half-row
+		tones              []term.RGB
+		sandTop            int
 	}
 	var stats []hourStat
 	var pal canvas.HTMLPalette
@@ -74,10 +79,12 @@ func main() {
 		if sandTop <= hy || sandTop > c.H {
 			sandTop = c.H
 		}
-		st := hourStat{tod: tod, skyRows: hy, seaRows: sandTop - hy}
+		st := hourStat{tod: tod, skyRows: hy, seaRows: sandTop - hy, tones: tones, sandTop: sandTop}
 		st.skyBands, st.skyMaxDE, st.skyMaxAt = bands(tones[:2*hy])
 		st.seaBands, st.seaMaxDE, st.seaMaxAt = bands(tones[2*hy : 2*sandTop])
 		st.seaMaxAt += hy * 2
+		st.skyHard = hardEdges(tones[:2*hy])
+		st.seaHard = hardEdges(tones[2*hy : 2*sandTop])
 		mx, my := sh.MoonPos()
 		if mx >= 0 && my >= 0 && my < c.H && mx < c.W {
 			_, fg, _ := c.ResolveAt(mx, my, term.Profile256)
@@ -86,21 +93,63 @@ func main() {
 		}
 		st.frame256 = c.HTMLFragmentClassed(6, term.Profile256, &pal)
 		st.frameTC = c.HTMLFragmentClassed(6, term.ProfileTrueColor, &pal)
+		// The same frame the way it was quantised before the ramps became
+		// paths: every row rounded on its own. Kept on the page so the change
+		// is judged against what it replaced, not against memory.
+		//
+		// Restore what was set, not "true": with XSCAPES_RAMP=0 the whole
+		// run is meant to be the before, and the first version of this line
+		// switched the paths ON for the other 47 hours, so a before/after
+		// comparison of the table came out identical. An instrument that
+		// changes the thing it measures reports whatever it was set to.
+		was := term.Ramps
+		term.Ramps = false
+		st.frameBefore = c.HTMLFragmentClassed(6, term.Profile256, &pal)
+		term.Ramps = was
 		stats = append(stats, st)
 	}
 
 	// The table.
-	fmt.Printf("%-6s %-6s %-9s %-8s %-6s %-9s %-8s %-10s\n", "time", "sky", "sky tones", "maxΔE@", "sea", "sea tones", "maxΔE@", "body 256")
+	fmt.Printf("%-6s %-6s %-9s %-8s %-5s %-6s %-9s %-8s %-5s %-10s\n", "time", "sky", "sky tones", "maxΔE@", "hard", "sea", "sea tones", "maxΔE@", "hard", "body 256")
 	for _, st := range stats {
-		fmt.Printf("%-6s %-6s %-9s %-8s %-6s %-9s %-8s %-10s\n",
+		fmt.Printf("%-6s %-6s %-9s %-8s %-5s %-6s %-9s %-8s %-5s %-10s\n",
 			clock(st.tod),
 			fmt.Sprintf("%d", st.skyRows), fmt.Sprintf("%d %s", len(st.skyBands), runs(st.skyBands)),
-			fmt.Sprintf("%.0f@%d", st.skyMaxDE, st.skyMaxAt/2+1),
+			fmt.Sprintf("%.0f@%d", st.skyMaxDE, st.skyMaxAt/2+1), fmt.Sprintf("%d", st.skyHard),
 			fmt.Sprintf("%d", st.seaRows), fmt.Sprintf("%d %s", len(st.seaBands), runs(st.seaBands)),
-			fmt.Sprintf("%.0f@%d", st.seaMaxDE, st.seaMaxAt/2+1),
+			fmt.Sprintf("%.0f@%d", st.seaMaxDE, st.seaMaxAt/2+1), fmt.Sprintf("%d", st.seaHard),
 			fmt.Sprintf("#%02x%02x%02x/%d", st.moon.R, st.moon.G, st.moon.B, st.moonIdx))
 	}
 
+	if *dump != "" {
+		want := map[string]bool{}
+		for _, f := range strings.Split(*dump, ",") {
+			var h float64
+			fmt.Sscanf(strings.TrimSpace(f), "%g", &h)
+			want[clock(h/24)] = true
+		}
+		for _, st := range stats {
+			if !want[clock(st.tod)] {
+				continue
+			}
+			fmt.Printf("\n== %s  sky rows 0-%d, sea rows %d-%d (half-rows; dE to the row above) ==\n", clock(st.tod), st.skyRows-1, st.skyRows, st.sandTop-1)
+			for i, c := range st.tones[:2*st.sandTop] {
+				region := "sky"
+				if i >= 2*st.skyRows {
+					region = "sea"
+				}
+				de := 0.0
+				if i > 0 {
+					de = deltaE(st.tones[i-1], c)
+				}
+				mark := ""
+				if de >= 20 {
+					mark = "  <-- edge"
+				}
+				fmt.Printf("%s %4.1f  #%02x%02x%02x  %3d  dE %4.1f%s\n", region, float64(i)/2, c.R, c.G, c.B, c.Index256(), de, mark)
+			}
+		}
+	}
 	if *out == "" {
 		return
 	}
@@ -108,7 +157,7 @@ func main() {
 	b.WriteString(`<!doctype html><html><head><meta charset="utf-8"><title>xscapes gradients by the hour</title><style>
 body{margin:0;background:#0b0b10;color:#c9c9d4;font:14px/1.5 -apple-system,Helvetica,Arial,sans-serif;padding:28px}
 h1{font-size:20px;margin:0 0 6px}p{max-width:80ch;color:#8a8a96;margin:0 0 18px}
-.hour{display:grid;grid-template-columns:70px 1fr 1fr 260px;gap:14px;align-items:start;margin-bottom:14px;padding-bottom:12px;border-bottom:1px solid #1c1c24}
+.hour{display:grid;grid-template-columns:64px 1fr 1fr 1fr 250px;gap:12px;align-items:start;margin-bottom:14px;padding-bottom:12px;border-bottom:1px solid #1c1c24}
 .t{font-size:18px;font-weight:600;color:#f0f0f4}.lbl{font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:#55555f;margin-bottom:4px}
 pre{margin:0;font-family:Menlo,monospace;line-height:1.0;letter-spacing:0;display:inline-block}
 .win{background:#000;border:1px solid #22222a;border-radius:4px;padding:4px 6px;overflow:hidden}
@@ -116,15 +165,16 @@ pre{margin:0;font-family:Menlo,monospace;line-height:1.0;letter-spacing:0;displa
 .sw{display:inline-block;width:14px;height:14px;border-radius:2px;vertical-align:middle;margin-right:2px;border:1px solid #333}
 ` + "</style></head><body>")
 	b.WriteString(`<h1>xscapes: the sky and the sea, hour by hour, as Terminal.app shows them</h1>
-<p>Left: the 256-colour frame, which is what you get. Middle: the truecolor frame the palette asks for. Right: what the 256 sky and sea actually carry in column 2, at half-row resolution: how many distinct tones, how tall each band of one tone is (top to bottom), and the largest perceptual jump between neighbouring half-rows (CIE76 &Delta;E; under 5 is barely visible, over 20 is a hard edge). Rendered at ` + fmt.Sprintf("%dx%d", *w, *h) + `, the scape your 124x62 window gets.</p>`)
+<p>First: the 256-colour frame as it was, every row rounded to the nearest palette entry on its own. Second: the 256-colour frame now, the sky and the sea each painted as one path through the palette. Third: the truecolor frame the palette asks for. Right: what the new 256 sky and sea carry in column 2, at half-row resolution: how many distinct tones, how tall each band of one tone is (top to bottom), how many steps between neighbouring half-rows are hard edges (CIE76 &Delta;E of 20 or over), and the largest. Under 5 is barely visible. Rendered at ` + fmt.Sprintf("%dx%d", *w, *h) + `, the scape your 124x62 window gets.</p>`)
 	for _, st := range stats {
 		b.WriteString(`<div class="hour"><div class="t">` + clock(st.tod) + `</div>`)
-		b.WriteString(`<div><div class="lbl">256, what you get</div><div class="win">` + st.frame256 + `</div></div>`)
+		b.WriteString(`<div><div class="lbl">256 before, rounded row by row</div><div class="win">` + st.frameBefore + `</div></div>`)
+		b.WriteString(`<div><div class="lbl">256 now, one path through the palette</div><div class="win">` + st.frame256 + `</div></div>`)
 		b.WriteString(`<div><div class="lbl">truecolor, what the palette asks for</div><div class="win">` + st.frameTC + `</div></div>`)
-		b.WriteString(`<div class="m"><div class="lbl">sky, ` + fmt.Sprintf("%d rows", st.skyRows) + `</div>`)
-		b.WriteString(swatches(st.skyBands) + fmt.Sprintf(`<br><b>%d</b> tones, bands %s, max &Delta;E <b>%.0f</b> at row %d<br><br>`, len(st.skyBands), runs(st.skyBands), st.skyMaxDE, st.skyMaxAt/2+1))
-		b.WriteString(`<div class="lbl">sea, ` + fmt.Sprintf("%d rows", st.seaRows) + `</div>`)
-		b.WriteString(swatches(st.seaBands) + fmt.Sprintf(`<br><b>%d</b> tones, bands %s, max &Delta;E <b>%.0f</b> at row %d<br><br>`, len(st.seaBands), runs(st.seaBands), st.seaMaxDE, st.seaMaxAt/2+1))
+		b.WriteString(`<div class="m"><div class="lbl">sky now, ` + fmt.Sprintf("%d rows", st.skyRows) + `</div>`)
+		b.WriteString(swatches(st.skyBands) + fmt.Sprintf(`<br><b>%d</b> tones, bands %s<br>hard edges <b>%d</b>, largest <b>%.0f</b> at row %d<br><br>`, len(st.skyBands), runs(st.skyBands), st.skyHard, st.skyMaxDE, st.skyMaxAt/2+1))
+		b.WriteString(`<div class="lbl">sea now, ` + fmt.Sprintf("%d rows", st.seaRows) + `</div>`)
+		b.WriteString(swatches(st.seaBands) + fmt.Sprintf(`<br><b>%d</b> tones, bands %s<br>hard edges <b>%d</b>, largest <b>%.0f</b> at row %d<br><br>`, len(st.seaBands), runs(st.seaBands), st.seaHard, st.seaMaxDE, st.seaMaxAt/2+1))
 		b.WriteString(fmt.Sprintf(`<div class="lbl">sun / moon</div><span class="sw" style="background:#%02x%02x%02x"></span> 256 index %d`, st.moon.R, st.moon.G, st.moon.B, st.moonIdx))
 		b.WriteString(`</div></div>`)
 	}
@@ -158,6 +208,18 @@ func bands(tones []term.RGB) (out []band, maxDE float64, at int) {
 		out = append(out, band{c, 1})
 	}
 	return out, maxDE, at
+}
+
+// hardEdges counts the steps between neighbouring half-rows that the eye
+// reads as an edge rather than a shade: CIE76 of 20 or over.
+func hardEdges(tones []term.RGB) int {
+	n := 0
+	for i := 1; i < len(tones); i++ {
+		if tones[i] != tones[i-1] && deltaE(tones[i-1], tones[i]) >= 20 {
+			n++
+		}
+	}
+	return n
 }
 
 func runs(bs []band) string {

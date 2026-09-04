@@ -52,12 +52,25 @@ type Canvas struct {
 	BG     []term.RGB
 	Layers []*Layer
 
+	// ramp binds a background cell to the gradient it is part of, so that on
+	// 256 the cell takes its tone from the ramp's path rather than from
+	// rounding its own colour. Nil where the background is a flat tone.
+	ramp []rampRef
+
 	buf []byte
+}
+
+// rampRef is a cell's place in a ramp: the ramp, and the span of it the
+// cell covers, top edge to bottom edge, so the two halves of the cell can
+// each take the tone the path puts there.
+type rampRef struct {
+	r      *term.Ramp
+	t0, t1 float64
 }
 
 // New builds a canvas with one layer per alpha given, ordered far to near.
 func New(w, h int, alphas ...float64) *Canvas {
-	c := &Canvas{W: w, H: h, BG: make([]term.RGB, w*h)}
+	c := &Canvas{W: w, H: h, BG: make([]term.RGB, w*h), ramp: make([]rampRef, w*h)}
 	for _, a := range alphas {
 		c.Layers = append(c.Layers, NewLayer(w, h, a))
 	}
@@ -70,6 +83,7 @@ func (c *Canvas) Resize(w, h int) {
 	}
 	c.W, c.H = w, h
 	c.BG = make([]term.RGB, w*h)
+	c.ramp = make([]rampRef, w*h)
 	for i, l := range c.Layers {
 		c.Layers[i] = NewLayer(w, h, l.Alpha)
 	}
@@ -94,6 +108,21 @@ func (c *Canvas) SetBG(x, y int, col term.RGB) {
 		return
 	}
 	c.BG[y*c.W+x] = col
+	c.ramp[y*c.W+x] = rampRef{}
+}
+
+// SetBGRamp paints a cell as part of a ramp. t0 and t1 are where the cell's
+// top and bottom edges fall along it, 0 at the ramp's start and 1 at its end.
+// The background reads as the true colour at the cell's centre, which is what
+// a truecolor terminal paints and what BGAt reports; on 256 the cell resolves
+// through the ramp's path instead of through the quantiser.
+func (c *Canvas) SetBGRamp(x, y int, r *term.Ramp, t0, t1 float64) {
+	if x < 0 || y < 0 || x >= c.W || y >= c.H || r == nil {
+		return
+	}
+	i := y*c.W + x
+	c.BG[i] = r.True((t0 + t1) / 2)
+	c.ramp[i] = rampRef{r: r, t0: t0, t1: t1}
 }
 
 // Far/Mid/Near are conveniences so scapes read as depth, not indices.
@@ -186,6 +215,25 @@ func (c *Canvas) resolve(x, y int, p term.Profile) resolved {
 	i := y*c.W + x
 	ch, fg, set := c.composite(i)
 	bg := c.BG[i]
+	if p == term.Profile256 && term.Ramps && c.ramp[i].r != nil {
+		// A cell of a ramp takes the path's tones, not the quantiser's. Both
+		// halves, where the path puts an edge inside the cell; and the same
+		// tone under a glyph as the open cells beside it, or every star
+		// would sit in a one-cell halo of a slightly different blue.
+		rr := c.ramp[i]
+		mid := rr.r.Tone((rr.t0 + rr.t1) / 2)
+		if !set {
+			if term.Shading {
+				up := rr.r.Tone(rr.t0 + 0.25*(rr.t1-rr.t0))
+				down := rr.r.Tone(rr.t0 + 0.75*(rr.t1-rr.t0))
+				if up != down {
+					return resolved{ch: '\u2580', fg: up, bg: down}
+				}
+			}
+			return resolved{ch: ' ', fg: mid, bg: mid, glyph: true}
+		}
+		return resolved{ch: ch, fg: fg, bg: mid, glyph: true}
+	}
 	if p == term.Profile256 && !set && term.Shading {
 		if up, down, ok := c.halves(x, y); ok {
 			ui, di := up.Index256Keeping(), down.Index256Keeping()

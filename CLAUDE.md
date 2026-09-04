@@ -2,6 +2,14 @@
 
 *(Renamed end to end on 2026-09-03: directory, env vars, state path and hook marker. Two names are kept on purpose and are not leftovers -- `internal/envx` still reads `ASCIISCAPES_*` and warns, and `install.go` still RECOGNISES the `# asciiscapes:v1` marker so the hooks it wrote before the rename can be found and removed.)*
 
+> **Session 15 (2026-09-04).** His picks: gradients **cube-path ONLY**; Terminal
+> automation **this session only** (tty rule); the page stays unpublished until the
+> pending items are in. **Built, measured, and INSTALLED** (*"Install it"*): the sky and the sea are
+> painted as one PATH through the 256 palette (`term.Ramp`, `canvas.SetBGRamp`) instead
+> of rounding each row — hard edges sky 84→65, sea 120→99, half-hours with a step ≥30
+> 29→6, the largest step unchanged at 33 (the cube's green step; unavoidable). Page:
+> artifact "Sky and Sea Repainted". Pushed; `~/.local/bin/xscapes` rebuilt. NEXT: live in it.
+>
 > **Session 14, the evening.** He lived in it and came back with six reports
 > (`_FEEDBACK.md`): three FIXED (swimmers above the waterline, balloon text
 > capped, the model's ESC ( B); the scroll-back glitch NOT reproduced in the

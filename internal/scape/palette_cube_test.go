@@ -269,18 +269,20 @@ func TestTheNightStaysMonochromeOn256(t *testing.T) {
 // which measured as a paler sky with fewer than half the bands. So this bounds
 // the wandering rather than forbidding it, and it is proven red against the
 // unweighted quantiser, which scores 5 reversals at his window size.
+//
+// Read from the RENDERED frame at his geometry, 24 half-rows of sky. It used
+// to call the quantiser on the palette directly, which stopped being what the
+// renderer does the day the sky became a path (term.Ramp); a test naming a
+// function checks the path nothing uses.
 func TestTheSkyHueDoesNotWander(t *testing.T) {
-	const rows = 24 // a real window, not the 10 rows a study panel gives
 	for i := 0; i < 48; i++ {
 		tod := float64(i) / 48
 		if !daylight(tod) {
 			continue
 		}
-		p := PaletteAt(tod)
+		c, hy, _ := skyAndSea(tod)
 		prev, dir, dips := -999, 0, 0
-		for r := 0; r < rows; r++ {
-			want := term.Lerp(p.SkyTop, p.SkyHorizon, float64(r)/float64(rows-1))
-			q := term.FromIndex256(want.Index256Keeping())
+		for _, q := range tonesDown(c, 2)[:2*hy] {
 			green := int(q.G) - int(q.R)
 			if prev != -999 && green != prev {
 				d := 1
