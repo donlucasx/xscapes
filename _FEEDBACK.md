@@ -653,3 +653,24 @@ Never paraphrase. Read the relevant section before editing anything it covers.
 
 - *"ok, gonna switch models to fable. Lets /wrap the session"*
   ⇒ This wrap.
+
+## Session 14 — 2026-09-03
+
+Resumed under Fable. Both ▶ NEXT decisions put to him as a two-question pick; he chose:
+
+- Submission — *"Not yet, draft the page now"* (the recommended option: a single-file HTML
+  submission page plus the spec for Commons Code mode; he publishes it and ticks it in the entry
+  picker).
+  ⇒ Confirms the entry is NOT submitted. Nothing web-shaped existed in the repo; the Commons
+    entry picker only lists published Commons apps (`research/commons-submission.md`). Chrome was
+    signed out of Commons, so his status could not be read from the site. Page comes FIRST, so he
+    can publish while the scrollback is built.
+- Scrollback — *"Build it now"* (the recommended option: the DECSC/DECRC interleave test and fix
+  first, then the ring buffer and scroll mode; two sessions).
+  ⇒ Unblocks ▶ NEXT #1 and #2 together. Report 1 (split input box) is worked as the first step.
+
+- *"audit the scrollback plan before you build it- ensure its the right path. Run a kimi audit if
+  needed as well"* (sent mid-turn, right after the two picks)
+  ⇒ Order changes: the scrollback is AUDITED before any of it is built. The submission page is
+    still first in line for delivery. Kimi packet per the s13 pattern if the audit leaves a
+    question the record cannot settle.

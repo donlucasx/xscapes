@@ -309,3 +309,36 @@ lines. The alternate screen never reflows, which is the property that makes the 
 ⇒ **"Put the band back on the main screen to get scrollback" is dead.** Height would be easier there,
 but width is unfixable, and windows get narrowed. Scrollback and the band cannot both come from
 Terminal.app; if xscapes wants scrollback it has to own it.
+
+## MEASURED, 2026-09-03 (session 14): five facts for the scrollback question, all read back by machine
+
+Read with `history of selected tab of window id N` over `osascript`, which returns the ALTERNATE
+screen's visible cells as well as the main buffer's — so "nothing reads cells back from
+Terminal.app" (above) is retired. Probes in `notes/histprobe`, `notes/shrinkprobe`,
+`notes/mirrorprobe`; the full write-up is `notes/scrollback-audit.md`.
+
+1. **The alternate screen has NO history.** Forty lines through a row-1 band of 17: on the
+   alternate screen only the 16 still visible are in `history`, and none after exit. On the main
+   screen (control) all forty, during and after. The row-1 anchoring rule above is a MAIN-screen
+   fact; on the alternate screen a line that leaves the band is gone.
+2. **A shrink homes the agent's cursor through the host's own Rebind.** Cursor on row 16 of a
+   17-row band, window 30→24 (band 17→14): after the terminal's shrink the cursor is still on 16
+   (content moved up 6); after `Rebind` it is on **row 1**. **DECRC into a region that no longer
+   contains the saved row lands on row 1.** A Claude-style relative redraw then paints a second
+   input box at the top of the band — Report 1 (2026-09-03 ~11:57), reproduced. Fixed by
+   restoring while the region is still the full screen, moving relatively, saving again, pinning
+   the band, restoring: cursor 13 and the box redrawn exactly over the moved one.
+3. **DECSET 47 switches buffers without clearing, in both directions.** 400 round trips
+   (`ESC[?47l` · write a row at the main buffer's last line · `\r\n` · `ESC[?47h`) at 5ms: the
+   alternate screen intact, all 400 rows in the main buffer's history, in order.
+4. **Terminal.app's view puts the main buffer ABOVE the alternate screen.** `history` while the
+   alternate screen is up lists the main rows, then the alternate rows. Scrolling up in
+   `xscapes claude` shows the shell's main buffer — including its blank rows, which is the "black
+   point" he reported, not cleared rows in scrollback.
+5. **`ESC[?1049l` discards most of what scrolled into the main buffer meanwhile**: 4 of 30 mirrored
+   rows survived exit. Anything mirrored for post-session review has to be printed again after
+   leaving the alternate screen.
+
+⚠ A synthetic mouse-wheel measurement was attempted and is VOID: the CGEvent posts never reached
+the window (the positive control with mouse reporting on received nothing either). Nothing about
+the wheel on the alternate screen has been measured.
