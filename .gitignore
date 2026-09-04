@@ -15,3 +15,9 @@
 
 # overlay mockups composite a capture of a real agent pane; never publish one
 /assets/frames/overlay*.png
+
+# probe binaries built for a look in the real terminal; go run ./notes/<probe> rebuilds them
+/mirrorprobe
+/shrinkprobe
+/histprobe
+/wheelprobe
