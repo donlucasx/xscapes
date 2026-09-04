@@ -7,7 +7,6 @@ import (
 
 	"github.com/donlucasx/xscapes/internal/canvas"
 	"github.com/donlucasx/xscapes/internal/companion"
-	"github.com/donlucasx/xscapes/internal/event"
 	"github.com/donlucasx/xscapes/internal/reduce"
 	"github.com/donlucasx/xscapes/internal/scape"
 )
@@ -20,61 +19,7 @@ import (
 // the companion or the sea reads wrong at some point in a turn, it shows up
 // here rather than in a demo recording.
 func wiredPage(seed int64) string {
-	// A believable turn, in the payload shapes verified out of the Claude Code
-	// binary. Times are seconds from the prompt.
-	type beat struct {
-		at   float64
-		note string
-		evs  []event.Event
-	}
-	sub := func(id, kind string, k event.Kind) event.Event {
-		return event.Event{Kind: k, Agent: id, AgentType: kind, Op: event.OpSub}
-	}
-	tool := func(k event.Kind, id string, op event.Op, name, target, detail string, ms int64) event.Event {
-		return event.Event{Kind: k, ID: id, Op: op, Tool: name, Target: target, Detail: detail, MS: ms}
-	}
-
-	beats := []beat{
-		{0, "the prompt lands — thinking, no tool yet", []event.Event{
-			{Kind: event.Prompt, Text: "add rate limiting to the auth endpoint"},
-		}},
-		{6, "reading around", []event.Event{
-			tool(event.ToolStart, "t1", event.OpRead, "Read", "internal/auth/handler.go", "", 0),
-			tool(event.ToolEnd, "t1", event.OpRead, "Read", "internal/auth/handler.go", "142 lines", 412),
-			tool(event.ToolStart, "t2", event.OpSearch, "Grep", "rate.Limiter", "", 0),
-			tool(event.ToolEnd, "t2", event.OpSearch, "Grep", "rate.Limiter", "3 files", 88),
-		}},
-		{11, "working hard — edits landing", []event.Event{
-			tool(event.ToolStart, "t3", event.OpEdit, "Edit", "internal/auth/handler.go", "", 0),
-			tool(event.ToolEnd, "t3", event.OpEdit, "Edit", "internal/auth/handler.go", "+18 -2", 120),
-			tool(event.ToolStart, "t4", event.OpWrite, "Write", "internal/auth/limiter.go", "", 0),
-			tool(event.ToolEnd, "t4", event.OpWrite, "Write", "internal/auth/limiter.go", "64 lines", 95),
-			tool(event.ToolStart, "t5", event.OpShell, "Bash", "go", "", 0),
-		}},
-		{14, "a fan-out — five subagents", []event.Event{
-			sub("a1", "code-reviewer", event.SubStart),
-			sub("a2", "general-purpose", event.SubStart),
-			sub("a3", "general-purpose", event.SubStart),
-			sub("a4", "Explore", event.SubStart),
-			sub("a5", "Explore", event.SubStart),
-		}},
-		{22, "a test fails — the companion carries it, not the weather", []event.Event{
-			sub("a4", "Explore", event.SubEnd),
-			sub("a5", "Explore", event.SubEnd),
-			tool(event.Error, "t5", event.OpShell, "Bash", "go", "exit 1", 4100),
-		}},
-		{30, "the user is asked for something", []event.Event{
-			{Kind: event.NeedsInput, Text: "allow Bash?"},
-		}},
-		{44, "done — the sea settles, the sand still holds the record", []event.Event{
-			sub("a1", "code-reviewer", event.SubEnd),
-			sub("a2", "general-purpose", event.SubEnd),
-			sub("a3", "general-purpose", event.SubEnd),
-			{Kind: event.Prompt, Text: "yes"},
-			{Kind: event.Done, Text: "Rate limiting is in. 100 req/min per IP."},
-		}},
-		{72, "half a minute later — flat, the writing receding", nil},
-	}
+	beats := demoTurn()
 
 	base := time.Now()
 	red := reduce.New("demo")

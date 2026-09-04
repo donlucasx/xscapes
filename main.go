@@ -8,6 +8,7 @@ import (
 	"flag"
 	"fmt"
 	"os"
+	"path/filepath"
 
 	"github.com/donlucasx/xscapes/internal/canvas"
 	"github.com/donlucasx/xscapes/internal/envx"
@@ -65,6 +66,7 @@ func main() {
 		mockup  = flag.String("mockup", "", "write the left-vs-mirrored composition study to an HTML file")
 		overlay = flag.String("overlay", "", "mock the agent INSIDE the scape: composite a captured pane (text file) over the scene")
 		sandfd  = flag.String("sandfade", "", "tuner: how far the lower beach falls away to black")
+		site    = flag.String("site", "", "write the submission page: reads <dir>/template.html, writes <dir>/index.html")
 	)
 	flag.Parse()
 
@@ -173,6 +175,20 @@ func main() {
 		return
 	}
 
+	if *site != "" {
+		page, err := sitePage(*seed, *site)
+		if err != nil {
+			fmt.Fprintln(os.Stderr, "xscapes:", err)
+			os.Exit(1)
+		}
+		out := filepath.Join(*site, "index.html")
+		if err := os.WriteFile(out, []byte(page), 0o644); err != nil {
+			fmt.Fprintln(os.Stderr, "xscapes:", err)
+			os.Exit(1)
+		}
+		fmt.Println(out)
+		return
+	}
 	if *wired != "" {
 		if err := os.WriteFile(*wired, []byte(wiredPage(*seed)), 0o644); err != nil {
 			fmt.Fprintln(os.Stderr, "xscapes:", err)

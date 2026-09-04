@@ -290,7 +290,57 @@ func (c *Canvas) HTMLFragment(fontPx int) string {
 	return c.htmlFragment(fontPx, term.ProfileTrueColor, false)
 }
 
+// HTMLPalette shares colour classes across every fragment rendered with it,
+// so a page of several frames carries each (foreground, background) pair once
+// in a <style> block instead of once per run. A five-frame page went from
+// 112KB to under half that; it exists because the submission page has to be
+// pasted into a chat box.
+type HTMLPalette struct {
+	idx   map[[2]term.RGB]int
+	pairs [][2]term.RGB
+}
+
+func (h *HTMLPalette) class(fg, bg term.RGB) int {
+	if h.idx == nil {
+		h.idx = map[[2]term.RGB]int{}
+	}
+	k := [2]term.RGB{fg, bg}
+	if i, ok := h.idx[k]; ok {
+		return i
+	}
+	i := len(h.pairs)
+	h.idx[k] = i
+	h.pairs = append(h.pairs, k)
+	return i
+}
+
+// CSS is the rules for every class handed out so far. Put it in the page's
+// <style> after the last fragment is rendered.
+func (h *HTMLPalette) CSS() string {
+	var b strings.Builder
+	for i, k := range h.pairs {
+		b.WriteString(".p")
+		b.WriteString(strconv.Itoa(i))
+		b.WriteString("{color:")
+		writeHex(&b, k[0])
+		b.WriteString(";background:")
+		writeHex(&b, k[1])
+		b.WriteString("}")
+	}
+	return b.String()
+}
+
+// HTMLFragmentClassed is HTMLFragmentAs with the colours taken out of the
+// markup and into pal.
+func (c *Canvas) HTMLFragmentClassed(fontPx int, p term.Profile, pal *HTMLPalette) string {
+	return c.htmlFragmentWith(fontPx, p, true, pal)
+}
+
 func (c *Canvas) htmlFragment(fontPx int, p term.Profile, quantise bool) string {
+	return c.htmlFragmentWith(fontPx, p, quantise, nil)
+}
+
+func (c *Canvas) htmlFragmentWith(fontPx int, p term.Profile, quantise bool, pal *HTMLPalette) string {
 	var b strings.Builder
 	b.WriteString(`<pre style="font-size:`)
 	b.WriteString(strconv.Itoa(fontPx))
@@ -300,15 +350,22 @@ func (c *Canvas) htmlFragment(fontPx int, p term.Profile, quantise bool) string 
 	// animation and a 15MB page.
 	var run strings.Builder
 	var rFG, rBG term.RGB
+	runGlyph := false // whether the current run holds anything but spaces
 	flush := func() {
 		if run.Len() == 0 {
 			return
 		}
-		b.WriteString(`<span style="color:`)
-		writeHex(&b, rFG)
-		b.WriteString(`;background:`)
-		writeHex(&b, rBG)
-		b.WriteString(`">`)
+		if pal != nil {
+			b.WriteString(`<span class="p`)
+			b.WriteString(strconv.Itoa(pal.class(rFG, rBG)))
+			b.WriteString(`">`)
+		} else {
+			b.WriteString(`<span style="color:`)
+			writeHex(&b, rFG)
+			b.WriteString(`;background:`)
+			writeHex(&b, rBG)
+			b.WriteString(`">`)
+		}
 		b.WriteString(run.String())
 		b.WriteString(`</span>`)
 		run.Reset()
@@ -323,10 +380,20 @@ func (c *Canvas) htmlFragment(fontPx int, p term.Profile, quantise bool) string 
 				fg = p.Quantise(fg, r.glyph)
 				bg = p.Quantise(bg, false)
 			}
-			if run.Len() > 0 && (fg != rFG || bg != rBG) {
+			// A space shows only its background, so it joins any run with
+			// that background, and a run made only of spaces takes the
+			// foreground of the first glyph that follows it. Fewer runs, and
+			// the same picture: a fifth of a page was space-only spans.
+			space := r.ch == ' '
+			switch {
+			case run.Len() == 0:
+				rFG, rBG, runGlyph = fg, bg, !space
+			case bg != rBG || (!space && runGlyph && fg != rFG):
 				flush()
+				rFG, rBG, runGlyph = fg, bg, !space
+			case !space && !runGlyph:
+				rFG, runGlyph = fg, true
 			}
-			rFG, rBG = fg, bg
 			switch r.ch {
 			case '<':
 				run.WriteString("&lt;")
