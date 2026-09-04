@@ -105,9 +105,12 @@ func runHostedOpts(t *testing.T, w1, h1, w2, h2 int, mode, child string, alt, hi
 		Cmd:       exec.Command("sh", "-c", child),
 		FPS:       60,
 		AltScreen: alt,
-		History:   history,
-		In:        tty.slave,
-		Out:       pw,
+		// The harness models Terminal.app's screen (resizeAlt and friends),
+		// so the host gets Terminal.app's rules; RulesFor does that in production.
+		Rules:   AppleTerminalRules,
+		History: history,
+		In:      tty.slave,
+		Out:     pw,
 		Size: func() (int, int) {
 			sz.Lock()
 			defer sz.Unlock()

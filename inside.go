@@ -127,6 +127,7 @@ With no command, runs claude.
 		AltScreen: *alt,
 		History:   *history && *alt,
 		Replay:    *history && *alt && appleTerminal,
+		Rules:     host.RulesFor(os.Getenv("TERM_PROGRAM")),
 		Paint: func(cols, rows int) []string {
 			now := time.Now()
 			if w, hh := fr.size(); w != cols || hh != rows {

@@ -93,6 +93,12 @@ type screen struct {
 	capture  bool
 	scrolled [][]cell
 
+	// restoreAbsolute switches DECRC to Ghostty's rule (read from its source,
+	// Terminal.zig restoreCursor, 2026-09-04): the saved row comes back
+	// verbatim, clamped to the screen and never homed into the region. Off,
+	// the model keeps Terminal.app's measured homing. Set by instruments only.
+	restoreAbsolute bool
+
 	// pending holds a trailing partial escape sequence. Reads off a pipe
 	// split wherever they like, and a parser that discards an incomplete
 	// sequence silently drops everything after it -- which is how the first
@@ -401,7 +407,7 @@ func (s *screen) feed(in string) {
 			// mode into a region that no longer contains the saved row lands
 			// on row 1. That is the whole mechanism of the split input box,
 			// and a model that restored the row verbatim could not see it.
-			if s.origin && (s.y < s.top || s.y > s.bot) {
+			if !s.restoreAbsolute && s.origin && (s.y < s.top || s.y > s.bot) {
 				s.y, s.x = s.top, 0
 			}
 			i++

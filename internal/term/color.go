@@ -3,7 +3,6 @@
 package term
 
 import (
-	"os"
 	"strconv"
 	"strings"
 
@@ -53,24 +52,23 @@ func (p Profile) String() string {
 	return "256"
 }
 
-// DetectProfile decides how many colours we may emit.
+// DetectProfile decides how many colours we may emit: the 256-colour cube,
+// on every terminal, unless XSCAPES_COLOR asks for truecolor.
 //
-// Deliberately does NOT trust COLORTERM on its own. Measured 2026-08-29: inside
-// a Claude Code session in Terminal.app the environment carries
-// COLORTERM=truecolor while Terminal.app renders 256 at most, and that is
-// exactly the environment xscapes launches into. Gate on the program.
+// Every terminal, on purpose (2026-09-04). The scene is designed for the
+// cube -- the sky and the sea are paths through it, and the sun's tones are
+// the entries the quantiser lands on -- and a truecolor terminal painting the
+// palette's raw blends showed a different picture: a flat tan sun where
+// Terminal.app shows peach over cream (notes/sunprobe, his Ghostty report).
+// Indices 16-255 are fixed by the xterm standard, so the same bytes draw the
+// same scene in Ghostty, iTerm2 and Terminal.app. COLORTERM is not consulted
+// any more: it was already untrustworthy (Terminal.app exports truecolor
+// inside a Claude Code session, measured 2026-08-29), and now it could only
+// pick the picture nobody tuned. The truecolor path stays for the studies
+// (-day, -colors) and for whoever sets XSCAPES_COLOR=truecolor.
 func DetectProfile() Profile {
 	switch strings.ToLower(envx.Lookup("COLOR")) {
 	case "truecolor", "24bit", "full":
-		return ProfileTrueColor
-	case "256", "ansi256":
-		return Profile256
-	}
-	if os.Getenv("TERM_PROGRAM") == "Apple_Terminal" {
-		return Profile256
-	}
-	switch strings.ToLower(os.Getenv("COLORTERM")) {
-	case "truecolor", "24bit":
 		return ProfileTrueColor
 	}
 	return Profile256

@@ -57,6 +57,10 @@ type Host struct {
 	// the session ends. An xterm-like terminal keeps it, and a replay there
 	// would duplicate every line; the launcher gates this on TERM_PROGRAM.
 	Replay bool
+	// Rules is what this terminal does to the alternate screen on a resize.
+	// The launcher picks them by TERM_PROGRAM (RulesFor); the zero value is
+	// the xterm-like set.
+	Rules Rules
 
 	// model is the host's own copy of the screen when History is on: every
 	// byte sent to the terminal is fed through it, so the rows that leave the
@@ -381,7 +385,7 @@ func (h *Host) Run() error {
 					h.mainRow = rows + 1
 				}
 				h.traceSize(cols, rows, agentRows)
-				h.write(resizeSequence(h.AltScreen, oldRows, rows, oldAgent, agentRows))
+				h.write(resizeSequence(h.AltScreen, h.Rules, oldRows, rows, oldAgent, agentRows))
 				// The screen was just touched behind the tracker's back.
 				dmg.reset()
 				p.SetSize(cols, agentRows)
@@ -487,7 +491,7 @@ func clearRowsBare(first, last int) string {
 // -- the trap that cost this project most of a day: notes/anchorprobe parks the
 // cursor and reads it back with DSR, so it reported "anchored top" for a screen
 // whose content was anchored bottom.
-func resizeSequence(alt bool, oldRows, rows, oldAgent, agentRows int) string {
+func resizeSequence(alt bool, r Rules, oldRows, rows, oldAgent, agentRows int) string {
 	// So the clear range starts where the old scape's first row LANDS.
 	drop := oldRows - rows
 	if drop < 0 {
@@ -498,8 +502,11 @@ func resizeSequence(alt bool, oldRows, rows, oldAgent, agentRows int) string {
 	// the ones that crossed the boundary. Alt screen only: that is where it was
 	// measured, and the main screen's grow pulls real scrollback back in, which
 	// is content a scroll would push away again.
+	// Only where the terminal pushes (Terminal.app): Ghostty keeps the content
+	// at the top on a grow, and scrolling it up there loses the transcript's
+	// first rows and leaves the agent's box a tick above its cursor.
 	grow := 0
-	if alt && rows > oldRows {
+	if alt && r.GrowPushesDown && rows > oldRows {
 		grow = rows - oldRows
 	}
 	from := oldAgent + 1 - drop
@@ -510,7 +517,10 @@ func resizeSequence(alt bool, oldRows, rows, oldAgent, agentRows int) string {
 	// A SHRINK on the alternate screen is the one case where the cursor, not
 	// just the rows, has to be put back -- see RebindShrinkAlt.
 	if alt && rows < oldRows {
-		return RebindShrinkAlt(oldRows-rows, oldAgent-agentRows, agentRows)
+		if r.ShrinkKeepsCursor {
+			return RebindShrinkAlt(oldRows-rows, oldAgent-agentRows, agentRows)
+		}
+		return RebindShrinkAltFollow(oldRows-rows, oldAgent-agentRows, agentRows)
 	}
 	return Rebind(grow, from, to, agentRows)
 }

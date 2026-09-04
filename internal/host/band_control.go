@@ -244,3 +244,73 @@ func Close(alt bool, agentRows, rows int) string {
 	}
 	return clearRows(agentRows+1, rows) + LeaveTo(agentRows+1)
 }
+
+// Rules is what a terminal does to the ALTERNATE screen when the window
+// changes height -- the one thing the host cannot find out by asking: the
+// cursor answers DSR from wherever it is, and the content moved, or did not,
+// without telling anyone. Two terminals have been read closely.
+//
+// Terminal.app, measured by eye 2026-09-03 (notes/contentprobe, shrinkprobe):
+// content anchored to the BOTTOM both ways -- a grow pushes it down and
+// inserts blanks at the top, a shrink pulls it up -- and the cursor stays on
+// its absolute row through both.
+//
+// Ghostty 1.3.1, read from its source 2026-09-04 (src/terminal/PageList.zig
+// resizeWithoutReflow, Terminal.zig restoreCursor): a grow with the cursor
+// above the last row keeps content at the TOP and appends blank rows; a
+// shrink scrolls rows off the top and the cursor FOLLOWS its row; DECRC
+// restores the saved row verbatim. Rows of painted spaces count as text, so
+// the scape is never trimmed as "trailing blank rows". His first Ghostty
+// session ran under Terminal.app's rules and the transcript moved by the
+// tick on every resize (_FEEDBACK.md, s15, 2026-09-04).
+//
+// The zero value is Ghostty's set, which is also what xterm's descendants are
+// expected to do; only Terminal.app has been measured to differ. A terminal
+// that behaves like neither will show up the way Ghostty did, and gets its
+// own entry then.
+type Rules struct {
+	// GrowPushesDown: a grow of N rows pushes the content down N and inserts
+	// blank rows at the top, so the host scrolls it back up before painting.
+	GrowPushesDown bool
+	// ShrinkKeepsCursor: a shrink pulls the content up but leaves the cursor
+	// on its absolute row, so the host has to move the cursor itself.
+	ShrinkKeepsCursor bool
+}
+
+var (
+	AppleTerminalRules = Rules{GrowPushesDown: true, ShrinkKeepsCursor: true}
+	XTermRules         = Rules{}
+)
+
+// RulesFor picks the rules by TERM_PROGRAM.
+func RulesFor(termProgram string) Rules {
+	if termProgram == "Apple_Terminal" {
+		return AppleTerminalRules
+	}
+	return XTermRules
+}
+
+// RebindShrinkAltFollow is RebindShrinkAlt for a terminal whose cursor went
+// up with its row through the shrink (Ghostty). The content still has to come
+// down by the scape's share of the shrink, so the text's bottom lands on the
+// new band's bottom -- and this time the cursor comes down with it, because
+// it went up with the content and SD leaves it where it is. The save around
+// DECSTBM is only there because DECSTBM homes the cursor; the first save
+// carries origin mode through the region reset, as in RebindShrinkAlt.
+func RebindShrinkAltFollow(shrink, bandShrink, agentRows int) string {
+	var b strings.Builder
+	b.WriteString(saveCursor)
+	b.WriteString(originOff + regionReset + "\x1b[0m")
+	k := shrink - bandShrink
+	if k > 0 {
+		fmt.Fprintf(&b, "\x1b[%dT", k)
+	}
+	b.WriteString(restoreCursor)
+	if k > 0 {
+		fmt.Fprintf(&b, "\x1b[%dB", k)
+	}
+	b.WriteString(saveCursor)
+	b.WriteString(EnterBand(agentRows))
+	b.WriteString(restoreCursor)
+	return b.String()
+}

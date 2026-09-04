@@ -49,7 +49,7 @@ func TestShrinkKeepsTheInputBoxUnderTheCursor(t *testing.T) {
 			for _, h := range tc.steps {
 				sc.resizeAlt(w, h) // the terminal
 				next, _ := Band(h)
-				sc.feed(resizeSequence(true, rows, h, band, next)) // the host's tick
+				sc.feed(resizeSequence(true, AppleTerminalRules, rows, h, band, next)) // the host's tick
 				rows, band = h, next
 			}
 			// Claude redraws its box from wherever the cursor is, relatively.
