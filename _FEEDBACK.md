@@ -812,3 +812,11 @@ automation, the scroll glitch); his answers:
     neighbour's half-cell MEAN (grey over olive in a tan rim), and a far star over a tip cell
     replaced the halves with one flat mean (a dark dot on the crown). **His pick pending: solid
     or the hue rim.** The rim switch (`Shore.MoonRim`) is study-only, off in production.
+  ⇒ Scrollback, first pass (11:35): replayed the three s13 traces in `/tmp` through the model with
+    capture on (`TestReplayTraceKept`, an instrument): 28 / 72 / 43 rows kept, NONE interleaved,
+    repeats = the startup banner only. Those traces are short and pre-mirror, so the corruption
+    is not reproduced offline. Needs a trace of a mirror-era session that shows it
+    (`XSCAPES_TRACE=/tmp/scroll.bin xscapes claude`, relaunch = his call, put to him by the peer).
+    Two hypotheses the trace separates: the model diverging over a long session (Ink's diff
+    writes landing on a misaligned row), or the mirror's own MirrorBatch bytes fed back through
+    the model desyncing its cursor.

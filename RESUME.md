@@ -658,10 +658,15 @@ Demo flags: `-wired -mockup -anim -compare -layout -context -day -busy -kittens 
    old rounding for a side-by-side, and `go run ./notes/gradientaudit -dump <hours>` shows the
    tones. Rebuild BOTH binaries after a change (`~/.local/bin/xscapes` is a copy).
 
-3. **The transcript start** (his report #6): redo the frozen comparison PROPERLY -- a window
-   addressed by the `do script` tab's tty, `kill -STOP` only a pid on that tty, readback, CONT,
-   `TRACE_DUMP` replay, diff aligned on the banner. Expect more model divergences like ESC ( B.
-   Only with his OK (#1).
+3. **⭐ THE MIRRORED TRANSCRIPT IS CORRUPT in a long session** (peer session, 09-04, 133x61:
+   rows interleaved character by character, blocks duplicated, the input box four times) — this
+   subsumes his report #6. Offline, the s13 traces replay CLEAN (`TestReplayTraceKept`), so it
+   needs a trace of a session that shows it: `XSCAPES_TRACE=/tmp/scroll.bin xscapes claude`,
+   live in it until it corrupts, then `KEPT_OUT=/tmp/kept.txt go test ./internal/host -run
+   TestReplayTraceKept -v` and read the kept rows. Interleaved there ⇒ the MODEL diverges (find
+   the sequence, like ESC ( B); clean there ⇒ the WRITE side (`MirrorBatch` row accounting in the
+   real terminal) — then the frozen comparison against Terminal.app's readback, tty rule only,
+   with his OK.
 
 4. **His report #2** (scape lines broken after scrolling): *"Did not check"* (2026-09-04). He
    watches for it next time he lives in it; if it persists, reproduce with a real Claude session.
