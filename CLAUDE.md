@@ -2,6 +2,17 @@
 
 *(Renamed end to end on 2026-09-03: directory, env vars, state path and hook marker. Two names are kept on purpose and are not leftovers -- `internal/envx` still reads `ASCIISCAPES_*` and warns, and `install.go` still RECOGNISES the `# asciiscapes:v1` marker so the hooks it wrote before the rename can be found and removed.)*
 
+> **Where we left off — 2026-09-03 (session 14).** The submission page exists
+> (`site/`, one static file, `xscapes -site site`) and is NOT yet published or
+> submitted — his hands. The scrollback plan below was AUDITED at his ask and
+> REPLACED: the alternate screen has no history (measured), but DECSET 47
+> switches buffers without clearing, so the terminal's OWN scrollback can be fed
+> while the band stays up; and every shrink was misplacing Claude's input box
+> (the terminal leaves the cursor, the host restored it into a band that no
+> longer held its row) — Report 1, reproduced and FIXED. His ruling: *"Go:
+> shrink fix, then mirroring."* Plan and measurements in
+> `notes/scrollback-audit.md`; RESUME ▶ NEXT carries the steps and the gate.
+>
 > **Where we left off — 2026-09-03 (session 13), HEAD `9452bc6`, pushed, tree clean.**
 > **Session 13: the resize damage was OURS, twice, and he had to report it four
 > times.** Both fixed and mutation-proven — the clear was painting rows in
@@ -15,11 +26,11 @@
 > answer to him. An external audit (agent Kimi, at his suggestion) caught the
 > worst one before any measurement did.
 >
-> ⚠ **SCROLLBACK IS A REQUIREMENT WITH NO CHEAP ANSWER.** He ruled *"should feel
-> like an embedded experience"*, and measurement killed every shortcut: the main
-> screen reflows on width and the host cannot undo it, tmux stacking leaves a
-> seam. Seamless + history forces xscapes to own its scrollback (~1 day). ⏸ HIS
-> CALL — and it is behind SUBMITTING THE ENTRY, which is now three days overdue.
+> ⚠ ~~**SCROLLBACK IS A REQUIREMENT WITH NO CHEAP ANSWER.**~~ **Superseded
+> 2026-09-03 (s14): there IS a cheap answer, measured — mirror into the main
+> buffer through DECSET 47 (see above).** The rest of this paragraph was true
+> as far as it went: the main screen reflows on width, tmux stacking leaves a
+> seam, and the alternate screen has no history of its own.
 >
 > **Session 12 was the rename.**
 > Finished end to end: directory

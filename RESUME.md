@@ -14,6 +14,38 @@ build the instrument before trusting the picture, and check what the RENDERED
 frame does rather than what the source says it should.
 ```
 
+## Where we left off (2026-09-03, session 14, NOT pushed, tree clean)
+
+**Two deliverables and a locked decision.** Resumed under Fable; both ▶ NEXT questions
+were put to him and answered, then he asked for the scrollback plan to be AUDITED before
+it was built, with Kimi if needed.
+
+1. **The submission page exists**: `site/index.html`, one static file, five frames from
+   the real reducer at 256 colours, copy in `site/template.html`, regenerated with
+   `xscapes -site site`. Publishing steps and the Commons prompt in `site/COMMONS-PROMPT.md`.
+   ⚠ **Still not published, still not submitted** — his hands (login-gated); deadline 09-17.
+2. **The scrollback plan was audited and replaced** (`notes/scrollback-audit.md`; Kimi round
+   1: REVISE, direction right, four gaps, all closed or budgeted). Three measurements, read
+   back by machine (`history of tab` returns the alternate screen's cells — retire "nothing
+   reads cells back from Terminal.app"):
+   - the alternate screen has NO history (premise holds);
+   - **every shrink misplaced Claude's input box** — the terminal leaves the cursor, the host
+     restored it into a band that no longer held its row, Terminal.app answers row 1. Report 1,
+     reproduced on demand, **FIXED and shipped** (`RebindShrinkAlt`, red-first in the
+     corrected model, eleven geometries in the real terminal, mutation-proven);
+   - **DECSET 47 switches buffers without clearing**, so rows can be written into the
+     terminal's OWN scrollback while the band stays up: 400 rows at 5ms, alt intact.
+   ⭐ **HIS RULING: *"Go: shrink fix, then mirroring."*** Own-the-viewer is dead. The plan is
+   at the end of the audit note (1.5 days): promote the model with full SGR and two buffers,
+   tee the agent's bytes, mirror rows that leave the band into the main buffer (DSR for the
+   shell's row BEFORE the child starts; SGR reset; batched per tick), drain the pty before a
+   Close replay on `Apple_Terminal`. **Step 2 is gated on him watching `mirrorprobe` once**
+   for flicker and for the view snapping while scrolled up; synthetic wheel/keys are refused
+   on this machine, so his eyes are the instrument.
+   ⚠ One flake seen once: `TestEveryBandRowIsRepaintedAfterAResize` failed on the run right
+   after a mutation revert (old scape rows in the band); three clean reruns since. Timing
+   harness (300ms resize / 600ms snapshot), pre-existing.
+
 ## Where we left off (2026-09-03, session 13, HEAD `9452bc6`, pushed, tree clean)
 
 **The resize damage was OURS, in two separate ways, and it took him reporting it
@@ -441,37 +473,36 @@ Demo flags: `-wired -mockup -anim -compare -layout -context -day -busy -kittens 
 
 **Order for a fresh session, 14 days to the deadline (closes 2026-09-17):**
 
-0. **⭐⭐ SUBMIT THE ENTRY.** Still not recorded as done. The plan said ~Sep 1,
-   so it is now THREE DAYS OVERDUE with the deadline on the 17th. Editable until
-   then, so a rough one costs nothing and removes the only failure mode that
-   cannot be recovered from. Raised again at the end of session 13 and still
-   unanswered. Ask him first — he may have done it and not written it down.
+0. **⭐⭐ PUBLISH THE PAGE AND SUBMIT.** `site/COMMONS-PROMPT.md` has the steps; the page is
+   `site/index.html`. His hands only. Until "Entry submitted." is on his screen the entry
+   scores zero however good the rest is. Ask whether it happened; do not assume.
 
-1. **⏸ HIS CALL: build the scrollback (option B)?** Locked requirement from
-   session 13: *"should feel like an embedded experience"*, and scrollback
-   matters to him. Measured to be impossible from Terminal.app while the band
-   exists (main screen reflows on width; tmux stacking leaves a seam), so the
-   only way to have both is for xscapes to own its own history.
-   **Scope:** move `screen` out of `_test.go` and give it fg + attributes (~100
-   lines) · tee the agent's forwarded bytes through it (~20) · capture rows as
-   they scroll off the band into a ring buffer (~30) · a scroll mode that renders
-   it and exits cleanly (~150) · mouse-wheel reporting (~30) · tests.
-   **Estimate: keyboard-only ~1 day / 2 sessions; with the wheel 1.5–2 days / 3.**
-   **Two risks that could not be sized:** exiting scroll mode must repaint the
-   band perfectly, so any remaining gap in the model shows as visible corruption
-   (today found it had NO cursor motion at all); and Claude redraws its UI block
-   in place, so the ring buffer may capture half-drawn frames — the thing most
-   likely to make the feature disappointing rather than late.
-   ⚠ Weigh against #0: an unsubmitted entry scores zero however good this is.
+1. **⏸ HIS EYES: the flicker gate.** `go run ./notes/mirrorprobe -n 400 -gap 5ms` in a
+   Terminal.app window: does the screen flash during the burst, and if he scrolls up during
+   it, does the view snap back down? Both unmeasured and unmeasurable from here. Step 2 below
+   waits on the answer.
 
-2. **⏸ Report 1 is NOT closed** — the split input box on an ESTABLISHED session,
-   photographed 2026-09-03 ~11:57 and never reproduced. Kimi rates the **shared
-   DECSC/DECRC slot** at least as likely as anything fixed: one save slot, three
-   writers (the host's Rebind, every paint frame, and the agent's own `ESC 7 …
-   ESC 8` pair). If a host frame lands inside the agent's pair, the agent's
-   restore returns the wrong position and every later RELATIVE draw is offset by
-   a row — which is exactly what a split input box looks like. No test
-   interleaves an agent save/restore with a host frame.
+2. **BUILD THE MIRRORING (his go, 2026-09-03), per `notes/scrollback-audit.md` "The revised
+   plan" + Kimi's F2/F3/F4:**
+   - step 1 (not gated): promote `screen` out of `_test.go`; cells carry fg + bg + attributes;
+     a real two-buffer pair for 47 vs 1049 (the model aliases them today); serialise a row back
+     to ANSI; tee the agent's filtered bytes through it. Then the existing trace tests run on
+     the promoted model.
+   - step 2 (gated on #1): rows leaving the band's top, and the top rows a shrink destroys,
+     appended to the main buffer in one batched write per tick: `ESC7 ?6l ESC[r` · `?47l` ·
+     CUP(mainRow) · row · `\r\n` · `?47h` · band · `ESC8`, SGR reset first. Grow pushes are
+     not mirrored. The shell's cursor row comes from a DSR issued BEFORE `Cmd.Start()` (the
+     child's startup replies travel the same fd; Kimi F3). Mirrored rows reflow on a narrowing
+     drag like any scrollback; say so in the README.
+   - step 3: Close replay on `TERM_PROGRAM=Apple_Terminal` only (an xterm-like keeps the
+     main scrollback across the alternate screen; a replay there duplicates). Drain the pty to
+     EOF with a deadline first (Kimi F4: the forwarder is never joined). A separator line
+     before the replay; `1049l` keeps the oldest few rows and they will repeat.
+   - step 4: tests on the model: the mirrored rows equal the rows that left; the trace replay
+     shows them in the main buffer in order.
+   If a split input box is photographed AFTER the shrink fix, the shared DECSC/DECRC slot
+   (Kimi, s13) is next in line; the hardening is to restore with an absolute CUP from the
+   model instead of DECRC.
 
 3. **The right-edge strip** — a 1–2 column strip of stale scape down the far
    right, photographed twice. `TestTraceRightEdge` proves the renderer paints to
