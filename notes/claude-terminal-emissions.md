@@ -319,7 +319,8 @@ Terminal.app" (above) is retired. Probes in `notes/histprobe`, `notes/shrinkprob
 
 1. **The alternate screen has NO history.** Forty lines through a row-1 band of 17: on the
    alternate screen only the 16 still visible are in `history`, and none after exit. On the main
-   screen (control) all forty, during and after. The row-1 anchoring rule above is a MAIN-screen
+   screen (control) all forty during, and 1–25 after exit (the shell prompt's `ESC[J` took the
+   rest; Kimi F6). The row-1 anchoring rule above is a MAIN-screen
    fact; on the alternate screen a line that leaves the band is gone.
 2. **A shrink homes the agent's cursor through the host's own Rebind.** Cursor on row 16 of a
    17-row band, window 30→24 (band 17→14): after the terminal's shrink the cursor is still on 16
@@ -327,7 +328,10 @@ Terminal.app" (above) is retired. Probes in `notes/histprobe`, `notes/shrinkprob
    contains the saved row lands on row 1.** A Claude-style relative redraw then paints a second
    input box at the top of the band — Report 1 (2026-09-03 ~11:57), reproduced. Fixed by
    restoring while the region is still the full screen, moving relatively, saving again, pinning
-   the band, restoring: cursor 13 and the box redrawn exactly over the moved one.
+   the band, restoring: cursor 13 and the box redrawn exactly over the moved one. **Eleven
+   geometries** (1/2/3/6/20-row shrinks, cursor top/mid/bottom, a three-tick drag, a shrink then a
+   grow, a shrink the band absorbs): overlay wherever the content survived; production misplaces
+   the box on EVERY shrink, by the tick size for small ones. Table in `notes/scrollback-audit.md`.
 3. **DECSET 47 switches buffers without clearing, in both directions.** 400 round trips
    (`ESC[?47l` · write a row at the main buffer's last line · `\r\n` · `ESC[?47h`) at 5ms: the
    alternate screen intact, all 400 rows in the main buffer's history, in order.
