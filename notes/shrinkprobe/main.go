@@ -97,33 +97,22 @@ func cursorRow(in *bufio.Reader) int {
 	return r
 }
 
-// shrinkFix is the candidate replacement for Rebind on a shrink. The order is
-// the whole fix: DECRC into a band that no longer contains the saved row lands
-// on row 1 (measured, fix=none), so the restore happens while the region is
-// still the full screen, the relative move follows it, and only then is the
-// band re-pinned -- around a fresh save of a row the new band does contain.
+// shrinkFix is the candidate correction. -fix sd is production's own
+// RebindShrinkAlt; -fix cuu is the variant that keeps the clear and leaves
+// blank rows under the box, kept for comparison.
 func shrinkFix(fix string, shrink, bandShrink, from, to, agent int) string {
+	if fix == "sd" {
+		// The shipped sequence itself, so this probe measures production's
+		// bytes and not a copy of them.
+		return host.RebindShrinkAlt(shrink, bandShrink, agent)
+	}
 	var b strings.Builder
 	b.WriteString("\x1b7\x1b[?6l\x1b[r\x1b[0m")
-	if fix == "sd" {
-		// The scape's share of the shrink is what left blank rows under the
-		// agent's text; scrolling the screen down by it puts the text's
-		// bottom back on the band's bottom, so nothing in the band needs
-		// clearing.
-		if k := shrink - bandShrink; k > 0 {
-			fmt.Fprintf(&b, "\x1b[%dT", k)
-		}
-		b.WriteString("\x1b8")
-		if bandShrink > 0 {
-			fmt.Fprintf(&b, "\x1b[%dA", bandShrink)
-		}
-	} else {
-		for r := from; r <= to; r++ {
-			fmt.Fprintf(&b, "\x1b[%d;1H\x1b[2K", r)
-		}
-		b.WriteString("\x1b8")
-		fmt.Fprintf(&b, "\x1b[%dA", shrink)
+	for r := from; r <= to; r++ {
+		fmt.Fprintf(&b, "\x1b[%d;1H\x1b[2K", r)
 	}
+	b.WriteString("\x1b8")
+	fmt.Fprintf(&b, "\x1b[%dA", shrink)
 	b.WriteString("\x1b7" + host.EnterBand(agent) + "\x1b8")
 	return b.String()
 }

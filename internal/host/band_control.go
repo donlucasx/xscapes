@@ -106,6 +106,50 @@ func Rebind(scrollUp, clearFrom, clearTo, agentRows int) string {
 	return b.String()
 }
 
+// RebindShrinkAlt moves the band after the window got SHORTER on the alternate
+// screen, where the terminal has already pulled the content up by the rows
+// lost and left the agent's cursor on its absolute row.
+//
+// Rebind cannot be used there, and the reason is the whole fix. It saves the
+// cursor, pins the smaller band, and restores -- and a restore under origin
+// mode into a region that no longer contains the saved row lands on row 1
+// (measured 2026-09-03, notes/shrinkprobe). Claude Code then draws its input
+// box, by relative moves, at the TOP of the band over the transcript; on a
+// one- or two-row tick the restore succeeds and the box is simply drawn that
+// many rows below its own text. Either way a split input box, on every shrink.
+//
+// So: the restore happens while the region is still the full screen, then the
+// cursor moves relatively, then a fresh save, and only then the band -- around
+// a restore into a band that does contain the row. The content is moved too:
+// the scape's share of the shrink (shrink minus the band's own shrink) is what
+// left blank rows under the agent's text, and scrolling the whole screen down
+// by that much puts the text's bottom back on the band's bottom, which is
+// where Claude Code believes its input box is. Nothing in the band needs
+// clearing after that: the rows above the text are freshly inserted blanks
+// (after an SGR reset, because SD fills with the current background like any
+// erase), and the old scape rows land exactly on the new scape area, which
+// repaints in full.
+//
+// Verified in eleven geometries, notes/scrollback-audit.md: single-row ticks,
+// a three-tick drag, the cursor at the top and the middle of the band, a
+// shrink past the band, one the band absorbs, and a shrink followed by a grow.
+func RebindShrinkAlt(shrink, bandShrink, agentRows int) string {
+	var b strings.Builder
+	b.WriteString(saveCursor)
+	b.WriteString(originOff + regionReset + "\x1b[0m")
+	if k := shrink - bandShrink; k > 0 {
+		fmt.Fprintf(&b, "\x1b[%dT", k)
+	}
+	b.WriteString(restoreCursor)
+	if bandShrink > 0 {
+		fmt.Fprintf(&b, "\x1b[%dA", bandShrink)
+	}
+	b.WriteString(saveCursor)
+	b.WriteString(EnterBand(agentRows))
+	b.WriteString(restoreCursor)
+	return b.String()
+}
+
 const (
 	altOn  = "\x1b[?1049h"
 	altOff = "\x1b[?1049l"

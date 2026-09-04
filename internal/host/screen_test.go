@@ -150,11 +150,19 @@ func (s *screen) resizeAnchoredBottom(w, h int) {
 // This is the behaviour production runs against, so it is the one the resize
 // tests must use.
 func (s *screen) resizeAlt(w, h int) {
+	y := s.y
 	if h > s.h {
 		s.resizeAnchoredBottom(w, h)
-		return
+	} else {
+		s.resizeScrolling(w, h)
 	}
-	s.resizeScrolling(w, h)
+	// The cursor stays on its absolute row (notes/anchorprobe, and again
+	// with notes/shrinkprobe: 16 before, 16 after a six-row shrink), and only
+	// a shrink past it clamps it to the new last row (16 -> 10 on a shrink to
+	// ten rows). The two helpers above move it with the content, which is
+	// the MAIN screen's rule; on this screen that rule hid the split input
+	// box from every test in this package.
+	s.y = clamp(y, 0, h-1)
 }
 
 // resize keeps what fits, which is what a terminal does when it GROWS.
@@ -292,6 +300,13 @@ func (s *screen) feed(in string) {
 		case c == '\x1b' && i+1 < len(r) && r[i+1] == '8':
 			s.x, s.y, s.origin, s.curBG = s.sx, s.sy, s.sOrigin, s.sBG
 			s.wrapNext = false
+			// Measured 2026-09-03 (notes/shrinkprobe): a restore under origin
+			// mode into a region that no longer contains the saved row lands
+			// on row 1. That is the whole mechanism of the split input box,
+			// and a model that restored the row verbatim could not see it.
+			if s.origin && (s.y < s.top || s.y > s.bot) {
+				s.y, s.x = s.top, 0
+			}
 			i++
 		case c == '\x1b' && i+1 < len(r) && r[i+1] == '[':
 			j := i + 2
@@ -566,9 +581,9 @@ func (s *screen) clone() *screen {
 //	XSCAPES_TRACE=/tmp/t.bin go test ./internal/host -run TestReplayTrace -v
 //
 // TRACE_SIZE=WxH gives the window size to model; TRACE_ALT=0 replays on the
-// main screen. Both resize directions on the alternate screen are ANCHORED TOP
-// (measured 2026-09-03, notes/anchorprobe), so a size change is applied here as
-// "keep what fits", which is what the model's resize does.
+// main screen. A size change is applied as the ALTERNATE screen does it
+// (anchored bottom, cursor unmoved -- notes/contentprobe and shrinkprobe), or
+// as "keep what fits" for the main screen.
 func TestReplayTrace(t *testing.T) {
 	path := os.Getenv("XSCAPES_TRACE")
 	if path == "" {
@@ -598,9 +613,11 @@ func TestReplayTrace(t *testing.T) {
 		if i > 0 {
 			sc.feed(string(b[fed:min(m.off, len(b))]))
 			fed = min(m.off, len(b))
-			// Measured 2026-09-03: the alternate screen is anchored-top in
-			// BOTH directions, which is what resize does.
-			sc.resize(m.cols, m.rows)
+			if os.Getenv("TRACE_ALT") == "0" {
+				sc.resize(m.cols, m.rows)
+			} else {
+				sc.resizeAlt(m.cols, m.rows)
+			}
 			t.Logf("-- resize at byte %d -> %dx%d (band 1..%d)", m.off, m.cols, m.rows, m.agent)
 		}
 	}

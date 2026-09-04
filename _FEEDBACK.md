@@ -674,3 +674,14 @@ Resumed under Fable. Both ▶ NEXT decisions put to him as a two-question pick; 
   ⇒ Order changes: the scrollback is AUDITED before any of it is built. The submission page is
     still first in line for delivery. Kimi packet per the s13 pattern if the audit leaves a
     question the record cannot settle.
+
+- Kimi round 1 on the scrollback audit came back **REVISE** (direction right, four gaps); the
+  shrink fix was then measured in eleven geometries. Put to him as a pick:
+  *"Go: shrink fix, then mirroring"* (the recommended option) over "shrink fix only" and "hold
+  until I have run the probe".
+  ⇒ **LOCKED 2026-09-03**: build the revised plan in `notes/scrollback-audit.md`. Step 0 (the
+    shrink fix, red-first in the corrected screen model) now; mirroring into Terminal.app's own
+    history next, gated on him watching `mirrorprobe` once for flicker and view-snapping. This
+    REPLACES his earlier first step (the DECSC/DECRC interleave test), because the shrink
+    reproduces the photographed split box and the slot cannot; if a split box is photographed
+    after the fix, the slot is next in line.
