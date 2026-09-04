@@ -107,7 +107,7 @@ alternate screen, so post-session review survives too. Gate that on `TERM_PROGRA
 an xterm-like terminal keeps the main scrollback intact across the alternate screen and a replay
 there would duplicate every line.
 
-### 4. `wheelprobe` — what the wheel sends on the alternate screen. **VOID, do not quote.**
+### 4. `wheelprobe` — what the wheel sends on the alternate screen. **First run VOID; re-measured after he granted Accessibility: 0 bytes without mouse reporting, SGR mouse events with it.** Terminal.app scrolls its own view. (Original text kept below.)
 
 A Swift tool posted synthetic wheel events at the window; the probe received nothing — and the
 positive control (SGR mouse reporting ON) received nothing either, so the events never reached
@@ -225,5 +225,15 @@ any host can do without a model.
 ### What is still unmeasured, and who measures it
 
 - Flicker on the 47 round trip: **him**, `go run ./notes/mirrorprobe -n 400 -gap 5ms`.
-- Whether the view snaps to the bottom when a batch lands while scrolled up: **him**, scroll up
-  during the same run. Synthetic wheel and keystroke events are both refused on this machine.
+- ~~Whether the view snaps to the bottom when a batch lands while scrolled up~~ **MEASURED, both
+  ways**: he scrolled up during the burst and reported *"stable when I scroll up"*; then, with
+  Accessibility granted, twelve synthetic wheel ticks during a 300-row burst at 50ms and two
+  `screencapture`s five seconds apart (a hundred rows landed between them) are byte-identical.
+  ⚠ That pair was VOID: the synthetic wheel never scrolls Terminal.app's view (the main-screen
+  control did not move either; wheel ticks reach only the mouse-reporting path). Re-measured with
+  keystrokes once Accessibility was granted: **Shift+Page Up scrolls the view over the alternate
+  screen into the mirrored rows** (plain Page Up is delivered to the program as `ESC[5~`), and
+  two `screencapture`s five seconds apart during a 300-row burst at 50ms show MIRROR LINE 11–40
+  at the same rows, only the scrollbar thumb moved. The view holds under a landing batch.
+  Flicker: *"not sure if it flashed"* at 200 switches a second; production does at most twelve.
+  **Gate passed 2026-09-03; step 2 is ungated.**

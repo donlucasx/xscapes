@@ -343,6 +343,15 @@ Terminal.app" (above) is retired. Probes in `notes/histprobe`, `notes/shrinkprob
    rows survived exit. Anything mirrored for post-session review has to be printed again after
    leaving the alternate screen.
 
-⚠ A synthetic mouse-wheel measurement was attempted and is VOID: the CGEvent posts never reached
-the window (the positive control with mouse reporting on received nothing either). Nothing about
-the wheel on the alternate screen has been measured.
+6. **The wheel on the alternate screen reaches the PROGRAM only under mouse reporting.** Measured
+   after he granted Accessibility to Terminal.app (the first attempt was VOID: the CGEvent posts
+   never arrived, and the control proved it). With SGR mouse reporting on, four ticks up and three
+   down arrive as `ESC[<64;61;15M` ×4 and `ESC[<65;61;15M` ×3 -- the control. With no mouse
+   reporting, production's state, the same ticks deliver **0 bytes**: Terminal.app does not
+   translate the wheel into arrow keys. ⚠ Whether the wheel scrolls the VIEW cannot be measured
+   synthetically: CGEvent scroll ticks never moved Terminal.app's view, main screen included.
+7. **Keys over the alternate screen**: plain Page Up is delivered to the program (`ESC[5~`);
+   **Shift+Page Up is kept by Terminal.app and scrolls the view** -- over the alternate screen,
+   into the main buffer's rows above it (screenshot: MIRROR LINE 11-40 with the band scrolled
+   out of sight). While a batch of rows lands below, the scrolled view HOLDS its position; only
+   the scrollbar thumb moves (two captures five seconds apart, identical rows).

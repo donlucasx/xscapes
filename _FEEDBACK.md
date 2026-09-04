@@ -685,3 +685,11 @@ Resumed under Fable. Both ▶ NEXT decisions put to him as a two-question pick; 
     REPLACES his earlier first step (the DECSC/DECRC interleave test), because the shrink
     reproduces the photographed split box and the slot cannot; if a split box is photographed
     after the fix, the slot is next in line.
+
+- *"not sure if it flashed, but it did populate fast a lot of lines. stable when I scroll up. Gave
+  terminal permissions to control the comp maybe u can test it as well"* (after running
+  `./mirrorprobe -n 400 -gap 5ms`; his first try was `./notes/mirrorprobe`, a directory)
+  ⇒ **THE FLICKER GATE IS PASSED.** 400 buffer switches in two seconds with no flash he could
+    name, and the view held while he was scrolled up. Production batches per tick, so at most
+    twelve switches a second. Step 2 (mirroring) is UNGATED. He granted Accessibility to
+    Terminal.app so the synthetic wheel/keys can be retried.
