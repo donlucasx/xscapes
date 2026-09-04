@@ -30,14 +30,15 @@ func TestTheMoonIsRoundAtEveryHeight(t *testing.T) {
 			ref := lumaOf(c.BGAt(2, y))
 			return lumaOf(col)-ref > 40
 		}
-		// Moon coverage per row, in half-cells, over a box wider than any disc.
-		var rows []int
+		// Moon coverage per row, in half-cells, over a box wider than any disc;
+		// and per row how many cells are FULL moon and how many are halves.
+		var rows, fulls, halves []int
 		var ys []int
 		for y := my - 5; y <= my+5; y++ {
 			if y < 0 || y >= c.H {
 				continue
 			}
-			n := 0
+			n, full, half := 0, 0, 0
 			for x := mx - 10; x <= mx+10; x++ {
 				if x < 0 || x >= c.W {
 					continue
@@ -45,6 +46,9 @@ func TestTheMoonIsRoundAtEveryHeight(t *testing.T) {
 				ch, fg, bg := c.ResolveAt(x, y, term.Profile256)
 				switch {
 				case ch == '▀':
+					if bright(fg, y) != bright(bg, y) {
+						half++
+					}
 					if bright(fg, y) {
 						n++
 					}
@@ -53,10 +57,13 @@ func TestTheMoonIsRoundAtEveryHeight(t *testing.T) {
 					}
 				case bright(bg, y):
 					n += 2
+					full++
 				}
 			}
 			if n > 0 {
 				rows = append(rows, n)
+				fulls = append(fulls, full)
+				halves = append(halves, half)
 				ys = append(ys, y)
 			}
 		}
@@ -75,6 +82,15 @@ func TestTheMoonIsRoundAtEveryHeight(t *testing.T) {
 		if top >= widest || bottom >= widest {
 			t.Errorf("h=%d: the moon's top row is %d half-cells wide and its bottom %d against a widest of %d -- that is a rectangle, not a disc",
 				h, top, bottom, widest)
+		}
+		// No pip: a tip row made of half cells must not carry a lone full
+		// cell in its middle (the second report, 133x27: "the moon not
+		// looking so good"). A flat top of several full cells with half-cell
+		// shoulders is a disc; one full cell between halves is a spike.
+		for _, k := range []int{0, len(rows) - 1} {
+			if fulls[k] == 1 && halves[k] > 0 {
+				t.Errorf("h=%d: row %d of the moon is one full cell between %d half cells -- a pip, not a curve", h, ys[k], halves[k])
+			}
 		}
 	}
 }

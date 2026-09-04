@@ -578,7 +578,13 @@ func (s *Shore) moon(c *canvas.Canvas, hy int, scale, lit, vis float64) {
 	// The terminator is approximated by a second disc sliding across the face:
 	// fully clear of it at full, concentric at new.
 	shadow := 2 * rr * lit
-	dark := term.RGB{R: 62, G: 62, B: 74}
+	// The unlit face. Dim, but it has to READ as part of the disc: at
+	// (62,62,74) and 0.45 it blended into a night sky within one grey step,
+	// so a moon one column into its phase looked bitten on the right rather
+	// than shaded -- his second report, "the moon not looking so good", at
+	// 133x27 and 9% context. Three steps above the night sky now, still well
+	// under the lit body, still darker than a daylight sky.
+	dark := term.RGB{R: 80, G: 80, B: 96}
 
 	s.moonX, s.moonY = mx, my
 	ry := int(rr+rim) + 1
@@ -598,7 +604,11 @@ func (s *Shore) moon(c *canvas.Canvas, hy int, scale, lit, vis float64) {
 			var in [2]bool
 			for k, off := range [2]float64{-0.25, 0.25} {
 				fy := float64(dy) + off
-				if math.Hypot(fx, fy) > rr {
+				// Strictly inside. At a radius of exactly 2.25 rows the top
+				// half of the centre column sits ON the edge, and a tie that
+				// counts as in makes that one cell full while its neighbours
+				// are halves: a one-column pip at twelve and six o'clock.
+				if math.Hypot(fx, fy) >= rr {
 					continue
 				}
 				// The disc ends at rr, not at rr+rim. rim used to be the width of
@@ -621,7 +631,7 @@ func (s *Shore) moon(c *canvas.Canvas, hy int, scale, lit, vis float64) {
 				}
 				col := s.pal.Moon
 				if math.Hypot(fx-shadow, fy) <= rr {
-					col, a = dark, a*0.45 // earthshine on the unlit face
+					col, a = dark, a*0.6 // earthshine on the unlit face
 				}
 				in[k] = true
 				half[k] = c.BGAt(x, y).Blend(col, a)

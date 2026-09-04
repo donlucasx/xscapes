@@ -768,3 +768,37 @@ automation, the scroll glitch); his answers:
   ⇒ **FIXED 00:55**: the companion's margin from the right edge grows with the width, 2 + w/32:
     5 columns at 124 (was 2), 4 at 80, 3 at 40, 2 at 30; narrower than the sprite it still pins
     left. `TestTheCompanionKeepsItsDistanceFromTheEdge`. Installed with the moon.
+
+### Relayed by the peer session "xscapes-e6" (live 133x61 `xscapes claude`, 2026-09-04 ~01:20, Lucas watching)
+
+- *"the moon not looking so good."* (second moon report tonight, after the half-row fix)
+  ⇒ Peer's measurement at 133x27, ctx 9%: (a) the bright body spans cols 33–40 on the middle row,
+    off-centre from 37; (b) a one-column pip at 12 and 6 o'clock — the centre column of the tip
+    rows is a FULL cell while its neighbours are half cells. Reproduce with the probe, raw cells.
+- Scrollback (s14 report #2, reproduced): mirrored history rows CORRUPT when scrolling back —
+  two rows composited character by character (spaces of one row filled with characters of
+  another), whole blocks duplicated, the input-box echo four times, strike-through rules to the
+  right margin. Symptom only; peer suspects `MirrorBatch`. Reproduce before theorising.
+- Kittens vanish too fast (4 agents done in 4.8–6.9s; `SubEnd` deletes on arrival, no hold).
+  ⇒ **HIS CALL** (encoding rule: subagents are counted live). Not implemented.
+- Not defects: a kitten in the wave band is a swimmer. Working: sand ops, sea rise/settle, litter
+  count, the 133-column companion margin.
+- *"screengrab of the sun/moon. I liked how the moon/sun looked in the original mockup — why
+  changed?"* (~10:50, two images: the live 133x61 session by day — the sun a tan disc ringed by
+  DARK cells where the half-row tips and the unlit limb are; and the s7 truecolor mockup, a soft
+  round moon with a darker rim and a glow)
+  ⇒ Two things: the dark ring is a DEFECT of this morning's half-row change (the sky half of a
+    split cell is painted dark instead of sky) — measure, fix. And the mockup question is a
+    decision to answer: the soft rim was removed in s11 because on 256 its blend cells went grey
+    ("a warm disc with a grey fringe"); a same-hue darker rim tone may give the mockup's look
+    without the grey. Propose, show, his pick.
+  ⇒ **The dark ring: FOUND and FIXED (11:05).** Sampled from his screenshot's pixels: every notch
+    was rgb(26,26,26) over rgb(180,180,180) — the NIGHT sky tone over the NIGHT moon tone, in a
+    blue sky. They were the moon's half-row tips from the session's first hours: the moon climbs
+    as context is used, the sky is repainted every frame through `SetBGRamp`, and that painter
+    never cleared the cell's half-row record, so a cell that had once been a tip showed that tip
+    forever. One line (`SetBGRamp` clears `half`), two tests red-first
+    (`TestTheMoonLeavesNoStaleTipsWhenItMoves`, canvas `TestHalvesDoNotOutliveARepaint`). This is
+    also part of the peer's "lumpy potato" at night: their moon moved a row as context grew.
+    Installed (new inode, verified running) with the tie and earthshine fixes. Sessions must be
+    restarted.

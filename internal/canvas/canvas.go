@@ -151,6 +151,10 @@ func (c *Canvas) SetBGRamp(x, y int, r *term.Ramp, t0, t1 float64) {
 	i := y*c.W + x
 	c.BG[i] = r.True((t0 + t1) / 2)
 	c.ramp[i] = rampRef{r: r, t0: t0, t1: t1}
+	// Every paint clears the other kinds of paint. This line was missing for
+	// ten hours and the moon's tips from the night stayed in the sky until
+	// eleven in the morning, as grey notches around the sun.
+	c.half[i] = halfRef{}
 }
 
 // Far/Mid/Near are conveniences so scapes read as depth, not indices.
