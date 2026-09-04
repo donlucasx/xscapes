@@ -11,10 +11,11 @@ question for me, not work for you.
 
 Two things about how to work on this, learned the hard way in session 11:
 build the instrument before trusting the picture, and check what the RENDERED
-frame does rather than what the source says it should.
+frame does rather than what the source says it should. And one from session 14:
+do NOT drive Terminal.app (osascript, System Events) without asking me first.
 ```
 
-## Where we left off (2026-09-03 late, session 14, NOT pushed, tree clean)
+## Where we left off (2026-09-03, session 14 WRAP, pushed, tree clean)
 
 **He lived in it for an evening and came back with six reports** (verbatim in `_FEEDBACK.md`).
 State of each:
@@ -35,8 +36,13 @@ State of each:
    BEFORE ANY CHANGES.* **Measured, nothing changed.** `notes/gradientaudit` renders every half
    hour at 124x27 and reads the 256 frame back: distinct tones, band heights, largest CIE76 step.
    Page: `assets/frames/gradients.html` (ignored, regenerate with `go run ./notes/gradientaudit
-   -html assets/frames/gradients.html`) and the artifact "Sky and Sea by the Hour". Findings and
-   the options are in the report to him; the decision is his.
+   -html assets/frames/gradients.html`) and the artifact "Sky and Sea by the Hour"
+   (https://claude.ai/code/artifact/b465bc20-2c01-4062-b7c3-937c92a1c909). Findings: 22:00–01:30
+   greys only (ΔE 5, smooth, colourless); 02:00–03:00 a pink dawn band on grey (ΔE 18); 03:30–21:00
+   a saturated blue slab over grey in the sky and a teal slab over grey in the sea (ΔE 25–33, the
+   edge he sees); the body is sun-coloured 03:00–21:00 and flips lavender/grey at night. Four
+   options put to him: cube-path gradients (recommended) · re-time the day to real sunrise/sunset ·
+   a stable cube-entry moon · keep the grey night. **⏸ HE WRAPPED BEFORE ANSWERING. His call.**
 6. *The beginning of the transcript broke (repeated banners, two garbled rows).* **PARTLY
    DIAGNOSED**: the repeats are Claude Code re-rendering its header while its own permission
    warnings (his 747 rules) scroll a 35-row band; a plain terminal would keep them too. The
@@ -554,34 +560,26 @@ Demo flags: `-wired -mockup -anim -compare -layout -context -day -busy -kittens 
 **Order for a fresh session, 14 days to the deadline (closes 2026-09-17):**
 
 0. **⭐⭐ PUBLISH THE PAGE AND SUBMIT.** `site/COMMONS-PROMPT.md` has the steps; the page is
-   `site/index.html`. His hands only. Until "Entry submitted." is on his screen the entry
-   scores zero however good the rest is. Ask whether it happened; do not assume.
+   `site/index.html`. His hands only. Ask whether it happened; do not assume.
 
-1. ~~**⏸ HIS EYES: the flicker gate.**~~ **PASSED 2026-09-03** — his eyes, then pixels (see
-   "Where we left off").
+1. **Check the incident's aftermath.** Did his "Xscapes status and hackathon news" session survive
+   the stray `/exit` (he was told to press Escape)? If it exited with agents running, that is on
+   this session. Then: is Terminal automation allowed again, and under the tty rule only?
 
-2. ~~**BUILD THE MIRRORING**~~ **BUILT 2026-09-03** — see "Where we left off". What is left of
-   it: **live in it for a day** (`xscapes claude` in Terminal.app, scroll up mid-turn, quit and
-   look at the replay), then decide on Kimi round 2. The plan as it was, for the record:
-   - step 1 (not gated): promote `screen` out of `_test.go`; cells carry fg + bg + attributes;
-     a real two-buffer pair for 47 vs 1049 (the model aliases them today); serialise a row back
-     to ANSI; tee the agent's filtered bytes through it. Then the existing trace tests run on
-     the promoted model.
-   - step 2 (gated on #1): rows leaving the band's top, and the top rows a shrink destroys,
-     appended to the main buffer in one batched write per tick: `ESC7 ?6l ESC[r` · `?47l` ·
-     CUP(mainRow) · row · `\r\n` · `?47h` · band · `ESC8`, SGR reset first. Grow pushes are
-     not mirrored. The shell's cursor row comes from a DSR issued BEFORE `Cmd.Start()` (the
-     child's startup replies travel the same fd; Kimi F3). Mirrored rows reflow on a narrowing
-     drag like any scrollback; say so in the README.
-   - step 3: Close replay on `TERM_PROGRAM=Apple_Terminal` only (an xterm-like keeps the
-     main scrollback across the alternate screen; a replay there duplicates). Drain the pty to
-     EOF with a deadline first (Kimi F4: the forwarder is never joined). A separator line
-     before the replay; `1049l` keeps the oldest few rows and they will repeat.
-   - step 4: tests on the model: the mirrored rows equal the rows that left; the trace replay
-     shows them in the main buffer in order.
-   If a split input box is photographed AFTER the shrink fix, the shared DECSC/DECRC slot
-   (Kimi, s13) is next in line; the hardening is to restore with an absolute CUP from the
-   model instead of DECRC.
+2. **⏸ HIS CALL: the gradient review.** Four options in "Where we left off" #5, page + artifact
+   ready. Nothing about the palette changes until he picks. If he picks cube-path gradients:
+   build the chain-through-the-cube interpolation in `internal/scape/palette.go`/`shore.go`,
+   re-measure with `notes/gradientaudit`, show him the same page again before installing.
+
+3. **The transcript start** (his report #6): redo the frozen comparison PROPERLY -- a window
+   addressed by the `do script` tab's tty, `kill -STOP` only a pid on that tty, readback, CONT,
+   `TRACE_DUMP` replay, diff aligned on the banner. Expect more model divergences like ESC ( B.
+   Only with his OK (#1).
+
+4. **His report #2** (scape lines broken after scrolling): ask whether it healed within ~4s. If it
+   persisted, reproduce with a real Claude session rather than a chatty child.
+
+5. **Live in it another day** with the fixes installed (swimmers, balloon cap, ESC ( B).
 
 3. **The right-edge strip** — a 1–2 column strip of stale scape down the far
    right, photographed twice. `TestTraceRightEdge` proves the renderer paints to

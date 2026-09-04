@@ -2,6 +2,16 @@
 
 *(Renamed end to end on 2026-09-03: directory, env vars, state path and hook marker. Two names are kept on purpose and are not leftovers -- `internal/envx` still reads `ASCIISCAPES_*` and warns, and `install.go` still RECOGNISES the `# asciiscapes:v1` marker so the hooks it wrote before the rename can be found and removed.)*
 
+> **Session 14, the evening.** He lived in it and came back with six reports
+> (`_FEEDBACK.md`): three FIXED (swimmers above the waterline, balloon text
+> capped, the model's ESC ( B); the scroll-back glitch NOT reproduced in the
+> buffer; the transcript-start garble PARTLY diagnosed (Ink re-rendering while
+> his 747 permission warnings scroll the band; one model divergence fixed, the
+> proper diff still to do); and **the gradient review MEASURED, nothing changed,
+> his decision pending** (`notes/gradientaudit`, artifact "Sky and Sea by the
+> Hour"). ⚠ An automation incident typed `/exit` into HIS window: no Terminal
+> driving without his OK, and never `front window` (hub memory).
+>
 > **Where we left off — 2026-09-03 (session 14).** The submission page exists
 > (`site/`, one static file, `xscapes -site site`) and is NOT yet published or
 > submitted — his hands. The scrollback plan below was AUDITED at his ask and
