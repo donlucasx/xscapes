@@ -602,3 +602,54 @@ Never paraphrase. Read the relevant section before editing anything it covers.
   reason (the parked row was clamped to the new height); the shrink was made gentler until no
   clamping was involved, and a main-screen control was added that gives the opposite answer from
   the same drag. One reading with a control beats three without.
+
+### Session 13, continued — the resize saga, and what it cost
+
+- *"just restarted, stretched the window and the issue persists (all the text that loads above when
+  running claude got broken up just by the resize)"*
+- *"the text issue does persist- just opened a new session, resized the window and lost all the text
+  above"*
+  ⇒ Reported a THIRD and FOURTH time, after I had twice said it was fixed. Both times I was wrong,
+    and both times because an instrument answered a question I had not asked.
+
+- *"why dont u use agent kimi to run an audit and consult on the issues first"*
+  ⇒ **Right call, and it changed the outcome.** Packet staged per [[kimi-cli]] (complete source +
+    symptoms + measurements + my own fixes marked as CLAIMS TO CHECK). Kimi's top finding was aimed
+    at my probe: it measured the alternate screen with NO scroll region while production runs
+    DECSTBM + DECOM. I closed that gap, got the same answer, and told him the hypothesis was
+    refuted. **It was not.** The configuration was the shallow fault; the deep one was that the
+    probe measured the CURSOR and I wrote the result up as a fact about CONTENT.
+
+- *"did it"* (ran `XSCAPES_TRACE`)
+  ⇒ The trace settled it: the agent drew at byte 184918 and emitted NOTHING until Ctrl-C at 825233 —
+    400KB of frames across six resizes, zero agent output, zero ED anywhere, and clear ranges that
+    never touch the agent's rows. Host and agent both eliminated; the terminal moved the text.
+
+- *"higher number at the top- content slid up"* (and the grow reading before it)
+  ⇒ **THE FACT, read off the screen by eye:** Terminal.app's alternate screen anchors CONTENT to the
+    BOTTOM edge in both directions, and the CURSOR moves with NEITHER. Grow +21 → ROW 01 at screen
+    row 22, cursor still on row 1. That is why a probe watching the cursor said "anchored top" twice.
+
+- *"will this fix the issue of loosing the text when scrolling back up"* → *"the scrollback is
+  important. What are our options"*
+  ⇒ Measured the MAIN screen before proposing anything, for once. Height: anchored TOP, no correction
+    needed. **Width: TOTAL REFLOW** — every full-width row re-wraps into two, and the host cannot undo
+    it because it moves ROWS while reflow changes how many rows a LINE occupies. So scrollback cannot
+    come from the terminal while the band exists.
+
+- *"is this how we had it before? where the terminal text is on the left and the xscape on the right?
+  not acceptable, should feel like an embedded experience"*
+  ⇒ He misread the tmux proposal (it was a top/bottom split, not the old side-by-side) but was right
+    to kill it: **tmux draws a pane border row between stacked panes, and the sky's colour changes
+    with the hour, so no styling hides the seam.** ⭐ **"Should feel like an embedded experience" is
+    now a locked requirement**, and it forces the answer: seamless + history ⇒ xscapes owns the
+    scrollback.
+
+- *"what is the least overbuilt and easier UI for the user?"* → *"how long do you estimate to build
+  this feature"*
+  ⇒ Estimate given: keyboard-only ~1 day / 2 sessions; with mouse wheel 1.5–2 days / 3 sessions.
+    Flagged the two unsizable risks (exiting scroll mode must repaint the band perfectly, and Claude
+    redraws in place so the ring buffer may capture half-drawn frames). ⏸ **Not started — his call.**
+
+- *"ok, gonna switch models to fable. Lets /wrap the session"*
+  ⇒ This wrap.

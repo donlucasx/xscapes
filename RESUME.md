@@ -14,7 +14,57 @@ build the instrument before trusting the picture, and check what the RENDERED
 frame does rather than what the source says it should.
 ```
 
-## Where we left off (2026-09-03, session 13, HEAD `a0e9a83`, pushed)
+## Where we left off (2026-09-03, session 13, HEAD `9452bc6`, pushed, tree clean)
+
+**The resize damage was OURS, in two separate ways, and it took him reporting it
+four times to establish that.** Both fixed. The durable output is not the fixes,
+it is one measured fact and one rule.
+
+**THE FACT** (`notes/contentprobe`, read off the screen by eye, both directions):
+Terminal.app's ALTERNATE screen anchors CONTENT to the BOTTOM edge — a grow of N
+pushes everything DOWN by N, a shrink pulls it UP and destroys the top N rows —
+and the CURSOR moves with NEITHER. Grow of +21: `ROW 01` landed on screen row 22
+with the cursor still on row 1.
+
+**THE RULE** ⭐ **an instrument can answer a question you did not ask.** FOUR did,
+today, and each one produced a confident wrong answer to him:
+- `screen` discarded SGR, so a row erased under a colour read as blank.
+- every resize test ran `AltScreen: false` while production runs alt.
+- `screen` implemented NO relative cursor motion — CUU/CUD/CUF/CUB/CHA, which is
+  all Claude Code uses — so every reconstruction of the agent's band was fiction.
+- `notes/anchorprobe` measured the CURSOR and I wrote it up as CONTENT. Twice.
+
+**Shipped, all mutation-proven in both directions:**
+1. `clearRowsBare` resets SGR before erasing. An erase fills with the CURRENT
+   background, and the clear runs off a timer with no relation to where the agent
+   is in its output — so it was painting rows in whatever colour Claude was
+   mid-draw. That was his wall of black.
+2. **Grow:** `Rebind` takes a scroll-up count and undoes the terminal's push over
+   the full screen before anything is painted. Without it the agent's first row
+   lands at screen row 31 after a 30→59 grow. Moving ROWS needs no model of the
+   UI in them, which is why the host may do it.
+3. **Shrink:** `drop` restored for BOTH screens. I made it alt-exempt earlier the
+   same day on the strength of the cursor reading; that was wrong and is reverted.
+4. The model learned SGR, the alternate screen, and every cursor motion Claude
+   emits. `XSCAPES_TRACE` + `TestReplayTrace` reconstruct a real session's screen
+   from the bytes the host sent; `TestTraceRightEdge` separates "renderer painted
+   short" from "the host's width belief was stale".
+
+**An external audit earned its keep** (*"why dont u use agent kimi"*). Kimi called
+the anchorprobe's configuration gap before any measurement did, and its F1
+mechanism was right while my refutation of it was wrong. Its other live finding is
+UNFIXED — see ▶ NEXT.
+
+⚠ **SCROLLBACK IS NOW A REQUIREMENT AND IT HAS NO CHEAP ANSWER.** Measured: the
+MAIN screen (the only one with history) is anchored TOP on height — easier than
+alt — but **reflows totally on WIDTH**, every full-width row becoming two, and the
+host cannot undo that because it moves rows while reflow changes how many rows a
+line takes. And tmux's stacked-pane border leaves a seam no styling hides, against
+a sky that changes colour hourly. He ruled: *"should feel like an embedded
+experience"*. Seamless + history therefore forces xscapes to own the scrollback.
+⏸ **Estimated and NOT started — his call.** See ▶ NEXT #1.
+
+## Superseded — session 13's first half (HEAD `a0e9a83`)
 
 **He reported the resize damage a third time, and this time it was ours --
 both halves of it.** Session 11 had written it off as Claude Code's screen
@@ -391,16 +441,50 @@ Demo flags: `-wired -mockup -anim -compare -layout -context -day -busy -kittens 
 
 **Order for a fresh session, 14 days to the deadline (closes 2026-09-17):**
 
-0. **⭐ SUBMIT THE ENTRY.** Not recorded anywhere as done, and the plan said
-   ~Sep 1. Editable until the 17th, so a rough one costs nothing and removes the
-   only failure mode that cannot be recovered from. Ask him first -- he may have
-   done it and not written it down.
-1. **The worry trigger** (see "waiting on him" above). Biggest signal defect in
+0. **⭐⭐ SUBMIT THE ENTRY.** Still not recorded as done. The plan said ~Sep 1,
+   so it is now THREE DAYS OVERDUE with the deadline on the 17th. Editable until
+   then, so a rough one costs nothing and removes the only failure mode that
+   cannot be recovered from. Raised again at the end of session 13 and still
+   unanswered. Ask him first — he may have done it and not written it down.
+
+1. **⏸ HIS CALL: build the scrollback (option B)?** Locked requirement from
+   session 13: *"should feel like an embedded experience"*, and scrollback
+   matters to him. Measured to be impossible from Terminal.app while the band
+   exists (main screen reflows on width; tmux stacking leaves a seam), so the
+   only way to have both is for xscapes to own its own history.
+   **Scope:** move `screen` out of `_test.go` and give it fg + attributes (~100
+   lines) · tee the agent's forwarded bytes through it (~20) · capture rows as
+   they scroll off the band into a ring buffer (~30) · a scroll mode that renders
+   it and exits cleanly (~150) · mouse-wheel reporting (~30) · tests.
+   **Estimate: keyboard-only ~1 day / 2 sessions; with the wheel 1.5–2 days / 3.**
+   **Two risks that could not be sized:** exiting scroll mode must repaint the
+   band perfectly, so any remaining gap in the model shows as visible corruption
+   (today found it had NO cursor motion at all); and Claude redraws its UI block
+   in place, so the ring buffer may capture half-drawn frames — the thing most
+   likely to make the feature disappointing rather than late.
+   ⚠ Weigh against #0: an unsubmitted entry scores zero however good this is.
+
+2. **⏸ Report 1 is NOT closed** — the split input box on an ESTABLISHED session,
+   photographed 2026-09-03 ~11:57 and never reproduced. Kimi rates the **shared
+   DECSC/DECRC slot** at least as likely as anything fixed: one save slot, three
+   writers (the host's Rebind, every paint frame, and the agent's own `ESC 7 …
+   ESC 8` pair). If a host frame lands inside the agent's pair, the agent's
+   restore returns the wrong position and every later RELATIVE draw is offset by
+   a row — which is exactly what a split input box looks like. No test
+   interleaves an agent save/restore with a host frame.
+
+3. **The right-edge strip** — a 1–2 column strip of stale scape down the far
+   right, photographed twice. `TestTraceRightEdge` proves the renderer paints to
+   the full width the host knows, so it is a stale WIDTH BELIEF, not a paint bug.
+   Unexplained: his title bar read 122 while the host's last known was 120, and
+   TIOCGWINSZ agrees with Terminal.app exactly on both screens. Most likely the
+   host lagging a drag; not confirmed to settle.
+4. **The worry trigger** (see "waiting on him" above). Biggest signal defect in
    the project and the cheapest real fix left.
-2. **Dial `TauFall`.** `xscapes tune -sweep` answers it in a second now. 12s
+5. **Dial `TauFall`.** `xscapes tune -sweep` answers it in a second now. 12s
    gives median 0.54 / p90 0.80 / 3.5% saturated; 20s gives 0.64 / 0.90 / 6.0%.
    40s pins the sea and should not ship.
-3. **The 45-60s demo video**, Terminal.app. ⚠ Before recording: **only 4
+6. **The 45-60s demo video**, Terminal.app. ⚠ Before recording: **only 4
    `needs_input` events exist in the entire 18,919-event record.** The cue the
    30%-weighted Waiting Experience is built on essentially never fires on its
    own, so the video either drives it deliberately or leads with `done` (119)
@@ -509,6 +593,23 @@ XSCAPES_SILENT=1 ./xscapes … # mute
   to a real emulator later would buy that back (and would own the scrollback,
   lifting the row-1 constraint), but it was days of work against 16 days left
   and a parser bug corrupts Claude's UI rather than just the picture.
+- **⏸ SCROLLBACK: build it, or live without it?** He said *"the scrollback is
+  important"* and then *"should feel like an embedded experience"*, and those two
+  together are only satisfiable by xscapes owning its own history. Options priced
+  in session 13 and all but one ruled out by measurement:
+  ~~main screen~~ (reflows on width, uncorrectable) · ~~tmux stacked panes~~
+  (border seam, no styling hides it against an hourly-changing sky) ·
+  `-beside` (works today, zero build, but side-by-side is what he rejected) ·
+  a history dump to a pager (half a day, not live scrolling) ·
+  **own the scrollback** (~1 day keyboard-only, the only one that satisfies both).
+  See ▶ NEXT #1 for scope, estimate and risks.
+
+- **Housekeeping from session 13** — throwaway probe binaries left in his home
+  directory (`~/anchorprobe`, `~/contentprobe`, `~/sgrprobe`, `~/sizecmp`) and
+  session traces in `/tmp` (`t.bin`, `fail.bin`, `repro*.bin`, plus `.log`
+  sidecars). The traces contain session screen content. Offered to delete; he did
+  not answer. Delete on request.
+
 - **Double sound.** His own afplay beeps still fire on Notification / Stop /
   PermissionRequest alongside the xscapes knocks, so he hears both. The brief
   always said "replace the beep", but they are HIS hooks and still work with no

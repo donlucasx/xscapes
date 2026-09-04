@@ -2,8 +2,27 @@
 
 *(Renamed end to end on 2026-09-03: directory, env vars, state path and hook marker. Two names are kept on purpose and are not leftovers -- `internal/envx` still reads `ASCIISCAPES_*` and warns, and `install.go` still RECOGNISES the `# asciiscapes:v1` marker so the hooks it wrote before the rename can be found and removed.)*
 
-> **Where we left off — 2026-09-03 (session 12), HEAD `c9a019e`, pushed, tree clean.**
-> **Session 12 was the rename**, finished end to end: directory
+> **Where we left off — 2026-09-03 (session 13), HEAD `9452bc6`, pushed, tree clean.**
+> **Session 13: the resize damage was OURS, twice, and he had to report it four
+> times.** Both fixed and mutation-proven — the clear was painting rows in
+> Claude's own background (an erase fills with the CURRENT background), and the
+> host never undid the terminal's downward push on a grow.
+>
+> **The measured fact that settles all of it:** Terminal.app's ALTERNATE screen
+> anchors CONTENT to the BOTTOM edge both ways, and the CURSOR moves with
+> NEITHER. **The rule worth more than the fixes:** an instrument can answer a
+> question you did not ask — four did today, each producing a confident wrong
+> answer to him. An external audit (agent Kimi, at his suggestion) caught the
+> worst one before any measurement did.
+>
+> ⚠ **SCROLLBACK IS A REQUIREMENT WITH NO CHEAP ANSWER.** He ruled *"should feel
+> like an embedded experience"*, and measurement killed every shortcut: the main
+> screen reflows on width and the host cannot undo it, tmux stacking leaves a
+> seam. Seamless + history forces xscapes to own its scrollback (~1 day). ⏸ HIS
+> CALL — and it is behind SUBMITTING THE ENTRY, which is now three days overdue.
+>
+> **Session 12 was the rename.**
+> Finished end to end: directory
 > `~/Documents/claude/xscapes/`, `XSCAPES_*` env vars, `~/.config/xscapes/`, and
 > the `# xscapes:v1` marker on the twelve installed hooks. `ASCIISCAPES_*` still
 > works and warns (`internal/envx`); `install.go` still RECOGNISES the old marker
