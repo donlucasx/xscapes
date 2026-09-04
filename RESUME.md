@@ -63,6 +63,19 @@ the scroll glitch (report #2): did not check. An account switch at 23:49 (sessio
   Fixed (save and restore); the before run now matches the pre-change baseline table on all 48
   half-hours, which is the check that makes the numbers above quotable.
 
+**His first live look, 00:36, at 124x52** (`_FEEDBACK.md`): *"looking good, on a first
+impression, the moon looks worse than before"* and *"more separation between the far right edge
+and the main companion ... a bit"*. Measured first (`notes/moonprobe`, cells around the moon with
+the paths on and off): **the moon was identical in both** — at the 23 rows a 52-row window gives
+the scape, the disc's radius is 1.92 rows, just under two, so its tip rows fell outside it and the
+three that remained were all seven wide: a rectangle, pre-existing, invisible at his earlier 62-row
+windows where the radius is two. **FIXED**: the disc is sampled at half rows and painted with
+U+2580 where its edge falls inside a row (`canvas.SetBGHalves`, a new background primitive; the
+moon painter in `shore.go`); `TestTheMoonIsRoundAtEveryHeight` holds it at 18–30 rows, red first at
+22 and 23. **FIXED**: the companion's right margin grows with the width, 2 + w/32 (5 at 124, was
+2; `compose` in `live.go`, `TestTheCompanionKeepsItsDistanceFromTheEdge`). Both installed the same
+night (commit, push, both binaries). His session has to be restarted to show them.
+
 **Not done**: a day lived in it with the paths on. The moon at 20:33 is still sun-coloured:
 that was the option he did not pick. `~/.local/bin/xscapes` is a COPY of the repo binary, not
 a symlink; rebuild both after any change.

@@ -57,7 +57,18 @@ type Canvas struct {
 	// rounding its own colour. Nil where the background is a flat tone.
 	ramp []rampRef
 
+	// half is a background cell painted as two colours, top and bottom, for
+	// a shape whose edge falls inside a row: the moon's tips. Unset where
+	// the background is one colour.
+	half []halfRef
+
 	buf []byte
+}
+
+// halfRef is a cell's two backgrounds, for a shape edge that falls mid-row.
+type halfRef struct {
+	up, down term.RGB
+	set      bool
 }
 
 // rampRef is a cell's place in a ramp: the ramp, and the span of it the
@@ -70,7 +81,7 @@ type rampRef struct {
 
 // New builds a canvas with one layer per alpha given, ordered far to near.
 func New(w, h int, alphas ...float64) *Canvas {
-	c := &Canvas{W: w, H: h, BG: make([]term.RGB, w*h), ramp: make([]rampRef, w*h)}
+	c := &Canvas{W: w, H: h, BG: make([]term.RGB, w*h), ramp: make([]rampRef, w*h), half: make([]halfRef, w*h)}
 	for _, a := range alphas {
 		c.Layers = append(c.Layers, NewLayer(w, h, a))
 	}
@@ -84,6 +95,7 @@ func (c *Canvas) Resize(w, h int) {
 	c.W, c.H = w, h
 	c.BG = make([]term.RGB, w*h)
 	c.ramp = make([]rampRef, w*h)
+	c.half = make([]halfRef, w*h)
 	for i, l := range c.Layers {
 		c.Layers[i] = NewLayer(w, h, l.Alpha)
 	}
@@ -109,6 +121,22 @@ func (c *Canvas) SetBG(x, y int, col term.RGB) {
 	}
 	c.BG[y*c.W+x] = col
 	c.ramp[y*c.W+x] = rampRef{}
+	c.half[y*c.W+x] = halfRef{}
+}
+
+// SetBGHalves paints a cell's top half one colour and its bottom half another,
+// with U+2580. This is how a shape gets an edge that falls inside a row: the
+// moon's tips, which at a radius just under two rows used to fall outside the
+// disc entirely and leave a rectangle. BGAt reports the mean of the two, so
+// what blends INTO the cell (a star, the glitter) sees one colour.
+func (c *Canvas) SetBGHalves(x, y int, up, down term.RGB) {
+	if x < 0 || y < 0 || x >= c.W || y >= c.H {
+		return
+	}
+	i := y*c.W + x
+	c.BG[i] = up.Blend(down, 0.5)
+	c.ramp[i] = rampRef{}
+	c.half[i] = halfRef{up: up, down: down, set: true}
 }
 
 // SetBGRamp paints a cell as part of a ramp. t0 and t1 are where the cell's
@@ -215,6 +243,16 @@ func (c *Canvas) resolve(x, y int, p term.Profile) resolved {
 	i := y*c.W + x
 	ch, fg, set := c.composite(i)
 	bg := c.BG[i]
+	if hf := c.half[i]; hf.set && !set {
+		// A shape's edge inside the row. Both halves are backgrounds and take
+		// the background quantiser; a glyph over the cell wins and sits on
+		// the mean, like anywhere else.
+		up, down := p.Quantise(hf.up, false), p.Quantise(hf.down, false)
+		if up != down {
+			return resolved{ch: '\u2580', fg: up, bg: down}
+		}
+		return resolved{ch: ' ', fg: up, bg: up, glyph: true}
+	}
 	if p == term.Profile256 && term.Ramps && c.ramp[i].r != nil {
 		// A cell of a ramp takes the path's tones, not the quantiser's. Both
 		// halves, where the path puts an edge inside the cell; and the same

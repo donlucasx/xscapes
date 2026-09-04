@@ -748,3 +748,23 @@ automation, the scroll glitch); his answers:
 - Gradient paths, after the page (artifact "Sky and Sea Repainted", before/after/truecolor per half
   hour) — **"Install it (Recommended)"** over "tune it first" and "revert it".
   ⇒ **INSTALLED 2026-09-04**: committed, pushed, `~/.local/bin/xscapes` rebuilt.
+- *"looking good, on a first impression, the moon looks worse than before"* (00:36, screenshot of
+  a live `xscapes claude` session at 124x52, night sky, context 6%: the moon is a solid light-grey
+  RECTANGLE, four rows by about seven columns, one tone, square corners)
+  ⇒ Reproduce at his geometry and hour with the paths on and off before theorising; the moon is
+    painted INTO the sky background, and the sky is what changed.
+  ⇒ **MEASURED (`notes/moonprobe`): the moon is IDENTICAL with the paths on and off.** At 22–23
+    scape rows (a 124x52 window) it is a 3-row-by-7 RECTANGLE in both builds: `scale` =
+    min(W/80, H/24) = 0.958 → radius 1.92 rows, just under 2, so the disc's tip rows are cut and
+    the three that remain are all 7 wide. At 62 rows (27 scape rows, his earlier screenshots) the
+    radius is 2 and the disc has 5 rows with narrow tips. The grey is pre-existing too: the
+    night moon (219,211,240) is a lavender the cube does not hold, so 256 shows grey 198.
+    **FIXED 00:55**: the disc is sampled at half rows and painted with U+2580 where its edge
+    falls inside a row (`canvas.SetBGHalves`); at 23 rows the moon is now 3 half-cells, 6, 7, 6,
+    3 half-cells — a disc — and `TestTheMoonIsRoundAtEveryHeight` holds it at 18–30 rows
+    (red first at 22 and 23). The grey body at night is unchanged: that was the option not picked.
+- *"also, I think we should have more separation between the far right edge and the main
+  companion. The companion feels too pushed to he side of the screen. a bit"* (00:40)
+  ⇒ **FIXED 00:55**: the companion's margin from the right edge grows with the width, 2 + w/32:
+    5 columns at 124 (was 2), 4 at 80, 3 at 40, 2 at 30; narrower than the sprite it still pins
+    left. `TestTheCompanionKeepsItsDistanceFromTheEdge`. Installed with the moon.

@@ -235,6 +235,11 @@ type layout struct {
 // column and leave half the frame carrying nothing.
 func compose(w int, catW int, mirror bool) layout {
 	const margin = 2
+	// The companion's own margin from the frame edge grows with the width:
+	// 2 at 40 columns, 4 at 80, 5 at 124. His report at 124: "the companion
+	// feels too pushed to the side of the screen. a bit". Two columns at
+	// every width was right for a narrow pane and cramped in a wide one.
+	right := margin + w/32
 	if !mirror {
 		return layout{
 			CatX: 5, BubbleX: 12,
@@ -242,7 +247,7 @@ func compose(w int, catW int, mirror bool) layout {
 			MoonX: 0.72, Mirror: false,
 		}
 	}
-	catX := w - catW - margin
+	catX := w - catW - right
 	if catX < 0 {
 		// Narrower than the sprite. Pin it to the left edge rather than let it
 		// slide off: clipping the far side costs the tail, clipping the near

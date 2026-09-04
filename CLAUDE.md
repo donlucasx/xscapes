@@ -8,7 +8,10 @@
 > painted as one PATH through the 256 palette (`term.Ramp`, `canvas.SetBGRamp`) instead
 > of rounding each row — hard edges sky 84→65, sea 120→99, half-hours with a step ≥30
 > 29→6, the largest step unchanged at 33 (the cube's green step; unavoidable). Page:
-> artifact "Sky and Sea Repainted". Pushed; `~/.local/bin/xscapes` rebuilt. NEXT: live in it.
+> artifact "Sky and Sea Repainted". Pushed; `~/.local/bin/xscapes` rebuilt. His first live
+> look (124x52): the moon was a RECTANGLE — pre-existing, the disc's radius is 1.92 rows there
+> and lost its tips — **FIXED** with half-row sampling (`canvas.SetBGHalves`); the companion's
+> right margin now grows with the width (5 columns at 124, was 2) — **FIXED**. NEXT: live in it.
 >
 > **Session 14, the evening.** He lived in it and came back with six reports
 > (`_FEEDBACK.md`): three FIXED (swimmers above the waterline, balloon text

@@ -583,46 +583,59 @@ func (s *Shore) moon(c *canvas.Canvas, hy int, scale, lit, vis float64) {
 	s.moonX, s.moonY = mx, my
 	ry := int(rr+rim) + 1
 	rx := int((rr+rim)*2) + 1
+	// Each cell is judged as TWO half-rows, a quarter above and a quarter
+	// below its centre, and painted with U+2580 where only one of them is
+	// inside the disc (or where the terminator crosses between them). His
+	// 124x52 window gives the scape 23 rows, a radius of 1.92, and at whole
+	// rows that disc has no tips at all: three rows, all seven wide, a
+	// rectangle. At half rows the tips come back as three half-cells. The
+	// disc still ends at rr; only the sampling got finer.
 	for dy := -ry; dy <= ry; dy++ {
 		for dx := -rx; dx <= rx; dx++ {
 			fx := float64(dx) / 2.0
-			d := math.Hypot(fx, float64(dy))
-			// The disc ends at rr, not at rr+rim.
-			//
-			// rim used to be the width of a FADE from rr-rim out to rr+rim, so
-			// the visually solid part was rr-rim and everything past it was
-			// falling away. Making the disc solid without moving the cutoff
-			// painted every one of those cells at full strength and the moon
-			// came out nearly twice the radius it should be -- a pink blob with
-			// a ragged edge. rr is what "the disc" has always meant; rim now
-			// only says how much of the outside was ever going to be soft.
-			if d > rr {
-				continue
-			}
-			// The disc is SOLID, and the soft rim it used to have is gone.
-			//
-			// A fading rim has nowhere to land on 256. Blending the sun into
-			// the sky passes through the alpha where its red and green cross --
-			// 0.667 at noon for this pair -- and the colours either side of that
-			// carry chroma in the twenties and thirties, which is where the
-			// greyscale ramp wins. Measured on the frame he sent: the rim cells
-			// were rgb(193,188,151) and rgb(141,163,158), painted as grey 188
-			// and grey 158. A warm disc with a grey fringe, which reads as a
-			// broken sprite rather than as a soft edge.
-			//
-			// Softness is not available here, so the honest version is a clean
-			// edge: the rim still decides the SHAPE of the ellipse, it just no
-			// longer fades what falls inside it.
-			a := 0.92 * vis
-			if a <= 0 {
-				continue
-			}
-			col := s.pal.Moon
-			if math.Hypot(fx-shadow, float64(dy)) <= rr {
-				col, a = dark, a*0.45 // earthshine on the unlit face
-			}
 			x, y := mx+dx, my+dy
-			c.SetBG(x, y, c.BGAt(x, y).Blend(col, a))
+			var half [2]term.RGB
+			var in [2]bool
+			for k, off := range [2]float64{-0.25, 0.25} {
+				fy := float64(dy) + off
+				if math.Hypot(fx, fy) > rr {
+					continue
+				}
+				// The disc ends at rr, not at rr+rim. rim used to be the width of
+				// a FADE from rr-rim out to rr+rim; making the disc solid without
+				// moving the cutoff painted every one of those cells at full
+				// strength and the moon came out nearly twice the radius it
+				// should be -- a pink blob with a ragged edge. rim now only says
+				// how much of the outside was ever going to be soft.
+				//
+				// And the disc IS solid: a fading rim has nowhere to land on 256.
+				// Blending the sun into the sky passes through the alpha where
+				// its red and green cross, and the colours either side of that
+				// carry chroma in the twenties and thirties, which is where the
+				// greyscale ramp wins -- measured on his frame, a warm disc with
+				// a grey fringe, which reads as a broken sprite. So the edge is
+				// clean, and the half-row sampling is what rounds it.
+				a := 0.92 * vis
+				if a <= 0 {
+					continue
+				}
+				col := s.pal.Moon
+				if math.Hypot(fx-shadow, fy) <= rr {
+					col, a = dark, a*0.45 // earthshine on the unlit face
+				}
+				in[k] = true
+				half[k] = c.BGAt(x, y).Blend(col, a)
+			}
+			switch {
+			case in[0] && in[1] && half[0] == half[1]:
+				c.SetBG(x, y, half[0])
+			case in[0] && in[1]:
+				c.SetBGHalves(x, y, half[0], half[1])
+			case in[0]:
+				c.SetBGHalves(x, y, half[0], c.BGAt(x, y))
+			case in[1]:
+				c.SetBGHalves(x, y, c.BGAt(x, y), half[1])
+			}
 		}
 	}
 }
