@@ -14,7 +14,45 @@ build the instrument before trusting the picture, and check what the RENDERED
 frame does rather than what the source says it should.
 ```
 
-## Where we left off (2026-09-03, session 14 continued, NOT pushed, tree clean)
+## Where we left off (2026-09-03 late, session 14, NOT pushed, tree clean)
+
+**He lived in it for an evening and came back with six reports** (verbatim in `_FEEDBACK.md`).
+State of each:
+
+1. *Chat history looks good on a first impression.* ✓
+2. *Scape pixel lines broke at the top-left after scrolling back down.* **NOT REPRODUCED in the
+   buffer**: a scroll-up/scroll-down cycle over a scrolling band at 124x62, read back, shows a
+   clean band and a clean seam. Likely a Terminal.app display artefact that the 50-frame full
+   repaint (~4s at 12fps) clears. ⏸ Ask him whether it healed on its own.
+3. *A subagent swimming on the sand at the tide line.* **FIXED**: swimmer lanes end two rows
+   above the shore's mean waterline (`sh.SandTop()-2`), not a fixed distance above the cat.
+   Unreported but in the same grab: the DONE balloon carrying a whole paragraph across the sea.
+   **FIXED**: balloon text capped at 44 runes with an ellipsis (`companion.MaxBubbleText`).
+4. *Does the moon look correct?* At 20:33 it is a tan/salmon block because the palette blends
+   dusk (18:00) straight into midnight (24:00) over six hours: at 20:33 the sky is still 58%
+   dusk and the body is 58% sun. Real LA sunset in early September is ~19:15. Part of #5.
+5. *Review all sky/water gradients; 256 translations abrupt; smoother, cleaner; REVIEW TOGETHER
+   BEFORE ANY CHANGES.* **Measured, nothing changed.** `notes/gradientaudit` renders every half
+   hour at 124x27 and reads the 256 frame back: distinct tones, band heights, largest CIE76 step.
+   Page: `assets/frames/gradients.html` (ignored, regenerate with `go run ./notes/gradientaudit
+   -html assets/frames/gradients.html`) and the artifact "Sky and Sea by the Hour". Findings and
+   the options are in the report to him; the decision is his.
+6. *The beginning of the transcript broke (repeated banners, two garbled rows).* **PARTLY
+   DIAGNOSED**: the repeats are Claude Code re-rendering its header while its own permission
+   warnings (his 747 rules) scroll a 35-row band; a plain terminal would keep them too. The
+   garbled rows are the MODEL diverging from the terminal. Diffing the model against Terminal.app's
+   readback of a real startup found one divergence, ESC ( B drawn as a "B" -- **FIXED**. The
+   frozen-readback comparison that would find the rest was INVALID (wrong window, see the
+   incident) and is still to be done properly.
+
+⚠ **INCIDENT, mine.** The second traced startup addressed Terminal.app's `front window`, which
+was HIS live window: the script read its history, brought it to the front and typed `/exit` +
+Return into his Claude session, which put up "Exit and stop tasks" over his running agents. He
+was told to press Escape. Lesson saved to hub memory: resolve the window from the `do script`
+tab's tty, assert before any keystroke, never "history contains" for cleanup. **No Terminal
+automation without his explicit OK from here.**
+
+
 
 **⭐ SCROLLBACK SHIPS: the mirror is built, tested and seen working in Terminal.app.**
 After his gate answers (*"not sure if it flashed ... stable when I scroll up"*, then
