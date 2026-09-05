@@ -85,10 +85,11 @@ type Shore struct {
 	// goes looking for, and stacking them in one column leaves half the frame
 	// carrying nothing. Zero means the default.
 	MoonX float64
-	// MoonRim is a STUDY switch for the disc's edge, off in production: ""
-	// (solid, what ships), "hue" (the outer ring one tone darker in the moon's
-	// own hue) or "blend" (the s7 mockup's fade, half toward the sky). Kept so
-	// notes/moonstudy can show him the three side by side on 256.
+	// MoonRim is the disc's edge: "hue" (the outer ring one tone darker in
+	// the disc's own hue -- what ships, his pick of 2026-09-05 from "The Moon,
+	// Four Ways"), "" (solid, what shipped from s11 to then) or "blend" (the
+	// s7 mockup's fade, half toward the sky, which rounds to grey on 256).
+	// NewShore sets "hue".
 	MoonRim string
 	// MoonEdge is a STUDY switch for how the disc's edge is sampled: "" (two
 	// half-rows per cell, what ships) or "quad" (four quarters per cell, the
@@ -183,7 +184,7 @@ func (s *Shore) MoonPos() (x, y int) { return s.moonX, s.moonY }
 func (s *Shore) MoonExtent() (rx, ry int) { return s.moonRX, s.moonRY }
 
 func NewShore(seed int64, asciiOnly bool) *Shore {
-	return &Shore{Seed: seed, ASCII: asciiOnly, SandFade: DefaultSandFade, WriteRows: DefaultWriteRows}
+	return &Shore{Seed: seed, ASCII: asciiOnly, SandFade: DefaultSandFade, WriteRows: DefaultWriteRows, MoonRim: "hue"}
 }
 
 func (s *Shore) Name() string { return "shore" }

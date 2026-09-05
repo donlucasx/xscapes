@@ -1118,3 +1118,8 @@ at 22:10 (lgarzoli out of tokens → donlucasx); artifact ownership checked, see
 - *"discard The "∘" altogether- nots not clear what it means"* (13:38)
   ⇒ **LOCKED 2026-09-05: no ring.** An unfinished todo draws nothing; the sky says *n*. `stars()`,
     `todo_stars_test.go`, the brief's row. Not yet installed (rides the next install).
+- *"lets go w hue rim"* (13:46, after the regenerated "The Moon, Four Ways")
+  ⇒ **LOCKED 2026-09-05: the disc's edge is the hue rim** (`Shore.MoonRim="hue"`, now the
+    default in `NewShore`): the outer ring one tone darker in the disc's own hue, on the half-row
+    disc. The quad edge, the shadowless sun and the night halo stay as study switches, off. Site
+    re-rendered; the brand session told to rebuild the deck.
