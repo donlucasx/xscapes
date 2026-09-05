@@ -1057,3 +1057,11 @@ at 22:10 (lgarzoli out of tokens → donlucasx); artifact ownership checked, see
     greys + noon blue 111; Geist Mono 700 + Geist). **REVERSE is the ALTERNATE COLOUR APPLICATION**
     (the same cell filled gold 179 instead of ink; 136 in the cell on light, 94 as text). Escape's
     four alternate marks are out. NEXT: the one-page guidelines, then the deck template.
+- *"[Image #10] I noticed [Image #11] when the moon/sun is riding low and theres 95/100 context
+  used, the word "LEFT" gets cutoff"* (13:12, both crops from "The Context Cycle": `5%   ft`)
+  ⇒ REPRODUCED once the test read the RENDERED frame instead of the layer (the first test passed
+    because it scanned the near layer, where the glyphs still were — the memory's lesson, again).
+    Cause: the label under a low moon landed on the disc's tip cells, and half cells win over
+    glyphs (s15's rule for stars on the tip). **FIXED**: the label goes under the disc while there
+    is sky under it (`MoonExtent`), beside it on its centre row when there is not, and every
+    letter is plotted with its own background so no half cell can eat one. Page regenerated.

@@ -15,6 +15,9 @@ type Shore struct {
 	// Where the moon landed this frame, so callers can anchor a label to it
 	// without recomputing the position and drifting out of sync.
 	moonX, moonY int
+	// The disc's reach in cells from its centre, columns and rows, so a
+	// caller can keep clear of it (the context readout).
+	moonRX, moonRY int
 
 	pal     Palette // this frame's colours, from the time of day
 	ctxUsed float64 // this frame's context reading, for the moon and its shine
@@ -153,6 +156,9 @@ func (s *Shore) SandColor() term.RGB { return s.pal.SandNear }
 
 // MoonPos is the moon's centre cell from the last Update.
 func (s *Shore) MoonPos() (x, y int) { return s.moonX, s.moonY }
+
+// MoonExtent is how far the disc reaches from MoonPos, in columns and rows.
+func (s *Shore) MoonExtent() (rx, ry int) { return s.moonRX, s.moonRY }
 
 func NewShore(seed int64, asciiOnly bool) *Shore {
 	return &Shore{Seed: seed, ASCII: asciiOnly, SandFade: DefaultSandFade, WriteRows: DefaultWriteRows}
@@ -594,6 +600,7 @@ func (s *Shore) moon(c *canvas.Canvas, hy int, scale, lit, vis float64) {
 	s.moonX, s.moonY = mx, my
 	ry := int(rr+rim) + 1
 	rx := int((rr+rim)*2) + 1
+	s.moonRX, s.moonRY = rx, ry
 	// Each cell is judged as TWO half-rows, a quarter above and a quarter
 	// below its centre, and painted with U+2580 where only one of them is
 	// inside the disc (or where the terminator crosses between them). His

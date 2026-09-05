@@ -321,31 +321,42 @@ const (
 	ReadoutWarn = 0.85
 )
 
-// drawReadout puts the number under the moon, kept inside the sky: with the
-// moon at the waterline the label would otherwise land in the sea.
+// drawReadout puts the number under the disc while there is sky under it,
+// and beside it once the disc rides low: at 95% the moon sits at the
+// waterline and a label under it landed ON the disc's tip cells, which are
+// painted as two-colour halves that win over any glyph -- "5% left" came out
+// as "5%  ft" (his report, 2026-09-05). Each cell is plotted with its own
+// background too, so no half cell can eat a letter wherever it lands.
 func drawReadout(c *canvas.Canvas, sh *scape.Shore, used float64) {
 	if used < ReadoutFrom {
 		return
 	}
 	mx, my := sh.MoonPos()
+	rx, ry := sh.MoonExtent()
 	pct := fmt.Sprintf("%.0f%%", (1-used)*100)
 	txt, col := pct, moonLabelDim
 	if used >= ReadoutWarn {
 		txt, col = pct+" left", moonLabelWarn
 	}
 	hy := int(float64(c.H)*0.42) + 1
-	y := my + 3
+	x, y := mx-len(txt)/2, my+ry+1
 	if y > hy-1 {
-		y = hy - 1
+		// No sky left under the disc: to its right, on its centre row.
+		y = my
+		x = mx + rx + 2
+		if x+len(txt) > c.W-1 {
+			x = mx - rx - 1 - len(txt)
+		}
 	}
-	x := mx - len(txt)/2
 	if x < 1 {
 		x = 1
 	}
 	if x+len(txt) > c.W-1 {
 		x = c.W - 1 - len(txt)
 	}
-	label(c, x, y, txt, col)
+	for i, r := range txt {
+		c.Near().PlotOn(x+i, y, r, col, c.BGAt(x+i, y), 1)
+	}
 }
 
 // drawScene paints one composed frame: the companion, its litter, the bubble

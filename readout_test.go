@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"strings"
 	"testing"
 	"time"
@@ -8,6 +9,7 @@ import (
 	"github.com/donlucasx/xscapes/internal/canvas"
 	"github.com/donlucasx/xscapes/internal/companion"
 	"github.com/donlucasx/xscapes/internal/scape"
+	"github.com/donlucasx/xscapes/internal/term"
 )
 
 // The context readout lives in the scene from 40% used (his ruling,
@@ -30,13 +32,16 @@ func TestTheReadoutAppearsAtFortyPercentUsed(t *testing.T) {
 		sh.Update(c, 2, st.Act)
 		drawScene(c, sh, cat, lay, st, 2, 7, c.H-2-chh)
 		hy := int(float64(c.H)*0.42) + 1
+		// Read the RENDERED cells, not the layer: a glyph the layer holds can
+		// still be dropped by resolve (the disc's half cells won over it, and
+		// "5% left" came out as "5%  ft" on the page).
 		for y := 0; y < hy; y++ {
 			var b strings.Builder
 			for x := 0; x < w; x++ {
-				cell := c.Near().Cells[y*w+x]
-				if cell.Set && cell.R != ' ' {
-					b.WriteRune(cell.R)
-					if cell.FG == moonLabelWarn {
+				r, fg, _ := c.ResolveAt(x, y, term.Profile256)
+				if r != ' ' && r != '▀' && r != '▄' {
+					b.WriteRune(r)
+					if fg == term.Profile256.Quantise(moonLabelWarn, true) {
 						warm = true
 					}
 				} else {
@@ -58,7 +63,10 @@ func TestTheReadoutAppearsAtFortyPercentUsed(t *testing.T) {
 	if s, _, warm := render(0.85); s != "15% left" || !warm {
 		t.Errorf("at 85%% used: got %q (warm=%v), want a warm \"15%% left\"", s, warm)
 	}
-	if s, y, _ := render(1.0); s != "0% left" || y < 0 {
-		t.Errorf("at 100%% used: got %q on row %d, want \"0%% left\" still above the horizon", s, y)
+	for _, used := range []float64{0.95, 1.0} {
+		want := fmt.Sprintf("%.0f%% left", (1-used)*100)
+		if s, y, _ := render(used); !strings.Contains(s, want) || y < 0 {
+			t.Errorf("at %.0f%% used: got %q on row %d, want %q whole, above the horizon", used*100, s, y, want)
+		}
 	}
 }
