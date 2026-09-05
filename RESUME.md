@@ -15,6 +15,38 @@ frame does rather than what the source says it should. And one from session 14:
 do NOT drive Terminal.app (osascript, System Events) without asking me first.
 ```
 
+## Where we left off (2026-09-05, session 16, INSTALLED `365b2bf`, pushed, clean)
+
+**The live tests ran, in both terminals.** From his screenshots (`_FEEDBACK.md` s16): resize
+PASSES in Ghostty and Terminal.app, both directions · the Ghostty sun is the cube's peach (the
+profile fix, live) · the moon is a disc at night · the companion margin holds · the stale-tip fix
+held through a night (a clean sun at 11:32). **Three defects found in the pixels, none fixed:**
+(1) two NIGHT scape rows (greys + the pink `d7afaf` moon tone, painted 01:55–02:50 by the sweep)
+left at window rows 28–29 of 61 in Terminal.app — the model with Terminal.app's rules is clean
+for every grow/drag (`apple_grow_probe_test.go`, kept), cause unknown, needs his 2 AM history;
+(2) at 123x55 after a WIDTH+height drag: a 6-column patch of scape cells above the band at the
+left and the band's last column painted from rows below — the trace (`/tmp/apple.bin`, 34
+resizes, width 120→130→123) replays CLEAN in the model, so the terminal does something on a
+width change the model does not know (its alt-screen width rule was never measured); (3) the
+moon's tips show Terminal.app's U+2580 hairline (*"a tad sloppy"*); the ▄ swap fixes it only if
+U+2584 is bottom-exact — his printf screenshot was a clipboard image, unresolved.
+
+**Shipped and installed (one restart shows it):** a finished subagent's kitten SWIMS OFF along
+the top lane over 6 s (`reduce.KittenExit`, `State.KittenExits`, `Cat.DrawKittenExits`; the
+count still drops at the end event). Built for his pick and then NOT taken: eye fills
+(`canvas.Layer.PlotOn`, `Cat.SetEyeFill` none/coat/socket, `xscapes -eyes`, artifact "The
+Companion's Eyes") — **LOCKED: the eyes stay holes.** Login flip 7 (donlucasx): s15's two
+artifacts are read-only here.
+
+**▶ NEXT:** 0. his OK for two READ-ONLY Terminal automations (a cell read-back of his window
+resolved by the tty of his `xscapes claude`, no keystrokes; a width probe in a window the script
+opens) — the width rule is the blocker for defect (2) · the printf as a SAVED screenshot (or a
+bigger font) for the ▄ question · the working-session items still unseen: bubbles + sound,
+kittens live, the mirror during work and its exit replay, the corrupt scrollback, the transcript
+start · then the Commons sequence: rebuild both binaries after any fix → `xscapes -site site` →
+his 45–60 s Terminal.app recording → `site/COMMONS-PROMPT.md` → he prompts the rebuild (page +
+gallery only, no web twin) → publish → SUBMIT (closes 09-17).
+
 ## Where we left off (2026-09-04 afternoon, session 15 continued, INSTALLED, committed `b9d65e7`, pushed)
 
 **His first run in Ghostty, two reports, both measured, both SHIPPED on his *"proceed w ur
