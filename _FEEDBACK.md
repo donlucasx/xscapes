@@ -1176,3 +1176,66 @@ at 22:10 (lgarzoli out of tokens → donlucasx); artifact ownership checked, see
 - */wrap* (14:35): *"once you are done (running low on context) and lets resume clean next session"*
   ⇒ Wrapped. Open for his look: the page and the deck (both regenerated, second pass), and one
     judgment call left to him — the cover's headline crosses the ASCII sea on both.
+
+## 2026-09-05 — session 19 (the FEATURES TEST, run live inside `xscapes claude`; parallel to s18's hub work)
+
+- *"run a light multi agent session to test out all the features of xscapes (we are currently
+  running it on this session"* (with a screenshot of the live scape, Terminal.app 132x53)
+  ⇒ Driven live against the running scape, confirmed reaching it (`sent ... to session 20aef58c`,
+    not spooled). Real hook traffic: read/search/shell from exploration, write+edit in the
+    scratchpad, one WebSearch, two subagents. Emitted by hand for the channels ordinary use cannot
+    reach here: `todo -n 1 -of 5` then `-n 5 -of 5` (TodoWrite is not in this harness's toolset at
+    all, so the star channel is still reachable only from `emit`), `error`, `needs_input`.
+- *"i did not see any multi agents at work"*
+  ⇒ ⚠ **The SECOND report of this**, and s15's ▶ NEXT already carried "kittens vanish in <7s".
+    Cause is not a bug in the channel: the two subagents lived **6.9 s and 15.7 s**, and a kitten
+    exists only between SubagentStart and 6 s past SubagentStop, so the whole lifecycle was over
+    before he read the reply that told him to look. Re-run with two subagents lasting **2.5 min and
+    4.7 min** — his answer to whether those were visible is still open. **The design question this
+    raises is his**: a subagent that finishes in seconds is currently unobservable, so either the
+    kitten needs a minimum dwell (a finished-work fact that lingers, like the stars) or short
+    subagents are accepted as invisible.
+- *"For the sake of testing the current instance of xscapes, lets run a multi agent session. I want
+  you to research what are the most viewed cozy scapes on youtube (hours long videos of loops of
+  cozy scenes people watch to relax, like fireplaces, starry skies and such) and identify the top 5
+  scenes we could try to build for xscapes (in addition to our existing beach front scene). In
+  parallel, pull up all the companion explorations we've done and rank the top 5 that would render
+  best in the same style of our existing cat (w its kittens!). Be aware we are building on a
+  parallel session"*
+  ⇒ Two agents, read-only, nothing written to the repo. **Scenes** (YouTube scraped by view count,
+    numbers not independently verified): rain is #1 by a factor of two but the big uploads are all
+    HYBRIDS (rain+fireplace, rain+café), so rain is a **modifier layer, not a scape**. Two hits on
+    decisions already in the brief: the planned **Campsite is the weaker half of its archetype**
+    (outdoor campfire #9, 8/20 ≥10M; indoor hearth #2, 15/20, top upload 164.8M), and the **rainy
+    window's companion gap closed itself** — the scenes agent proposed the cat on the inside sill
+    (which the brief already predicts) and the companion agent, blind to it, ranked **frog** for
+    that scape because its eyes are domes in the silhouette rather than gaps and tadpoles already
+    swim. Five picked: hearth/cabin · rainy window · café table · aquarium · snow cabin. Argued
+    against: the lofi-girl bedroom (#3 by evidence) — a drawn human at photographic detail, no
+    element for the motion slot, and the most imitated aesthetic on the internet, so it spends
+    Originality. ⏸ **All of it is his pick; nothing chosen.**
+    **Companions**: five ranked — owl · rabbit · frog · hedgehog · otter; fox excluded because at
+    the real sprite size its ear notch and muzzle are the cat's and the honest coat is the banned
+    orange. Inventory found bird/fox/wisp exist **only as words** in `CLAUDE.md` and
+    `origin-chat.md`: never drawn, never coded.
+  ⇒ ⚠ **A stale number in the brief, measured**: the locked table says the companion is "3–4 lines
+    tall". `CatBody` is 24x28 px and `Size()` is `W/2, H/4`, so the shipped cat is **12 cols x 7
+    rows**. Every new companion would be designed against a figure that is off by half.
+- *"looking at the history on this session, is this formatting issue a xscapes bug?"* (screenshot of
+  this session's own scrollback: horizontal table rules struck through prose rows, a doubled table
+  header with a rule landing inside a word — "sc-ne" — and two duplicated prose blocks)
+  ⇒ **YES, the struck-through rows are ours**, and this is the s14 #2 merge signature (rows merged
+    where one had spaces) reproducing live. Verified rather than inferred: host PID 29679,
+    `TERM_PROGRAM=Apple_Terminal`, so `-history` defaults ON and those scrollback rows were written
+    by our model through DECSET 47, not by Claude Code. **Not claimed as ours**: the duplicated
+    prose blocks, because s14 #6 established Claude Code re-renders and a plain terminal keeps both
+    copies too. ⚠ **UNTRACED, the third occurrence** — `ps eww -p 29679` shows no `XSCAPES_TRACE`;
+    `/tmp/apple.bin` is s16's, 12:56.
+  ⇒ **The restart that preserves the conversation needs a `--` separator** (verified with `-print`,
+    and independently by claude-48): `XSCAPES_TRACE=/tmp/apple2.bin xscapes claude -- --continue`.
+    Bare `xscapes claude --continue` dies with *flag provided but not defined: -continue* because
+    Go's flag parser eats it before it can reach the agent.
+  ⇒ **Sequencing, from claude-48 (s14 probe 3):** leaving the alternate screen discards most of the
+    mirrored rows, so a traced restart DESTROYS the evidence a read-back would read. If both are
+    wanted: read back FIRST, then restart. ⏸ Both waiting on him; his OK for read-only Terminal
+    automation was per-session and needs asking again.
