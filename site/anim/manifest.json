@@ -4,34 +4,39 @@
     "frames": 60,
     "fps": 10,
     "note": "the fan-out at noon: busy sea, five kittens, the sand carrying the tool calls",
-    "secs": 6
+    "secs": 6,
+    "px": 14
   },
   {
     "name": "worried",
     "frames": 40,
     "fps": 10,
     "note": "a command exited 1: the companion carries it",
-    "secs": 4
+    "secs": 4,
+    "px": 14
   },
   {
     "name": "ask",
     "frames": 40,
     "fps": 10,
     "note": "dusk: the agent needs permission, solid balloon, alert pose",
-    "secs": 4
+    "secs": 4,
+    "px": 14
   },
   {
     "name": "done",
     "frames": 50,
     "fps": 10,
     "note": "night: done, dotted balloon, the constellation, the moon with its readout",
-    "secs": 5
+    "secs": 5,
+    "px": 14
   },
   {
     "name": "resting",
     "frames": 40,
     "fps": 10,
     "note": "dawn, half a minute later: flat sea, the writing receding",
-    "secs": 4
+    "secs": 4,
+    "px": 14
   }
 ]

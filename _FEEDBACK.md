@@ -1144,3 +1144,29 @@ at 22:10 (lgarzoli out of tokens → donlucasx); artifact ownership checked, see
     moon and kitten rows updated, PDF re-printed (first frames). `COMMONS-PROMPT.md`: the clips are
     separate files, so the paste alone is not the page; upload `anim/` or host `site/` on Pages.
     **Brand guide**: read; consistent with the product; nothing changed.
+- *"[Image #15] on a first impression there are two sub agents overlapping (the one behind's face
+  breaks). Also, we should show truecolor grabs, not 256. Aim for optimal depictions of the
+  instances. -- Couple more notes: 1. branding should be bigger. Lets stick to the b&w version. 2.
+  Come up with a more exciting visually striking layout for the presentation. Rn is quite plain. 3.
+  [Image #16] animations bounding boxes are bigger than the art, size them correctly. 4. Instead of
+  a long deck describing the product, the first page should be impactful enough to captivate our
+  judges (and anyone). Should have brand, sinopsis of what it is and its most relevant features
+  (why would users care) and a good animation that is representative. 5. Id be curious to test a
+  cover page at the very beginning with the brand centered and some sort of minimal ASCII background
+  to embrace the style"* (14:05)
+  ⇒ All six, in order. **Overlap**: real defect — swimmers were slotted per LANE, so the first
+    swimmer of every lane started at the same column and the upper one painted over the lower one's
+    face. Swimmers are slotted across ALL of them now (`Cat.swimmerSpans`), lanes by hash; red-first
+    `TestSwimmersNeverShareColumns` over 2–12 swimmers, four widths, four seeds. **Truecolor**: the
+    clips render through the truecolor path at a 14px cell (`GIFPx`); judged side by side first
+    (`notes/tcframe`): smooth sky, navy night, warm dusk. The product still runs on the cube.
+    **Branding bigger, b&w**: the ink cell everywhere on the page and the deck (no gold; the brand
+    README notes the ruling, `guidelines.html` is the brand session's to bring in line). **Layout**:
+    a full-viewport COVER (the mark centered over six glyph-only frames of the real night sea,
+    stepping by CSS; `coverLayers`, `site/anim/cover.html`), then the ONE PAGE: lockup at 56px, the
+    synopsis as the headline, four features (why users care), the hero clip full width, install
+    lines; then four states in a two-column grid, the glance table, the protocol, the session
+    companion. **Bounding boxes**: each frame box is now sized to its art (a magenta right border
+    the slicer reads), 675x336. **Deck**: cover slide centered in b&w over the same glyph sea, then
+    a one-page slide (synopsis, four features, the hero clip); the old frame slide is gone; PDF
+    re-printed. Not yet his look.

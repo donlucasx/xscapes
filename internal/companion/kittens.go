@@ -269,57 +269,13 @@ func (c *Cat) drawSwimmers(l *canvas.Layer, idx []int, px, py, w, seaTop, seaBot
 		return 0
 	}
 
-	// Bucket by lane, keeping index order so the layout is deterministic.
-	byLane := make([][]int, lanes)
-	for _, i := range idx {
-		ln := int(HashF(i, 13, seed) * float64(lanes))
-		if ln >= lanes {
-			ln = lanes - 1
-		}
-		byLane[ln] = append(byLane[ln], i)
-	}
-
-	// Start clear of the parent. Swimmers are drawn on the same layer and after
-	// it, so anything overlapping its footprint paints straight over its face.
-	pw, _ := c.Size()
-	x0 := px + pw + 1
-	span := w - x0 - 1
-	if c.mirror {
-		// Open water is everything to the LEFT of the companion.
-		x0 = 1
-		span = px - 2
-	}
-	if span < kw+2 {
-		return 0
-	}
+	spans := c.swimmerSpans(idx, px, py, w, seaTop, seaBot, t, seed)
 	drawn := 0
 	var pend []pendingEyes
-
-	for ln := 0; ln < lanes; ln++ {
-		members := byLane[ln]
-		if len(members) == 0 {
-			continue
-		}
-		slot := span / len(members)
-		if slot < kw+1 {
-			// Lane is oversubscribed; take what fits and drop the rest.
-			members = members[:max(1, span/(kw+1))]
-			slot = span / len(members)
-		}
-		for k, i := range members {
-			phase := HashF(i, 12, seed) * 6.283
-			slack := (slot - kw) / 2
-			if slack > 3 {
-				slack = 3
-			}
-			if slack < 0 {
-				slack = 0
-			}
-			x := x0 + k*slot + (slot-kw)/2 + int(float64(slack)*math.Sin(t*0.32+phase))
-			y := top + ln*kh
-			if x < 1 || x+kw >= w || y < top || y+kh > bot {
-				continue
-			}
+	for _, sp := range spans {
+		i, x, y := sp.i, sp.x0, sp.y
+		phase := HashF(i, 12, seed) * 6.283
+		{
 
 			// The bob happens INSIDE the sprite box, not by moving it: two
 			// source rows is half a character cell, and the chin clipping off
@@ -360,6 +316,78 @@ func (c *Cat) drawSwimmers(l *canvas.Layer, idx []int, px, py, w, seaTop, seaBot
 		p.draw()
 	}
 	return drawn
+}
+
+// swimSpan is where one swimmer goes: its index, its columns and its row.
+type swimSpan struct {
+	i, x0, x1, y int
+}
+
+// swimmerSpans lays the swimmers out. Every swimmer owns a SLOT of the open
+// water's width, counted across all of them rather than per lane, so two
+// swimmers in different lanes can never share columns -- lanes are only a
+// row apart, and the one above painted over the one below's face (his note
+// of 2026-09-05). The lane is by hash so a swimmer does not change rows
+// between frames; the waddle stays inside the slot's slack.
+func (c *Cat) swimmerSpans(idx []int, px, py, w, seaTop, seaBot int, t float64, seed int64) []swimSpan {
+	if len(idx) == 0 || c.swim == nil {
+		if c.swim == nil {
+			c.swim = ParseBitmap(KittenSwim)
+		}
+		if len(idx) == 0 {
+			return nil
+		}
+	}
+	kw, kh := c.swim.W/2, c.swim.H/4
+	_, ph := c.Size()
+	top := seaTop + 1
+	bot := py + ph - 4
+	if seaBot > 0 && seaBot < bot {
+		bot = seaBot
+	}
+	lanes := (bot - top) / kh
+	if lanes < 1 {
+		return nil
+	}
+	pw, _ := c.Size()
+	x0 := px + pw + 1
+	span := w - x0 - 1
+	if c.mirror {
+		x0 = 1
+		span = px - 2
+	}
+	if span < kw+2 {
+		return nil
+	}
+	members := idx
+	slot := span / len(members)
+	if slot < kw+1 {
+		// Oversubscribed: take what fits and drop the rest.
+		members = members[:max(1, span/(kw+1))]
+		slot = span / len(members)
+	}
+	var out []swimSpan
+	for k, i := range members {
+		phase := HashF(i, 12, seed) * 6.283
+		slack := (slot - kw) / 2
+		if slack > 3 {
+			slack = 3
+		}
+		if slack < 0 {
+			slack = 0
+		}
+		x := x0 + k*slot + (slot-kw)/2 + int(float64(slack)*math.Sin(t*0.32+phase))
+		ln := int(HashF(i, 13, seed) * float64(lanes))
+		if ln >= lanes {
+			ln = lanes - 1
+		}
+		y := top + ln*kh
+		if x < 1 || x+kw >= w || y < top || y+kh > bot {
+			continue
+		}
+		out = append(out, swimSpan{i, x, x + kw - 1, y})
+	}
+	return out
 }
 
 // plotRim clears a one-cell ring around a sprite's silhouette before it is

@@ -40,20 +40,26 @@ def slices(im):
             y += 1
     if len(seps) < 2:
         sys.exit('no separators found; is the page rendered?')
-    x1 = 0
-    y0 = seps[0][0]
-    while x1 < w and px[x1, y0] == MAGENTA:
-        x1 += 1
-    boxes = [(0, seps[i][1], x1, seps[i + 1][0]) for i in range(len(seps) - 1)]
+    # The frame's own width: each frame box ends in a magenta right border,
+    # so the art is everything left of the first magenta pixel on a row
+    # inside the box (the sand's black rows carry no magenta).
+    boxes = []
+    for i in range(len(seps) - 1):
+        top, bottom = seps[i][1], seps[i + 1][0]
+        ym = (top + bottom) // 2
+        x1 = 0
+        while x1 < w and px[x1, ym] != MAGENTA:
+            x1 += 1
+        boxes.append((0, top, x1, bottom))
     return boxes
 
 def main():
     manifest = json.load(open(os.path.join(ANIM, 'manifest.json')))
     for clip in manifest:
-        name, n, fps = clip['name'], clip['frames'], clip['fps']
+        name, n, fps, px_ = clip['name'], clip['frames'], clip['fps'], clip.get('px', 12)
         page = os.path.join(ANIM, name + '.html')
         png = os.path.join(ANIM, name + '.png')
-        capture(page, png, n * 292 + 8)
+        capture(page, png, n * (24 * px_ + 4) + 8)
         im = Image.open(png).convert('RGB')
         boxes = slices(im)
         if len(boxes) != n:

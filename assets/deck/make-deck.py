@@ -30,6 +30,10 @@ def main():
             sys.exit(f'missing {src}: run go run . -site site && python3 site/make-gifs.py first')
         shutil.copyfile(src, os.path.join(anim, name + '.gif'))
     t = open(os.path.join(HERE, 'deck.tpl.html')).read()
+    cover = os.path.join(ROOT, 'site', 'anim', 'cover.html')
+    if not os.path.exists(cover):
+        sys.exit(f'missing {cover}: run go run . -site site first')
+    t = t.replace('@@COVER@@', open(cover).read())
     if '@@' in t:
         sys.exit('a placeholder was left unfilled')
     cut = t.index('</style>') + len('</style>')

@@ -2,11 +2,14 @@ package main
 
 import (
 	"fmt"
+	"html"
 	"os"
 	"path/filepath"
 	"strings"
 
+	"github.com/donlucasx/xscapes/internal/canvas"
 	"github.com/donlucasx/xscapes/internal/event"
+	"github.com/donlucasx/xscapes/internal/scape"
 )
 
 // turnBeat is one moment of the demo turn: seconds from the prompt, a note,
@@ -100,6 +103,11 @@ func sitePage(seed int64, dir string) (string, error) {
 		return "", err
 	}
 	page := string(tmpl)
+	cover := coverLayers(seed)
+	page = strings.Replace(page, "{{cover}}", cover, 1)
+	if err := os.WriteFile(filepath.Join(dir, "anim", "cover.html"), []byte(cover), 0o644); err != nil {
+		return "", err
+	}
 	if i := strings.Index(page, "{{"); i >= 0 {
 		end := min(i+40, len(page))
 		return "", fmt.Errorf("template marker not filled: %q", page[i:end])
@@ -108,4 +116,25 @@ func sitePage(seed int64, dir string) (string, error) {
 		return "", err
 	}
 	return page, nil
+}
+
+// coverLayers is the cover's background: six frames of the real shore at
+// night, glyphs only, stacked as <pre> layers a CSS step animation cycles.
+// The mark sits over its own sea. Written to <dir>/anim/cover.html too, so
+// the deck's title slide can carry the same.
+func coverLayers(seed int64) string {
+	const w, h = 168, 44
+	var b strings.Builder
+	sh := scape.NewShore(seed, false)
+	sh.MoonX = 0.28
+	act := scape.Activity{Working: true, Level: 0.55, TimeOfDay: 0.93}
+	c := canvas.New(w, h, canvas.AlphaFar, canvas.AlphaMid, canvas.AlphaNear)
+	for i := 0; i < 30; i++ {
+		sh.Update(c, float64(i)/20, act)
+	}
+	for i := 0; i < 6; i++ {
+		sh.Update(c, 2+float64(i)*0.7, act)
+		fmt.Fprintf(&b, `<pre style="animation-delay:-%.1fs">%s</pre>`, float64(i)*0.7, html.EscapeString(c.RenderPlain()))
+	}
+	return b.String()
 }

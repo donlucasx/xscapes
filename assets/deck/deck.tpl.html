@@ -89,6 +89,21 @@ ul.big li{padding-left:44px;position:relative}
 ul.big li:before{content:"";position:absolute;left:0;top:.55em;width:18px;height:2px;background:var(--acc)}
 ul.big li span{color:var(--d)}
 .win img.clip{display:block;image-rendering:pixelated;width:100%;max-width:1280px;height:auto}
+.title{position:relative;overflow:hidden}
+.cover-sea{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;pointer-events:none}
+.cover-sea pre{position:absolute;margin:0;font:700 16px/1 var(--mono);color:#3a3a3a;white-space:pre;opacity:0;animation:step 4.2s steps(1) infinite}
+@keyframes step{0%{opacity:1}16.66%{opacity:0}100%{opacity:0}}
+.title .lockup,.title .foot,.title .t32{position:relative;text-shadow:0 0 40px #121212,0 0 12px #121212}
+.title .lockup{font-size:200px}
+.title{align-items:center;text-align:center}
+.title .head{align-items:center;text-align:center}
+.title .head h1,.title .head p{margin-left:auto;margin-right:auto}
+.blk{text-shadow:none}
+.onebody{display:grid;grid-template-columns:1fr 1.15fr;gap:48px;align-items:center}
+.feats{list-style:none;padding:0;margin:0;display:grid;gap:22px;font-size:26px;line-height:1.35}
+.feats li{padding-left:28px;position:relative}
+.feats li::before{content:"";position:absolute;left:0;top:.5em;width:12px;height:12px;background:var(--i)}
+.feats b{color:var(--i)}
 </style>
 
 <div class="hint">arrows to move &middot; print for a PDF, one slide per page</div>
@@ -96,9 +111,10 @@ ul.big li span{color:var(--d)}
 
 <!-- 1 · title (Reverse) -->
 <div class="page"><div class="stage"><section class="s title">
-  <div class="lockup"><span class="blk gold">x</span>scapes</div>
+  <div class="cover-sea">@@COVER@@</div>
+  <div class="lockup"><span class="blk">x</span>scapes</div>
   <div class="head"><h1 class="t72">The waiting layer for terminal agents.</h1><p class="t32">An event protocol, pluggable adapters, and one reference scape.</p></div>
-  <div class="foot"><span>Commons &middot; Make Waiting for AI Fun</span><span class="goldtx">September 2026</span></div>
+  <div class="foot"><span>Commons &middot; Make Waiting for AI Fun</span><span>September 2026</span></div>
 </section></div></div>
 
 <!-- 2 · statement -->
@@ -107,11 +123,19 @@ ul.big li span{color:var(--d)}
   <div class="foot"><span class="lockup"><span class="blk">x</span>scapes</span><span>02</span></div>
 </section></div></div>
 
-<!-- 3 · frame: working -->
-<div class="page"><div class="stage"><section class="s frame">
-  <div class="head"><h2 class="t56">One command. Claude Code runs inside a shoreline.</h2></div>
-  <div class="body"><div class="win"><img class="clip" src="anim/hero.gif" width="640" height="288" alt="Six seconds of a turn at noon"></div></div>
-  <div class="capbar"><p class="m20" style="max-width:none"><span class="accent">Fourteen seconds into a turn, at noon.</span> Edits landing, five subagents out on the sand and in the water, the last tool calls written in the sand. The real engine folding the events a Claude Code hook emits, as a 256-colour terminal shows it.</p></div>
+<!-- 3 · the one page: what it is, why anyone cares, and the clip -->
+<div class="page"><div class="stage"><section class="s onepage">
+  <div class="head"><div class="lockup" style="font-size:64px"><span class="blk">x</span>scapes</div><h2 class="t56" style="max-width:20em">Claude Code runs inside a shoreline. The sea rises while it works, the sand records what it did, and a cat knocks when it needs you.</h2></div>
+  <div class="body onebody">
+    <ul class="feats">
+      <li><b>A glance is enough.</b> How hard it is working, what it is doing, whether something broke, whether it is waiting on you.</li>
+      <li><b>Two knocks you can tell apart from across the room,</b> each with its own sound. Silent while it works.</li>
+      <li><b>It lives where the agent lives.</b> The same window, nothing to configure, the agent's screen untouched.</li>
+      <li><b>Subagents are kittens, context is the moon.</b> Every fact about the session has its own place, and no two share one.</li>
+    </ul>
+    <div class="win"><img class="clip" src="anim/hero.gif" width="675" height="336" alt="Six seconds of a turn at noon"></div>
+  </div>
+  <div class="foot"><span class="lockup"><span class="blk">x</span>scapes</span><span>03</span></div>
 </section></div></div>
 
 <!-- 4 · table: what a glance tells you -->
@@ -215,7 +239,7 @@ xscapes claude</div>
 
 <!-- 11 · close (Reverse) -->
 <div class="page"><div class="stage"><section class="s close">
-  <div class="lockup"><span class="blk gold">x</span>scapes</div>
+  <div class="lockup"><span class="blk">x</span>scapes</div>
   <div class="head"><p class="t72" style="font-size:56px">a thinking screen for terminal agents</p><div class="code" style="font-size:26px;width:max-content">go install github.com/donlucasx/xscapes@latest
 xscapes claude</div></div>
   <div class="foot"><span>github.com/donlucasx/xscapes &middot; MIT</span><span class="goldtx">Lucas Garzoli &middot; Los Angeles</span></div>
