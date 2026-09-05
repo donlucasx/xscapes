@@ -77,8 +77,8 @@ clips, a cover and a one-page pitch. **Open threads, all his:** (1) LOOK at `sit
 (2) publish + SUBMIT on Commons (the clips are files beside the page, `site/COMMONS-PROMPT.md`;
 closes 09-17) · (3) his 45–60 s Terminal.app recording · (4) a TRACED working session for the
 scrollback corruption seen in his live buffer · (5) the 6-column patch above the band and the 2 AM
-stale rows, both open · (6) `assets/brand/guidelines.html` still shows gold for the page and deck;
-his ruling is b&w (the brand session's file).
+stale rows, both open · (6) DONE, session 18 (2026-09-05 15:50): `assets/brand/guidelines.html` and the brand README
+say ink on the page and the deck, his b&w ruling.
 
 **The live tests ran, in both terminals.** From his screenshots (`_FEEDBACK.md` s16): resize
 PASSES in Ghostty and Terminal.app, both directions · the Ghostty sun is the cube's peach (the

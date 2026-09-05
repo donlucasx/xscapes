@@ -61,8 +61,7 @@ word stays ink. Use it once per surface where the brand is the subject: the
 avatar and social image. Everywhere the mark labels something else, the cell
 is ink. In the terminal it is always plain reverse video. **The Commons page
 and the deck use the ink cell, not gold** (Lucas, 2026-09-05: "Lets stick to
-the b&w version"); `guidelines.html` still shows gold there and is to be
-brought in line by the brand session.
+the b&w version"); `guidelines.html` says the same.
 
 | use                | hex     | index | SGR      |
 |--------------------|---------|-------|----------|
