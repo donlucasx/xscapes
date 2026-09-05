@@ -411,3 +411,90 @@ func max(a, b int) int {
 	}
 	return b
 }
+
+// DrawKittenExits draws one swimmer per finished subagent, each on its way
+// out: from the open water beside the litter toward the far edge of the frame
+// as its progress runs 0 to 1, receding (lower alpha) over the second half,
+// and gone at 1. The leaving is carried by POSITION, so a still frame reads
+// it, and the litter count itself dropped the moment the end event came.
+// Returns how many were drawn.
+func (c *Cat) DrawKittenExits(l *canvas.Layer, exits []float64, px, py, w, seaTop, seaBot int, t float64, seed int64) int {
+	if len(exits) == 0 {
+		return 0
+	}
+	if c.swim == nil {
+		c.swim = ParseBitmap(KittenSwim)
+	}
+	kw, kh := c.swim.W/2, c.swim.H/4
+	_, ph := c.Size()
+	top := seaTop + 1
+	bot := py + ph - 4
+	if seaBot > 0 && seaBot < bot {
+		bot = seaBot
+	}
+	lanes := (bot - top) / kh
+	if lanes < 1 {
+		return 0
+	}
+	// The exit lane is the top one: nearest the horizon, which is where
+	// "leaving" points, and clear of the sitters on the sand.
+	y := top
+	pw, _ := c.Size()
+	// From beside the parent to the far edge; mirrored, the far edge is the
+	// left one.
+	from, to := px+pw+1, w-1-kw
+	if c.mirror {
+		from, to = px-1-kw, 1
+	}
+	if (to-from)*(to-from) < (kw+2)*(kw+2) {
+		return 0
+	}
+	drawn := 0
+	var pend []pendingEyes
+	for k, p := range exits {
+		if p >= 1 || p < 0 {
+			continue
+		}
+		x := from + int(float64(to-from)*p+0.5)
+		if x < 1 || x+kw >= w || y+kh > bot {
+			continue
+		}
+		alpha := 1.0
+		if p > 0.5 {
+			alpha = 1 - 0.65*(p-0.5)/0.5
+		}
+		phase := HashF(k, 21, seed) * 6.283
+		sink := 0
+		if math.Sin(t*0.9+float64(x)*0.16+phase) > 0.35 {
+			sink = 2
+		}
+		f := c.swim.Blank()
+		for sy := 0; sy < f.H; sy++ {
+			for sx := 0; sx < f.W; sx++ {
+				if c.swim.at(sx, sy-sink) {
+					f.Set(sx, sy)
+				}
+			}
+		}
+		// Face the way it is going.
+		if !c.mirror {
+			f = f.Mirrored()
+		}
+		rows := f.ToQuadrant()
+		plotRim(l, rows, x, y)
+		(&Sprite{Rows: rows, Body: furCol, Alpha: alpha}).Draw(l, x, y)
+		e := eyeCols["kittenSwim"]
+		glyph := 'o'
+		if math.Mod(t+phase, 4.2) < 0.17 {
+			glyph = '-'
+		}
+		l.Plot(x-1, y+kh-1, '~', furCol, 0.5*alpha)
+		l.Plot(x+kw, y+kh-1, '~', furCol, 0.5*alpha)
+		pend = append(pend, pendingEyes{x + e[0], x + e[1], y + 1, glyph, alpha, l})
+		drawn++
+	}
+	for _, p := range pend {
+		p.draw()
+	}
+	return drawn
+}

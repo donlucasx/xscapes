@@ -68,6 +68,8 @@ type Cat struct {
 	// face is the detail drawn over the body; coat is what the body is made of.
 	face Face
 	coat term.RGB
+	// eyeFill is one of the EyeFill constants; see SetEyeFill.
+	eyeFill string
 }
 
 // SetFace chooses how much detail the companion's face carries.
@@ -75,6 +77,32 @@ func (c *Cat) SetFace(f Face) { c.face = f }
 
 // SetCoat chooses the body colour.
 func (c *Cat) SetCoat(col term.RGB) { c.coat = col }
+
+// Eye fills. The eyes are characters plotted in gaps of the body bitmap, so
+// by default an eye cell shows the SCENE behind the head: dark water at
+// night, which reads as a socket with a shine, and bright sea by day, which
+// read as two blue holes (his 12:49 screengrab, 2026-09-04). A fill gives the
+// cell fur before the glyph, so the eye is a mark on the face at every hour.
+const (
+	EyeFillNone   = ""       // the scene shows through (the original)
+	EyeFillCoat   = "coat"   // the coat itself
+	EyeFillSocket = "socket" // the coat darkened a step: a socket, not a hole
+)
+
+// SetEyeFill picks one of the fills above.
+func (c *Cat) SetEyeFill(fill string) { c.eyeFill = fill }
+
+// eyeGround is the fill's colour, and whether there is one.
+func (c *Cat) eyeGround() (term.RGB, bool) {
+	switch c.eyeFill {
+	case EyeFillCoat:
+		return c.coat, true
+	case EyeFillSocket:
+		return term.RGB{R: uint8(float64(c.coat.R) * 0.78), G: uint8(float64(c.coat.G) * 0.78),
+			B: uint8(float64(c.coat.B) * 0.78)}, true
+	}
+	return term.RGB{}, false
+}
 
 func NewCat() *Cat {
 	return &Cat{body: ParseBitmap(CatBody), worried: ParseBitmap(CatWorried), coat: furCol}
@@ -179,6 +207,11 @@ func (c *Cat) eyes(l *canvas.Layer, x, y int, t float64, st State) {
 	if c.mirror {
 		w, _ := c.Size()
 		a, b = w-1-a, w-1-b
+	}
+	if ground, ok := c.eyeGround(); ok {
+		l.PlotOn(x+a, y+2, glyph, col, ground, 1)
+		l.PlotOn(x+b, y+2, glyph, col, ground, 1)
+		return
 	}
 	l.Plot(x+a, y+2, glyph, col, 1)
 	l.Plot(x+b, y+2, glyph, col, 1)

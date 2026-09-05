@@ -10,6 +10,7 @@ package reduce
 
 import (
 	"math"
+	"sort"
 	"time"
 
 	"github.com/donlucasx/xscapes/internal/companion"
@@ -64,6 +65,11 @@ var (
 	// otherwise leave the cat working forever.
 	TurnSilence = 5 * time.Minute
 
+	// KittenExit is how long a finished subagent's kitten takes to swim off.
+	// The litter count drops the moment the end arrives (the count is live);
+	// the exit is a position, not a rate, so a glance still reads it.
+	KittenExit = 6 * time.Second
+
 	// SubStale drops a subagent whose end event never arrived, so one lost
 	// event does not strand a kitten on the beach for the rest of the day.
 	SubStale = 30 * time.Minute
@@ -90,6 +96,10 @@ type State struct {
 
 	// Kittens is how many subagents are running right now.
 	Kittens int
+	// KittenExits is one entry per subagent that finished within KittenExit:
+	// how far along its swim off it is, 0 at the end event, 1 when gone.
+	// Oldest first.
+	KittenExits []float64
 
 	// Tail is the sand: newest last.
 	Tail []Line
@@ -123,6 +133,7 @@ type Reducer struct {
 
 	flight map[string]inflight
 	subs   map[string]time.Time
+	gone   map[string]time.Time // subagents that ended, until their kitten has swum off
 
 	worried    bool
 	needsInput bool
@@ -144,6 +155,7 @@ func New(session string) *Reducer {
 	return &Reducer{
 		flight:  map[string]inflight{},
 		subs:    map[string]time.Time{},
+		gone:    map[string]time.Time{},
 		session: session,
 	}
 }
@@ -245,11 +257,15 @@ func (r *Reducer) Apply(e event.Event, now time.Time) {
 	case event.SubStart:
 		if e.Agent != "" {
 			r.subs[e.Agent] = now
+			delete(r.gone, e.Agent) // back in the litter, mid-swim or not
 		}
 		r.heat += Impulse
 
 	case event.SubEnd:
 		if e.Agent != "" {
+			if _, ok := r.subs[e.Agent]; ok {
+				r.gone[e.Agent] = now
+			}
 			delete(r.subs, e.Agent)
 		}
 		r.heat += Impulse
@@ -314,6 +330,39 @@ func (r *Reducer) decay(now time.Time) {
 			delete(r.subs, id)
 		}
 	}
+	for id, t := range r.gone {
+		if now.Sub(t) >= KittenExit {
+			delete(r.gone, id)
+		}
+	}
+}
+
+// kittenExits is the swim-off progress of every recently finished subagent,
+// oldest first (ties by id, so two ending in one tick draw the same way every
+// frame).
+func (r *Reducer) kittenExits(now time.Time) []float64 {
+	if len(r.gone) == 0 {
+		return nil
+	}
+	type g struct {
+		id string
+		at time.Time
+	}
+	gs := make([]g, 0, len(r.gone))
+	for id, t := range r.gone {
+		gs = append(gs, g{id, t})
+	}
+	sort.Slice(gs, func(i, j int) bool {
+		if !gs[i].at.Equal(gs[j].at) {
+			return gs[i].at.Before(gs[j].at)
+		}
+		return gs[i].id < gs[j].id
+	})
+	out := make([]float64, len(gs))
+	for i, x := range gs {
+		out[i] = clamp01(float64(now.Sub(x.at)) / float64(KittenExit))
+	}
+	return out
 }
 
 // State reads out the current scene. TimeOfDay comes from the caller's wall
@@ -360,13 +409,14 @@ func (r *Reducer) State(now time.Time) State {
 			TodoDone:    r.todoDone,
 			TodoTotal:   r.todoOf,
 		},
-		Pose:      r.pose(now),
-		Kittens:   len(r.subs),
-		Tail:      r.tail.lines(now),
-		tail:      &r.tail,
-		Session:   r.session,
-		LastEvent: r.last,
-		Events:    r.count,
+		Pose:        r.pose(now),
+		Kittens:     len(r.subs),
+		KittenExits: r.kittenExits(now),
+		Tail:        r.tail.lines(now),
+		tail:        &r.tail,
+		Session:     r.session,
+		LastEvent:   r.last,
+		Events:      r.count,
 	}
 	// The bubble is NOT gated on the pose. Gating it meant that after any
 	// failed command the companion went Worried and swallowed everything --
@@ -409,6 +459,7 @@ func (r *Reducer) reset() {
 	r.turnOpn = false
 	r.flight = map[string]inflight{}
 	r.subs = map[string]time.Time{}
+	r.gone = map[string]time.Time{}
 	r.worried, r.needsInput = false, false
 	r.doneAt = time.Time{}
 	r.bubble = ""

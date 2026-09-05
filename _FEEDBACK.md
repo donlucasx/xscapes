@@ -904,3 +904,83 @@ automation, the scroll glitch); his answers:
   nothing. Times above corrected from the commit clock and the screenshot files (my earlier
   annotations ran ~1 h fast). Memory consolidated for the new session: see `project_xscapes.md`
   "NEXT SESSION".
+
+## Session 16 — 2026-09-04 evening / 2026-09-05 morning
+
+Resumed under Fable in the hub cwd. A 22-item live-test list was produced from the 09-04 records
+(Ghostty resize + sun · Terminal.app regression · moon, companion, gradients, kittens). Login flip 7
+at 22:10 (lgarzoli out of tokens → donlucasx); artifact ownership checked, see memory.
+
+- *"ive re logged on w another claude account fyi (donlucasx@gmail) because I ran out of tokens on
+  the lgarzoli@gmail account. Do i need to notify you when this happen? do you loose context when re
+  loggin on, or are you able to continue working normally"* (22:12)
+  ⇒ Context survives; only artifact ownership and Remote Control move. `Artifact list` under
+    donlucasx: owns "Sky and Sea by the Hour" (s14); NOT "Sky and Sea Repainted" / "The Moon's Edge"
+    (lgarzoli's, read-only here).
+- *"2. ok this is what I see on ghostty [Image #2] and this is on the terminal.app [Image #3]
+  resizing the window looks good, but I cant tell the colors since its nightime. Now during daytime
+  [Image #4] (ghostty) and [Image #5] (terminal). resizing it seems to work well"*
+  (Images: Ghostty 22:39 night · Terminal.app 22:16 night 120x61 · Ghostty 09-05 11:32 day ·
+  Terminal.app 09-05 11:32 day 120x61)
+  ⇒ Resize: PASSES his eye in both terminals, both directions (the s15 Ghostty rules, first live
+    confirmation). Night: the moon is a disc in both (no rectangle, no pip). Day: the Ghostty sun is
+    now the cube's peach, same as Terminal.app (the profile fix, confirmed live); Ghostty shows no
+    hairlines, Terminal.app shows full-width hairlines in the sky at the ramp's half-row edges
+    (known U+2580 glyph gap, now visible across the whole width because the ramps split rows).
+  ⇒ **DEFECT, Terminal.app day (Image #5)**: two stale rows at about screen rows 27–28 of 61,
+    inside Claude's blank area above the band: night-sky grey with three `+` stars at the same
+    columns as the night frame's stars and a PINK block where the moon stands (a dawn-tinted body
+    over a still-dark zenith ⇒ painted around 04:30–05:30, then left behind). Not reported by him;
+    seen in the pixels. Hypotheses to separate: a resize he made (or macOS made on wake/display
+    change) at that hour, with the grow's clear missing the old band's first two rows; or a
+    zero-delta SIGWINCH on wake. Needs his geometry history or a trace.
+  ⇒ MEASURED (09-05 ~12:00, from the screenshot's pixels at full resolution and the renderer):
+    the strip is 2 rows at window rows 28–29, full 120-column width; row 1 is a U+2580 split cell
+    (rendered 34/34/34 over 42/42/42 = cube greys `262626`/`303030` under Terminal.app's colour
+    transform, the same one that shows `005faf` as 0/84/166); the block is 6 columns at the
+    moon's x in 209/166/166 = `d7afaf`. `notes/sunprobe` sweep: the top rows carry `d7afaf` with
+    those two greys ONLY at 20:50–21:50 and 01:55–02:50; at 22:04+ the body is `c6c6c6` grey (his
+    22:16 screenshot, which shows the area CLEAN). So the rows were painted 01:55–02:50, in a
+    window whose band began at row 28 (about 45 rows tall), and survived a grow back to 61.
+    The screen model with Terminal.app's rules is GREEN for a 44→61 grow at once, in ticks of
+    four, one row at a time, shrink-then-grow, grow-shrink-grow and a six-tick drag
+    (`internal/host/apple_grow_probe_test.go`, kept as a regression test): the host's own
+    sequences do not leave the rows under the modelled terminal. Open: what happened at ~02:00
+    (a display/monitor sleep, a Mac sleep, a resize by hand?) and a trace of a session that
+    shows it (`XSCAPES_TRACE=/tmp/apple.bin xscapes claude`, replay with `TestReplayTrace`).
+    Not fixed; nothing changed in the host.
+- *"[Image #6] ok running on terminal, some lines broke on the top right after some resizing (was
+  not happening earlier?)"* (12:08, Terminal.app 123x55 with the trace on: a 6-column patch of
+  scape cells in the three rows ABOVE the band at the left edge, and the band's LAST column painted
+  with cells from several rows lower; the Claude header's first row gone; the input box's cursor a
+  row low at column 2)
+  ⇒ MEASURED from the trace (`/tmp/apple.bin`, 34 resizes, WIDTH 120→130→123 as well as height
+    30→56→55): replayed through the screen model with Terminal.app's rules, the final screen is
+    CLEAN — rows 28–31 default background in every column, column 123 painted the same as 121–122
+    in every band row. The host's bytes do not produce the patch or the strip under the modelled
+    terminal. The model's WIDTH rule for the alternate screen ("keep what fits") has never been
+    measured; s13 measured height only. Suspect: Terminal.app reflowing or re-joining rows on a
+    width change. Next instrument: a read-back of his window's cells (`history of tab`, read-only)
+    against the screenshot, and a width probe in a window the script opens — both need his OK.
+- *"moon looks a tad sloppy on terminal compared to the ghostty version"* (12:10)
+  ⇒ Known cause: Terminal.app's U+2580 glyph starts 5px below the cell top, so every half-block
+    edge (the disc's tips, the ramp edges) shows a hairline of the lower colour. Cheap fix IF
+    Terminal.app's U+2584 (lower half) is bottom-exact: emit ▄ with the colours swapped on
+    Apple_Terminal. Needs one screenshot of a printf test from him.
+- *"eyes: show me a mockup of what filling the eyes w fur looks like. Ok with your recommendations
+  on kittens swimming off"* (12:12)
+  ⇒ BUILT both, tests red-first, suite green. Eyes: `canvas.Layer.PlotOn` (a glyph with its own
+    ground, resolved before halves/ramps/shading), `Cat.SetEyeFill` (none/coat/socket, default
+    NONE until his pick), study page `xscapes -eyes` → artifact "The Companion's Eyes". Kittens:
+    `reduce.KittenExit` 6 s — the count drops at the end event, the kitten swims off along the top
+    lane toward the far edge, receding over the second half (`DrawKittenExits`, `State.KittenExits`).
+    Not installed yet: one install after the eyes pick.
+- *"regarding eyes, keep holes (as is). [Image #7]"* (12:27; the image: the printf test in a fresh
+  Terminal.app window, two rows of ▀ in blue on red beside two rows of ▄ in red on blue)
+  ⇒ **LOCKED 2026-09-05: the eyes stay HOLES.** `Cat.SetEyeFill` keeps the two fills for the
+    record, default none; the study page stays at `xscapes -eyes` (artifact "The Companion's Eyes",
+    https://claude.ai/code/artifact/9ce364b3-de4b-4348-b7d8-9c54ca10a7b1).
+  ⇒ The printf: a clipboard capture, no file to sample; at the pasted size the left block shows
+    the five stripes the ▀ gap predicts, and the right block cannot be resolved between four
+    stripes (▄ bottom-exact, the one-switch fix) and five (▄ inset too, no cheap fix). Asked for a
+    saved screenshot or a larger font.

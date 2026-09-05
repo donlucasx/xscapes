@@ -22,6 +22,12 @@ type Cell struct {
 	FG  term.RGB
 	A   float64 // per-cell alpha, multiplied by the layer alpha
 	Set bool
+	// BG is the cell's own background, when HasBG: a glyph that brings its
+	// ground with it instead of showing the scene through. The companion's
+	// eyes are the case -- characters plotted in gaps of the body bitmap,
+	// which showed the sea behind the head by day.
+	BG    term.RGB
+	HasBG bool
 }
 
 type Layer struct {
@@ -45,6 +51,16 @@ func (l *Layer) Plot(x, y int, r rune, fg term.RGB, a float64) {
 		return
 	}
 	l.Cells[y*l.W+x] = Cell{R: r, FG: fg, A: a, Set: true}
+}
+
+// PlotOn is Plot with the cell's own background. The background is blended
+// toward the scene by the same alpha as the glyph, so a far layer's ground
+// recedes with it; at the near layer it is exact.
+func (l *Layer) PlotOn(x, y int, r rune, fg, bg term.RGB, a float64) {
+	if x < 0 || y < 0 || x >= l.W || y >= l.H || a <= 0 {
+		return
+	}
+	l.Cells[y*l.W+x] = Cell{R: r, FG: fg, A: a, Set: true, BG: bg, HasBG: true}
 }
 
 type Canvas struct {
@@ -165,20 +181,33 @@ func (c *Canvas) Near() *Layer { return c.Layers[2] }
 // composite resolves one cell to a final glyph plus foreground colour, and
 // says whether any layer actually put something there.
 func (c *Canvas) composite(i int) (rune, term.RGB, bool) {
+	ch, fg, _, _, set := c.compositeBG(i)
+	return ch, fg, set
+}
+
+// compositeBG is composite with the cell's own ground, when the topmost glyph
+// brought one (PlotOn): own is that ground blended toward the scene by the
+// glyph's alpha, and hasOwn says it applies. A glyph plotted over an own-ground
+// cell without a ground of its own keeps the ground under it.
+func (c *Canvas) compositeBG(i int) (ch rune, fg, own term.RGB, hasOwn, set bool) {
 	bg := c.BG[i]
-	fg := bg
-	ch := ' '
-	set := false
+	fg = bg
+	ch = ' '
+	own = bg
 	for _, l := range c.Layers {
 		cell := l.Cells[i]
 		if !cell.Set {
 			continue
 		}
+		if cell.HasBG {
+			own = own.Blend(cell.BG, l.Alpha*cell.A)
+			hasOwn = true
+		}
 		fg = fg.Blend(cell.FG, l.Alpha*cell.A)
 		ch = cell.R
 		set = true
 	}
-	return ch, fg, set
+	return ch, fg, own, hasOwn, set
 }
 
 // resolved is one cell ready to draw. glyph says the foreground came from a
@@ -252,8 +281,14 @@ func (c *Canvas) halves(x, y int) (up, down term.RGB, ok bool) {
 // pattern on the screen, so it is the second choice rather than the first.
 func (c *Canvas) resolve(x, y int, p term.Profile) resolved {
 	i := y*c.W + x
-	ch, fg, set := c.composite(i)
+	ch, fg, own, hasOwn, set := c.compositeBG(i)
 	bg := c.BG[i]
+	if hasOwn {
+		// A glyph that brought its own ground owns the whole cell: no split,
+		// no ramp tone, no shading. The eye sits on fur whatever is behind
+		// the head.
+		return resolved{ch: ch, fg: fg, bg: own, glyph: true}
+	}
 	if hf := c.half[i]; hf.set {
 		// A shape's edge inside the row. Both halves are backgrounds and take
 		// the background quantiser. The halves win over a glyph: a far star
@@ -439,7 +474,23 @@ func (c *Canvas) htmlFragment(fontPx int, p term.Profile, quantise bool) string 
 	return c.htmlFragmentWith(fontPx, p, quantise, nil)
 }
 
+// HTMLFragmentCropAs is HTMLFragmentAs for the cells x0..x1-1, y0..y1-1 only,
+// so a study can show one part of a real frame at a size the whole would not
+// fit. Clamped to the canvas.
+func (c *Canvas) HTMLFragmentCropAs(x0, y0, x1, y1, fontPx int, p term.Profile) string {
+	x0, y0 = max(x0, 0), max(y0, 0)
+	x1, y1 = min(x1, c.W), min(y1, c.H)
+	if x1 <= x0 || y1 <= y0 {
+		return ""
+	}
+	return c.htmlFragmentRect(fontPx, p, true, nil, x0, y0, x1, y1)
+}
+
 func (c *Canvas) htmlFragmentWith(fontPx int, p term.Profile, quantise bool, pal *HTMLPalette) string {
+	return c.htmlFragmentRect(fontPx, p, quantise, pal, 0, 0, c.W, c.H)
+}
+
+func (c *Canvas) htmlFragmentRect(fontPx int, p term.Profile, quantise bool, pal *HTMLPalette, x0, y0, x1, y1 int) string {
 	var b strings.Builder
 	b.WriteString(`<pre style="font-size:`)
 	b.WriteString(strconv.Itoa(fontPx))
@@ -469,8 +520,8 @@ func (c *Canvas) htmlFragmentWith(fontPx int, p term.Profile, quantise bool, pal
 		b.WriteString(`</span>`)
 		run.Reset()
 	}
-	for y := 0; y < c.H; y++ {
-		for x := 0; x < c.W; x++ {
+	for y := y0; y < y1; y++ {
+		for x := x0; x < x1; x++ {
 			r := c.resolve(x, y, p)
 			fg, bg := r.fg, r.bg
 			if quantise {

@@ -322,6 +322,11 @@ func drawScene(c *canvas.Canvas, sh *scape.Shore, cat *companion.Cat, lay layout
 		cat.DrawKittens(c.Near(), c.Mid(), lay.CatX, top, st.Kittens, c.W-1,
 			int(float64(c.H)*0.42)+1, sh.SandTop()-2, t, seed)
 	}
+	if len(st.KittenExits) > 0 {
+		// Finished subagents swim off along the top lane; same water bounds.
+		cat.DrawKittenExits(c.Near(), st.KittenExits, lay.CatX, top, c.W-1,
+			int(float64(c.H)*0.42)+1, sh.SandTop()-2, t, seed)
+	}
 	if st.Bubble != "" {
 		rows, col := companion.DoneBubble(st.Bubble), bubbleCol
 		if st.BubbleAsk {
