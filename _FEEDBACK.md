@@ -1035,6 +1035,9 @@ at 22:10 (lgarzoli out of tokens → donlucasx); artifact ownership checked, see
     Waterline is dropped as an identity (its palette stays for the shore wherever the deck shows
     it). Round two: Cursor polished into a system · four alternate Escape marks · a hybrid,
     "Reverse" (Cursor's block in Escape's gold, the lockup carrying its own escape sequence).
+### Session 16, continued — 2026-09-05 afternoon (engineering; the brand session's block above was
+### inserted while these were being appended, so its two closing lines sit among them)
+
 - *"can you show me on a html page the context cycle of the sun (and moon) what is to be expected to
   look like as the context rans out? at what point the user sees a text percentage indicator?"* (13:00)
   ⇒ Page built from the live renderer (`xscapes -ctxcycle`, artifact "The Context Cycle"): ten
@@ -1170,3 +1173,6 @@ at 22:10 (lgarzoli out of tokens → donlucasx); artifact ownership checked, see
     the slicer reads), 675x336. **Deck**: cover slide centered in b&w over the same glyph sea, then
     a one-page slide (synopsis, four features, the hero clip); the old frame slide is gone; PDF
     re-printed. Not yet his look.
+- */wrap* (14:35): *"once you are done (running low on context) and lets resume clean next session"*
+  ⇒ Wrapped. Open for his look: the page and the deck (both regenerated, second pass), and one
+    judgment call left to him — the cover's headline crosses the ASCII sea on both.

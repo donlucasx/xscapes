@@ -67,7 +67,18 @@ and upload (his hands).
 from the other session swept three in (`bff64d1`, since removed). Render previews with headless Chrome
 `--screenshot=` straight into the scratchpad instead.
 
-## Where we left off (2026-09-05, session 16, INSTALLED, pushed, clean — SHAs in `git log`)
+## Where we left off (2026-09-05, session 16 WRAPPED 14:40, HEAD `2f28667`+wrap, INSTALLED, pushed, clean)
+
+**Session 16 in one line:** the live tests passed; shipped and installed: kitten swim-off · the
+readout from 40% · ▄ split cells on Terminal.app · the disc-tip fix · the hue-rim disc · no todo
+ring · swimmers never share columns; the site and the deck rebuilt on the brand with truecolor
+clips, a cover and a one-page pitch. **Open threads, all his:** (1) LOOK at `site/index.html` and
+`assets/deck/index.html`; one judgment call: the cover's headline crosses the ASCII sea on both ·
+(2) publish + SUBMIT on Commons (the clips are files beside the page, `site/COMMONS-PROMPT.md`;
+closes 09-17) · (3) his 45–60 s Terminal.app recording · (4) a TRACED working session for the
+scrollback corruption seen in his live buffer · (5) the 6-column patch above the band and the 2 AM
+stale rows, both open · (6) `assets/brand/guidelines.html` still shows gold for the page and deck;
+his ruling is b&w (the brand session's file).
 
 **The live tests ran, in both terminals.** From his screenshots (`_FEEDBACK.md` s16): resize
 PASSES in Ghostty and Terminal.app, both directions · the Ghostty sun is the cube's peach (the

@@ -2,14 +2,17 @@
 
 *(Renamed end to end on 2026-09-03: directory, env vars, state path and hook marker. Two names are kept on purpose and are not leftovers -- `internal/envx` still reads `ASCIISCAPES_*` and warns, and `install.go` still RECOGNISES the `# asciiscapes:v1` marker so the hooks it wrote before the rename can be found and removed.)*
 
-> **Session 16 (2026-09-05).** Live tests PASSED in both terminals; shipped: kitten swim-off ·
-> the context READOUT in the scene from 40% used (his ruling) · ▄ split cells on Terminal.app (no
-> hairlines) · the disc-tip sky half through the ramp · the outstanding-todo ring REMOVED (his
-> ruling). Measured: Terminal.app's alt screen RETAINS rows at their widest on a width change
-> (`notes/width-audit.md`). Studies for his pick: "The Moon, Four Ways" (quad edge, sun without
-> shadow, night halo; `xscapes -moon`). **Brand LOCKED 2026-09-05** by the parallel brand session
-> (Cursor + Reverse alt; guidelines v1.0 in `assets/brand/`); deck = parked draft; see `RESUME.md`
-> "Brand workstream". Details in `RESUME.md`.
+> **Session 16 (2026-09-05), WRAPPED.** Live tests PASSED in both terminals. Shipped + installed:
+> kitten swim-off · the context READOUT from 40% used (his ruling; it had never been in the live
+> scene) · ▄ split cells on Terminal.app (no hairlines) · the disc-tip sky half through the ramp ·
+> **the disc's edge is the HUE RIM** (his pick from "The Moon, Four Ways"; quad edge, shadowless sun,
+> night halo stay as study switches) · the outstanding-todo ring REMOVED (his ruling) · swimmers
+> never share columns. Measured: Terminal.app's alt screen RETAINS rows at their widest on a width
+> change (`notes/width-audit.md`). **The site and the deck are rebuilt on the brand** with five
+> TRUECOLOR clips from the real reducer (`go run . -site site && python3 site/make-gifs.py`, then
+> `assets/deck/make-deck.py`), a cover over the real sea's glyphs and a one-page pitch; his look is
+> next, then Commons (closes 09-17). **Brand LOCKED** by the parallel s17 session (b&w on the page and
+> deck by his ruling; `assets/brand/`). Details in `RESUME.md`.
 >
 > **Session 15 (2026-09-04).** His picks: gradients **cube-path ONLY**; Terminal
 > automation **this session only** (tty rule); the page stays unpublished until the
