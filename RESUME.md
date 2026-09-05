@@ -37,12 +37,15 @@ verified: profile=256 under ghostty/Apple_Terminal/iTerm.app). Commons research:
 commons-submission.md` §8 — a web twin is feasible (Durable Objects, WebSockets, cron proven live;
 renderer compiles to wasm, 3.4 MB); not started, his call.
 
-**▶ NEXT (afternoon):** he restarts `xscapes claude` in Ghostty and resizes — the fix is proven in
+**▶ NEXT (afternoon):** 0. CONSOLIDATE first — three sessions ran on 09-04 (the morning one that
+shipped the ramps and the moon, `1eb6e92`; this one, `3601ac0`…`9414e96`; a hub session whose wrap
+rewrote the hub `MEMORY.md` xscapes line): one pass over `RESUME.md`, `_FEEDBACK.md` s15 and the
+xscapes memory, then the live tests · he restarts `xscapes claude` in Ghostty and resizes — the fix is proven in
 the model, not yet live · the two fully BLANK sky rows in his screenshot are NOT reproduced offline
 (`XSCAPES_TRACE=/tmp/ghostty.bin xscapes claude` in Ghostty, then resize, would replay them) · the
 sun still reads rough on 256 in both terminals: the disc is quantised cell by cell against the
 sky gradient (peach over cream) — "quantise the disc once" is the small follow-up, his pick ·
-the companion's eyes are HOLES to the scene by day (measured from his 14:00 screengrab: the eye
+the companion's eyes are HOLES to the scene by day (measured from his 12:49 screengrab: the eye
 cells are the sea's colour; by design the eyes sit in gaps the body bitmap leaves) — fill the two
 eye cells with fur before the glyph, his pick · still his from the morning: solid moon or hue rim ·
 kittens vanish in <7s · the mirror corruption needs a mirror-era trace · publish the page, submit

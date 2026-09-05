@@ -830,7 +830,7 @@ automation, the scroll glitch); his answers:
   repeated at the right; the sun a flat tan disc. Image 2: Terminal.app at 120x73 — the sun
   a peach-over-cream disc with thin sky-blue lines through it; the cat grey-white.)
   ⇒ Two reports. Diagnosing both with instruments before touching anything.
-  ⇒ **Both DIAGNOSED (12:50), nothing fixed — his call on each.**
+  ⇒ **Both DIAGNOSED (~12:30), nothing fixed — his call on each.**
     **The sun.** `notes/sunprobe` renders the noon frame under both profiles: the palette's sun
     is #ffd787 painted at 0.92×0.85 into a blue sky, and that blend is TAN (#cfc192). Ghostty
     runs the truecolor profile and paints that tan faithfully (screenshot pixels #bfb384).
@@ -861,13 +861,13 @@ automation, the scroll glitch); his answers:
     grow, SD k + CUD k on a shrink (small, measured, extend the probe into a red-first test);
     (B) repaint the whole band from the screen model at the new size and place the cursor
     absolutely, terminal-independent but leaning on the model's fidelity, which s14 #2 doubts.
-- *"the sun looks smaller on truecolor and abit rough/broken up on 256"* (12:55) — same disc, same
+- *"the sun looks smaller on truecolor and abit rough/broken up on 256"* (~12:35) — same disc, same
   nine-column footprint under both profiles (probe); Terminal.app's glyph gap pads each tip row to
   18 of 30 px in sun colour and the peach has 107 luma over its sky against the tan's 80, so the
   Terminal.app sun reads about half a row taller and brighter; the roughness is cell-by-cell
   quantisation against the sky gradient + the hairlines + the unlit sliver quantising to blue.
-- *"proceed w ur recommendation to starndardize the experience wihout overengineering it."* (13:05)
-  ⇒ **SHIPPED and INSTALLED (13:40), not committed.** (1) `term.DetectProfile` returns the cube on
+- *"proceed w ur recommendation to starndardize the experience wihout overengineering it."* (~12:40)
+  ⇒ **SHIPPED and INSTALLED (12:50; commits `3601ac0`, `b9d65e7`, docs `d0c6b74` at the wrap).** (1) `term.DetectProfile` returns the cube on
   every terminal; `XSCAPES_COLOR=truecolor` opts out; `profile_test.go`. (2) `host.Rules` +
   `RulesFor(TERM_PROGRAM)`: Terminal.app's sequences unchanged byte for byte; Ghostty and
   everything else get no SU on a grow and `RebindShrinkAltFollow` (SD k + CUD k) on a shrink.
@@ -877,13 +877,13 @@ automation, the scroll glitch); his answers:
   He must restart his Ghostty session. Left out on purpose: the one-colour disc (changes the tuned
   Terminal.app sun) and the blank sky rows (need a Ghostty trace).
 - *"make sure to update the other terminal session on what you are doing (the one that is idle rn)"*
-  (13:45) ⇒ sent to the idle peer `xscapes-aa` over SendMessage (the full change list, what is
+  (~12:52) ⇒ sent to the idle peer `xscapes-aa` over SendMessage (the full change list, what is
   open, and not to rebuild or commit on his behalf). Standing expectation from here: when two
   sessions run, the one doing the work keeps the idle one current.
-- *"ok, /wrap this session and make sure the parallel one is up to date on everything"* (13:55)
+- *"ok, /wrap this session and make sure the parallel one is up to date on everything"* (12:53)
   ⇒ wrapped: committed and pushed (SHAs in `RESUME.md`), the peer told again at the end.
 - *"another note before you wrap- look at the companions eyes on the ghostty terminal [Image #3]"*
-  (14:00; the peer session's Ghostty window, idle, still the old binary — tan sun) ⇒ **MEASURED,
+  (his 12:49 screengrab of the peer session's Ghostty window, idle, still the old binary — tan sun) ⇒ **MEASURED,
   nothing changed.** From the pixels: each eye cell is `#6799e4`, exactly the sea band behind the
   head, with a 2px trace of `#6ca1df` at mid-height — the dozing `-` in mint (168,236,176),
   antialiased to a hairline by Ghostty's font. By design (`cat.go` `eyes`): the eyes are characters
@@ -893,6 +893,14 @@ automation, the scroll glitch); his answers:
   Option: give the two eye cells the body's own colour (or a darker fur tone) as background before
   the glyph, so the eye is a mark on fur at every hour. Small. **His pick.**
 - *"ok, /wrap and make sure the parallel session (now idle) is aware of all the updates and things
-  that need testing"* (14:10) ⇒ nothing changed since `d0c6b74`; the peer `xscapes-aa` was sent a
+  that need testing"* (21:04) ⇒ nothing changed since `d0c6b74`; `xscapes-aa` had exited, so the idle `claude-a5` was sent a
   live-test checklist (restart in Ghostty · resize both ways · the sun · the eyes · a trace for the
   blank rows · a Terminal.app regression pass) with what to look for on each.
+- *"i did not mean the ghosty session. I just wrapped a parallel session on another terminal. Read
+  the existing memory and update it w a proper /wrap on this one. Will start a new session after
+  to consolidate notes and testing"* (21:14) ⇒ the other session was a HUB session (its wrap rewrote
+  the hub `MEMORY.md` xscapes line at 21:12, consistent with this one: HEAD `9414e96`, live-untested);
+  the Ghostty session `xscapes-aa` (transcript `fa4fae65…`) only received messages and changed
+  nothing. Times above corrected from the commit clock and the screenshot files (my earlier
+  annotations ran ~1 h fast). Memory consolidated for the new session: see `project_xscapes.md`
+  "NEXT SESSION".
