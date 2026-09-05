@@ -1,0 +1,323 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>xscapes Submission Deck</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Geist+Mono:wght@400;700&family=Geist:wght@400;500;600&display=swap">
+<style>
+/* xscapes deck template, on the brand guidelines v1.0 (assets/brand/guidelines.html).
+   One <section class="s ..."> per slide, 1920 x 1080, scaled to the window; print gives one slide per page.
+   Slide kinds: .title (Reverse, gold cell) · .statement · .table · .frame (a real rendered frame) · .diagram · .split · .numbers · .list · .close (Reverse). */
+:root{--g:#121212;--s:#1c1c1c;--ln:#303030;--d:#8a8a8a;--i:#eeeeee;--acc:#87afff;--gold:#d7af5f;--k:1;
+  --mono:"Geist Mono",ui-monospace,"SF Mono",Menlo,monospace;--sans:"Geist",-apple-system,BlinkMacSystemFont,"Segoe UI",Helvetica,Arial,sans-serif}
+*{box-sizing:border-box}
+html,body{margin:0;background:#000;color:var(--i)}
+body{font-family:var(--sans);scroll-snap-type:y mandatory;overflow-y:auto;height:100vh}
+.page{height:100vh;scroll-snap-align:start;display:flex;align-items:center;justify-content:center;background:#000}
+.stage{width:calc(1920px * var(--k));height:calc(1080px * var(--k));overflow:hidden;flex:none}
+.s{width:1920px;height:1080px;transform:scale(var(--k));transform-origin:top left;background:var(--g);padding:96px 120px 84px;display:flex;flex-direction:column;justify-content:space-between;position:relative;overflow:hidden}
+.counter{position:fixed;right:18px;bottom:14px;font:12px var(--mono);color:#585858;z-index:9}
+.hint{position:fixed;left:18px;bottom:14px;font:12px var(--mono);color:#585858;z-index:9}
+body.all{scroll-snap-type:none;height:auto;padding:40px 0}
+body.all .page{height:auto;margin:0 auto 36px;display:block;width:960px}
+body.all .stage{width:960px;height:540px}
+body.all .s{transform:scale(.5)}
+body.all .counter,body.all .hint{display:none}
+@media print{
+  @page{size:1920px 1080px;margin:0}
+  html,body{background:var(--g);height:auto;overflow:visible;scroll-snap-type:none}
+  .page{height:1080px;display:block;break-after:page;page-break-after:always}
+  .stage{width:1920px;height:1080px}
+  .s{transform:none}
+  .counter,.hint{display:none}
+}
+/* the mark */
+.blk{display:inline-block;width:1ch;line-height:1.2em;text-align:center;vertical-align:top;background:var(--i);color:var(--g);font-family:var(--mono);font-weight:700}
+.blk.gold{background:var(--gold)}
+.lockup{font:700 1em/1.2 var(--mono);letter-spacing:0;white-space:nowrap}
+/* type scale, deck */
+.t72{font:600 72px/1.05 var(--sans);letter-spacing:-.02em;margin:0;text-wrap:balance}
+.t56{font:600 56px/1.1 var(--sans);letter-spacing:-.02em;margin:0;text-wrap:balance}
+.t32{font:400 32px/1.3 var(--sans);margin:0;color:var(--d)}
+.t26{font:400 26px/1.45 var(--sans);margin:0;max-width:62ch}
+.m20{font:400 20px/1.5 var(--mono);color:var(--d);margin:0}
+.m16{font:400 16px/1.4 var(--mono);color:var(--d);margin:0;letter-spacing:.02em}
+.accent{color:var(--acc)}
+.goldtx{color:var(--gold)}
+.foot{display:flex;justify-content:space-between;align-items:flex-end;font:16px/1.4 var(--mono);color:var(--d)}
+.foot .lockup{font-size:22px;color:var(--i)}
+.head{display:flex;flex-direction:column;gap:22px}
+.body{flex:1;display:flex;flex-direction:column;justify-content:center;gap:28px;min-height:0}
+/* title + close */
+.title,.close{justify-content:space-between}
+.title .lockup,.close .lockup{font-size:120px}
+/* table */
+table{border-collapse:collapse;width:100%;font:26px/1.35 var(--sans)}
+td,th{padding:20px 0;border-bottom:1px solid var(--ln);vertical-align:top;text-align:left}
+th{font:16px/1.2 var(--mono);letter-spacing:.06em;text-transform:uppercase;color:var(--d);padding:0 0 14px;font-weight:400}
+td:first-child{color:var(--d);width:34%;padding-right:40px}
+td.m{font:22px/1.4 var(--mono)}
+.two{display:grid;grid-template-columns:1fr 1fr;gap:80px;align-items:start}
+/* frames */
+.win{background:#000;border:1px solid var(--ln);padding:18px 22px;width:max-content;max-width:100%}
+.win pre{margin:0;font:26px/1.0 var(--mono);letter-spacing:0;display:inline-block}
+.frame .body{align-items:center;justify-content:center;padding:12px 0}
+.capbar{display:flex;gap:40px;align-items:baseline}
+.capbar .t26{max-width:none}
+/* split: frame left, facts right */
+.split .body{flex-direction:row;gap:64px;align-items:center}
+.split .win pre{font-size:20px}
+.split .facts{display:flex;flex-direction:column;gap:26px;max-width:600px}
+.code{background:var(--s);border:1px solid var(--ln);padding:22px 26px;font:19px/1.6 var(--mono);color:var(--i);white-space:pre;overflow:hidden}
+.code .c{color:var(--d)}
+/* diagram */
+.dg{display:grid;grid-template-columns:1fr 64px 1fr 64px 1fr;gap:0;align-items:start}
+.diagram .body{justify-content:flex-start;gap:24px}
+.box{background:var(--s);border:1px solid var(--ln);padding:28px 30px;display:flex;flex-direction:column;gap:10px}
+.box h4{font:16px/1.2 var(--mono);letter-spacing:.06em;text-transform:uppercase;color:var(--d);margin:0 0 8px;font-weight:400}
+.box .ev{font:20px/1.55 var(--mono);color:var(--i);columns:2;column-gap:28px}
+.box p{margin:0;font:22px/1.4 var(--sans)}
+.box .nx{color:var(--d)}
+.arrow{display:flex;align-items:center;justify-content:center;color:var(--d);font:700 34px var(--mono)}
+.adapters{display:grid;grid-template-columns:1fr 1fr;gap:24px}
+/* numbers */
+.tiles{display:grid;grid-template-columns:repeat(3,1fr);gap:24px}
+.tile{background:var(--s);border:1px solid var(--ln);padding:36px 34px 32px;display:flex;flex-direction:column;gap:14px;min-height:340px}
+.tile .n{font:600 96px/1 var(--sans);letter-spacing:-.03em;font-variant-numeric:tabular-nums}
+.tile .n small{font:400 32px/1 var(--sans);color:var(--d);letter-spacing:0;margin-left:10px}
+.tile p{margin:0;font:22px/1.45 var(--sans);color:var(--d)}
+.tile p b{color:var(--i);font-weight:500}
+/* list */
+ul.big{margin:0;padding:0;list-style:none;display:flex;flex-direction:column;gap:22px;font:28px/1.4 var(--sans);max-width:1200px}
+ul.big li{padding-left:44px;position:relative}
+ul.big li:before{content:"";position:absolute;left:0;top:.55em;width:18px;height:2px;background:var(--acc)}
+ul.big li span{color:var(--d)}
+.p0{color:#005faf;background:#005faf}.p1{color:#d7af87;background:#d7af87}.p2{color:#005faf;background:#0087d7}.p3{color:#afd7ff;background:#005faf}.p4{color:#005f87;background:#005f87}.p5{color:#0087af;background:#005faf}.p6{color:#5f87af;background:#5f87d7}.p7{color:#5fafd7;background:#5f87d7}.p8{color:#5f87d7;background:#5f87d7}.p9{color:#d7d787;background:#d7d787}.p10{color:#87afd7;background:#5f87d7}.p11{color:#5f87d7;background:#5fafd7}.p12{color:#5fafd7;background:#87afd7}.p13{color:#87afd7;background:#87afd7}.p14{color:#87afff;background:#87afd7}.p15{color:#afd7ff;background:#afd7ff}.p16{color:#5f8787;background:#005f5f}.p17{color:#5f87af;background:#005f5f}.p18{color:#5fafaf;background:#005f5f}.p19{color:#5faf87;background:#005f5f}.p20{color:#5f87af;background:#005f87}.p21{color:#5f8787;background:#005f87}.p22{color:#9e9e9e;background:#005f87}.p23{color:#87d7ff;background:#005f87}.p24{color:#87d7d7;background:#005f87}.p25{color:#87afd7;background:#005f87}.p26{color:#5fafd7;background:#5f87af}.p27{color:#5f87af;background:#5f87af}.p28{color:#5fafaf;background:#5f87af}.p29{color:#87afaf;background:#5f87af}.p30{color:#afd7ff;background:#5f87af}.p31{color:#87afff;background:#5f87af}.p32{color:#87d7d7;background:#5f87af}.p33{color:#87d7ff;background:#5f87af}.p34{color:#87afd7;background:#5f87af}.p35{color:#e4e4e4;background:#5f87af}.p36{color:#ffffff;background:#5f87af}.p37{color:#ffffff;background:#5f87d7}.p38{color:#afd7ff;background:#5f87d7}.p39{color:#87d787;background:#5f87d7}.p40{color:#e4e4e4;background:#5f87d7}.p41{color:#87d7ff;background:#5f87d7}.p42{color:#ffffff;background:#5fafd7}.p43{color:#afd7ff;background:#5fafd7}.p44{color:#e4e4e4;background:#5fafd7}.p45{color:#e4e4e4;background:#87afff}.p46{color:#e4e4e4;background:#87afd7}.p47{color:#000000;background:#8787af}.p48{color:#dadada;background:#808080}.p49{color:#c6c6c6;background:#767676}.p50{color:#e4e4e4;background:#767676}.p51{color:#bcbcbc;background:#6c6c6c}.p52{color:#e4e4e4;background:#875f5f}.p53{color:#c6c6c6;background:#875f5f}.p54{color:#d0d0d0;background:#6c6c6c}.p55{color:#eeeeee;background:#6c6c6c}.p56{color:#d0d0d0;background:#767676}.p57{color:#808080;background:#808080}.p58{color:#5f87d7;background:#8787af}.p59{color:#eeeeee;background:#87afd7}.p60{color:#d7d7ff;background:#87afff}.p61{color:#d7d7ff;background:#5fafd7}.p62{color:#d0d0d0;background:#8787af}.p63{color:#87afff;background:#87afff}.p64{color:#ffffff;background:#87afff}.p65{color:#afd7ff;background:#87afff}.p66{color:#87afff;background:#afafd7}.p67{color:#afd7ff;background:#87afd7}.p68{color:#bcbcbc;background:#8787af}.p69{color:#e4e4e4;background:#8787af}.p70{color:#87d787;background:#767676}.p71{color:#e4e4e4;background:#6c6c6c}.p72{color:#87d787;background:#d7af87}.p73{color:#e4e4e4;background:#d7af87}.p74{color:#ffd787;background:#d7af87}.p75{color:#eeeeee;background:#d7af87}.p76{color:#000000;background:#6c6c6c}.p77{color:#000000;background:#767676}.p78{color:#000000;background:#87afd7}.p79{color:#87ffaf;background:#87afff}.p80{color:#eeeeee;background:#87afff}.p81{color:#dadada;background:#d7af87}.p82{color:#b2b2b2;background:#d7af87}.p83{color:#875f5f;background:#6c6c6c}.p84{color:#eeeeee;background:#767676}.p85{color:#87afd7;background:#a8a8a8}.p86{color:#afafff;background:#87afff}.p87{color:#8787d7;background:#87afd7}.p88{color:#8787d7;background:#8787af}.p89{color:#d7afaf;background:#d7af87}.p90{color:#e4e4e4;background:#808080}.p91{color:#dadada;background:#8787af}.p92{color:#767676;background:#767676}.p93{color:#eeeeee;background:#808080}.p94{color:#c6c6c6;background:#8787af}.p95{color:#000000;background:#875f5f}.p96{color:#303030;background:#d7af87}.p97{color:#d7af5f;background:#d7af87}.p98{color:#005faf;background:#5f87af}.p99{color:#5f5f87;background:#005f87}.p100{color:#5f87af;background:#87afaf}.p101{color:#87afaf;background:#a8a8a8}.p102{color:#a8a8a8;background:#a8a8a8}.p103{color:#afafaf;background:#b2b2b2}.p104{color:#bcbcbc;background:#c6c6c6}.p105{color:#bcbcbc;background:#bcbcbc}.p106{color:#c6c6c6;background:#bcbcbc}.p107{color:#ffd787;background:#ffd7af}.p108{color:#ffd7af;background:#ffd7af}.p109{color:#949494;background:#005f87}.p110{color:#87afff;background:#005f87}.p111{color:#5fafd7;background:#005f87}.p112{color:#949494;background:#5f87af}.p113{color:#c6c6c6;background:#5f87af}.p114{color:#d0d0d0;background:#5f87af}.p115{color:#9e9e9e;background:#5f87af}.p116{color:#eeeeee;background:#5f87af}.p117{color:#eeeeee;background:#5f87d7}.p118{color:#afafff;background:#5f87d7}.p119{color:#dadada;background:#5f87d7}.p120{color:#eeeeee;background:#5fafd7}.p121{color:#d0d0d0;background:#5fafd7}.p122{color:#d7d7d7;background:#5fafd7}.p123{color:#5f87af;background:#808080}.p124{color:#b2b2b2;background:#626262}.p125{color:#dadada;background:#626262}.p126{color:#5f5f5f;background:#875f5f}.p127{color:#d7af87;background:#585858}.p128{color:#dadada;background:#585858}.p129{color:#bcbcbc;background:#875f5f}.p130{color:#c6c6c6;background:#6c6c6c}.p131{color:#5f87af;background:#8a8a8a}.p132{color:#c6c6c6;background:#5fafd7}.p133{color:#d0d0d0;background:#87afd7}.p134{color:#d7d7d7;background:#87afff}.p135{color:#d0d0d0;background:#87afff}.p136{color:#dadada;background:#87afff}.p137{color:#87afd7;background:#9e9e9e}.p138{color:#bcbcbc;background:#5f87af}.p139{color:#87d787;background:#6c6c6c}.p140{color:#e4e4e4;background:#626262}.p141{color:#87d787;background:#af875f}.p142{color:#e4e4e4;background:#af875f}.p143{color:#d7af87;background:#af875f}.p144{color:#ffd7af;background:#af875f}.p145{color:#af875f;background:#af875f}.p146{color:#ffaf87;background:#af875f}.p147{color:#ffaf5f;background:#87afff}.p148{color:#6c6c6c;background:#6c6c6c}.p149{color:#87afd7;background:#8787af}.p150{color:#5f87af;background:#8787af}.p151{color:#b2b2b2;background:#875f5f}.p152{color:#000000;background:#626262}.p153{color:#af8787;background:#af875f}.p154{color:#dadada;background:#6c6c6c}.p155{color:#dadada;background:#767676}.p156{color:#bcbcbc;background:#808080}.p157{color:#d7d7d7;background:#8787af}.p158{color:#bcbcbc;background:#767676}.p159{color:#e4e4e4;background:#585858}.p160{color:#ffd787;background:#af875f}.p161{color:#303030;background:#af875f}.p162{color:#ffaf5f;background:#af875f}.p163{color:#005f87;background:#4e4e4e}.p164{color:#afd7ff;background:#005f87}.p165{color:#444444;background:#4e4e4e}.p166{color:#5f5faf;background:#005f87}.p167{color:#005f87;background:#5f87af}.p168{color:#585858;background:#5f87af}.p169{color:#5f5faf;background:#5f5f87}.p170{color:#5f87d7;background:#5f5f87}.p171{color:#5f5f87;background:#6c6c6c}.p172{color:#626262;background:#626262}.p173{color:#767676;background:#875f5f}.p174{color:#808080;background:#875f5f}.p175{color:#af5f5f;background:#875f5f}.p176{color:#af5f5f;background:#af5f5f}.p177{color:#d7875f;background:#af5f5f}.p178{color:#d7875f;background:#d7875f}.p179{color:#005f87;background:#005f5f}.p180{color:#008787;background:#005f5f}.p181{color:#8a8a8a;background:#005f5f}.p182{color:#808080;background:#005f5f}.p183{color:#878787;background:#005f5f}.p184{color:#ffd787;background:#005f5f}.p185{color:#949494;background:#005f5f}.p186{color:#9e9e9e;background:#005f5f}.p187{color:#005f5f;background:#005f87}.p188{color:#767676;background:#005f5f}.p189{color:#a8a8a8;background:#005f5f}.p190{color:#ffd7af;background:#005f5f}.p191{color:#b2b2b2;background:#005f5f}.p192{color:#ffd7af;background:#005f87}.p193{color:#ffd787;background:#005f87}.p194{color:#a8a8a8;background:#005f87}.p195{color:#b2b2b2;background:#005f87}.p196{color:#000000;background:#005f87}.p197{color:#005f87;background:#585858}.p198{color:#ffaf87;background:#005f87}.p199{color:#e4e4e4;background:#005f87}.p200{color:#ffd7af;background:#5f87af}.p201{color:#a8a8a8;background:#5f87af}.p202{color:#b2b2b2;background:#5f87af}.p203{color:#afafaf;background:#5f87af}.p204{color:#e4e4e4;background:#4e4e4e}.p205{color:#d7875f;background:#444444}.p206{color:#ffaf87;background:#444444}.p207{color:#d7af87;background:#444444}.p208{color:#ffd7af;background:#4e4e4e}.p209{color:#d7af87;background:#4e4e4e}.p210{color:#585858;background:#585858}.p211{color:#ffaf87;background:#5f87af}.p212{color:#ffafaf;background:#5f87af}.p213{color:#9e9e9e;background:#585858}.p214{color:#000000;background:#444444}.p215{color:#000000;background:#4e4e4e}.p216{color:#000000;background:#585858}.p217{color:#ffaf5f;background:#5f87af}.p218{color:#4e4e4e;background:#4e4e4e}.p219{color:#ffd7af;background:#585858}.p220{color:#ffaf87;background:#5f5f87}.p221{color:#5f5f87;background:#5f5f87}.p222{color:#444444;background:#444444}.p223{color:#e4e4e4;background:#444444}.p224{color:#e4e4e4;background:#5f5f87}.p225{color:#ffaf87;background:#4e4e4e}.p226{color:#ffafaf;background:#585858}.p227{color:#ffaf87;background:#585858}.p228{color:#d7af5f;background:#af875f}.p229{color:#00005f;background:#121212}.p230{color:#c6c6c6;background:#c6c6c6}.p231{color:#3a3a3a;background:#121212}.p232{color:#303030;background:#121212}.p233{color:#00005f;background:#1c1c1c}.p234{color:#303030;background:#1c1c1c}.p235{color:#1c1c1c;background:#1c1c1c}.p236{color:#4e4e4e;background:#1c1c1c}.p237{color:#afafff;background:#1c1c1c}.p238{color:#262626;background:#262626}.p239{color:#262626;background:#1c1c1c}.p240{color:#5f5f87;background:#1c1c1c}.p241{color:#1c1c1c;background:#262626}.p242{color:#5f5f87;background:#262626}.p243{color:#afafff;background:#262626}.p244{color:#4e4e4e;background:#262626}.p245{color:#3a3a3a;background:#262626}.p246{color:#303030;background:#262626}.p247{color:#585858;background:#262626}.p248{color:#262626;background:#303030}.p249{color:#4e4e4e;background:#303030}.p250{color:#5f5f5f;background:#303030}.p251{color:#303030;background:#3a3a3a}.p252{color:#3a3a3a;background:#3a3a3a}.p253{color:#444444;background:#3a3a3a}.p254{color:#3a3a3a;background:#444444}.p255{color:#5f5f87;background:#3a3a3a}.p256{color:#005f87;background:#262626}.p257{color:#808080;background:#262626}.p258{color:#005f5f;background:#262626}.p259{color:#e4e4e4;background:#262626}.p260{color:#878787;background:#262626}.p261{color:#8a8a8a;background:#262626}.p262{color:#5f5f87;background:#303030}.p263{color:#949494;background:#303030}.p264{color:#005f87;background:#303030}.p265{color:#5f87af;background:#303030}.p266{color:#e4e4e4;background:#303030}.p267{color:#9e9e9e;background:#303030}.p268{color:#5fafd7;background:#303030}.p269{color:#a8a8a8;background:#303030}.p270{color:#d0d0d0;background:#303030}.p271{color:#c6c6c6;background:#303030}.p272{color:#87afd7;background:#303030}.p273{color:#bcbcbc;background:#303030}.p274{color:#e4e4e4;background:#3a3a3a}.p275{color:#5f87af;background:#3a3a3a}.p276{color:#9e9e9e;background:#3a3a3a}.p277{color:#5fafd7;background:#3a3a3a}.p278{color:#a8a8a8;background:#3a3a3a}.p279{color:#bcbcbc;background:#3a3a3a}.p280{color:#d0d0d0;background:#3a3a3a}.p281{color:#afafaf;background:#3a3a3a}.p282{color:#b2b2b2;background:#3a3a3a}.p283{color:#c6c6c6;background:#3a3a3a}.p284{color:#5f5faf;background:#3a3a3a}.p285{color:#5f87d7;background:#3a3a3a}.p286{color:#949494;background:#3a3a3a}.p287{color:#d7d7d7;background:#3a3a3a}.p288{color:#afaf5f;background:#875f00}.p289{color:#d7d7d7;background:#875f00}.p290{color:#d7af5f;background:#875f00}.p291{color:#c6c6c6;background:#875f00}.p292{color:#875f00;background:#875f00}.p293{color:#dadada;background:#875f00}.p294{color:#87afd7;background:#3a3a3a}.p295{color:#87ffaf;background:#3a3a3a}.p296{color:#d0d0d0;background:#875f00}.p297{color:#e4e4e4;background:#875f00}.p298{color:#d7af87;background:#875f00}.p299{color:#d7d787;background:#875f00}.p300{color:#d7af5f;background:#d7af5f}.p301{color:#5f87af;background:#5f8787}.p302{color:#afd7ff;background:#5f8787}.p303{color:#808080;background:#8a8a8a}.p304{color:#878787;background:#8787af}.p305{color:#949494;background:#949494}.p306{color:#9e9e9e;background:#9e9e9e}.p307{color:#a8a8a8;background:#d7afaf}.p308{color:#d7af87;background:#d7afaf}.p309{color:#ffaf87;background:#d7af87}.p310{color:#ffaf87;background:#ffaf87}.p311{color:#878787;background:#005f87}.p312{color:#878787;background:#5f87af}.p313{color:#8a8a8a;background:#5f87af}.p314{color:#808080;background:#5f87af}.p315{color:#5f87af;background:#5f5f87}.p316{color:#d0d0d0;background:#5f5f87}.p317{color:#bcbcbc;background:#5f5f87}.p318{color:#dadada;background:#5f5f87}.p319{color:#b2b2b2;background:#5f5f87}.p320{color:#c6c6c6;background:#5f5f87}.p321{color:#d7d7d7;background:#5f87af}.p322{color:#dadada;background:#5f87af}.p323{color:#afafaf;background:#5f5f87}.p324{color:#d7d7d7;background:#5f5f87}.p325{color:#8787af;background:#5f5f87}.p326{color:#9e9e9e;background:#5f5f87}.p327{color:#ffd7af;background:#5f5f5f}.p328{color:#d0d0d0;background:#5f5f5f}.p329{color:#afafaf;background:#585858}.p330{color:#c6c6c6;background:#585858}.p331{color:#a8a8a8;background:#5f5f5f}.p332{color:#87ffaf;background:#5f5f87}.p333{color:#ffd7af;background:#5f5f87}.p334{color:#ffafaf;background:#5f5f5f}.p335{color:#a8a8a8;background:#5f5f87}.p336{color:#ffd7af;background:#626262}.p337{color:#c6c6c6;background:#5f5f5f}.p338{color:#bcbcbc;background:#626262}.p339{color:#e4e4e4;background:#5f5f5f}.p340{color:#444444;background:#af875f}
+</style>
+</head>
+<body>
+
+<div class="hint">arrows to move &middot; print for a PDF, one slide per page</div>
+<div class="counter"><span id="cur">1</span> / <span id="tot">11</span></div>
+
+<!-- 1 · title (Reverse) -->
+<div class="page"><div class="stage"><section class="s title">
+  <div class="lockup"><span class="blk gold">x</span>scapes</div>
+  <div class="head"><h1 class="t72">The waiting layer for terminal agents.</h1><p class="t32">An event protocol, pluggable adapters, and one reference scape.</p></div>
+  <div class="foot"><span>Commons &middot; Make Waiting for AI Fun</span><span class="goldtx">September 2026</span></div>
+</section></div></div>
+
+<!-- 2 · statement -->
+<div class="page"><div class="stage"><section class="s statement">
+  <div class="body" style="gap:40px"><h2 class="t72">Waiting for an agent is dead time.</h2><p class="t26" style="font-size:32px;line-height:1.4;max-width:30em;color:var(--d)">You send a prompt, the terminal goes quiet, you tab away, and then you forget to come back. Agents now think for minutes at a time, and that time has no face.</p></div>
+  <div class="foot"><span class="lockup"><span class="blk">x</span>scapes</span><span>02</span></div>
+</section></div></div>
+
+<!-- 3 · frame: working -->
+<div class="page"><div class="stage"><section class="s frame">
+  <div class="head"><h2 class="t56">One command. Claude Code runs inside a shoreline.</h2></div>
+  <div class="body"><div class="win"><pre><span class="p0">                      </span><span class="p1"> </span><span class="p0">                                                         </span>
+<span class="p0">                   </span><span class="p1"> ·     </span><span class="p0">                                                      </span>
+<span class="p2">▀▀▀▀▀▀▀▀▀▀▀</span><span class="p3">*</span><span class="p2">▀▀▀▀▀▀</span><span class="p1">        </span><span class="p4"> </span><span class="p2">▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀</span><span class="p5">+</span><span class="p2">▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀</span>
+<span class="p6">                   </span><span class="p1">       </span><span class="p7">             ∘   </span><span class="p6">+                   .    </span><span class="p7">∘           </span>
+<span class="p8">            .         </span><span class="p9"> </span><span class="p10">                              ∘                          </span>
+<span class="p11">▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀ ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀</span>
+<span class="p12">▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀</span>
+<span class="p13">                                                                                </span>
+<span class="p14">                                                           .           .        </span>
+<span class="p15">                                                                                </span>
+<span class="p15">                                                                                </span>
+<span class="p16">---------- </span><span class="p17">-</span><span class="p18">≋</span><span class="p16">------•--</span><span class="p19">•</span><span class="p16">-•-------------</span><span class="p17">--------</span><span class="p16">----------------------------------</span>
+<span class="p20">--------------------</span><span class="p21">•</span><span class="p20">--</span><span class="p22">•</span><span class="p21">•</span><span class="p20">----~----------------</span><span class="p23">~~~~~~~</span><span class="p24">≋≋≋≋</span><span class="p20">-·   -----------</span><span class="p25">≋≋≋</span><span class="p20">~---</span>
+<span class="p26">    ·~</span><span class="p27">-------</span><span class="p26">-    </span><span class="p28">• </span><span class="p26">~</span><span class="p28">•</span><span class="p26">~</span><span class="p29">•</span><span class="p27">•</span><span class="p26">~~~       </span><span class="p30">≈≈≈≈≈≈≈≈≈≈</span><span class="p31">~ </span><span class="p26">-</span><span class="p32">≋≋≋≋≋</span><span class="p30">~~~~~</span><span class="p26">~~~~~~~~~~~~~~~~</span><span class="p27">------</span>
+<span class="p30">≈~~~~~~~~~~</span><span class="p33">~~</span><span class="p30">~~~</span><span class="p26">~~~</span><span class="p27">•</span><span class="p26">--</span><span class="p34">•</span><span class="p28">•</span><span class="p26">--</span><span class="p33">≋≋ </span><span class="p35">▐▙▄▟▌  </span><span class="p33">~~~~ </span><span class="p26">~~</span><span class="p30">·~≈≈≈</span><span class="p36">≋≋≋</span><span class="p30">-·</span><span class="p26">~~~~</span><span class="p36">≋</span><span class="p33">~</span><span class="p30">~~</span><span class="p26">---------</span><span class="p34">~</span><span class="p26">·  ~~</span><span class="p30">≈≈≈≈</span>
+<span class="p37">≋</span><span class="p38">≈≈≈</span><span class="p37">≋≋≋</span><span class="p38">-</span><span class="p10">~~~~~~</span><span class="p6">▀▀</span><span class="p38">~~~</span><span class="p37">≋≋≋≋≋≋≋≋≋</span><span class="p10">~ </span><span class="p39">o o    </span><span class="p40">°  </span><span class="p38">·</span><span class="p41">∘</span><span class="p37">≋≋≋≋≋</span><span class="p38">∘·</span><span class="p37">≋</span><span class="p41">∘</span><span class="p37">≋≋≋≋≋≋</span><span class="p6">▀</span><span class="p37">≋≋≋≋≋≋≋≋≋</span><span class="p38">~·</span><span class="p6">▀</span><span class="p40">█▙▄▄▄█▌</span><span class="p6">▀▀</span><span class="p38">~</span>
+<span class="p42">≋≋≋≋</span><span class="p43">≈≈≈</span><span class="p11">▀▀▀▀▀▀</span><span class="p42">≋≋≋≋≋≋≋≋≋</span><span class="p43">-≈≈~~~  </span><span class="p44">▐▙▄</span><span class="p45">▟</span><span class="p46">▌</span><span class="p47">  </span><span class="p48">·</span><span class="p49">·</span><span class="p50">·</span><span class="p51"> ∘</span><span class="p52">°</span><span class="p53">·</span><span class="p54">°</span><span class="p55">∘</span><span class="p56">∘ </span><span class="p57"> </span><span class="p58">  </span><span class="p59">·</span><span class="p60">∘</span><span class="p43"> ≈≈·</span><span class="p61">~</span><span class="p42">≋≋≋≋≋≋</span><span class="p43">~</span><span class="p42">≋≋≋≋</span><span class="p44">████████▌</span><span class="p43">~</span><span class="p11">▀</span>
+<span class="p62">°</span><span class="p59">∘</span><span class="p63">   </span><span class="p14">▀</span><span class="p64"> ≋≋≋≋≋≋</span><span class="p60">~</span><span class="p64">≋≋≋≋≋</span><span class="p65">≈≈≈≈ </span><span class="p63">• </span><span class="p45">°</span><span class="p66">▀</span><span class="p67">°</span><span class="p68">~</span><span class="p69">▐</span><span class="p70">o</span><span class="p71">█</span><span class="p72">o</span><span class="p73">▌</span><span class="p74">~</span><span class="p75">°  </span><span class="p1">·</span><span class="p75">·            </span><span class="p76"> </span><span class="p77"> </span><span class="p47">  </span><span class="p78"> </span><span class="p45">        ▖  █▙</span><span class="p79">o</span><span class="p45">██▙</span><span class="p79">o</span><span class="p45">█▌</span><span class="p80">·</span><span class="p64">≋</span>
+<span class="p81">°</span><span class="p82">▀</span><span class="p83"> </span><span class="p84">·</span><span class="p69">· </span><span class="p85">▀</span><span class="p65">··</span><span class="p60">-</span><span class="p64">≋</span><span class="p65">≈≈≈≈≈°</span><span class="p60">·</span><span class="p65">≈</span><span class="p86">•</span><span class="p80">∘ </span><span class="p66">▀</span><span class="p87"> </span><span class="p88"> </span><span class="p57"> </span><span class="p49">∘</span><span class="p81">·</span><span class="p89">▀                </span><span class="p73">▐█▄▄█▌ ▐█▄▄█▌ </span><span class="p50">▗</span><span class="p90">▄</span><span class="p47">  </span><span class="p46">▄</span><span class="p45">▖ ▙ </span><span class="p65">∘</span><span class="p45">▀██████▛</span><span class="p46">▘</span><span class="p91"> °</span>
+<span class="p75">  ·  °</span><span class="p89">▀</span><span class="p82">▀</span><span class="p71">·</span><span class="p92"> </span><span class="p93">° </span><span class="p94">∘∘</span><span class="p69">·  </span><span class="p62">°</span><span class="p93">∘</span><span class="p56">° </span><span class="p53">∘</span><span class="p82">▀  </span><span class="p73">·      </span><span class="p1">·            </span><span class="p73">▐</span><span class="p72">o</span><span class="p73">▟</span><span class="p72">o</span><span class="p73">▟▙ ▐</span><span class="p72">o</span><span class="p73">▟</span><span class="p72">o</span><span class="p73">▟▌ ▐</span><span class="p72">o</span><span class="p73">▜</span><span class="p72">o</span><span class="p73">▜▌</span><span class="p95"> </span><span class="p71">▜</span><span class="p50">▖ ▗▟███</span><span class="p71">█</span><span class="p73">█▄ ∘ </span>
+<span class="p96">  read   internal/auth/handler.go  142 lines </span><span class="p73">▝█████ ▝█████ ▐████▙  ▜▄████████▌  </span>
+<span class="p96">  search  rate.Limiter  3 files              </span><span class="p73">▐████▌ ▐████▌ ▗████▌   ▝▜█▀██▛▜█▘  </span>
+<span class="p96">  edit   internal/auth/handler.go  +18 -2                                       </span>
+<span class="p96">  write  internal/auth/limiter.go  64 lines                                     </span>
+</pre></div></div>
+  <div class="capbar"><p class="m20" style="max-width:none"><span class="accent">Fourteen seconds into a turn.</span> Edits landing, five subagents out, the sand carrying the last tool calls. Rendered by the real engine from the events a Claude Code hook emits, as a 256-colour terminal shows it.</p></div>
+</section></div></div>
+
+<!-- 4 · table: what a glance tells you -->
+<div class="page"><div class="stage"><section class="s table">
+  <div class="head"><h2 class="t56">What a glance tells you</h2><p class="t32">Nothing to read, nothing to configure, and the agent's own screen is untouched.</p></div>
+  <div class="body"><table>
+    <tr><td>how hard it is working</td><td>the swells: how many are travelling, how tall, whitecaps above half</td></tr>
+    <tr><td>what it is doing right now</td><td>written in the sand, newest brightest, older lines fading as the tide takes them</td></tr>
+    <tr><td>something broke</td><td>the companion, not the weather: ears back, hunched, amber eyes, until it clears</td></tr>
+    <tr><td>context remaining</td><td>the moon: its phase and its height</td></tr>
+    <tr><td>it needs you</td><td>a knock and a sound, and a different one for done</td></tr>
+  </table></div>
+  <div class="foot"><span class="lockup"><span class="blk">x</span>scapes</span><span>04</span></div>
+</section></div></div>
+
+<!-- 5 · the rule -->
+<div class="page"><div class="stage"><section class="s table">
+  <div class="head"><h2 class="t56">The water is the work. The sky is the world.</h2><p class="t32">One variable per perceptual channel. Nothing crosses. Encoded in coverage, count or position, never in rate, because a glance is the entire budget and a screenshot has no motion.</p></div>
+  <div class="body"><div class="two">
+    <table><tr><th>the agent</th><th></th></tr>
+      <tr><td>busy, how hard</td><td>swells</td></tr>
+      <tr><td>doing now</td><td>text in the sand</td></tr>
+      <tr><td>broken</td><td>the companion's pose</td></tr>
+      <tr><td>needs you, done</td><td>a bubble, rare</td></tr>
+      <tr><td>context left</td><td>the moon</td></tr>
+      <tr><td>todos</td><td>stars, lit as they finish</td></tr>
+      <tr><td>subagents</td><td>kittens</td></tr>
+    </table>
+    <table><tr><th>the world</th><th></th></tr>
+      <tr><td>time of day</td><td>sky colour, the real clock</td></tr>
+      <tr><td>weather</td><td><span style="color:var(--d)">deferred on purpose: it would be read as activity</span></td></tr>
+    </table>
+  </div></div>
+  <div class="foot"><span class="lockup"><span class="blk">x</span>scapes</span><span>05</span></div>
+</section></div></div>
+
+<!-- 6 · frame: needs you -->
+<div class="page"><div class="stage"><section class="s frame">
+  <div class="head"><h2 class="t56">The nudge has to beat a terminal bell.</h2></div>
+  <div class="body"><div class="win"><pre><span class="p4">                      </span><span class="p1"> </span><span class="p4">               ·                                  +      </span>
+<span class="p4">                   </span><span class="p1"> ·     </span><span class="p4">           .  .         .                    </span><span class="p99">.        </span>
+<span class="p163">▀▀▀▀▀▀▀▀▀▀▀</span><span class="p164">*</span><span class="p163">▀▀▀▀▀▀</span><span class="p1">        </span><span class="p165">▀</span><span class="p163">▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀</span><span class="p4">+</span><span class="p163">▀▀▀▀▀▀▀▀▀▀▀▀▀▀</span><span class="p166">.</span><span class="p163">▀▀▀▀▀▀▀▀▀▀▀▀▀</span>
+<span class="p167">▀▀▀▀▀▀▀▀▀▀▀▀▀</span><span class="p99">+</span><span class="p167">▀▀▀▀</span><span class="p99"> </span><span class="p1">       </span><span class="p168">▀</span><span class="p167">▀▀▀▀</span><span class="p166">·</span><span class="p167">▀▀▀▀▀</span><span class="p166">.</span><span class="p167">▀</span><span class="p164">*</span><span class="p167">▀▀▀</span><span class="p166">+</span><span class="p167">▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀</span><span class="p166">.</span><span class="p99">.</span><span class="p167">▀▀▀</span><span class="p20">∘</span><span class="p167">▀▀▀▀▀▀▀▀▀▀▀</span>
+<span class="p169">            .         </span><span class="p1"> </span><span class="p169">                    .         </span><span class="p170">∘              </span><span class="p169">+           </span>
+<span class="p171">▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀</span><span class="p172"> </span><span class="p171">▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀</span>
+<span class="p173">                                           ·                                 </span><span class="p174">·  </span>
+<span class="p175">                                                                                </span>
+<span class="p176">         ·                                                 .           .        </span>
+<span class="p177">                  .                                     ·                       </span>
+<span class="p178">                                                                                </span>
+<span class="p179">-----     ·</span><span class="p180">~</span><span class="p181">≋≋≋≋≋</span><span class="p179">--</span><span class="p180">•</span><span class="p179">--</span><span class="p182">•</span><span class="p179">-</span><span class="p180">•</span><span class="p179">------------------------    </span><span class="p180">-</span><span class="p181">≋≋≋≋≋</span><span class="p179">---------------------</span>
+<span class="p16">~~~</span><span class="p180">-----------------•--</span><span class="p183">•</span><span class="p180">•--------</span><span class="p16">~~~~~~~~~~~~~~~~</span><span class="p184">.-------------.</span><span class="p180">-----</span><span class="p16">-~</span><span class="p185">≋≋≋≋</span><span class="p16">~</span><span class="p180">·   </span>
+<span class="p16">---~~~~~~</span><span class="p186">≋≋≋</span><span class="p16">-</span><span class="p187">▀▀▀▀▀</span><span class="p16">•</span><span class="p187">▀▀</span><span class="p188">•</span><span class="p187">▀</span><span class="p185">~</span><span class="p186">~~~</span><span class="p189">~</span><span class="p186">~~~~~</span><span class="p190">≋≋≋≋≋≋≋≋≋</span><span class="p187">▀</span><span class="p186">≈≈≈</span><span class="p189">≈</span><span class="p191">≈≈</span><span class="p184">| allow Bash? |</span><span class="p187">▀</span><span class="p16">·-</span><span class="p186">≋≋</span><span class="p16">-----~~~~~~</span>
+<span class="p20">·~</span><span class="p22">≋≋≋≋≋≋</span><span class="p20">~~~~~~~~~~</span><span class="p22">~</span><span class="p109">~</span><span class="p22">~~~</span><span class="p21">•</span><span class="p20">~~~</span><span class="p22">-  </span><span class="p192">≋≋≋     </span><span class="p22">≈≈≈≈</span><span class="p192">≋≋≋≋</span><span class="p109">~~~</span><span class="p193">'----------v--'</span><span class="p22">~~~~~~~~~~</span><span class="p109">~~~~~ </span>
+<span class="p192">≋</span><span class="p194">≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈</span><span class="p109">~</span><span class="p22">-</span><span class="p194">~</span><span class="p192">≋≋≋</span><span class="p195">~</span><span class="p22">-</span><span class="p167">▀▀</span><span class="p192">≋≋≋</span><span class="p167">▀</span><span class="p196">       </span><span class="p197">▀</span><span class="p195">-</span><span class="p198">~</span><span class="p22">∘</span><span class="p192">≋≋≋≋≋</span><span class="p22">∘</span><span class="p194">·</span><span class="p167">▀</span><span class="p22">∘</span><span class="p167">▀▀▀▀▀▀▀</span><span class="p194">≈≈≈</span><span class="p192">≋≋≋≋≋</span><span class="p194">-</span><span class="p109">·</span><span class="p167">▀</span><span class="p199">▄▄</span><span class="p167">▀▀▀▀</span><span class="p199">▗▄▖</span><span class="p192">≋≋</span>
+<span class="p200">≋≋≋≋</span><span class="p112">~~~~~~~~  </span><span class="p115">·</span><span class="p201">-</span><span class="p202">~</span><span class="p201">≈≈≈</span><span class="p203">≈≈</span><span class="p201">≈</span><span class="p203">≈</span><span class="p201">≈</span><span class="p200">≋≋</span><span class="p201">≈≈≈≈ </span><span class="p35">▐▙</span><span class="p159">▄▟</span><span class="p204">▌ </span><span class="p205">·</span><span class="p206">· </span><span class="p205">∘</span><span class="p206">°</span><span class="p207">·°</span><span class="p208">∘</span><span class="p209">∘</span><span class="p210">  </span><span class="p200">  ·   </span><span class="p201">·</span><span class="p203">·</span><span class="p200">≋≋≋≋</span><span class="p201">≈≈≈≈    </span><span class="p35">████████▌</span><span class="p201">≈≈</span>
+<span class="p203">°</span><span class="p211">∘  </span><span class="p200">≋≋     </span><span class="p201">·</span><span class="p138">~</span><span class="p200">≋≋≋≋</span><span class="p138">~</span><span class="p203">·</span><span class="p27">••</span><span class="p112">•</span><span class="p200">≋≋≋ </span><span class="p212">° </span><span class="p213">°</span><span class="p208"> ∘</span><span class="p143">~</span><span class="p142">▐</span><span class="p141">o</span><span class="p142">█</span><span class="p141">o</span><span class="p142">▌</span><span class="p143">~ </span><span class="p145">·</span><span class="p144">·    </span><span class="p143">°    </span><span class="p144">·</span><span class="p214"> </span><span class="p215">  </span><span class="p216"> </span><span class="p200">           ≋≋≋</span><span class="p35">█▙</span><span class="p217">o</span><span class="p35">██▙</span><span class="p217">o</span><span class="p35">█▌</span><span class="p200">·≋</span>
+<span class="p143">°</span><span class="p207">°</span><span class="p218"> </span><span class="p219">·</span><span class="p220">·</span><span class="p200">  ≋≋≋≋≋≋≋</span><span class="p113">~</span><span class="p202">·°</span><span class="p113">· </span><span class="p200">≋∘</span><span class="p201">·</span><span class="p221"> </span><span class="p210"> </span><span class="p218"> </span><span class="p222"> </span><span class="p143"> ·                </span><span class="p145">·       </span><span class="p142">▐█▄▄█</span><span class="p223">▌</span><span class="p215"> </span><span class="p159">▐</span><span class="p224">█</span><span class="p35">▄▄█▌   </span><span class="p201">∘</span><span class="p35">▀██████▛</span><span class="p224">▘</span><span class="p210"> </span><span class="p209">°</span>
+<span class="p144">  ·  </span><span class="p146">° </span><span class="p207">·</span><span class="p225">· </span><span class="p226">° </span><span class="p213">∘∘</span><span class="p227">·  </span><span class="p209">°</span><span class="p208">∘</span><span class="p207">°</span><span class="p146">     ·      </span><span class="p145">·                   </span><span class="p142">▐</span><span class="p141">o</span><span class="p142">▟</span><span class="p141">o</span><span class="p142">▟▌ ▐</span><span class="p141">o</span><span class="p142">▟</span><span class="p141">o</span><span class="p223">▟▌</span><span class="p209"> °  </span><span class="p204">▟███</span><span class="p223">██</span><span class="p142">██▖</span><span class="p143">∘ </span>
+<span class="p161">  search  rate.Limiter  3 files                     </span><span class="p142">▝█████ ▝████▛  ▜▙████████▌  </span>
+<span class="p161">  edit   internal/auth/handler.go  +18 -2           </span><span class="p142">▐████▌ ▐████▌   ▝▜█▀██▛▜█▘  </span>
+<span class="p161">  write  internal/auth/limiter.go  64 lines                                     </span>
+<span class="p228">  shell  go  exit 1                                                             </span>
+</pre></div></div>
+  <div class="capbar"><p class="m20" style="max-width:none"><span class="accent">Dusk. The agent needs permission.</span> A solid balloon, a warm colour, a chime. Done is a dotted balloon, a cool colour, a low note. Two cues you can tell apart from across the room, and each rings once.</p></div>
+</section></div></div>
+
+<!-- 7 · the layer -->
+<div class="page"><div class="stage"><section class="s diagram">
+  <div class="head"><h2 class="t56">Underneath, a protocol. Any agent that can emit ten events gets every scape.</h2></div>
+  <div class="body">
+    <div class="dg">
+      <div class="box"><h4>events</h4><div class="ev">session_start<br>prompt<br>tool<br>error<br>test_pass<br>test_fail<br>compact<br>needs_input<br>done<br>session_end</div><p class="nx" style="font-size:18px;margin-top:8px">tool carries a kind: read, write, edit, search, shell, web, subagent, todo, mcp</p></div>
+      <div class="arrow">&rarr;</div>
+      <div class="box"><h4>engine</h4><p>A Unix socket, with a JSON-lines file as the fallback.</p><p>One reducer turns the stream into a level, a tail, a pose, a bubble.</p><p class="nx">Recordings replay offline, so the mapping is tuned on real sessions, not on a demo.</p></div>
+      <div class="arrow">&rarr;</div>
+      <div class="box"><h4>scapes</h4><p>Shore <span class="accent">shipped</span></p><p class="nx">Campsite, rainy window: next. Each fills six slots: light, sky, motion, surface, accumulator, companion.</p></div>
+    </div>
+    <div class="adapters">
+      <div class="box"><h4>adapter &middot; Claude Code hooks <span class="accent">shipped</span></h4><p>Installed with one command. Your settings are merged, not replaced, and the uninstall restores them byte for byte.</p></div>
+      <div class="box"><h4>adapter &middot; any process <span class="nx">next</span></h4><p>Busy means alive and printing; done means the prompt is back. Enough for agents with no hooks at all.</p></div>
+    </div>
+  </div>
+  <div class="foot"><span class="lockup"><span class="blk">x</span>scapes</span><span>07</span></div>
+</section></div></div>
+
+<!-- 8 · split: native -->
+<div class="page"><div class="stage"><section class="s split">
+  <div class="head"><h2 class="t56">One Go binary. No dependencies. Any 256-colour terminal.</h2></div>
+  <div class="body">
+    <div class="win"><pre><span class="p229">                      </span><span class="p230"> </span><span class="p231">               ·                                  </span><span class="p232">+      </span>
+<span class="p233">                   </span><span class="p230"> ·     </span><span class="p234">           .  </span><span class="p235">.         </span><span class="p234">.                    </span><span class="p236">.        </span>
+<span class="p237">           *      </span><span class="p230">        </span><span class="p238"> </span><span class="p239">                        +              </span><span class="p240">.             </span>
+<span class="p241">▀▀▀▀▀▀▀▀▀▀▀▀▀</span><span class="p238">+</span><span class="p241">▀▀▀▀ </span><span class="p230">       </span><span class="p241"> ▀▀▀▀</span><span class="p242">·</span><span class="p241">▀▀▀▀▀</span><span class="p242">.</span><span class="p241">▀</span><span class="p243">*</span><span class="p241">▀▀▀</span><span class="p244">+</span><span class="p241">▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀</span><span class="p245">.</span><span class="p238">.</span><span class="p241">▀▀▀</span><span class="p243">*</span><span class="p241">▀▀▀▀▀▀▀▀▀▀▀</span>
+<span class="p245">            .         </span><span class="p230"> </span><span class="p246">                    .         </span><span class="p243">*              </span><span class="p247">+           </span>
+<span class="p248">▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀ ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀</span>
+<span class="p249">                                           ·                                 </span><span class="p250">·  </span>
+<span class="p251">▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀</span>
+<span class="p252">         ·                                                 .           </span><span class="p253">.        </span>
+<span class="p254">▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀</span><span class="p255">.</span><span class="p254">▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀</span><span class="p255">·</span><span class="p254">▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀</span>
+<span class="p222">                                                                                </span>
+<span class="p246">---       </span><span class="p256">-</span><span class="p257">≋≋≋≋≋≋</span><span class="p256">~-</span><span class="p242">•</span><span class="p246">--</span><span class="p257">•</span><span class="p246">-</span><span class="p242">•</span><span class="p246">----------------------     </span><span class="p258">·</span><span class="p256">~</span><span class="p257">≋≋≋≋≋</span><span class="p256">-</span><span class="p258">·</span><span class="p246">-------------------</span>
+<span class="p256">~~ </span><span class="p258">--</span><span class="p256">---------------</span><span class="p259">............................................</span><span class="p256">----·-~</span><span class="p260">≋≋≋</span><span class="p261">≋</span><span class="p256">-    </span>
+<span class="p256">--~~~~~~~</span><span class="p261">≋≋</span><span class="p242">~</span><span class="p256">·</span><span class="p248">▀▀▀▀▀</span><span class="p242">•</span><span class="p248">▀</span><span class="p259">: Rate limiting is in. 100 req/min per IP. :</span><span class="p248">▀</span><span class="p256">·</span><span class="p242">~</span><span class="p261">≋</span><span class="p256">------~~~~~~</span>
+<span class="p262">-</span><span class="p263">≋≋≋≋≋≋≋</span><span class="p262">~</span><span class="p264">~~~~~~~~ </span><span class="p265">~~</span><span class="p266">'.......................................v..'</span><span class="p267">~~~</span><span class="p265">~~~~~~~~~~~~ </span>
+<span class="p266">≋</span><span class="p268">≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈</span><span class="p265">~</span><span class="p268">-</span><span class="p269">~</span><span class="p266">≋≋</span><span class="p269">~</span><span class="p267">-</span><span class="p265">·  </span><span class="p266">≋≋≋ </span><span class="p251">▀▀</span><span class="p270">·</span><span class="p268">≈≈≈</span><span class="p271">°</span><span class="p272">·</span><span class="p273">~</span><span class="p266">≋</span><span class="p265">∘</span><span class="p266">≋≋≋≋≋</span><span class="p263">∘·</span><span class="p265">~∘~~~~  </span><span class="p268">≈≈≈≈</span><span class="p266">≋≋≋≋</span><span class="p269">~</span><span class="p265">-   </span><span class="p266">█▙▄▄▄█▌≋≋≋</span>
+<span class="p274">≋≋≋</span><span class="p275">~~~~~~~~~~ ·</span><span class="p276">~</span><span class="p274">≋</span><span class="p277">≈</span><span class="p276">≈</span><span class="p277">≈</span><span class="p276">≈</span><span class="p278">≈</span><span class="p277">≈</span><span class="p276">≈</span><span class="p277">≈</span><span class="p274">≋≋</span><span class="p277">≈≈≈  </span><span class="p279">°  </span><span class="p280">· </span><span class="p279">·</span><span class="p276">·</span><span class="p280">· </span><span class="p276">∘</span><span class="p280">°</span><span class="p278">·</span><span class="p281">°</span><span class="p280">∘</span><span class="p282">∘    </span><span class="p280">·   </span><span class="p276">-</span><span class="p282">~</span><span class="p274">≋≋≋≋</span><span class="p277">≈≈≈     </span><span class="p274">████████▌</span><span class="p277">≈≈</span>
+<span class="p278">°</span><span class="p283">∘ </span><span class="p274">≋≋≋     </span><span class="p276">-</span><span class="p282">~</span><span class="p274">≋≋≋</span><span class="p279">~</span><span class="p278">- </span><span class="p284">••</span><span class="p285">•</span><span class="p274">≋≋≋</span><span class="p285">∘</span><span class="p280">° </span><span class="p286">° </span><span class="p287">∘</span><span class="p288">·</span><span class="p289">· </span><span class="p290">° </span><span class="p291">°  </span><span class="p292">·</span><span class="p289">·    </span><span class="p290">°    </span><span class="p293">·</span><span class="p276"> °</span><span class="p281">°  </span><span class="p274">≋≋≋</span><span class="p280">·</span><span class="p294">·</span><span class="p281">∘  </span><span class="p277">≈≈</span><span class="p274">▖≋≋█▙</span><span class="p295">^</span><span class="p274">██▙</span><span class="p295">^</span><span class="p274">█▌</span><span class="p280">·</span><span class="p274">≋</span>
+<span class="p290">°</span><span class="p279">° </span><span class="p287">·</span><span class="p283">·  </span><span class="p274">≋≋≋≋≋≋</span><span class="p283">~</span><span class="p281">- </span><span class="p278">°</span><span class="p279">· </span><span class="p275">•</span><span class="p280">∘</span><span class="p286">·   </span><span class="p290">  ·</span><span class="p292">·               ·           </span><span class="p283"> ∘°</span><span class="p279">· </span><span class="p278">∘ </span><span class="p274">≋≋≋▌ </span><span class="p285">∘</span><span class="p274">▀██████▛▘ </span><span class="p279">°</span>
+<span class="p289">  ·  </span><span class="p291">°</span><span class="p281">°</span><span class="p278">·</span><span class="p280">· ° </span><span class="p286">∘∘</span><span class="p283">·  </span><span class="p278">°</span><span class="p287">∘</span><span class="p281">°</span><span class="p292">            ·                        </span><span class="p296">∘    </span><span class="p283">   ·</span><span class="p274">▜▖ ▗▟███</span><span class="p297">██▄ </span><span class="p298">∘ </span>
+<span class="p299">  search  rate.Limiter  3 files                                    </span><span class="p297">▜▙████████▌  </span>
+<span class="p299">  edit   internal/auth/handler.go  +18 -2                           </span><span class="p297">▝▜█▀██▛▜█▘  </span>
+<span class="p299">  write  internal/auth/limiter.go  64 lines                                     </span>
+<span class="p290">  shell  go  exit 1                                                             </span>
+</pre></div>
+    <div class="facts">
+      <p class="t26">Every colour is an xterm-256 index, so the picture is the same on every terminal and every profile. Terminal.app, iTerm2, Ghostty.</p>
+      <p class="t26">Claude Code runs in the same window, no tmux. The older side-by-side layout is one flag away.</p>
+      <div class="code">go install github.com/donlucasx/xscapes@latest
+xscapes install claude --apply
+xscapes claude</div>
+    </div>
+  </div>
+  <div class="foot"><span class="lockup"><span class="blk">x</span>scapes</span><span>08</span></div>
+</section></div></div>
+
+<!-- 9 · numbers -->
+<div class="page"><div class="stage"><section class="s numbers">
+  <div class="head"><h2 class="t56">Built against measurement, not against a demo.</h2><p class="t32">Every visual claim was checked on the rendered frame, not on what the source says it should do.</p></div>
+  <div class="body"><div class="tiles">
+    <div class="tile"><div class="n">13,682</div><p><b>tool events</b> from real Claude Code sessions, recorded by the hooks and folded through the reducer offline to tune what the sea does.</p></div>
+    <div class="tile"><div class="n">48</div><p><b>half-hours</b> of sky and sea measured on the rendered frame, so the gradient bands were counted, not eyeballed.</p></div>
+    <div class="tile"><div class="n">43<small>%</small></div><p><b>of "notification" hooks</b> turned out to be a 60-second idle nag, not a request for input. Measured on 12,809 events, and the adapter tells them apart.</p></div>
+  </div></div>
+  <div class="foot"><span class="lockup"><span class="blk">x</span>scapes</span><span>09</span></div>
+</section></div></div>
+
+<!-- 10 · list: repeatability -->
+<div class="page"><div class="stage"><section class="s list">
+  <div class="head"><h2 class="t56">A companion for the session, not a toy for the task.</h2></div>
+  <div class="body"><ul class="big">
+    <li>It runs for the whole session. Tasks move the scene; the day passes over it.</li>
+    <li>The same repository always gets the same shoreline, seeded from its git root. The companion is yours across all of them.</li>
+    <li>Three interactions, one keypress each, and it never becomes a game. <span>Pet the companion, plant a tree, skip a stone.</span></li>
+    <li>Next: the campsite and the rainy window, an adapter for any process, and a browser gallery for people who will not install a binary. <span>All MIT, public since day one.</span></li>
+  </ul></div>
+  <div class="foot"><span class="lockup"><span class="blk">x</span>scapes</span><span>10</span></div>
+</section></div></div>
+
+<!-- 11 · close (Reverse) -->
+<div class="page"><div class="stage"><section class="s close">
+  <div class="lockup"><span class="blk gold">x</span>scapes</div>
+  <div class="head"><p class="t72" style="font-size:56px">a thinking screen for terminal agents</p><div class="code" style="font-size:26px;width:max-content">go install github.com/donlucasx/xscapes@latest
+xscapes claude</div></div>
+  <div class="foot"><span>github.com/donlucasx/xscapes &middot; MIT</span><span class="goldtx">Lucas Garzoli &middot; Los Angeles</span></div>
+</section></div></div>
+
+<script>
+(function(){
+  var pages=[].slice.call(document.querySelectorAll('.page'));
+  document.getElementById('tot').textContent=pages.length;
+  if(/(^|[?&])all(=|&|$)/.test(location.search)) document.body.classList.add('all');
+  function fit(){var k=Math.min(innerWidth/1920, innerHeight/1080); document.documentElement.style.setProperty('--k', k.toFixed(4));}
+  fit(); addEventListener('resize',fit);
+  function idx(){var y=document.body.scrollTop||document.documentElement.scrollTop||0; return Math.round(y/innerHeight);}
+  function go(i){i=Math.max(0,Math.min(pages.length-1,i)); pages[i].scrollIntoView({behavior:'smooth',block:'start'}); document.getElementById('cur').textContent=i+1;}
+  addEventListener('keydown',function(e){
+    if(document.body.classList.contains('all')) return;
+    if(['ArrowRight','ArrowDown','PageDown',' '].indexOf(e.key)>=0){e.preventDefault();go(idx()+1);}
+    if(['ArrowLeft','ArrowUp','PageUp'].indexOf(e.key)>=0){e.preventDefault();go(idx()-1);}
+  });
+  var t; addEventListener('scroll',function(){clearTimeout(t); t=setTimeout(function(){document.getElementById('cur').textContent=idx()+1;},80);},true);
+  var h=parseInt((location.hash||'').replace('#',''),10); if(h>0) setTimeout(function(){go(h-1);},50);
+})();
+</script>
+
+</body>
+</html>

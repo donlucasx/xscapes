@@ -1065,3 +1065,8 @@ at 22:10 (lgarzoli out of tokens → donlucasx); artifact ownership checked, see
     glyphs (s15's rule for stars on the tip). **FIXED**: the label goes under the disc while there
     is sky under it (`MoonExtent`), beside it on its centre row when there is not, and every
     letter is plotted with its own background so no half cell can eat one. Page regenerated.
+- *"looks great, lock it in"* (the guidelines, artifact "xscapes Brand Guidelines"
+  https://claude.ai/code/artifact/86fde655-b172-4fb5-9ca5-36e41a841eb4; repo copy `assets/brand/`, commit `258df3e`)
+  ⇒ **GUIDELINES v1.0 LOCKED.** Cell 0.6 x 1.2 em, x on the baseline at 955/1200; greys + noon blue 111 on
+    dark, dawn 24 as the accent on light; Reverse = gold 179 cell once per surface where the brand is the
+    subject (136 in the cell on light, 94 as text); Geist Mono 700 + Geist; the fixed lines. NEXT: the deck.
