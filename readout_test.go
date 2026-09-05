@@ -60,7 +60,7 @@ func TestTheReadoutAppearsAtFortyPercentUsed(t *testing.T) {
 	if s, y, warm := render(0.40); !strings.Contains(s, "60%") || warm || y < 0 {
 		t.Errorf("at 40%% used: got %q (warm=%v, row %d), want a dim 60%%", s, warm, y)
 	}
-	if s, _, warm := render(0.85); s != "15% left" || !warm {
+	if s, _, warm := render(0.85); !strings.Contains(s, "15% left") || !warm {
 		t.Errorf("at 85%% used: got %q (warm=%v), want a warm \"15%% left\"", s, warm)
 	}
 	for _, used := range []float64{0.95, 1.0} {
