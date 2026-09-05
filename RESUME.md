@@ -17,6 +17,11 @@ do NOT drive Terminal.app (osascript, System Events) without asking me first.
 
 ## Brand workstream — where we left off (2026-09-05, session 17, a PARALLEL session; HEAD `9ba068e`, pushed)
 
+> **Engineering note, 13:50 (claude-6e):** the renderer is settled for the deck — Lucas picked the
+> **hue rim** for the disc and ruled the outstanding-todo ring OUT; `site/index.html` is re-rendered
+> from that at `b13598a`. Rebuild the deck from it with `assets/deck/make-deck.py`; stage only
+> `assets/deck/`. The brand session had exited before this could be sent to it.
+
 **Copy-paste this prompt into a fresh BRAND session** (the engineering session owns the code, `notes/`,
 this file's other sections and the `CLAUDE.md` banner; brand touches `site/`, `assets/`, README and appends
 under its own heading in `_FEEDBACK.md`):
