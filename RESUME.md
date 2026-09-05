@@ -15,7 +15,7 @@ frame does rather than what the source says it should. And one from session 14:
 do NOT drive Terminal.app (osascript, System Events) without asking me first.
 ```
 
-## Where we left off (2026-09-05, session 16, INSTALLED `365b2bf`, pushed, clean)
+## Where we left off (2026-09-05, session 16, INSTALLED, pushed, clean — SHAs in `git log`)
 
 **The live tests ran, in both terminals.** From his screenshots (`_FEEDBACK.md` s16): resize
 PASSES in Ghostty and Terminal.app, both directions · the Ghostty sun is the cube's peach (the
@@ -38,12 +38,25 @@ count still drops at the end event). Built for his pick and then NOT taken: eye 
 Companion's Eyes") — **LOCKED: the eyes stay holes.** Login flip 7 (donlucasx): s15's two
 artifacts are read-only here.
 
-**▶ NEXT:** 0. his OK for two READ-ONLY Terminal automations (a cell read-back of his window
-resolved by the tty of his `xscapes claude`, no keystrokes; a width probe in a window the script
-opens) — the width rule is the blocker for defect (2) · the printf as a SAVED screenshot (or a
-bigger font) for the ▄ question · the working-session items still unseen: bubbles + sound,
-kittens live, the mirror during work and its exit replay, the corrupt scrollback, the transcript
-start · then the Commons sequence: rebuild both binaries after any fix → `xscapes -site site` →
+**Later the same afternoon (his *"go ahead"* + a saved printf screenshot):** defect (3) is
+FIXED — U+2584 is bottom-exact in Terminal.app, so split cells are drawn as ▄ with the colours
+the other way up there (`term.LowerHalf`, `DetectSplit`, `XSCAPES_SPLIT`); the hairlines on the
+disc and across the sky are gone. Defect (2) is EXPLAINED and documented, not fixable:
+Terminal.app's alt screen RETAINS rows at their widest on a width change, erase reaches the
+visible width only, and his 123.6-column window drew a partial 124th column of retained cells
+(`notes/width-audit.md`, `notes/widthprobe`, model switch `screen.retainWidth`,
+`TRACE_RETAIN=1`). The six-column patch above the band is NOT reproduced under either rule —
+open. A read-back of his live window found the s14 #2 scrollback CORRUPTION in the main buffer
+(`✻ Tomtotal reported 1259,cfetched)1259,sunique 1259`, rows merged where one had spaces) —
+the mirror wrote what the model held; that session was untraced.
+
+**▶ NEXT:** 0. a TRACED working session in Terminal.app (`XSCAPES_TRACE=/tmp/apple.bin xscapes
+claude`) that he works in until the mirrored rows corrupt, then a read-back of the same window
+(his OK stands for read-only) → diff the model's kept rows against the buffer, fix the divergence ·
+the patch above the band (a hosted probe under scripted width+height drags, pixels via
+`screencapture -l` of the script's own window) · the working-session items still unseen:
+bubbles + sound, kittens live (now with the swim-off), the mirror during work and its exit
+replay, the transcript start · then the Commons sequence: rebuild both binaries after any fix → `xscapes -site site` →
 his 45–60 s Terminal.app recording → `site/COMMONS-PROMPT.md` → he prompts the rebuild (page +
 gallery only, no web twin) → publish → SUBMIT (closes 09-17).
 

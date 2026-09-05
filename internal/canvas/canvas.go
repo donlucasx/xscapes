@@ -297,7 +297,8 @@ func (c *Canvas) resolve(x, y int, p term.Profile) resolved {
 		// thing anyone misses.
 		up, down := p.Quantise(hf.up, false), p.Quantise(hf.down, false)
 		if up != down {
-			return resolved{ch: '\u2580', fg: up, bg: down}
+			ch, fg, bg := term.Split(up, down)
+			return resolved{ch: ch, fg: fg, bg: bg}
 		}
 		return resolved{ch: ' ', fg: up, bg: up, glyph: true}
 	}
@@ -313,7 +314,8 @@ func (c *Canvas) resolve(x, y int, p term.Profile) resolved {
 				up := rr.r.Tone(rr.t0 + 0.25*(rr.t1-rr.t0))
 				down := rr.r.Tone(rr.t0 + 0.75*(rr.t1-rr.t0))
 				if up != down {
-					return resolved{ch: '\u2580', fg: up, bg: down}
+					ch, fg, bg := term.Split(up, down)
+					return resolved{ch: ch, fg: fg, bg: bg}
 				}
 			}
 			return resolved{ch: ' ', fg: mid, bg: mid, glyph: true}
@@ -325,8 +327,8 @@ func (c *Canvas) resolve(x, y int, p term.Profile) resolved {
 			ui, di := up.Index256Keeping(), down.Index256Keeping()
 			if ui != di {
 				// A band edge falls inside this cell: put it there.
-				return resolved{ch: '\u2580',
-					fg: term.FromIndex256(ui), bg: term.FromIndex256(di)}
+				ch, fg, bg := term.Split(term.FromIndex256(ui), term.FromIndex256(di))
+				return resolved{ch: ch, fg: fg, bg: bg}
 			}
 		}
 		if sbg, sfg, r, ok := term.ShadeCell(bg); ok {

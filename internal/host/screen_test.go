@@ -46,6 +46,9 @@ func TestReplayTrace(t *testing.T) {
 		w, h = marks[0].cols, marks[0].rows
 	}
 	sc := newScreen(w, h)
+	// TRACE_RETAIN=1 replays with Terminal.app's width rule (retain and clip,
+	// measured 2026-09-05) instead of cut-and-pad.
+	sc.retainWidth = os.Getenv("TRACE_RETAIN") == "1"
 	fed := 0
 	for i, m := range marks {
 		if i > 0 {

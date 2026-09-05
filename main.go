@@ -19,6 +19,9 @@ import (
 
 func main() {
 	warnLegacyEnv(os.Args[1:])
+	// Before dispatch: the host paints too, and Terminal.app draws U+2580
+	// with a gap above it (see term.LowerHalf).
+	term.LowerHalf = term.DetectSplit(os.Getenv("TERM_PROGRAM"))
 
 	// Subcommands are checked before the flag set is parsed. The renderer has
 	// twenty demo flags and the adapters have their own; keeping them in
@@ -79,8 +82,12 @@ func main() {
 
 	if *info {
 		tw, th := termSize()
-		fmt.Printf("profile=%s  size=%dx%d  glyph-chroma=%.1fx  sound=%s  TERM=%q COLORTERM=%q TERM_PROGRAM=%q\n",
-			term.DetectProfile(), tw, th, term.GlyphBoost, notify.New().Describe(),
+		split := "upper"
+		if term.LowerHalf {
+			split = "lower"
+		}
+		fmt.Printf("profile=%s  size=%dx%d  glyph-chroma=%.1fx  split=%s  sound=%s  TERM=%q COLORTERM=%q TERM_PROGRAM=%q\n",
+			term.DetectProfile(), tw, th, term.GlyphBoost, split, notify.New().Describe(),
 			os.Getenv("TERM"), os.Getenv("COLORTERM"), os.Getenv("TERM_PROGRAM"))
 		return
 	}

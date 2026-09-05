@@ -984,3 +984,20 @@ at 22:10 (lgarzoli out of tokens → donlucasx); artifact ownership checked, see
     the five stripes the ▀ gap predicts, and the right block cannot be resolved between four
     stripes (▄ bottom-exact, the one-switch fix) and five (▄ inset too, no cheap fix). Asked for a
     saved screenshot or a larger font.
+- *"1. [Image #8] is this better"* (12:30, the printf test saved to the Screenshots folder)
+  ⇒ MEASURED stripe by stripe (30px rows): ▀ = 5px gap, 12px ink, 13px bg; ▄ = 17px bg, 12px ink
+    to the cell's bottom edge, NO gap. **So the ▄ swap works.** SHIPPED: `term.LowerHalf`
+    (`DetectSplit` on TERM_PROGRAM, `XSCAPES_SPLIT=upper|lower`), `term.Split` at the three
+    split-cell emits in `canvas.resolve`, set before dispatch in `main`; `-info` prints `split=`.
+    Every half-block edge in Terminal.app — the disc's tips, the ramp edges across the width —
+    loses its hairline. Ghostty draws both blocks exact and is unaffected.
+- *"2. go ahead"* (12:31) ⇒ his OK for the two READ-ONLY automations. Done, both in windows the
+  script opened or resolved by tty, no keystrokes: (a) `history of tab` of his live window
+  (ttys000, 133x52): the alt screen reads back consistent with the band; the MAIN buffer holds
+  three interleaved rows, e.g. `✻ Tomtotal reported 1259,cfetched)1259,sunique 1259` — the s14
+  #2 corruption, now seen IN THE BUFFER of a live session (untraced; the mirror wrote what the
+  model held). (b) `notes/widthprobe` + two drivers: **Terminal.app's alt screen retains every
+  row at its widest and clips; erase-line and a narrow repaint leave the hidden tail; widening
+  exposes it.** His 123.6-column window draws a partial 124th column of RETAINED cells = the
+  strip. Full record: `notes/width-audit.md`. The six-column patch above the band is NOT
+  reproduced under either rule; open.

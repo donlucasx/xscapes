@@ -60,7 +60,8 @@ const (
 )
 
 type screen struct {
-	w, h int
+	retainWidth bool // Terminal.app's width rule; see retain
+	w, h        int
 
 	// The rendition in force, and the copy DECSC keeps.
 	curFG, curBG int
@@ -104,6 +105,24 @@ type screen struct {
 	// sequence silently drops everything after it -- which is how the first
 	// version of this model showed a blank screen and blamed the host.
 	pending string
+}
+
+// retainWidth is Terminal.app's alternate screen on a WIDTH change, measured
+// 2026-09-05 (notes/widthprobe): every row keeps its cells at the widest the
+// window has been; a narrower window clips the display and a wider one shows
+// the retained cells again. No reflow, no wrap, no blanking. With it off, a
+// row is cut to the new width and padded with blanks, which is what the model
+// assumed before and what Ghostty's source does.
+func (s *screen) retain(w int, row []cell) []cell {
+	if !s.retainWidth || len(row) <= w {
+		r := blankRow(max(w, len(row)))
+		copy(r, row)
+		if !s.retainWidth {
+			r = r[:w]
+		}
+		return r
+	}
+	return row
 }
 
 func newScreen(w, h int) *screen {
@@ -180,9 +199,7 @@ func (s *screen) resizeScrolling(w, h int) {
 		s.cells = append([][]cell{}, kept...)
 		s.h = h
 		for i := range s.cells {
-			row := blankRow(w)
-			copy(row, s.cells[i])
-			s.cells[i] = row
+			s.cells[i] = s.retain(w, s.cells[i])
 		}
 		s.w = w
 		s.resizeOther(w, h)
@@ -204,7 +221,7 @@ func (s *screen) resizeAnchoredBottom(w, h int) {
 			rows[i] = hostRow(w, defaultBG)
 		}
 		for i := range s.cells {
-			copy(rows[i+grow], s.cells[i])
+			rows[i+grow] = s.retain(w, s.cells[i])
 		}
 		s.cells, s.w, s.h = rows, w, h
 		s.resizeOther(w, h)
@@ -243,7 +260,7 @@ func (s *screen) resize(w, h int) {
 	s.cells = blankRows(w, h)
 	for i := range s.cells {
 		if i < len(old) {
-			copy(s.cells[i], old[i])
+			s.cells[i] = s.retain(w, old[i])
 		}
 	}
 	s.w, s.h = w, h
@@ -609,6 +626,14 @@ func (s *screen) csi(params string, final rune) {
 				s.cells[s.y][x] = s.blank()
 			}
 		case 2:
+			if s.retainWidth && len(s.cells[s.y]) > s.w {
+				// Measured 2026-09-05 (notes/width-audit.md): Terminal.app's
+				// erase reaches the visible width only; the cells a narrowing
+				// hid stay, and a widening shows them again.
+				row := bgRow(s.w, s.curBG)
+				s.cells[s.y] = append(row, s.cells[s.y][s.w:]...)
+				break
+			}
 			s.cells[s.y] = bgRow(s.w, s.curBG)
 		default:
 			for x := s.x; x < s.w; x++ {

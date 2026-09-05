@@ -74,6 +74,40 @@ func DetectProfile() Profile {
 	return Profile256
 }
 
+// LowerHalf says a cell split in two colours is drawn with U+2584 (the lower
+// half in the foreground, the upper in the background) instead of U+2580.
+//
+// Measured 2026-09-05 in his Terminal.app (Menlo, 30px rows): U+2580's ink
+// starts 5px below the cell top and stops 13px above the bottom, so every
+// split cell showed a hairline of the LOWER colour above its upper half --
+// "thin lines through the sun", a sloppy moon. U+2584's ink runs from 17px
+// down to the cell's bottom edge exactly, so the same two colours drawn the
+// other way up meet with no hairline at all; the split sits at 57% instead
+// of 50%, which nothing can see. Ghostty draws both blocks pixel-exact, so
+// there it is a matter of indifference. Set by DetectSplit from TERM_PROGRAM;
+// XSCAPES_SPLIT=upper|lower overrides.
+var LowerHalf bool
+
+// DetectSplit picks LowerHalf for the terminal in TERM_PROGRAM.
+func DetectSplit(termProgram string) bool {
+	switch strings.ToLower(envx.Lookup("SPLIT")) {
+	case "lower":
+		return true
+	case "upper":
+		return false
+	}
+	return termProgram == "Apple_Terminal"
+}
+
+// Split is the glyph and colour order for a cell whose top half is up and
+// bottom half is down, under LowerHalf.
+func Split(up, down RGB) (ch rune, fg, bg RGB) {
+	if LowerHalf {
+		return '\u2584', down, up
+	}
+	return '\u2580', up, down
+}
+
 // xterm-256 cube levels. Indices 0-15 are theme-dependent and unreliable, so
 // we quantise into the 6x6x6 cube (16-231) and the greyscale ramp (232-255).
 var cubeLevels = [6]uint8{0, 95, 135, 175, 215, 255}
