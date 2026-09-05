@@ -73,6 +73,9 @@ type Canvas struct {
 	// rounding its own colour. Nil where the background is a flat tone.
 	ramp []rampRef
 
+	// quad is a background cell painted as four quarters; see quadRef.
+	quad []quadRef
+
 	// half is a background cell painted as two colours, top and bottom, for
 	// a shape whose edge falls inside a row: the moon's tips. Unset where
 	// the background is one colour.
@@ -94,6 +97,17 @@ type halfRef struct {
 	set      bool
 }
 
+// quadRef is a background cell split into four quarters, each either the
+// shape's colour or the ground's. It is how a disc gets an edge at half a
+// cell horizontally as well as vertically: the same quadrant glyphs the
+// companion is drawn with, used as two backgrounds. mask bits: 8 upper-left,
+// 4 upper-right, 2 lower-left, 1 lower-right, set where the SHAPE is.
+type quadRef struct {
+	shape, ground term.RGB
+	mask          uint8
+	set           bool
+}
+
 // rampRef is a cell's place in a ramp: the ramp, and the span of it the
 // cell covers, top edge to bottom edge, so the two halves of the cell can
 // each take the tone the path puts there.
@@ -104,7 +118,7 @@ type rampRef struct {
 
 // New builds a canvas with one layer per alpha given, ordered far to near.
 func New(w, h int, alphas ...float64) *Canvas {
-	c := &Canvas{W: w, H: h, BG: make([]term.RGB, w*h), ramp: make([]rampRef, w*h), half: make([]halfRef, w*h)}
+	c := &Canvas{W: w, H: h, BG: make([]term.RGB, w*h), ramp: make([]rampRef, w*h), half: make([]halfRef, w*h), quad: make([]quadRef, w*h)}
 	for _, a := range alphas {
 		c.Layers = append(c.Layers, NewLayer(w, h, a))
 	}
@@ -119,6 +133,7 @@ func (c *Canvas) Resize(w, h int) {
 	c.BG = make([]term.RGB, w*h)
 	c.ramp = make([]rampRef, w*h)
 	c.half = make([]halfRef, w*h)
+	c.quad = make([]quadRef, w*h)
 	for i, l := range c.Layers {
 		c.Layers[i] = NewLayer(w, h, l.Alpha)
 	}
@@ -145,6 +160,65 @@ func (c *Canvas) SetBG(x, y int, col term.RGB) {
 	c.BG[y*c.W+x] = col
 	c.ramp[y*c.W+x] = rampRef{}
 	c.half[y*c.W+x] = halfRef{}
+	c.quad[y*c.W+x] = quadRef{}
+}
+
+// SetBGQuad paints a cell as four quarters: the shape's colour where mask
+// has a bit (8 upper-left, 4 upper-right, 2 lower-left, 1 lower-right) and
+// the ground's colour elsewhere. A full mask is a flat cell of the shape; an
+// empty one paints nothing. BGAt reports the mean weighted by the mask, so
+// what blends INTO the cell sees one colour. A ramp the cell was part of is
+// kept, so the ground quarters take the path's tone like the cells beside.
+func (c *Canvas) SetBGQuad(x, y int, shape, ground term.RGB, mask uint8) {
+	if x < 0 || y < 0 || x >= c.W || y >= c.H {
+		return
+	}
+	mask &= 0b1111
+	switch mask {
+	case 0:
+		return
+	case 0b1111:
+		c.SetBG(x, y, shape)
+		return
+	}
+	i := y*c.W + x
+	n := 0
+	for b := uint8(1); b < 16; b <<= 1 {
+		if mask&b != 0 {
+			n++
+		}
+	}
+	c.BG[i] = ground.Blend(shape, float64(n)/4)
+	c.half[i] = halfRef{}
+	c.quad[i] = quadRef{shape: shape, ground: ground, mask: mask, set: true}
+}
+
+// quadGlyph is the block for a mask with the SHAPE as the foreground.
+var quadGlyph = [16]rune{
+	0b0000: ' ', 0b0001: '▗', 0b0010: '▖', 0b0011: '▄',
+	0b0100: '▝', 0b0101: '▐', 0b0110: '▞', 0b0111: '▟',
+	0b1000: '▘', 0b1001: '▚', 0b1010: '▌', 0b1011: '▙',
+	0b1100: '▀', 0b1101: '▜', 0b1110: '▛', 0b1111: '█',
+}
+
+// resolveQuad draws a quad cell. Terminal.app's block glyphs start five
+// pixels below the cell top (measured 2026-09-05), so wherever the top two
+// quarters agree the cell is drawn with that colour as the BACKGROUND and
+// the other colour inked only in the lower quarters: no ink touches the top
+// edge, no hairline. A cell whose top quarters differ has to ink the top and
+// takes the notch in Terminal.app; Ghostty draws every block exact.
+func resolveQuad(q quadRef, shape, ground term.RGB) resolved {
+	switch q.mask & 0b1100 {
+	case 0b1100:
+		lower := ^q.mask & 0b0011
+		if lower == 0 {
+			return resolved{ch: ' ', fg: shape, bg: shape, glyph: true}
+		}
+		return resolved{ch: quadGlyph[lower], fg: ground, bg: shape}
+	case 0:
+		return resolved{ch: quadGlyph[q.mask], fg: shape, bg: ground}
+	}
+	return resolved{ch: quadGlyph[q.mask], fg: shape, bg: ground}
 }
 
 // SetBGHalves paints a cell's top half one colour and its bottom half another,
@@ -160,6 +234,7 @@ func (c *Canvas) SetBGHalves(x, y int, up, down term.RGB) {
 	bg := c.BG[i]
 	onRamp := c.ramp[i].r != nil
 	c.BG[i] = up.Blend(down, 0.5)
+	c.quad[i] = quadRef{}
 	// The ramp binding stays when a half is plain sky, so resolve can ask
 	// the path for that half's tone.
 	c.half[i] = halfRef{up: up, down: down, set: true,
@@ -185,6 +260,7 @@ func (c *Canvas) SetBGRamp(x, y int, r *term.Ramp, t0, t1 float64) {
 	// ten hours and the moon's tips from the night stayed in the sky until
 	// eleven in the morning, as grey notches around the sun.
 	c.half[i] = halfRef{}
+	c.quad[i] = quadRef{}
 }
 
 // Far/Mid/Near are conveniences so scapes read as depth, not indices.
@@ -302,6 +378,20 @@ func (c *Canvas) resolve(x, y int, p term.Profile) resolved {
 		// no ramp tone, no shading. The eye sits on fur whatever is behind
 		// the head.
 		return resolved{ch: ch, fg: fg, bg: own, glyph: true}
+	}
+	if q := c.quad[i]; q.set {
+		// A shape's edge inside the cell, four quarters. Both colours are
+		// backgrounds; the ground takes the ramp's mid tone where the cell
+		// was part of one, so the disc never sits on a differently rounded
+		// sliver of sky.
+		shape, ground := p.Quantise(q.shape, false), p.Quantise(q.ground, false)
+		if rr := c.ramp[i]; p == term.Profile256 && term.Ramps && rr.r != nil {
+			ground = rr.r.Tone((rr.t0 + rr.t1) / 2)
+		}
+		if shape == ground {
+			return resolved{ch: ' ', fg: shape, bg: shape, glyph: true}
+		}
+		return resolveQuad(q, shape, ground)
 	}
 	if hf := c.half[i]; hf.set {
 		// A shape's edge inside the row. Both halves are backgrounds and take

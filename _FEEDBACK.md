@@ -1070,3 +1070,22 @@ at 22:10 (lgarzoli out of tokens → donlucasx); artifact ownership checked, see
   ⇒ **GUIDELINES v1.0 LOCKED.** Cell 0.6 x 1.2 em, x on the baseline at 955/1200; greys + noon blue 111 on
     dark, dawn 24 as the accent on light; Reverse = gold 179 cell once per surface where the brand is the
     subject (136 in the cell on light, 94 as text); Geist Mono 700 + Geist; the fixed lines. NEXT: the deck.
+- *"lastly- is this the best moon/sun we can draw within the existing limitations? [Image #12]
+  looking at this session on Ghostty and it seems to not be super accurate. I also kinda miss the
+  [Image #13] original design we had, which was the issue? why did we change it?"* (13:18; Image 12
+  = the brand session's Ghostty window by day at 30% used, the sun a stepped 7-cell block with a
+  slate sliver; Image 13 = the s7 truecolor mockup GIF, a soft round moon with a glow on a navy sky)
+  ⇒ Answered: the mockup was truecolor; on the cube its soft edge rounds to grey fringes (s11,
+    measured) and its navy has no entry (the electric night), so the disc went solid and the night
+    grey. Then *"do it"* ⇒ **study BUILT** (`xscapes -moon`, artifact "The Moon, Four Ways",
+    https://claude.ai/code/artifact/f43d79b2-de33-421d-ba5d-249a07926e67): five treatments × day/night
+    × 5/30/60% at 130x22 on 256 — ships · **quad edge** (`canvas.SetBGQuad`, four quarters per cell,
+    the companion's block glyphs as two backgrounds; drawn with the top edge as BACKGROUND wherever
+    the top quarters agree, so no hairline in Terminal.app except where they differ) · **sun without
+    shadow** (`Shore.SunShadow="sky"`, no unlit face by day) · **night halo** (`Shore.MoonHalo`, a
+    soft ring in the grey ramp; measured on the page: 68/48/38 greys fading out beside the disc) ·
+    hue rim (s15). All study-only, defaults unchanged. ⚠ The first render's halo was INVISIBLE —
+    "night" was keyed on the body's colour, and at 22:20 the body is a pinkish grey that reads as
+    warm; the same test stripped the night moon's dark face in the no-shadow column. Both now key on
+    the sky's luma (`Shore.night`). Caught by sampling the page's pixels, not by looking at it.
+    **His pick pending.** Recommendation: quad edge + sun without shadow + night halo.

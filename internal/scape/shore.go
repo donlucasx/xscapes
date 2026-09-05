@@ -81,6 +81,19 @@ type Shore struct {
 	// own hue) or "blend" (the s7 mockup's fade, half toward the sky). Kept so
 	// notes/moonstudy can show him the three side by side on 256.
 	MoonRim string
+	// MoonEdge is a STUDY switch for how the disc's edge is sampled: "" (two
+	// half-rows per cell, what ships) or "quad" (four quarters per cell, the
+	// companion's own block glyphs used as two backgrounds -- twice the
+	// horizontal resolution of the edge).
+	MoonEdge string
+	// SunShadow is a STUDY switch for the unlit face by day: "" (the slate
+	// tone, what ships) or "sky" (the sky's own colour, so the sun wanes as a
+	// crescent with no dark bite).
+	SunShadow string
+	// MoonHalo is a STUDY switch: a soft lightening of the sky around the
+	// disc at night, the one piece of the s7 mockup's softness the grey ramp
+	// can carry.
+	MoonHalo bool
 
 	// writeTop is the first row of the writing band, or c.H when there is none.
 	writeTop int
@@ -596,11 +609,22 @@ func (s *Shore) moon(c *canvas.Canvas, hy int, scale, lit, vis float64) {
 	// 133x27 and 9% context. Three steps above the night sky now, still well
 	// under the lit body, still darker than a daylight sky.
 	dark := term.RGB{R: 80, G: 80, B: 96}
+	// By day the body is the sun (the palette's warm body), and a slate
+	// sliver on it read as a bite; with SunShadow "sky" the unlit face is
+	// simply not painted, so the sun wanes as a crescent.
+	noShadow := s.SunShadow == "sky" && !s.night()
 
 	s.moonX, s.moonY = mx, my
 	ry := int(rr+rim) + 1
 	rx := int((rr+rim)*2) + 1
 	s.moonRX, s.moonRY = rx, ry
+	if s.MoonEdge == "quad" {
+		s.moonQuad(c, mx, my, rx, ry, rr, shadow, vis, dark, noShadow)
+		if s.MoonHalo {
+			s.moonHalo(c, mx, my, rx, ry, rr, vis)
+		}
+		return
+	}
 	// Each cell is judged as TWO half-rows, a quarter above and a quarter
 	// below its centre, and painted with U+2580 where only one of them is
 	// inside the disc (or where the terminator crosses between them). His
@@ -644,6 +668,9 @@ func (s *Shore) moon(c *canvas.Canvas, hy int, scale, lit, vis float64) {
 				col := s.pal.Moon
 				lit := true
 				if math.Hypot(fx-shadow, fy) <= rr {
+					if noShadow {
+						continue
+					}
 					col, a, lit = dark, a*0.6, false // earthshine on the unlit face
 				}
 				rim := lit && s.MoonRim != "" && math.Hypot(fx, fy) > rr-0.55
@@ -672,6 +699,99 @@ func (s *Shore) moon(c *canvas.Canvas, hy int, scale, lit, vis float64) {
 			case in[1]:
 				c.SetBGHalves(x, y, c.BGAt(x, y), half[1])
 			}
+		}
+	}
+}
+
+// moonQuad samples the disc at four quarters per cell (a quarter of a
+// cell's width, a quarter of its height, about its centre) and paints each
+// cell with canvas.SetBGQuad. A cell the terminator crosses inside the disc
+// carries the lit and the unlit colour as its two quarters' colours; a cell
+// on the edge carries the majority face against the sky.
+func (s *Shore) moonQuad(c *canvas.Canvas, mx, my, rx, ry int, rr, shadow, vis float64, dark term.RGB, noShadow bool) {
+	a := 0.92 * vis
+	if a <= 0 {
+		return
+	}
+	for dy := -ry; dy <= ry; dy++ {
+		for dx := -rx; dx <= rx; dx++ {
+			x, y := mx+dx, my+dy
+			var litMask, darkMask uint8
+			for k, q := range [4][2]float64{{-0.125, -0.25}, {0.125, -0.25}, {-0.125, 0.25}, {0.125, 0.25}} {
+				fx, fy := float64(dx)/2.0+q[0], float64(dy)+q[1]
+				if math.Hypot(fx, fy) >= rr {
+					continue
+				}
+				bit := uint8(8) >> uint(k)
+				if math.Hypot(fx-shadow, fy) <= rr {
+					if !noShadow {
+						darkMask |= bit
+					}
+					continue
+				}
+				litMask |= bit
+			}
+			if litMask|darkMask == 0 {
+				continue
+			}
+			sky := c.BGAt(x, y)
+			litCol := sky.Blend(s.pal.Moon, a)
+			darkCol := sky.Blend(dark, a*0.6)
+			switch {
+			case litMask|darkMask == 0b1111 && darkMask == 0:
+				c.SetBG(x, y, litCol)
+			case litMask|darkMask == 0b1111 && litMask == 0:
+				c.SetBG(x, y, darkCol)
+			case litMask|darkMask == 0b1111:
+				c.SetBGQuad(x, y, litCol, darkCol, litMask)
+			default:
+				shape, mask := litCol, litMask|darkMask
+				if bits(darkMask) > bits(litMask) {
+					shape = darkCol
+				}
+				c.SetBGQuad(x, y, shape, sky, mask)
+			}
+		}
+	}
+}
+
+// night is whether the sky is dark enough for the body to be the moon: the
+// zenith under a luma of 80. The body's own colour cannot say -- at 22:20 it
+// is a pinkish grey that reads as warm.
+func (s *Shore) night() bool {
+	t := s.pal.SkyTop
+	return 0.299*float64(t.R)+0.587*float64(t.G)+0.114*float64(t.B) < 80
+}
+
+func bits(m uint8) int {
+	n := 0
+	for ; m != 0; m >>= 1 {
+		n += int(m & 1)
+	}
+	return n
+}
+
+// moonHalo lightens the sky in a soft ring around the disc, at night only:
+// the grey ramp has the steps for it, a daylight sky in the cube does not.
+// Cells the disc painted are left alone.
+func (s *Shore) moonHalo(c *canvas.Canvas, mx, my, rx, ry int, rr, vis float64) {
+	if !s.night() {
+		return
+	}
+	const reach = 2.5
+	for dy := -ry - 3; dy <= ry+3; dy++ {
+		for dx := -rx - 5; dx <= rx+5; dx++ {
+			x, y := mx+dx, my+dy
+			d := math.Hypot(float64(dx)/2.0, float64(dy))
+			if d < rr+0.5 || d > rr+reach {
+				continue
+			}
+			t := 1 - (d-rr-0.5)/(reach-0.5)
+			lift := 0.28 * t * t * vis
+			if lift < 0.03 {
+				continue
+			}
+			c.SetBG(x, y, c.BGAt(x, y).Blend(s.pal.Moon, lift))
 		}
 	}
 }
