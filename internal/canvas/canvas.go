@@ -83,6 +83,13 @@ type Canvas struct {
 
 // halfRef is a cell's two backgrounds, for a shape edge that falls mid-row.
 type halfRef struct {
+	// upSky / downSky: that half is the cell's own background, not the
+	// shape -- the painter passed BGAt for it. On a ramp cell the half then
+	// takes the ramp's tone for its quarter, the same as its neighbours, so
+	// a disc's tip never sits on a differently rounded sliver of sky (his
+	// "thin line underneath the sun", 2026-09-05).
+	upSky, downSky bool
+
 	up, down term.RGB
 	set      bool
 }
@@ -150,9 +157,16 @@ func (c *Canvas) SetBGHalves(x, y int, up, down term.RGB) {
 		return
 	}
 	i := y*c.W + x
+	bg := c.BG[i]
+	onRamp := c.ramp[i].r != nil
 	c.BG[i] = up.Blend(down, 0.5)
-	c.ramp[i] = rampRef{}
-	c.half[i] = halfRef{up: up, down: down, set: true}
+	// The ramp binding stays when a half is plain sky, so resolve can ask
+	// the path for that half's tone.
+	c.half[i] = halfRef{up: up, down: down, set: true,
+		upSky: onRamp && up == bg, downSky: onRamp && down == bg}
+	if !c.half[i].upSky && !c.half[i].downSky {
+		c.ramp[i] = rampRef{}
+	}
 }
 
 // SetBGRamp paints a cell as part of a ramp. t0 and t1 are where the cell's
@@ -296,6 +310,14 @@ func (c *Canvas) resolve(x, y int, p term.Profile) resolved {
 		// dark dot on the crown, and a star behind the moon's edge is not a
 		// thing anyone misses.
 		up, down := p.Quantise(hf.up, false), p.Quantise(hf.down, false)
+		if rr := c.ramp[i]; p == term.Profile256 && term.Ramps && rr.r != nil {
+			if hf.upSky {
+				up = rr.r.Tone(rr.t0 + 0.25*(rr.t1-rr.t0))
+			}
+			if hf.downSky {
+				down = rr.r.Tone(rr.t0 + 0.75*(rr.t1-rr.t0))
+			}
+		}
 		if up != down {
 			ch, fg, bg := term.Split(up, down)
 			return resolved{ch: ch, fg: fg, bg: bg}

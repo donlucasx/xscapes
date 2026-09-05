@@ -1001,3 +1001,16 @@ at 22:10 (lgarzoli out of tokens → donlucasx); artifact ownership checked, see
   exposes it.** His 123.6-column window draws a partial 124th column of RETAINED cells = the
   strip. Full record: `notes/width-audit.md`. The six-column patch above the band is NOT
   reproduced under either rule; open.
+- *"[Image #9] testing on terminal.app, look at the sun, has a think line underneath not sure if
+  intentional (after resizing)"* (12:51, Terminal.app 133x54 by day: a thin, slightly different
+  blue line three cells wide directly under the disc's bottom tip)
+  ⇒ Not intentional, and not the resize. REPRODUCED offline (`notes/sunprobe -w 133 -h 24 -tod
+    0.535 -ctx 0.20`): when the disc's bottom tip lands on a ramp-edge row, the tip cells' SKY
+    half was `p.Quantise(BGAt)` = `5fafd7` while the row's other cells took the ramp path's
+    quarter tone `87afd7` — `SetBGHalves` dropped the cell's ramp binding, so the sky half was
+    rounded on its own. At ctx 0.03 the tip sits on a flat row and the two happen to agree,
+    which is why the first offline frame was clean. **FIXED**: `halfRef.upSky/downSky` (a half
+    that is the cell's own background keeps the ramp binding) and `resolve` takes the ramp's
+    quarter tone for that half. Red-first `TestATipCellsSkyHalfTakesTheRampsTone` with a
+    positive control (a span where rounding and the path disagree, else the test fatals).
+    His window captured by id (`screencapture -l`, read-only) for the pixels.
