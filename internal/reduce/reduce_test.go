@@ -141,12 +141,14 @@ func TestSubagentsCountAndSurviveLostEvents(t *testing.T) {
 	if got := r.State(at(2)).Kittens; got != 3 {
 		t.Errorf("duplicate start changed the count to %d", got)
 	}
-	r.Apply(event.Event{Kind: event.SubEnd, Agent: "b"}, at(3))
-	if got := r.State(at(3)).Kittens; got != 2 {
+	// An end past the dwell drops the count at once.
+	e := KittenDwell.Seconds() + 3
+	r.Apply(event.Event{Kind: event.SubEnd, Agent: "b"}, at(e))
+	if got := r.State(at(e)).Kittens; got != 2 {
 		t.Errorf("kittens = %d, want 2", got)
 	}
 	// A stop event that never arrives must not strand a kitten forever.
-	if got := r.State(at(3 + SubStale.Seconds() + 1)).Kittens; got != 0 {
+	if got := r.State(at(e + SubStale.Seconds() + 1)).Kittens; got != 0 {
 		t.Errorf("stale subagents should age out, still showing %d", got)
 	}
 }

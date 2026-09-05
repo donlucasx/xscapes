@@ -70,6 +70,14 @@ var (
 	// the exit is a position, not a rate, so a glance still reads it.
 	KittenExit = 6 * time.Second
 
+	// KittenDwell is the least time a kitten stays in the litter after its
+	// subagent starts. A subagent that finishes in seconds was invisible: its
+	// kitten had come and swum off before anyone looked (his report, twice,
+	// 2026-09-04 and 2026-09-05, agents of 6.9 s and 15.7 s). An end that
+	// arrives inside the dwell is remembered, and the swim-off waits for it.
+	// His ruling, 2026-09-05.
+	KittenDwell = 60 * time.Second
+
 	// SubStale drops a subagent whose end event never arrived, so one lost
 	// event does not strand a kitten on the beach for the rest of the day.
 	SubStale = 30 * time.Minute
@@ -94,10 +102,11 @@ type State struct {
 	// brief locks done and needs_input as distinct cues.
 	BubbleAsk bool
 
-	// Kittens is how many subagents are running right now.
+	// Kittens is how many subagents are running right now, plus any that
+	// finished inside their KittenDwell and are still sitting it out.
 	Kittens int
-	// KittenExits is one entry per subagent that finished within KittenExit:
-	// how far along its swim off it is, 0 at the end event, 1 when gone.
+	// KittenExits is one entry per subagent whose swim-off is under way: how
+	// far along it is, 0 when it leaves the litter, 1 when gone.
 	// Oldest first.
 	KittenExits []float64
 
@@ -133,7 +142,7 @@ type Reducer struct {
 
 	flight map[string]inflight
 	subs   map[string]time.Time
-	gone   map[string]time.Time // subagents that ended, until their kitten has swum off
+	gone   map[string]time.Time // subagents that ended: when each kitten leaves (may be ahead of now, the dwell), until it has swum off
 
 	worried    bool
 	needsInput bool
@@ -263,10 +272,18 @@ func (r *Reducer) Apply(e event.Event, now time.Time) {
 
 	case event.SubEnd:
 		if e.Agent != "" {
-			if _, ok := r.subs[e.Agent]; ok {
-				r.gone[e.Agent] = now
+			if started, ok := r.subs[e.Agent]; ok {
+				// The kitten leaves at the end, or at the end of its dwell,
+				// whichever is later. Until then it stays in the litter.
+				leave := now
+				if d := started.Add(KittenDwell); d.After(now) {
+					leave = d
+				}
+				r.gone[e.Agent] = leave
+				if !leave.After(now) {
+					delete(r.subs, e.Agent)
+				}
 			}
-			delete(r.subs, e.Agent)
 		}
 		r.heat += Impulse
 
@@ -331,6 +348,10 @@ func (r *Reducer) decay(now time.Time) {
 		}
 	}
 	for id, t := range r.gone {
+		if t.After(now) {
+			continue // still dwelling, still in the litter
+		}
+		delete(r.subs, id) // its dwell is over: the swim-off has begun
 		if now.Sub(t) >= KittenExit {
 			delete(r.gone, id)
 		}
@@ -350,7 +371,13 @@ func (r *Reducer) kittenExits(now time.Time) []float64 {
 	}
 	gs := make([]g, 0, len(r.gone))
 	for id, t := range r.gone {
+		if t.After(now) {
+			continue // dwelling: counted in Kittens, not leaving yet
+		}
 		gs = append(gs, g{id, t})
+	}
+	if len(gs) == 0 {
+		return nil
 	}
 	sort.Slice(gs, func(i, j int) bool {
 		if !gs[i].at.Equal(gs[j].at) {

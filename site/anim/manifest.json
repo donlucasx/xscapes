@@ -33,10 +33,10 @@
   },
   {
     "name": "resting",
-    "frames": 40,
+    "frames": 80,
     "fps": 10,
-    "note": "dawn, half a minute later: flat sea, the writing receding",
-    "secs": 4,
+    "note": "dawn, half a minute later: flat sea, the writing receding, the litter swims off as its dwell ends",
+    "secs": 8,
     "px": 14
   }
 ]

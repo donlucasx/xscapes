@@ -146,11 +146,12 @@ write side (`MirrorBatch`) ·
 2. **kittens, the SECOND report** (s19, *"i did not see any multi agents at work"*): measured, not a
 channel bug — his two subagents lived 6.9 s and 15.7 s, and a kitten lives from SubStart to 6 s past
 SubEnd (`reduce.KittenExit`), so the whole lifecycle passed before he looked; a re-run with 2.5 and
-4.7 min agents is unanswered. HIS design call: a minimum dwell for a kitten (a finished-work fact
-that lingers, like the stars) or short subagents accepted as invisible ·
+4.7 min agents is unanswered. HIS RULING (*"agreed with your rec"*) → **SHIPPED + INSTALLED, s18**:
+`reduce.KittenDwell` 60 s, and the exit queue rule the regenerated clips exposed (`exitSpans`, a fan-out
+now leaves as a queue, not one stacked shape); page, clips, deck, PDF regenerated. `_FEEDBACK.md` s18 ·
 3. **the brief's companion figure is stale** (s19, measured here too): `CLAUDE.md` says "3–4 lines
 tall"; `CatBody` is 24x28 px and `Size()` is W/2, H/4, so the shipped cat is **12 cols x 7 rows**. HIS call
-which figure is right before any new companion is drawn; the brief's line stays until he rules ·
+which figure is right — HIS RULING *"fix it"* → **DONE, s18**: `CLAUDE.md` says 12 columns by 7 rows as shipped ·
 4. his picks on the s19 research, none chosen (five scenes: hearth/cabin · rainy window · café table ·
 aquarium · snow cabin; five companions: owl · rabbit · frog · hedgehog · otter; `_FEEDBACK.md` s19) ·
 the patch above the band (a hosted probe under scripted width+height drags, pixels via

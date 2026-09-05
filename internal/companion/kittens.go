@@ -440,6 +440,78 @@ func max(a, b int) int {
 	return b
 }
 
+// exitSpans lays the leaving kittens out. The exit lane is the top one:
+// nearest the horizon, which is where "leaving" points, and clear of the
+// sitters on the sand. Each exit's progress 0..1 runs it from beside the
+// parent to the far edge (mirrored, the far edge is the left one).
+//
+// The queue rule: no exit is ahead of, or on top of, the one placed before
+// it. A kitten that would be is held one width behind it, and one held back
+// past the start of the lane has not entered it yet. The dwell makes a
+// fan-out leave at one instant, and without this rule five kittens swimming
+// off were drawn on one another and read as one.
+func (c *Cat) exitSpans(exits []float64, px, py, w, seaTop, seaBot int) []swimSpan {
+	if len(exits) == 0 {
+		return nil
+	}
+	if c.swim == nil {
+		c.swim = ParseBitmap(KittenSwim)
+	}
+	kw, kh := c.swim.W/2, c.swim.H/4
+	pw, ph := c.Size()
+	top := seaTop + 1
+	bot := py + ph - 4
+	if seaBot > 0 && seaBot < bot {
+		bot = seaBot
+	}
+	if (bot-top)/kh < 1 {
+		return nil
+	}
+	y := top
+	if y+kh > bot {
+		return nil
+	}
+	from, to := px+pw+1, w-1-kw
+	if c.mirror {
+		from, to = px-1-kw, 1
+	}
+	if (to-from)*(to-from) < (kw+2)*(kw+2) {
+		return nil
+	}
+	var out []swimSpan
+	prev := 0
+	for k, p := range exits {
+		if p >= 1 || p < 0 {
+			continue
+		}
+		x := from + int(float64(to-from)*p+0.5)
+		if len(out) > 0 {
+			if c.mirror {
+				// Leaving is leftward: behind means a larger x.
+				if lim := prev + kw + 1; x < lim {
+					x = lim
+				}
+				if x > from {
+					continue
+				}
+			} else {
+				if lim := prev - kw - 1; x > lim {
+					x = lim
+				}
+				if x < from {
+					continue
+				}
+			}
+		}
+		if x < 1 || x+kw >= w {
+			continue
+		}
+		out = append(out, swimSpan{k, x, x + kw - 1, y})
+		prev = x
+	}
+	return out
+}
+
 // DrawKittenExits draws one swimmer per finished subagent, each on its way
 // out: from the open water beside the litter toward the far edge of the frame
 // as its progress runs 0 to 1, receding (lower alpha) over the second half,
@@ -447,46 +519,15 @@ func max(a, b int) int {
 // it, and the litter count itself dropped the moment the end event came.
 // Returns how many were drawn.
 func (c *Cat) DrawKittenExits(l *canvas.Layer, exits []float64, px, py, w, seaTop, seaBot int, t float64, seed int64) int {
-	if len(exits) == 0 {
+	spans := c.exitSpans(exits, px, py, w, seaTop, seaBot)
+	if len(spans) == 0 {
 		return 0
-	}
-	if c.swim == nil {
-		c.swim = ParseBitmap(KittenSwim)
 	}
 	kw, kh := c.swim.W/2, c.swim.H/4
-	_, ph := c.Size()
-	top := seaTop + 1
-	bot := py + ph - 4
-	if seaBot > 0 && seaBot < bot {
-		bot = seaBot
-	}
-	lanes := (bot - top) / kh
-	if lanes < 1 {
-		return 0
-	}
-	// The exit lane is the top one: nearest the horizon, which is where
-	// "leaving" points, and clear of the sitters on the sand.
-	y := top
-	pw, _ := c.Size()
-	// From beside the parent to the far edge; mirrored, the far edge is the
-	// left one.
-	from, to := px+pw+1, w-1-kw
-	if c.mirror {
-		from, to = px-1-kw, 1
-	}
-	if (to-from)*(to-from) < (kw+2)*(kw+2) {
-		return 0
-	}
 	drawn := 0
 	var pend []pendingEyes
-	for k, p := range exits {
-		if p >= 1 || p < 0 {
-			continue
-		}
-		x := from + int(float64(to-from)*p+0.5)
-		if x < 1 || x+kw >= w || y+kh > bot {
-			continue
-		}
+	for _, s := range spans {
+		k, p, x, y := s.i, exits[s.i], s.x0, s.y
 		alpha := 1.0
 		if p > 0.5 {
 			alpha = 1 - 0.65*(p-0.5)/0.5

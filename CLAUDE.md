@@ -2,6 +2,17 @@
 
 *(Renamed end to end on 2026-09-03: directory, env vars, state path and hook marker. Two names are kept on purpose and are not leftovers -- `internal/envx` still reads `ASCIISCAPES_*` and warns, and `install.go` still RECOGNISES the `# asciiscapes:v1` marker so the hooks it wrote before the rename can be found and removed.)*
 
+> **Session 18 (2026-09-05, the hub session), his two rulings SHIPPED + INSTALLED.** *"decision 1:
+> agreed with your rec. Decision 2: fix it"* ⇒ **a kitten stays at least 60 s after its subagent
+> starts** (`reduce.KittenDwell`; an end inside the dwell is remembered, the swim-off waits for it),
+> and **the companion is 12 columns by 7 rows** in the table and the Companion bullet below (the
+> "3–4 lines" was stale). The dwell makes a fan-out leave at one instant, and the exit painter drew
+> them on one another as one kitten — the exit lane now queues them (`exitSpans`, red-first test).
+> Page, clips (the resting clip is 8 s: the litter swims off at dawn), deck and PDF regenerated;
+> the binary installed through a new inode. Earlier in the session: the brand guidelines say ink on
+> the page and deck (`fb6d9ee`), and the corruption's third repro is recorded with the
+> read-back-first order. Details in `RESUME.md`, `_FEEDBACK.md` s18.
+>
 > **Session 19 (2026-09-05), WRAPPED. No code changed; three things wait on him.** A live features
 > test run INSIDE `xscapes claude` at his ask, plus two research streams. **The scrollback corruption
 > REPRODUCED a third time and was UNTRACED again** (his screenshot of this session's own scrollback:
@@ -217,7 +228,7 @@ only if nothing else needs it.
 | companion identity | **coat + face**: cream/slate/sage/mauve/charcoal, nose, toes, inner-shadow ears, whiskers | ⏸ options built, awaiting Lucas's pick; nothing defaulted |
 | what it is doing now | **text written in the sand**, newest brightest, older fading as the tide takes them | done — anchored to the waterline, degrades by dropping whole pieces when narrow. **The lower beach falls away to black (`DefaultSandFade` = 1.0, locked 2026-09-01)**: contrast on the newest line 132→204 at midday, 148→204 at night, and equal at every hour, so legibility stops depending on the clock. Ink is sampled from the PAINTED background per row, never the palette's nominal sand. |
 | todos completed | **star count** | done 2026-09-02 &mdash; a constellation in the upper sky, `*` for each finished todo. ~~`&#8728;` for each outstanding one, so it reads *n of N*~~ &mdash; **the ring is GONE (his ruling 2026-09-05: "discard the ring altogether, it's not clear what it means")**; the sky says *n*. Position is fixed by index and seed so a star lights where it always was. Held at a visibility floor like the moon: a completed todo is a fact about the AGENT and `StarVis` is 0 at noon. ⚠ **TodoWrite has been called ZERO times in the whole recorded history** &mdash; 13,682 tool events &mdash; so today it only lights from `xscapes emit todo` or the demo cycle. |
-| subagents | **kittens** | done — `agent_id`/`agent_type`, counted live |
+| subagents | **kittens** | done — `agent_id`/`agent_type`, counted live; **a kitten stays at least 60 s after its start** before it swims off (`reduce.KittenDwell`; his ruling 2026-09-05, after twice not seeing subagents that lived 7–16 s) |
 
 Rejected and why: session-elapsed as its own variable (the real clock covers it,
 and a session-relative sky lies about the world); weather carrying activity (it
@@ -317,7 +328,7 @@ pane, where 80% used to leave a single row.
   Completed todos light stars. Subagents appear as kittens.
 
 **Companion**
-- 3–4 lines tall, resident not subject. States: resting, working (small idle motion), needs-you (walks to the edge nearest the agent pane, shows `!`).
+- 12 columns by 7 rows as shipped (`CatBody` 24x28 px drawn at half width, quarter height; the brief said "3–4 lines" until 2026-09-05, corrected on his ruling, and a new companion is designed against 12x7), resident not subject. States: resting, working (small idle motion), needs-you (walks to the edge nearest the agent pane, shows `!`).
 - Shortlist: cat and bird. Fox and wisp as alternates. Decide after rendering real frames.
 - Companion is global (same across repos); has a name.
 

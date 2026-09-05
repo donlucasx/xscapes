@@ -30,7 +30,7 @@ var gifScenes = []gifScene{
 	{"worried", 22, 0.62, 4, "a command exited 1: the companion carries it"},
 	{"ask", 30, 0.80, 4, "dusk: the agent needs permission, solid balloon, alert pose"},
 	{"done", 44, 0.96, 5, "night: done, dotted balloon, the constellation, the moon with its readout"},
-	{"resting", 72, 0.27, 4, "dawn, half a minute later: flat sea, the writing receding"},
+	{"resting", 72, 0.27, 8, "dawn, half a minute later: flat sea, the writing receding, the litter swims off as its dwell ends"},
 }
 
 // GIFFPS is the clip rate. Ten a second is the scape's own cadence rounded

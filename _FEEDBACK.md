@@ -1239,3 +1239,22 @@ at 22:10 (lgarzoli out of tokens → donlucasx); artifact ownership checked, see
     mirrored rows, so a traced restart DESTROYS the evidence a read-back would read. If both are
     wanted: read back FIRST, then restart. ⏸ Both waiting on him; his OK for read-only Terminal
     automation was per-session and needs asking again.
+
+## 2026-09-05 — session 18 (the hub session, resumed 15:40; his two rulings came after s19 wrapped)
+
+- *"decision 1: agreed with your rec. Decision 2: fix it"* (after 16:00, answering the two s19
+  findings put to him: (1) subagents he never saw, a minimum dwell or short subagents accepted as
+  invisible; (2) the brief's "3–4 lines tall" against the shipped 12x7 cat)
+  ⇒ **LOCKED 2026-09-05: a kitten stays at least 60 s after its subagent starts**
+    (`reduce.KittenDwell`; an end inside the dwell is remembered and the swim-off waits for it; a
+    restart during the dwell is simply running again). Red first:
+    `TestAShortSubagentsKittenStaysForTheDwell`, `TestASubagentThatRestartsDuringItsDwellIsRunningAgain`;
+    the two older kitten tests moved past the dwell. **Found in the regenerated clips, not in a
+    test**: the dwell makes a fan-out leave at ONE instant, and the exit painter placed every exit
+    by its progress alone, so five kittens swimming off were drawn on one another and read as one.
+    Fixed with a queue rule (`exitSpans`: each exit one kitten's width behind the one before it;
+    `TestExitsNeverShareColumns`, red first). The demo's resting clip runs 8 s so the litter's
+    swim-off at dawn fits in it; page, clips, deck and PDF regenerated; the binary rebuilt and
+    installed through a new inode. His session must restart to show it.
+  ⇒ **The brief corrected** (`CLAUDE.md`): the companion is 12 columns by 7 rows as shipped, and the
+    kittens row of the locked table carries the dwell.
