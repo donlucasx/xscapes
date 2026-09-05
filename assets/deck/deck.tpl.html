@@ -1,0 +1,241 @@
+<title>xscapes Submission Deck</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Geist+Mono:wght@400;700&family=Geist:wght@400;500;600&display=swap">
+<style>
+/* xscapes deck template, on the brand guidelines v1.0 (assets/brand/guidelines.html).
+   One <section class="s ..."> per slide, 1920 x 1080, scaled to the window; print gives one slide per page.
+   Slide kinds: .title (Reverse, gold cell) · .statement · .table · .frame (a real rendered frame) · .diagram · .split · .numbers · .list · .close (Reverse). */
+:root{--g:#121212;--s:#1c1c1c;--ln:#303030;--d:#8a8a8a;--i:#eeeeee;--acc:#87afff;--gold:#d7af5f;--k:1;
+  --mono:"Geist Mono",ui-monospace,"SF Mono",Menlo,monospace;--sans:"Geist",-apple-system,BlinkMacSystemFont,"Segoe UI",Helvetica,Arial,sans-serif}
+*{box-sizing:border-box}
+html,body{margin:0;background:#000;color:var(--i)}
+body{font-family:var(--sans);scroll-snap-type:y mandatory;overflow-y:auto;height:100vh}
+.page{height:100vh;scroll-snap-align:start;display:flex;align-items:center;justify-content:center;background:#000}
+.stage{width:calc(1920px * var(--k));height:calc(1080px * var(--k));overflow:hidden;flex:none}
+.s{width:1920px;height:1080px;transform:scale(var(--k));transform-origin:top left;background:var(--g);padding:96px 120px 84px;display:flex;flex-direction:column;justify-content:space-between;position:relative;overflow:hidden}
+.counter{position:fixed;right:18px;bottom:14px;font:12px var(--mono);color:#585858;z-index:9}
+.hint{position:fixed;left:18px;bottom:14px;font:12px var(--mono);color:#585858;z-index:9}
+body.all{scroll-snap-type:none;height:auto;padding:40px 0}
+body.all .page{height:auto;margin:0 auto 36px;display:block;width:960px}
+body.all .stage{width:960px;height:540px}
+body.all .s{transform:scale(.5)}
+body.all .counter,body.all .hint{display:none}
+@media print{
+  @page{size:1920px 1080px;margin:0}
+  html,body{background:var(--g);height:auto;overflow:visible;scroll-snap-type:none}
+  .page{height:1080px;display:block;break-after:page;page-break-after:always}
+  .stage{width:1920px;height:1080px}
+  .s{transform:none}
+  .counter,.hint{display:none}
+}
+/* the mark */
+.blk{display:inline-block;width:1ch;line-height:1.2em;text-align:center;vertical-align:top;background:var(--i);color:var(--g);font-family:var(--mono);font-weight:700}
+.blk.gold{background:var(--gold)}
+.lockup{font:700 1em/1.2 var(--mono);letter-spacing:0;white-space:nowrap}
+/* type scale, deck */
+.t72{font:600 72px/1.05 var(--sans);letter-spacing:-.02em;margin:0;text-wrap:balance}
+.t56{font:600 56px/1.1 var(--sans);letter-spacing:-.02em;margin:0;text-wrap:balance}
+.t32{font:400 32px/1.3 var(--sans);margin:0;color:var(--d)}
+.t26{font:400 26px/1.45 var(--sans);margin:0;max-width:62ch}
+.m20{font:400 20px/1.5 var(--mono);color:var(--d);margin:0}
+.m16{font:400 16px/1.4 var(--mono);color:var(--d);margin:0;letter-spacing:.02em}
+.accent{color:var(--acc)}
+.goldtx{color:var(--gold)}
+.foot{display:flex;justify-content:space-between;align-items:flex-end;font:16px/1.4 var(--mono);color:var(--d)}
+.foot .lockup{font-size:22px;color:var(--i)}
+.head{display:flex;flex-direction:column;gap:22px}
+.body{flex:1;display:flex;flex-direction:column;justify-content:center;gap:28px;min-height:0}
+/* title + close */
+.title,.close{justify-content:space-between}
+.title .lockup,.close .lockup{font-size:120px}
+/* table */
+table{border-collapse:collapse;width:100%;font:26px/1.35 var(--sans)}
+td,th{padding:20px 0;border-bottom:1px solid var(--ln);vertical-align:top;text-align:left}
+th{font:16px/1.2 var(--mono);letter-spacing:.06em;text-transform:uppercase;color:var(--d);padding:0 0 14px;font-weight:400}
+td:first-child{color:var(--d);width:34%;padding-right:40px}
+td.m{font:22px/1.4 var(--mono)}
+.two{display:grid;grid-template-columns:1fr 1fr;gap:80px;align-items:start}
+/* frames */
+.win{background:#000;border:1px solid var(--ln);padding:18px 22px;width:max-content;max-width:100%}
+.win pre{margin:0;font:26px/1.0 var(--mono);letter-spacing:0;display:inline-block}
+.frame .body{align-items:center;justify-content:center;padding:12px 0}
+.capbar{display:flex;gap:40px;align-items:baseline}
+.capbar .t26{max-width:none}
+/* split: frame left, facts right */
+.split .body{flex-direction:row;gap:64px;align-items:center}
+.split .win pre{font-size:20px}
+.split .facts{display:flex;flex-direction:column;gap:26px;max-width:600px}
+.code{background:var(--s);border:1px solid var(--ln);padding:22px 26px;font:19px/1.6 var(--mono);color:var(--i);white-space:pre;overflow:hidden}
+.code .c{color:var(--d)}
+/* diagram */
+.dg{display:grid;grid-template-columns:1fr 64px 1fr 64px 1fr;gap:0;align-items:start}
+.diagram .body{justify-content:flex-start;gap:24px}
+.box{background:var(--s);border:1px solid var(--ln);padding:28px 30px;display:flex;flex-direction:column;gap:10px}
+.box h4{font:16px/1.2 var(--mono);letter-spacing:.06em;text-transform:uppercase;color:var(--d);margin:0 0 8px;font-weight:400}
+.box .ev{font:20px/1.55 var(--mono);color:var(--i);columns:2;column-gap:28px}
+.box p{margin:0;font:22px/1.4 var(--sans)}
+.box .nx{color:var(--d)}
+.arrow{display:flex;align-items:center;justify-content:center;color:var(--d);font:700 34px var(--mono)}
+.adapters{display:grid;grid-template-columns:1fr 1fr;gap:24px}
+/* numbers */
+.tiles{display:grid;grid-template-columns:repeat(3,1fr);gap:24px}
+.tile{background:var(--s);border:1px solid var(--ln);padding:36px 34px 32px;display:flex;flex-direction:column;gap:14px;min-height:340px}
+.tile .n{font:600 96px/1 var(--sans);letter-spacing:-.03em;font-variant-numeric:tabular-nums}
+.tile .n small{font:400 32px/1 var(--sans);color:var(--d);letter-spacing:0;margin-left:10px}
+.tile p{margin:0;font:22px/1.45 var(--sans);color:var(--d)}
+.tile p b{color:var(--i);font-weight:500}
+/* list */
+ul.big{margin:0;padding:0;list-style:none;display:flex;flex-direction:column;gap:22px;font:28px/1.4 var(--sans);max-width:1200px}
+ul.big li{padding-left:44px;position:relative}
+ul.big li:before{content:"";position:absolute;left:0;top:.55em;width:18px;height:2px;background:var(--acc)}
+ul.big li span{color:var(--d)}
+@@FRAMECSS@@
+</style>
+
+<div class="hint">arrows to move &middot; print for a PDF, one slide per page</div>
+<div class="counter"><span id="cur">1</span> / <span id="tot">11</span></div>
+
+<!-- 1 · title (Reverse) -->
+<div class="page"><div class="stage"><section class="s title">
+  <div class="lockup"><span class="blk gold">x</span>scapes</div>
+  <div class="head"><h1 class="t72">The waiting layer for terminal agents.</h1><p class="t32">An event protocol, pluggable adapters, and one reference scape.</p></div>
+  <div class="foot"><span>Commons &middot; Make Waiting for AI Fun</span><span class="goldtx">September 2026</span></div>
+</section></div></div>
+
+<!-- 2 · statement -->
+<div class="page"><div class="stage"><section class="s statement">
+  <div class="body" style="gap:40px"><h2 class="t72">Waiting for an agent is dead time.</h2><p class="t26" style="font-size:32px;line-height:1.4;max-width:30em;color:var(--d)">You send a prompt, the terminal goes quiet, you tab away, and then you forget to come back. Agents now think for minutes at a time, and that time has no face.</p></div>
+  <div class="foot"><span class="lockup"><span class="blk">x</span>scapes</span><span>02</span></div>
+</section></div></div>
+
+<!-- 3 · frame: working -->
+<div class="page"><div class="stage"><section class="s frame">
+  <div class="head"><h2 class="t56">One command. Claude Code runs inside a shoreline.</h2></div>
+  <div class="body"><div class="win"><pre>@@FRAME0@@</pre></div></div>
+  <div class="capbar"><p class="m20" style="max-width:none"><span class="accent">Fourteen seconds into a turn.</span> Edits landing, five subagents out, the sand carrying the last tool calls. Rendered by the real engine from the events a Claude Code hook emits, as a 256-colour terminal shows it.</p></div>
+</section></div></div>
+
+<!-- 4 · table: what a glance tells you -->
+<div class="page"><div class="stage"><section class="s table">
+  <div class="head"><h2 class="t56">What a glance tells you</h2><p class="t32">Nothing to read, nothing to configure, and the agent's own screen is untouched.</p></div>
+  <div class="body"><table>
+    <tr><td>how hard it is working</td><td>the swells: how many are travelling, how tall, whitecaps above half</td></tr>
+    <tr><td>what it is doing right now</td><td>written in the sand, newest brightest, older lines fading as the tide takes them</td></tr>
+    <tr><td>something broke</td><td>the companion, not the weather: ears back, hunched, amber eyes, until it clears</td></tr>
+    <tr><td>context remaining</td><td>the moon: its phase and its height</td></tr>
+    <tr><td>it needs you</td><td>a knock and a sound, and a different one for done</td></tr>
+  </table></div>
+  <div class="foot"><span class="lockup"><span class="blk">x</span>scapes</span><span>04</span></div>
+</section></div></div>
+
+<!-- 5 · the rule -->
+<div class="page"><div class="stage"><section class="s table">
+  <div class="head"><h2 class="t56">The water is the work. The sky is the world.</h2><p class="t32">One variable per perceptual channel. Nothing crosses. Encoded in coverage, count or position, never in rate, because a glance is the entire budget and a screenshot has no motion.</p></div>
+  <div class="body"><div class="two">
+    <table><tr><th>the agent</th><th></th></tr>
+      <tr><td>busy, how hard</td><td>swells</td></tr>
+      <tr><td>doing now</td><td>text in the sand</td></tr>
+      <tr><td>broken</td><td>the companion's pose</td></tr>
+      <tr><td>needs you, done</td><td>a bubble, rare</td></tr>
+      <tr><td>context left</td><td>the moon</td></tr>
+      <tr><td>todos</td><td>stars, lit as they finish</td></tr>
+      <tr><td>subagents</td><td>kittens</td></tr>
+    </table>
+    <table><tr><th>the world</th><th></th></tr>
+      <tr><td>time of day</td><td>sky colour, the real clock</td></tr>
+      <tr><td>weather</td><td><span style="color:var(--d)">deferred on purpose: it would be read as activity</span></td></tr>
+    </table>
+  </div></div>
+  <div class="foot"><span class="lockup"><span class="blk">x</span>scapes</span><span>05</span></div>
+</section></div></div>
+
+<!-- 6 · frame: needs you -->
+<div class="page"><div class="stage"><section class="s frame">
+  <div class="head"><h2 class="t56">The nudge has to beat a terminal bell.</h2></div>
+  <div class="body"><div class="win"><pre>@@FRAME3@@</pre></div></div>
+  <div class="capbar"><p class="m20" style="max-width:none"><span class="accent">Dusk. The agent needs permission.</span> A solid balloon, a warm colour, a chime. Done is a dotted balloon, a cool colour, a low note. Two cues you can tell apart from across the room, and each rings once.</p></div>
+</section></div></div>
+
+<!-- 7 · the layer -->
+<div class="page"><div class="stage"><section class="s diagram">
+  <div class="head"><h2 class="t56">Underneath, a protocol. Any agent that can emit ten events gets every scape.</h2></div>
+  <div class="body">
+    <div class="dg">
+      <div class="box"><h4>events</h4><div class="ev">session_start<br>prompt<br>tool<br>error<br>test_pass<br>test_fail<br>compact<br>needs_input<br>done<br>session_end</div><p class="nx" style="font-size:18px;margin-top:8px">tool carries a kind: read, write, edit, search, shell, web, subagent, todo, mcp</p></div>
+      <div class="arrow">&rarr;</div>
+      <div class="box"><h4>engine</h4><p>A Unix socket, with a JSON-lines file as the fallback.</p><p>One reducer turns the stream into a level, a tail, a pose, a bubble.</p><p class="nx">Recordings replay offline, so the mapping is tuned on real sessions, not on a demo.</p></div>
+      <div class="arrow">&rarr;</div>
+      <div class="box"><h4>scapes</h4><p>Shore <span class="accent">shipped</span></p><p class="nx">Campsite, rainy window: next. Each fills six slots: light, sky, motion, surface, accumulator, companion.</p></div>
+    </div>
+    <div class="adapters">
+      <div class="box"><h4>adapter &middot; Claude Code hooks <span class="accent">shipped</span></h4><p>Installed with one command. Your settings are merged, not replaced, and the uninstall restores them byte for byte.</p></div>
+      <div class="box"><h4>adapter &middot; any process <span class="nx">next</span></h4><p>Busy means alive and printing; done means the prompt is back. Enough for agents with no hooks at all.</p></div>
+    </div>
+  </div>
+  <div class="foot"><span class="lockup"><span class="blk">x</span>scapes</span><span>07</span></div>
+</section></div></div>
+
+<!-- 8 · split: native -->
+<div class="page"><div class="stage"><section class="s split">
+  <div class="head"><h2 class="t56">One Go binary. No dependencies. Any 256-colour terminal.</h2></div>
+  <div class="body">
+    <div class="win"><pre>@@FRAME4@@</pre></div>
+    <div class="facts">
+      <p class="t26">Every colour is an xterm-256 index, so the picture is the same on every terminal and every profile. Terminal.app, iTerm2, Ghostty.</p>
+      <p class="t26">Claude Code runs in the same window, no tmux. The older side-by-side layout is one flag away.</p>
+      <div class="code">go install github.com/donlucasx/xscapes@latest
+xscapes install claude --apply
+xscapes claude</div>
+    </div>
+  </div>
+  <div class="foot"><span class="lockup"><span class="blk">x</span>scapes</span><span>08</span></div>
+</section></div></div>
+
+<!-- 9 · numbers -->
+<div class="page"><div class="stage"><section class="s numbers">
+  <div class="head"><h2 class="t56">Built against measurement, not against a demo.</h2><p class="t32">Every visual claim was checked on the rendered frame, not on what the source says it should do.</p></div>
+  <div class="body"><div class="tiles">
+    <div class="tile"><div class="n">13,682</div><p><b>tool events</b> from real Claude Code sessions, recorded by the hooks and folded through the reducer offline to tune what the sea does.</p></div>
+    <div class="tile"><div class="n">48</div><p><b>half-hours</b> of sky and sea measured on the rendered frame, so the gradient bands were counted, not eyeballed.</p></div>
+    <div class="tile"><div class="n">43<small>%</small></div><p><b>of "notification" hooks</b> turned out to be a 60-second idle nag, not a request for input. Measured on 12,809 events, and the adapter tells them apart.</p></div>
+  </div></div>
+  <div class="foot"><span class="lockup"><span class="blk">x</span>scapes</span><span>09</span></div>
+</section></div></div>
+
+<!-- 10 · list: repeatability -->
+<div class="page"><div class="stage"><section class="s list">
+  <div class="head"><h2 class="t56">A companion for the session, not a toy for the task.</h2></div>
+  <div class="body"><ul class="big">
+    <li>It runs for the whole session. Tasks move the scene; the day passes over it.</li>
+    <li>The same repository always gets the same shoreline, seeded from its git root. The companion is yours across all of them.</li>
+    <li>Three interactions, one keypress each, and it never becomes a game. <span>Pet the companion, plant a tree, skip a stone.</span></li>
+    <li>Next: the campsite and the rainy window, an adapter for any process, and a browser gallery for people who will not install a binary. <span>All MIT, public since day one.</span></li>
+  </ul></div>
+  <div class="foot"><span class="lockup"><span class="blk">x</span>scapes</span><span>10</span></div>
+</section></div></div>
+
+<!-- 11 · close (Reverse) -->
+<div class="page"><div class="stage"><section class="s close">
+  <div class="lockup"><span class="blk gold">x</span>scapes</div>
+  <div class="head"><p class="t72" style="font-size:56px">a thinking screen for terminal agents</p><div class="code" style="font-size:26px;width:max-content">go install github.com/donlucasx/xscapes@latest
+xscapes claude</div></div>
+  <div class="foot"><span>github.com/donlucasx/xscapes &middot; MIT</span><span class="goldtx">Lucas Garzoli &middot; Los Angeles</span></div>
+</section></div></div>
+
+<script>
+(function(){
+  var pages=[].slice.call(document.querySelectorAll('.page'));
+  document.getElementById('tot').textContent=pages.length;
+  if(/(^|[?&])all(=|&|$)/.test(location.search)) document.body.classList.add('all');
+  function fit(){var k=Math.min(innerWidth/1920, innerHeight/1080); document.documentElement.style.setProperty('--k', k.toFixed(4));}
+  fit(); addEventListener('resize',fit);
+  function idx(){var y=document.body.scrollTop||document.documentElement.scrollTop||0; return Math.round(y/innerHeight);}
+  function go(i){i=Math.max(0,Math.min(pages.length-1,i)); pages[i].scrollIntoView({behavior:'smooth',block:'start'}); document.getElementById('cur').textContent=i+1;}
+  addEventListener('keydown',function(e){
+    if(document.body.classList.contains('all')) return;
+    if(['ArrowRight','ArrowDown','PageDown',' '].indexOf(e.key)>=0){e.preventDefault();go(idx()+1);}
+    if(['ArrowLeft','ArrowUp','PageUp'].indexOf(e.key)>=0){e.preventDefault();go(idx()-1);}
+  });
+  var t; addEventListener('scroll',function(){clearTimeout(t); t=setTimeout(function(){document.getElementById('cur').textContent=idx()+1;},80);},true);
+  var h=parseInt((location.hash||'').replace('#',''),10); if(h>0) setTimeout(function(){go(h-1);},50);
+})();
+</script>

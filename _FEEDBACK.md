@@ -1089,3 +1089,13 @@ at 22:10 (lgarzoli out of tokens → donlucasx); artifact ownership checked, see
     warm; the same test stripped the night moon's dark face in the no-shadow column. Both now key on
     the sky's luma (`Shore.night`). Caught by sampling the page's pixels, not by looking at it.
     **His pick pending.** Recommendation: quad edge + sun without shadow + night halo.
+- *"sun looks wrong and there are sub agents "swimming" on the sand (also wrong). I will have
+  additional notes as well, so just save it as a draft for now (no edits needed, just notes) and we ll
+  revisit it once we are done w the fixes on the other session"* (the deck, first pass, artifact
+  https://claude.ai/code/artifact/6a42a717-461d-4778-bcef-5bd343e21b7c, commit `9c5da75`)
+  ⇒ **DECK = DRAFT, parked.** Two renderer notes, not deck notes: the three frames are lifted verbatim
+    from `site/index.html` (frames 0, 3, 4 of its five), which `xscapes -site site` rendered from
+    `demoTurn` BEFORE the s15/s16 fixes (round moon at every height, the kitten lanes, the tip sliver),
+    so the sun and the kittens' placement are the OLD renderer's. Regenerate after the engineering
+    session's fixes: `go run . -site site` then `python3 assets/deck/make-deck.py`. More notes to come;
+    no edits until then.
