@@ -132,9 +132,17 @@ python3 site/make-gifs.py && python3 assets/deck/make-deck.py`, then the Chrome 
 **▶ NEXT:** 0. HIS LOOK at `site/index.html` and `assets/deck/index.html` (both open locally; the
 clips play) · then Commons: publish the page (the clips are files: upload `anim/` or host `site/`
 on GitHub Pages, `site/COMMONS-PROMPT.md`), his 45–60 s Terminal.app recording, SUBMIT (closes
-09-17) · 1. a TRACED working session in Terminal.app (`XSCAPES_TRACE=/tmp/apple.bin xscapes
-claude`) that he works in until the mirrored rows corrupt, then a read-back of the same window
-(his OK stands for read-only) → diff the model's kept rows against the buffer, fix the divergence ·
+09-17) · 1. **the scrollback corruption REPRODUCED a third time, 2026-09-05 ~15:55, UNTRACED** (the peer
+session `xscapes-0a`, Terminal.app 132x53, host started 13:49 without `XSCAPES_TRACE`; his screenshot:
+table rules struck through prose rows, `sc-ne` inside a doubled header = the s14 #2 merge). Order for
+the next one: (a) read back the LIVE window first, by tty, with his OK (`1049l` discards most mirrored
+rows, s14 probe 3, so a restart destroys the evidence) · (b) the traced restart that keeps the
+conversation: `XSCAPES_TRACE=/tmp/apple2.bin xscapes claude -- --continue`; the `--` is REQUIRED,
+verified with `-print`: bare `xscapes claude --continue` dies with "flag provided but not defined" ·
+(c) work in it until the rows corrupt, read back the same window, then offline
+`XSCAPES_TRACE=/tmp/apple2.bin KEPT_OUT=/tmp/kept.txt go test ./internal/host -run TestReplayTraceKept -v`
+and diff the kept rows against the buffer: interleaved in the model ⇒ the model diverges; clean ⇒ the
+write side (`MirrorBatch`) ·
 the patch above the band (a hosted probe under scripted width+height drags, pixels via
 `screencapture -l` of the script's own window) · the working-session items still unseen:
 bubbles + sound, kittens live (now with the swim-off), the mirror during work and its exit
