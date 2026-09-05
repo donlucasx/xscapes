@@ -1099,3 +1099,22 @@ at 22:10 (lgarzoli out of tokens → donlucasx); artifact ownership checked, see
     so the sun and the kittens' placement are the OLD renderer's. Regenerate after the engineering
     session's fixes: `go run . -site site` then `python3 assets/deck/make-deck.py`. More notes to come;
     no edits until then.
+- *"make sure to /wrap"* ⇒ session 17 (brand) WRAPPED: RESUME.md gained a "Brand workstream" section (its own
+  heading, above session 16's); memory `project_xscapes_brand.md` is current; nothing of the engineering
+  session's touched; the deck stays a parked draft.
+- *"[Image #14] i like the quad edge approach, but seems the 'empty shadow' it leaves as context
+  depletes is broken/messy. Should be a clean container underneath. Also, why is there a ∘ next to
+  all of them? is that supposed to be a star? are stars showcased like that in our current
+  xscapes?"* (13:35, the study's day column: at 30% the dark face in loose blocks, at 60% the
+  crescent's lower cells a different yellow, a `∘` beside the disc)
+  ⇒ The `∘` was the OUTSTANDING-todo mark of the constellation (`*` finished, `∘` outstanding, "n of
+    N"); the demo state has five todos with one done. Live sessions show it only when Claude calls
+    TodoWrite (never, in the recorded history). The disc: FIXED in the quad path — one lit tone and
+    one dark tone per frame (sampled at the disc's centre; row-by-row blends rounded to two
+    yellows), the terminator inside an edge cell goes to the face holding more of it, ties to the
+    dark face, and a second pass keeps the dark face in ONE piece (`darkPieces`); test
+    `TestTheQuadDiscIsOneCleanContainer` reads the rendered frame against a control frame without
+    the disc (`MoonEdge="none"`), because a sky tone can round to the dark tone by coincidence.
+- *"discard The "∘" altogether- nots not clear what it means"* (13:38)
+  ⇒ **LOCKED 2026-09-05: no ring.** An unfinished todo draws nothing; the sky says *n*. `stars()`,
+    `todo_stars_test.go`, the brief's row. Not yet installed (rides the next install).

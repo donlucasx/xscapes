@@ -2,6 +2,15 @@
 
 *(Renamed end to end on 2026-09-03: directory, env vars, state path and hook marker. Two names are kept on purpose and are not leftovers -- `internal/envx` still reads `ASCIISCAPES_*` and warns, and `install.go` still RECOGNISES the `# asciiscapes:v1` marker so the hooks it wrote before the rename can be found and removed.)*
 
+> **Session 16 (2026-09-05).** Live tests PASSED in both terminals; shipped: kitten swim-off ·
+> the context READOUT in the scene from 40% used (his ruling) · ▄ split cells on Terminal.app (no
+> hairlines) · the disc-tip sky half through the ramp · the outstanding-todo ring REMOVED (his
+> ruling). Measured: Terminal.app's alt screen RETAINS rows at their widest on a width change
+> (`notes/width-audit.md`). Studies for his pick: "The Moon, Four Ways" (quad edge, sun without
+> shadow, night halo; `xscapes -moon`). **Brand LOCKED 2026-09-05** by the parallel brand session
+> (Cursor + Reverse alt; guidelines v1.0 in `assets/brand/`); deck = parked draft; see `RESUME.md`
+> "Brand workstream". Details in `RESUME.md`.
+>
 > **Session 15 (2026-09-04).** His picks: gradients **cube-path ONLY**; Terminal
 > automation **this session only** (tty rule); the page stays unpublished until the
 > pending items are in. **Built, measured, and INSTALLED** (*"Install it"*): the sky and the sea are
@@ -184,7 +193,7 @@ only if nothing else needs it.
 | needs you | **bubble**, rare: needs_input, error, done. Nothing else | done — distinct cues shipped 2026-08-31: ask = warm SOLID box + alert pose; done = cool DOTTED knock + content `^ ^` pose, bounded by DoneHold |
 | companion identity | **coat + face**: cream/slate/sage/mauve/charcoal, nose, toes, inner-shadow ears, whiskers | ⏸ options built, awaiting Lucas's pick; nothing defaulted |
 | what it is doing now | **text written in the sand**, newest brightest, older fading as the tide takes them | done — anchored to the waterline, degrades by dropping whole pieces when narrow. **The lower beach falls away to black (`DefaultSandFade` = 1.0, locked 2026-09-01)**: contrast on the newest line 132→204 at midday, 148→204 at night, and equal at every hour, so legibility stops depending on the clock. Ink is sampled from the PAINTED background per row, never the palette's nominal sand. |
-| todos completed | **star count** | done 2026-09-02 &mdash; a constellation in the upper sky, `*` for each finished todo and `&#8728;` for each outstanding one, so it reads *n of N*. Position is fixed by index and seed so a star lights where it always was. Held at a visibility floor like the moon: a completed todo is a fact about the AGENT and `StarVis` is 0 at noon. ⚠ **TodoWrite has been called ZERO times in the whole recorded history** &mdash; 13,682 tool events &mdash; so today it only lights from `xscapes emit todo` or the demo cycle. |
+| todos completed | **star count** | done 2026-09-02 &mdash; a constellation in the upper sky, `*` for each finished todo. ~~`&#8728;` for each outstanding one, so it reads *n of N*~~ &mdash; **the ring is GONE (his ruling 2026-09-05: "discard the ring altogether, it's not clear what it means")**; the sky says *n*. Position is fixed by index and seed so a star lights where it always was. Held at a visibility floor like the moon: a completed todo is a fact about the AGENT and `StarVis` is 0 at noon. ⚠ **TodoWrite has been called ZERO times in the whole recorded history** &mdash; 13,682 tool events &mdash; so today it only lights from `xscapes emit todo` or the demo cycle. |
 | subagents | **kittens** | done — `agent_id`/`agent_type`, counted live |
 
 Rejected and why: session-elapsed as its own variable (the real clock covers it,

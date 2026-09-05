@@ -18,6 +18,15 @@ type Shore struct {
 	// The disc's reach in cells from its centre, columns and rows, so a
 	// caller can keep clear of it (the context readout).
 	moonRX, moonRY int
+	// litTone and darkTone are the quad disc's two colours this frame, one
+	// each for the whole disc (sampled against the sky at its centre), so
+	// the lit face never rounds to two yellows across the sky's rows.
+	litTone, darkTone term.RGB
+	// quadDark records, per cell the quad disc painted, whether its shape
+	// colour is the dark face -- the painter's own decision, for the test
+	// that holds the dark face to one piece (a sky tone can round to the
+	// dark tone by coincidence, so the frame alone cannot say).
+	quadDark map[[2]int]bool
 
 	pal     Palette // this frame's colours, from the time of day
 	ctxUsed float64 // this frame's context reading, for the moon and its shine
@@ -572,13 +581,12 @@ func (s *Shore) todoStars(c *canvas.Canvas, hy, done, total int) {
 		if dx, dy := x-s.moonX, y-s.moonY; dx*dx+4*dy*dy <= 16 {
 			continue
 		}
+		// Only finished todos are drawn. An unfinished one used to leave a
+		// ring, so the sky read "n of N"; his ruling of 2026-09-05 -- "discard
+		// the ring altogether, it's not clear what it means" -- so the sky
+		// says n, and the size of the list is not on screen.
 		if i < done {
 			near.Plot(x, y, '*', s.pal.Star, todoStarFloor)
-		} else {
-			// A ring, not a dot: the ambient field is made of dots, and an
-			// outstanding todo has to be legible as a DIFFERENT thing rather
-			// than as a dim one.
-			near.Plot(x, y, '\u2218', s.pal.Star, 0.30)
 		}
 	}
 }
@@ -618,6 +626,9 @@ func (s *Shore) moon(c *canvas.Canvas, hy int, scale, lit, vis float64) {
 	ry := int(rr+rim) + 1
 	rx := int((rr+rim)*2) + 1
 	s.moonRX, s.moonRY = rx, ry
+	if s.MoonEdge == "none" {
+		return // a control frame for the tests: everything but the disc
+	}
 	if s.MoonEdge == "quad" {
 		s.moonQuad(c, mx, my, rx, ry, rr, shadow, vis, dark, noShadow)
 		if s.MoonHalo {
@@ -713,44 +724,132 @@ func (s *Shore) moonQuad(c *canvas.Canvas, mx, my, rx, ry int, rr, shadow, vis f
 	if a <= 0 {
 		return
 	}
+	// One tone each for the whole disc, against the sky at its centre. Blended
+	// row by row, the crescent's lower cells rounded to a different yellow
+	// from its upper ones on 256 -- "broken/messy", his study note.
+	centre := c.BGAt(mx, my)
+	litCol := centre.Blend(s.pal.Moon, a)
+	darkCol := centre.Blend(dark, a*0.6)
+	s.litTone, s.darkTone = litCol, darkCol
+
+	// Pass one: sample every cell's four quarters and decide its two colours.
+	type qcell struct {
+		x, y              int
+		litMask, darkMask uint8
+		dark              bool // the shape colour is the dark face
+	}
+	var cells []qcell
 	for dy := -ry; dy <= ry; dy++ {
 		for dx := -rx; dx <= rx; dx++ {
-			x, y := mx+dx, my+dy
-			var litMask, darkMask uint8
-			for k, q := range [4][2]float64{{-0.125, -0.25}, {0.125, -0.25}, {-0.125, 0.25}, {0.125, 0.25}} {
-				fx, fy := float64(dx)/2.0+q[0], float64(dy)+q[1]
+			var q qcell
+			q.x, q.y = mx+dx, my+dy
+			for k, off := range [4][2]float64{{-0.125, -0.25}, {0.125, -0.25}, {-0.125, 0.25}, {0.125, 0.25}} {
+				fx, fy := float64(dx)/2.0+off[0], float64(dy)+off[1]
 				if math.Hypot(fx, fy) >= rr {
 					continue
 				}
 				bit := uint8(8) >> uint(k)
 				if math.Hypot(fx-shadow, fy) <= rr {
 					if !noShadow {
-						darkMask |= bit
+						q.darkMask |= bit
 					}
 					continue
 				}
-				litMask |= bit
+				q.litMask |= bit
 			}
-			if litMask|darkMask == 0 {
+			if q.litMask|q.darkMask == 0 {
 				continue
 			}
-			sky := c.BGAt(x, y)
-			litCol := sky.Blend(s.pal.Moon, a)
-			darkCol := sky.Blend(dark, a*0.6)
-			switch {
-			case litMask|darkMask == 0b1111 && darkMask == 0:
-				c.SetBG(x, y, litCol)
-			case litMask|darkMask == 0b1111 && litMask == 0:
-				c.SetBG(x, y, darkCol)
-			case litMask|darkMask == 0b1111:
-				c.SetBGQuad(x, y, litCol, darkCol, litMask)
-			default:
-				shape, mask := litCol, litMask|darkMask
-				if bits(darkMask) > bits(litMask) {
-					shape = darkCol
-				}
-				c.SetBGQuad(x, y, shape, sky, mask)
+			// An edge cell can carry two colours, and the edge against the
+			// sky is the one that has to stay clean, so the terminator inside
+			// it goes to whichever face holds more of the cell, ties to the
+			// dark face: a thin sliver at 30% reads as one dark rim along the
+			// edge rather than as loose blocks.
+			q.dark = q.litMask == 0 || (q.litMask|q.darkMask != 0b1111 && bits(q.darkMask) >= bits(q.litMask))
+			cells = append(cells, q)
+		}
+	}
+	// Pass two: the dark face is ONE piece. At 60% the crescent's horn can
+	// leave a single dark cell adrift at its tip where the lens is thinner
+	// than a cell; any dark cell not connected to the largest dark group goes
+	// to the lit face. His note on the study: "should be a clean container".
+	xs, ys, darks := make([]int, len(cells)), make([]int, len(cells)), make([]bool, len(cells))
+	for i, q := range cells {
+		xs[i], ys[i], darks[i] = q.x, q.y, q.dark
+	}
+	darkPieces(xs, ys, darks)
+	s.quadDark = make(map[[2]int]bool, len(cells))
+	for i := range cells {
+		cells[i].dark = darks[i]
+		full := cells[i].litMask|cells[i].darkMask == 0b1111
+		s.quadDark[[2]int{cells[i].x, cells[i].y}] = (full && cells[i].litMask == 0) || (!full && darks[i])
+	}
+
+	for _, q := range cells {
+		sky := c.BGAt(q.x, q.y)
+		switch {
+		case q.litMask|q.darkMask == 0b1111 && q.darkMask == 0:
+			c.SetBG(q.x, q.y, litCol)
+		case q.litMask|q.darkMask == 0b1111 && q.litMask == 0:
+			c.SetBG(q.x, q.y, darkCol)
+		case q.litMask|q.darkMask == 0b1111:
+			c.SetBGQuad(q.x, q.y, litCol, darkCol, q.litMask)
+		default:
+			shape := litCol
+			if q.dark {
+				shape = darkCol
 			}
+			c.SetBGQuad(q.x, q.y, shape, sky, q.litMask|q.darkMask)
+		}
+	}
+}
+
+// darkPieces groups the dark-shaped cells 8-connected and flips every group
+// but the largest to the lit face, so the dark face is one piece.
+func darkPieces(xs, ys []int, dark []bool) {
+	n := len(xs)
+	idx := map[[2]int]int{}
+	for i := 0; i < n; i++ {
+		if dark[i] {
+			idx[[2]int{xs[i], ys[i]}] = i
+		}
+	}
+	seen := make([]bool, n)
+	var groups [][]int
+	for i := 0; i < n; i++ {
+		if !dark[i] || seen[i] {
+			continue
+		}
+		var g []int
+		stack := []int{i}
+		seen[i] = true
+		for len(stack) > 0 {
+			j := stack[len(stack)-1]
+			stack = stack[:len(stack)-1]
+			g = append(g, j)
+			for dy := -1; dy <= 1; dy++ {
+				for dx := -1; dx <= 1; dx++ {
+					if k, ok := idx[[2]int{xs[j] + dx, ys[j] + dy}]; ok && !seen[k] {
+						seen[k] = true
+						stack = append(stack, k)
+					}
+				}
+			}
+		}
+		groups = append(groups, g)
+	}
+	best := -1
+	for i, g := range groups {
+		if best < 0 || len(g) > len(groups[best]) {
+			best = i
+		}
+	}
+	for i, g := range groups {
+		if i == best {
+			continue
+		}
+		for _, j := range g {
+			dark[j] = false
 		}
 	}
 }

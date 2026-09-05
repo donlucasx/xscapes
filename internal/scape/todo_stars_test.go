@@ -35,16 +35,17 @@ func todoFrame(t *testing.T, tod float64, done, total int) (*canvas.Canvas, int)
 	return c, int(float64(c.H) * 0.42)
 }
 
-// The sky says "n of N", not just n. A finished todo lights a star and an
-// unfinished one leaves a mark, so the size of the job is visible as well as
-// the progress through it.
+// The sky says n: a finished todo lights a star. It used to say "n of N"
+// with a ring for each unfinished one, until his ruling of 2026-09-05 --
+// "discard the ring altogether, it's not clear what it means" -- so an
+// unfinished todo now draws nothing.
 func TestTheSkyCountsTheChecklist(t *testing.T) {
 	for _, tc := range []struct{ done, total int }{{0, 5}, {2, 5}, {5, 5}, {1, 3}} {
 		c, hy := todoFrame(t, 0.5, tc.done, tc.total)
 		lit, pending := skyMarks(c, hy)
 		t.Logf("%d of %d: %d lit, %d pending", tc.done, tc.total, lit, pending)
-		if lit != tc.done || lit+pending != tc.total {
-			t.Errorf("%d of %d: sky shows %d lit and %d pending", tc.done, tc.total, lit, pending)
+		if lit != tc.done || pending != 0 {
+			t.Errorf("%d of %d: sky shows %d lit and %d rings, want %d lit and no rings", tc.done, tc.total, lit, pending, tc.done)
 		}
 	}
 }

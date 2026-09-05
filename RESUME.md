@@ -15,6 +15,53 @@ frame does rather than what the source says it should. And one from session 14:
 do NOT drive Terminal.app (osascript, System Events) without asking me first.
 ```
 
+## Brand workstream — where we left off (2026-09-05, session 17, a PARALLEL session; HEAD `9ba068e`, pushed)
+
+**Copy-paste this prompt into a fresh BRAND session** (the engineering session owns the code, `notes/`,
+this file's other sections and the `CLAUDE.md` banner; brand touches `site/`, `assets/`, README and appends
+under its own heading in `_FEEDBACK.md`):
+
+```
+cd ~/Documents/claude/xscapes/ and read CLAUDE.md, then the "Brand workstream" section of RESUME.md,
+then assets/brand/README.md. The identity is LOCKED (Cursor, with Reverse as the alternate colour);
+the guidelines are LOCKED v1.0 (assets/brand/guidelines.html). The deck (assets/deck/) is a PARKED
+DRAFT with my notes in _FEEDBACK.md session 17; do not edit it until I say so. Tell me where we
+left off, then wait for my notes.
+```
+
+**Locked, in order, all on 2026-09-05 (verbatim quotes in `_FEEDBACK.md`, session 17):**
+- *"i love Cursor ... lets keep/polish Cursor"* → **the identity is CURSOR**: a block cursor over the x,
+  reverse video, one cell 0.6 x 1.2 em, the x on the terminal's baseline (955/1200), Geist Mono 700,
+  greys 233/234/236/245/255 + the noon sea 111 `#87afff`; on light, dawn 24 `#005f87` as the accent.
+- *"lock in the CURSOR option with REVERSE as an ALT color application"* → the same cell in gold 179
+  `#d7af5f`, once per surface where the brand is the subject (136 in the cell on light, 94 as text).
+- *"looks great, lock it in"* → **guidelines v1.0**: https://claude.ai/code/artifact/86fde655-b172-4fb5-9ca5-36e41a841eb4
+  and `assets/brand/` (12 SVGs from the font's outlines, `make-brand.py`, `guidelines.html`, `README.md`).
+- Four rules that hold everywhere: every colour an xterm-256 index 16–255 · every mark typeable
+  (`printf '\e[7mx\e[0mscapes'`) · Claude's oranges out · plain words, the name lowercase always.
+
+**Boards, for the record:** round one "Cursor, Waterline, Escape" `3042ea75-…` · round two "Cursor, Escape,
+Reverse" `91c5853d-…` · guidelines `86fde655-…` · deck `6a42a717-…` (all this login's).
+
+**The deck is a PARKED DRAFT** (`assets/deck/index.html` + `xscapes-deck.pdf`, 11 slides, three real frames
+lifted from `site/index.html`). His notes so far: *"sun looks wrong and there are sub agents "swimming" on the
+sand (also wrong) ... just save it as a draft for now (no edits needed, just notes)"*. Both are RENDERER facts
+about the frames: the site has since been re-rendered (`9ba068e`; the kittens on the sand are now SITTERS by
+design) and the sun disc changes ONCE MORE after his moon pick in the engineering session. More notes coming.
+
+**▶ NEXT (brand):** 0. his further deck notes · 1. after the sun pick lands and he says go:
+`go run . -site site` (if not already re-rendered) → `python3 assets/deck/make-deck.py` → print the PDF
+(command in the script's docstring) → his review · 2. the Commons page restyle at its rebuild
+(`site/template.html`: ground 233, gold lockup once at the top, blue 111 links, Geist; its `#e8c27a` is not
+a cube entry and goes) · 3. README header via `<picture>` with the two lockup SVGs (snippet in
+`assets/brand/README.md`) · 4. the CLI help header mark (two lines of reverse video in `cmd.go` `usage()`,
+the engineering session's file: hand it over) · 5. GitHub avatar: export `avatar-gold.svg` to PNG at 512
+and upload (his hands).
+
+⚠ Housekeeping learned today: the Playwright MCP writes screenshots into the REPO ROOT and a `-A` commit
+from the other session swept three in (`bff64d1`, since removed). Render previews with headless Chrome
+`--screenshot=` straight into the scratchpad instead.
+
 ## Where we left off (2026-09-05, session 16, INSTALLED, pushed, clean — SHAs in `git log`)
 
 **The live tests ran, in both terminals.** From his screenshots (`_FEEDBACK.md` s16): resize
