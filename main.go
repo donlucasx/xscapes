@@ -73,6 +73,7 @@ func main() {
 		overlay = flag.String("overlay", "", "mock the agent INSIDE the scape: composite a captured pane (text file) over the scene")
 		sandfd  = flag.String("sandfade", "", "tuner: how far the lower beach falls away to black")
 		site    = flag.String("site", "", "write the submission page: reads <dir>/template.html, writes <dir>/index.html")
+		gifsDir = flag.String("gifs", "", "write the animated clips of the demo turn as frame pages into <dir> (then site/make-gifs.py encodes them)")
 	)
 	flag.Parse()
 
@@ -172,6 +173,14 @@ func main() {
 			os.Exit(1)
 		}
 		fmt.Println(*eyesHT)
+		return
+	}
+	if *gifsDir != "" {
+		if err := gifPages(*seed, *gifsDir); err != nil {
+			fmt.Fprintln(os.Stderr, "xscapes:", err)
+			os.Exit(1)
+		}
+		fmt.Println(*gifsDir)
 		return
 	}
 	if *ctxHT != "" {

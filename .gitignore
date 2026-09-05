@@ -22,3 +22,5 @@
 /histprobe
 /wheelprobe
 .playwright-mcp/
+site/anim/*.html
+site/anim/*.png

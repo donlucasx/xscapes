@@ -88,7 +88,7 @@ ul.big{margin:0;padding:0;list-style:none;display:flex;flex-direction:column;gap
 ul.big li{padding-left:44px;position:relative}
 ul.big li:before{content:"";position:absolute;left:0;top:.55em;width:18px;height:2px;background:var(--acc)}
 ul.big li span{color:var(--d)}
-@@FRAMECSS@@
+.win img.clip{display:block;image-rendering:pixelated;width:100%;max-width:1280px;height:auto}
 </style>
 
 <div class="hint">arrows to move &middot; print for a PDF, one slide per page</div>
@@ -110,8 +110,8 @@ ul.big li span{color:var(--d)}
 <!-- 3 · frame: working -->
 <div class="page"><div class="stage"><section class="s frame">
   <div class="head"><h2 class="t56">One command. Claude Code runs inside a shoreline.</h2></div>
-  <div class="body"><div class="win"><pre>@@FRAME0@@</pre></div></div>
-  <div class="capbar"><p class="m20" style="max-width:none"><span class="accent">Fourteen seconds into a turn.</span> Edits landing, five subagents out, the sand carrying the last tool calls. Rendered by the real engine from the events a Claude Code hook emits, as a 256-colour terminal shows it.</p></div>
+  <div class="body"><div class="win"><img class="clip" src="anim/hero.gif" width="640" height="288" alt="Six seconds of a turn at noon"></div></div>
+  <div class="capbar"><p class="m20" style="max-width:none"><span class="accent">Fourteen seconds into a turn, at noon.</span> Edits landing, five subagents out on the sand and in the water, the last tool calls written in the sand. The real engine folding the events a Claude Code hook emits, as a 256-colour terminal shows it.</p></div>
 </section></div></div>
 
 <!-- 4 · table: what a glance tells you -->
@@ -121,7 +121,7 @@ ul.big li span{color:var(--d)}
     <tr><td>how hard it is working</td><td>the swells: how many are travelling, how tall, whitecaps above half</td></tr>
     <tr><td>what it is doing right now</td><td>written in the sand, newest brightest, older lines fading as the tide takes them</td></tr>
     <tr><td>something broke</td><td>the companion, not the weather: ears back, hunched, amber eyes, until it clears</td></tr>
-    <tr><td>context remaining</td><td>the moon: its phase and its height</td></tr>
+    <tr><td>context remaining</td><td>the moon: it wanes and sinks as context is used, with a number under it from 40% used</td></tr>
     <tr><td>it needs you</td><td>a knock and a sound, and a different one for done</td></tr>
   </table></div>
   <div class="foot"><span class="lockup"><span class="blk">x</span>scapes</span><span>04</span></div>
@@ -138,7 +138,7 @@ ul.big li span{color:var(--d)}
       <tr><td>needs you, done</td><td>a bubble, rare</td></tr>
       <tr><td>context left</td><td>the moon</td></tr>
       <tr><td>todos</td><td>stars, lit as they finish</td></tr>
-      <tr><td>subagents</td><td>kittens</td></tr>
+      <tr><td>subagents</td><td>kittens, on the sand or in the water; they swim off when they finish</td></tr>
     </table>
     <table><tr><th>the world</th><th></th></tr>
       <tr><td>time of day</td><td>sky colour, the real clock</td></tr>
@@ -151,7 +151,7 @@ ul.big li span{color:var(--d)}
 <!-- 6 · frame: needs you -->
 <div class="page"><div class="stage"><section class="s frame">
   <div class="head"><h2 class="t56">The nudge has to beat a terminal bell.</h2></div>
-  <div class="body"><div class="win"><pre>@@FRAME3@@</pre></div></div>
+  <div class="body"><div class="win"><img class="clip" src="anim/ask.gif" width="640" height="288" alt="Dusk: the agent needs permission"></div></div>
   <div class="capbar"><p class="m20" style="max-width:none"><span class="accent">Dusk. The agent needs permission.</span> A solid balloon, a warm colour, a chime. Done is a dotted balloon, a cool colour, a low note. Two cues you can tell apart from across the room, and each rings once.</p></div>
 </section></div></div>
 
@@ -178,7 +178,7 @@ ul.big li span{color:var(--d)}
 <div class="page"><div class="stage"><section class="s split">
   <div class="head"><h2 class="t56">One Go binary. No dependencies. Any 256-colour terminal.</h2></div>
   <div class="body">
-    <div class="win"><pre>@@FRAME4@@</pre></div>
+    <div class="win"><img class="clip" src="anim/done.gif" width="640" height="288" alt="Night: the turn is done"></div>
     <div class="facts">
       <p class="t26">Every colour is an xterm-256 index, so the picture is the same on every terminal and every profile. Terminal.app, iTerm2, Ghostty.</p>
       <p class="t26">Claude Code runs in the same window, no tmux. The older side-by-side layout is one flag away.</p>

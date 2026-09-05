@@ -5,14 +5,8 @@ import (
 	"os"
 	"path/filepath"
 	"strings"
-	"time"
 
-	"github.com/donlucasx/xscapes/internal/canvas"
-	"github.com/donlucasx/xscapes/internal/companion"
 	"github.com/donlucasx/xscapes/internal/event"
-	"github.com/donlucasx/xscapes/internal/reduce"
-	"github.com/donlucasx/xscapes/internal/scape"
-	"github.com/donlucasx/xscapes/internal/term"
 )
 
 // turnBeat is one moment of the demo turn: seconds from the prompt, a note,
@@ -39,6 +33,9 @@ func demoTurn() []turnBeat {
 	}
 	todo := func(n, of int) event.Event {
 		return event.Event{Kind: event.Todo, Op: event.OpTodo, N: n, Of: of}
+	}
+	ctx := func(used float64) event.Event {
+		return event.Event{Kind: event.Context, Frac: &used}
 	}
 	return []turnBeat{
 		{0, "the prompt lands — thinking, no tool yet", []event.Event{
@@ -72,6 +69,9 @@ func demoTurn() []turnBeat {
 			sub("a5", "Explore", event.SubEnd),
 			tool(event.Error, "t5", event.OpShell, "Bash", "go", "exit 1", 4100),
 			todo(3, 5),
+			// The session is past 40% of its context here, so the readout
+			// under the moon is on from this beat (his ruling, 2026-09-05).
+			ctx(0.46),
 		}},
 		{30, "the user is asked for something", []event.Event{
 			{Kind: event.NeedsInput, Text: "allow Bash?"},
@@ -88,89 +88,24 @@ func demoTurn() []turnBeat {
 	}
 }
 
-// siteFrame names one frame of the submission page: which beat of the demo
-// turn, at what time of day, and the marker in the template it replaces.
-type siteFrame struct {
-	marker string
-	at     float64 // the beat, by its seconds from the prompt
-	dt     float64 // seconds after the beat, so a wave is mid-travel
-	tod    float64 // 0 midnight, .25 dawn, .5 noon, .75 dusk
-}
-
-var siteFrames = []siteFrame{
-	{"hero", 14, 0.35, 0.52},   // the fan-out at noon: busy sea, kittens, sand
-	{"resting", 72, 0.2, 0.27}, // flat at dawn, the writing receding
-	{"worried", 22, 0.5, 0.62}, // the failed command, afternoon
-	{"ask", 30, 0.3, 0.80},     // the question, dusk
-	{"done", 44, 0.3, 0.96},    // the finish, night, the constellation full
-}
-
-// sitePage fills site/template.html with frames from the real reducer,
-// rendered as a 256-colour terminal would show them.
-//
-// 256 on purpose. The page is for people deciding whether to install this,
-// and the target terminal is Terminal.app; a truecolor preview would show a
-// picture no user gets. Nothing in the frames is posed: the same events a
-// Claude Code hook emits go through the same fold the live loop uses.
+// sitePage writes the submission page: the template as it is, with the
+// animated clips rendered beside it into <dir>/anim by gifPages. The clips
+// are the demo turn folded through the real reducer, as a 256-colour
+// terminal shows it; site/make-gifs.py then captures and encodes them.
+// The page used to carry five stills lifted from the same fold; his
+// direction of 2026-09-05: animated clips, no still screens.
 func sitePage(seed int64, dir string) (string, error) {
 	tmpl, err := os.ReadFile(filepath.Join(dir, "template.html"))
 	if err != nil {
 		return "", err
 	}
 	page := string(tmpl)
-
-	base := time.Now()
-	red := reduce.New("site")
-	sh := scape.NewShore(seed, false)
-	cat := companion.NewCat()
-	cat.FaceLeft(true)
-	ccw, chh := cat.Size()
-
-	// Fold the whole turn once, in order, and pick the frames off as their
-	// beats pass. The shore is stateful, so the frames must come out of one
-	// timeline, the way the wired study does it.
-	wanted := map[float64][]siteFrame{}
-	for _, f := range siteFrames {
-		wanted[f.at] = append(wanted[f.at], f)
-	}
-	var missing []string
-	var pal canvas.HTMLPalette
-	for _, bt := range demoTurn() {
-		now := base.Add(time.Duration(bt.at * float64(time.Second)))
-		for _, e := range bt.evs {
-			red.Apply(e, now)
-		}
-		for _, f := range wanted[bt.at] {
-			st := red.State(now)
-			st.Act.TimeOfDay = f.tod
-			c := canvas.New(80, 24, canvas.AlphaFar, canvas.AlphaMid, canvas.AlphaNear)
-			t := bt.at + f.dt
-			lay := compose(c.W, ccw, true)
-			sh.MoonX = lay.MoonX
-			sh.Update(c, t, st.Act)
-			st.Tail = st.FitTail(now, lay.SandTo-lay.SandFrom)
-			drawScene(c, sh, cat, lay, st, t, seed, c.H-2-chh)
-			marker := "{{" + f.marker + "}}"
-			if !strings.Contains(page, marker) {
-				missing = append(missing, marker)
-				continue
-			}
-			page = strings.Replace(page, marker, c.HTMLFragmentClassed(12, term.Profile256, &pal), 1)
-		}
-	}
-	if !strings.Contains(page, "{{palette}}") {
-		missing = append(missing, "{{palette}}")
-	}
-	page = strings.Replace(page, "{{palette}}", pal.CSS(), 1)
-	if len(missing) > 0 {
-		return "", fmt.Errorf("template has no %s", strings.Join(missing, ", "))
-	}
 	if i := strings.Index(page, "{{"); i >= 0 {
-		end := i + 40
-		if end > len(page) {
-			end = len(page)
-		}
+		end := min(i+40, len(page))
 		return "", fmt.Errorf("template marker not filled: %q", page[i:end])
+	}
+	if err := gifPages(seed, filepath.Join(dir, "anim")); err != nil {
+		return "", err
 	}
 	return page, nil
 }

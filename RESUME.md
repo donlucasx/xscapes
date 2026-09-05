@@ -102,7 +102,18 @@ open. A read-back of his live window found the s14 #2 scrollback CORRUPTION in t
 (`✻ Tomtotal reported 1259,cfetched)1259,sunique 1259`, rows merged where one had spaces) —
 the mirror wrote what the model held; that session was untraced.
 
-**▶ NEXT:** 0. a TRACED working session in Terminal.app (`XSCAPES_TRACE=/tmp/apple.bin xscapes
+**Afternoon, 13:00–14:05:** the context readout SHIPPED at 40% used (his ruling; it had never been in
+the live scene) · the outstanding-todo ring REMOVED (his ruling) · the disc's edge LOCKED as the hue
+rim (his pick from "The Moon, Four Ways"; quad edge, shadowless sun and night halo stay as study
+switches) · the SITE rebuilt on the brand with five ANIMATED CLIPS from the real reducer
+(`xscapes -gifs`, `site/make-gifs.py`, `site/anim/*.gif`) and the DECK re-cut on them
+(`assets/deck/make-deck.py`, PDF re-printed). The brand session (s17) locked the identity and
+wrapped; its files ride in `assets/brand/` and `assets/deck/`.
+
+**▶ NEXT:** 0. HIS LOOK at `site/index.html` and `assets/deck/index.html` (both open locally; the
+clips play) · then Commons: publish the page (the clips are files: upload `anim/` or host `site/`
+on GitHub Pages, `site/COMMONS-PROMPT.md`), his 45–60 s Terminal.app recording, SUBMIT (closes
+09-17) · 1. a TRACED working session in Terminal.app (`XSCAPES_TRACE=/tmp/apple.bin xscapes
 claude`) that he works in until the mirrored rows corrupt, then a read-back of the same window
 (his OK stands for read-only) → diff the model's kept rows against the buffer, fix the divergence ·
 the patch above the band (a hosted probe under scripted width+height drags, pixels via

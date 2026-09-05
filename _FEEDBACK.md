@@ -1123,3 +1123,24 @@ at 22:10 (lgarzoli out of tokens → donlucasx); artifact ownership checked, see
     default in `NewShore`): the outer ring one tone darker in the disc's own hue, on the half-row
     disc. The quad edge, the shadowless sun and the night halo stay as study switches, off. Site
     re-rendered; the brand session told to rebuild the deck.
+- *"ok. check on the new brand guide we made, and the latest site we built for the hackathon. update
+  it w animated gifs (no still screens), and ensure they showcase the latest sun/moon, as well as sub
+  agents where they belong (either standing on the sand or swimming in the water- no swimming in the
+  sand). Lastly, ensure the pitch deck/page is simple and to the point, answering to the hackathon
+  guidelines, and emphasizing what makes Xscapes unique, fun and useful"* (13:52)
+  ⇒ DONE, first pass. **Clips**: `xscapes -gifs <dir>` renders five clips of the demo turn through
+    the real reducer (hero 6 s at noon · worried · ask at dusk · done at night · resting at dawn, 10
+    fps, 80x24 at 12px Menlo = 640x288) as stacked frame pages; `site/make-gifs.py` captures each
+    page once in headless Chrome, slices on magenta separators, quantises to one palette per clip
+    without dithering, `gifsicle -O3` (96–430 KB each, 1.3 MB together). The demo turn gained a
+    `context` beat (46% used at the failing test) so the readout shows from the afternoon on.
+    Checked frame by frame: the hue-rim disc, the readout, sitters on the sand and swimmers in the
+    water, no kitten on the sand's water. **Site** (`site/template.html`): rebuilt on the brand's
+    tokens (ground 233, gold lockup as the one Reverse instance, noon blue for links, Geist and Geist
+    Mono, the shore only as itself), five clips in place of the stills, copy cut to the rubric: why
+    (waiting) · what a glance tells you · the clips · two knocks · lives where the agent lives (fit) ·
+    the protocol (originality) · a companion for the session (repeatability) · where it is. **Deck**:
+    the three frame slides carry the clips (`assets/deck/anim/`, copied by `make-deck.py`), the
+    moon and kitten rows updated, PDF re-printed (first frames). `COMMONS-PROMPT.md`: the clips are
+    separate files, so the paste alone is not the page; upload `anim/` or host `site/` on Pages.
+    **Brand guide**: read; consistent with the product; nothing changed.
