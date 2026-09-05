@@ -57,6 +57,7 @@ func main() {
 		colors  = flag.String("colors", "", "write the 256-vs-truecolor study to an HTML file")
 		facesHT = flag.String("faces", "", "write the companion face/coat study to an HTML file")
 		eyesHT  = flag.String("eyes", "", "write the companion eye-fill study to an HTML file")
+		ctxHT   = flag.String("ctxcycle", "", "write the context cycle study (moon phase, altitude, readout) to an HTML file")
 		reelAt  = flag.Int("reel-from", 0, "first frame of the reel strip")
 		reelN   = flag.Int("reel-count", 40, "how many frames of the reel strip")
 		tod     = flag.Float64("tod", 0, "time of day: 0 midnight, .25 dawn, .5 noon, .75 dusk")
@@ -170,6 +171,14 @@ func main() {
 			os.Exit(1)
 		}
 		fmt.Println(*eyesHT)
+		return
+	}
+	if *ctxHT != "" {
+		if err := os.WriteFile(*ctxHT, []byte(ctxCyclePage(*seed)), 0o644); err != nil {
+			fmt.Fprintln(os.Stderr, "xscapes:", err)
+			os.Exit(1)
+		}
+		fmt.Println(*ctxHT)
 		return
 	}
 

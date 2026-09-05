@@ -1014,3 +1014,34 @@ at 22:10 (lgarzoli out of tokens → donlucasx); artifact ownership checked, see
     quarter tone for that half. Red-first `TestATipCellsSkyHalfTakesTheRampsTone` with a
     positive control (a span where rounding and the path disagree, else the test fatals).
     His window captured by id (`screencapture -l`, read-only) for the pixels.
+
+## 2026-09-05 — session 17 (BRAND, a parallel session to s16's live work; touches no code)
+
+- *"lets resume work on xscapes. we are currently working on a parallel terminal.app on it, here I
+  want to dive into brand exploration. I want to come up w a logo, brand colors and guidelines
+  that will dictate the submission deck as well as any other brand decisions. I think it should be
+  rooted on ASCII, but should also be clean, pop and simple. We ll need some colors and fonts as
+  well. Lets find a conceptual thread and present some options for initial direction."*
+  ⇒ Round one: three directions (Cursor · Waterline · Escape) under four shared rules (every colour
+    a cube index 16–255 · every mark typeable · Claude's oranges out · plain words). Artifact
+    "Cursor, Waterline, Escape" https://claude.ai/code/artifact/3042ea75-6d62-4598-b352-fb0b7fe6cf44
+    Recommended Cursor, with Waterline's sea and sand as the scene palette under it. Found on the
+    way: the coat's source cream #ece4d2 is not a cube entry (a 256 terminal shows grey 254), and
+    the `seaShallow` comment in `palette.go` says index 75 where #87afff is 111 (comment only).
+- *"i love Cursor. I also love Escape, and the accent color, but the ascii logo does not look good.
+  Lets keep/polish Cursor and try some alts for the Escape logo. maybe a hybrid 3rd option between
+  Cursor and Escape"*
+  ⇒ **Cursor is the keeper.** Escape's `^[` mark is OUT; its gold (#d7af5f, index 179) STAYS.
+    Waterline is dropped as an identity (its palette stays for the shore wherever the deck shows
+    it). Round two: Cursor polished into a system · four alternate Escape marks · a hybrid,
+    "Reverse" (Cursor's block in Escape's gold, the lockup carrying its own escape sequence).
+- *"can you show me on a html page the context cycle of the sun (and moon) what is to be expected to
+  look like as the context rans out? at what point the user sees a text percentage indicator?"* (13:00)
+  ⇒ Page built from the live renderer (`xscapes -ctxcycle`, artifact "The Context Cycle"): ten
+    levels × night and day, crops of the sky at 2x plus whole frames. **Finding: there is NO text
+    percentage in the live scene.** Session 6 decided style C (a dim number under the moon from 65%
+    used, a warm "NN% left" from 85%) and the brief's table marks it done, but `label()` only ever
+    ran in the study page (`context.go`); `drawScene` draws none. The page shows the decided readout
+    on a second row so he can confirm or drop it. Also visible on the page: by day the unlit face is
+    a slate-grey disc, so a half-spent sun reads as an eclipse; at 100% the night moon is a dark disc
+    at the horizon, near-invisible by design.
