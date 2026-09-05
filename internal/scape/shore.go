@@ -632,7 +632,7 @@ func (s *Shore) moon(c *canvas.Canvas, hy int, scale, lit, vis float64) {
 	if s.MoonEdge == "quad" {
 		s.moonQuad(c, mx, my, rx, ry, rr, shadow, vis, dark, noShadow)
 		if s.MoonHalo {
-			s.moonHalo(c, mx, my, rx, ry, rr, vis)
+			s.moonHalo(c, hy, mx, my, rx, ry, rr, vis)
 		}
 		return
 	}
@@ -854,12 +854,13 @@ func darkPieces(xs, ys []int, dark []bool) {
 	}
 }
 
-// night is whether the sky is dark enough for the body to be the moon: the
-// zenith under a luma of 80. The body's own colour cannot say -- at 22:20 it
-// is a pinkish grey that reads as warm.
+// night is whether the sky is dark enough for the body to be the moon: no
+// channel of the zenith reaches 80. Luma cannot say -- the midday zenith is
+// a saturated blue (0,95,175) whose luma is 76 -- and neither can the body's
+// own colour, a pinkish grey at 22:20 that reads as warm.
 func (s *Shore) night() bool {
 	t := s.pal.SkyTop
-	return 0.299*float64(t.R)+0.587*float64(t.G)+0.114*float64(t.B) < 80
+	return t.R < 80 && t.G < 80 && t.B < 80
 }
 
 func bits(m uint8) int {
@@ -873,7 +874,7 @@ func bits(m uint8) int {
 // moonHalo lightens the sky in a soft ring around the disc, at night only:
 // the grey ramp has the steps for it, a daylight sky in the cube does not.
 // Cells the disc painted are left alone.
-func (s *Shore) moonHalo(c *canvas.Canvas, mx, my, rx, ry int, rr, vis float64) {
+func (s *Shore) moonHalo(c *canvas.Canvas, hy, mx, my, rx, ry int, rr, vis float64) {
 	if !s.night() {
 		return
 	}
@@ -881,6 +882,9 @@ func (s *Shore) moonHalo(c *canvas.Canvas, mx, my, rx, ry int, rr, vis float64) 
 	for dy := -ry - 3; dy <= ry+3; dy++ {
 		for dx := -rx - 5; dx <= rx+5; dx++ {
 			x, y := mx+dx, my+dy
+			if y >= hy {
+				continue // the sky only: on the water it rounded to pink
+			}
 			d := math.Hypot(float64(dx)/2.0, float64(dy))
 			if d < rr+0.5 || d > rr+reach {
 				continue

@@ -104,3 +104,20 @@ func regions(cells map[cellPt]bool) int {
 	}
 	return n
 }
+
+// Night is a property of the sky, and the midday zenith is a dark saturated
+// blue: it must not count. The halo and the sun's missing shadow both key
+// on this.
+func TestNightIsNotTheMiddayZenith(t *testing.T) {
+	for _, tc := range []struct {
+		tod   float64
+		night bool
+	}{{0.556, false}, {0.479, false}, {0.931, true}, {0.02, true}} {
+		sh := NewShore(7, false)
+		c := canvas.New(40, 12, canvas.AlphaFar, canvas.AlphaMid, canvas.AlphaNear)
+		sh.Update(c, 2, Activity{TimeOfDay: tc.tod})
+		if got := sh.night(); got != tc.night {
+			t.Errorf("tod %.3f: night=%v, want %v (zenith %v)", tc.tod, got, tc.night, sh.pal.SkyTop)
+		}
+	}
+}
