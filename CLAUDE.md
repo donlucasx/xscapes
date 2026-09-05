@@ -2,6 +2,26 @@
 
 *(Renamed end to end on 2026-09-03: directory, env vars, state path and hook marker. Two names are kept on purpose and are not leftovers -- `internal/envx` still reads `ASCIISCAPES_*` and warns, and `install.go` still RECOGNISES the `# asciiscapes:v1` marker so the hooks it wrote before the rename can be found and removed.)*
 
+> **Session 19 (2026-09-05), WRAPPED. No code changed; three things wait on him.** A live features
+> test run INSIDE `xscapes claude` at his ask, plus two research streams. **The scrollback corruption
+> REPRODUCED a third time and was UNTRACED again** (his screenshot of this session's own scrollback:
+> table rules struck through prose rows, `sc-ne` inside a doubled header = the s14 #2 merge signature).
+> Confirmed ours rather than inferred — host PID 29679, `TERM_PROGRAM=Apple_Terminal`, so `-history`
+> was ON and those rows were written by our model through DECSET 47. NOT claimed as ours: the
+> duplicated prose blocks (s14 #6 — Claude Code re-renders; a plain terminal keeps both). **Order for
+> the next one, and it is not optional: read the live window back FIRST** (`1049l` discards most
+> mirrored rows, s14 probe 3, so a restart destroys the evidence), then
+> `XSCAPES_TRACE=/tmp/apple2.bin xscapes claude -- --continue` — **the `--` is REQUIRED**, verified
+> with `-print`. Two measurements that are HIS ruling: **kittens are the SECOND report** (*"i did not
+> see any multi agents at work"*; not a channel bug — his subagents lived 6.9 s and 15.7 s against a
+> 6 s exit, so nothing was on screen by the time he looked — a minimum dwell, or short subagents stay
+> invisible), and **the companion figure below is stale** (the table says 3–4 lines; `CatBody` is
+> 24x28 px at `W/2, H/4`, so the shipped cat is **12 cols x 7 rows** — the line stays until he rules).
+> Research, all his pick, nothing chosen: five scenes (hearth/cabin · rainy window · café table ·
+> aquarium · snow cabin; rain is a MODIFIER, not a scape, and the planned Campsite is the weaker half
+> of its archetype) and five companions (owl · rabbit · frog · hedgehog · otter; bird/fox/wisp turn
+> out to be words in this file only, never drawn). Details in `RESUME.md` ▶ NEXT 1–4, `_FEEDBACK.md` s19.
+>
 > **Session 16 (2026-09-05), WRAPPED.** Live tests PASSED in both terminals. Shipped + installed:
 > kitten swim-off · the context READOUT from 40% used (his ruling; it had never been in the live
 > scene) · ▄ split cells on Terminal.app (no hairlines) · the disc-tip sky half through the ramp ·
