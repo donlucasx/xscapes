@@ -309,11 +309,51 @@ func luma(c term.RGB) float64 {
 	return 0.30*float64(c.R) + 0.59*float64(c.G) + 0.11*float64(c.B)
 }
 
+// The context readout. The moon carries context as phase and altitude; the
+// number under it says the same thing in digits once it starts to matter.
+// Silent before ReadoutFrom (his ruling 2026-09-05: "the readout should show
+// up when context hits 40% used" -- the session-6 study had said 65%), a dim
+// figure of what is LEFT from there, and a warm "NN% left" from ReadoutWarn.
+// The reveal itself is the first warning, and it teaches what the moon means
+// at the moment it starts to matter.
+const (
+	ReadoutFrom = 0.40
+	ReadoutWarn = 0.85
+)
+
+// drawReadout puts the number under the moon, kept inside the sky: with the
+// moon at the waterline the label would otherwise land in the sea.
+func drawReadout(c *canvas.Canvas, sh *scape.Shore, used float64) {
+	if used < ReadoutFrom {
+		return
+	}
+	mx, my := sh.MoonPos()
+	pct := fmt.Sprintf("%.0f%%", (1-used)*100)
+	txt, col := pct, moonLabelDim
+	if used >= ReadoutWarn {
+		txt, col = pct+" left", moonLabelWarn
+	}
+	hy := int(float64(c.H)*0.42) + 1
+	y := my + 3
+	if y > hy-1 {
+		y = hy - 1
+	}
+	x := mx - len(txt)/2
+	if x < 1 {
+		x = 1
+	}
+	if x+len(txt) > c.W-1 {
+		x = c.W - 1 - len(txt)
+	}
+	label(c, x, y, txt, col)
+}
+
 // drawScene paints one composed frame: the companion, its litter, the bubble
 // and the sand. The live loop and the mockup both go through here, so a change
 // to the composition cannot land in one and miss the other.
 func drawScene(c *canvas.Canvas, sh *scape.Shore, cat *companion.Cat, lay layout,
 	st reduce.State, t float64, seed int64, top int) {
+	drawReadout(c, sh, st.Act.ContextUsed)
 	cat.Draw(c.Near(), lay.CatX, top, t, st.Pose)
 	if st.Kittens > 0 {
 		// Swimmers stay above the shore's mean waterline with a row to spare

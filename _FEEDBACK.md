@@ -1045,3 +1045,15 @@ at 22:10 (lgarzoli out of tokens → donlucasx); artifact ownership checked, see
     on a second row so he can confirm or drop it. Also visible on the page: by day the unlit face is
     a slate-grey disc, so a half-spent sun reads as an eclipse; at 100% the night moon is a dark disc
     at the horizon, near-invisible by design.
+- *"I think the readout should show up when context hits 40% used"* (13:12)
+  ⇒ **LOCKED 2026-09-05: the readout appears at 40% used** (dim figure of what is LEFT under the
+    moon; the warm "NN% left" keeps its 85% step until he says otherwise). BUILT into the live
+    scene for the first time: `drawReadout` in `drawScene`, `ReadoutFrom` 0.40 / `ReadoutWarn`
+    0.85 in `live.go`, clamped above the horizon; red-first `readout_test.go`. The brief's row
+    corrected (it had said 65% and "done"). The context page regenerated from the same code.
+- *"ok, lets lock in the CURSOR option with REVERSE as an ALT color application"* (round two,
+  artifact "Cursor, Escape, Reverse" https://claude.ai/code/artifact/91c5853d-ee25-480a-972c-b504ffa27f89)
+  ⇒ **LOCKED: the xscapes identity is CURSOR** (a block cursor over the x, reverse video, one cell;
+    greys + noon blue 111; Geist Mono 700 + Geist). **REVERSE is the ALTERNATE COLOUR APPLICATION**
+    (the same cell filled gold 179 instead of ink; 136 in the cell on light, 94 as text). Escape's
+    four alternate marks are out. NEXT: the one-page guidelines, then the deck template.

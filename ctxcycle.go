@@ -12,12 +12,13 @@ import (
 
 // ctxCyclePage is the context cycle as the live scene paints it: the moon (the
 // sun by day) waning from full to new and sinking from high to the horizon as
-// context is used, its shine on the water fading with it. The numeric readout
-// decided in session 6 (appears at 65% used, brightens at 85%) is shown on a
-// second row for each hour, because it is NOT in the live scene today.
+// context is used, its shine on the water fading with it, and the readout
+// under it from ReadoutFrom (his ruling 2026-09-05: 40% used), warm from
+// ReadoutWarn. The page found the readout missing from the live scene on
+// 2026-09-05; it is drawn by drawScene now, so the page shows what ships.
 func ctxCyclePage(seed int64) string {
 	const w, h = 120, 24
-	frame := func(tod, used float64, readout bool) (*canvas.Canvas, int, int, int) {
+	frame := func(tod, used float64) (*canvas.Canvas, int, int, int) {
 		c := canvas.New(w, h, canvas.AlphaFar, canvas.AlphaMid, canvas.AlphaNear)
 		sh := scape.NewShore(seed, false)
 		cat := companion.NewCat()
@@ -32,14 +33,6 @@ func ctxCyclePage(seed int64) string {
 		sh.Update(c, 2, st.Act)
 		drawScene(c, sh, cat, lay, st, 2, seed, c.H-2-chh)
 		mx, my := sh.MoonPos()
-		if readout {
-			pct := fmt.Sprintf("%.0f%%", (1-used)*100)
-			if used >= 0.85 {
-				label(c, mx-len(pct)/2-2, my+3, pct+" left", moonLabelWarn)
-			} else if used >= 0.65 {
-				label(c, mx-len(pct)/2, my+3, pct, moonLabelDim)
-			}
-		}
 		return c, mx, my, int(float64(c.H)*0.42) + 1
 	}
 
@@ -62,18 +55,18 @@ func ctxCyclePage(seed int64) string {
 		`down at the horizon when it is spent (row = 22% + 62% &times; used, of the sky's height). The shine on the ` +
 		`water fades with the lit fraction. Every frame below is the live composition at 120 columns, painted as the ` +
 		`256 cube paints it in both terminals. The crops show the sky around the body at twice the size.</p>`)
-	b.WriteString(`<p class="nt"><b>The text percentage: there is none in the live scene today.</b> Session 6 decided ` +
-		`style C &mdash; a dim number under the moon from 65% used, a warm &ldquo;NN% left&rdquo; from 85% &mdash; and ` +
-		`the brief marks it done, but the label was only ever drawn in the study page. The second row for each hour ` +
-		`shows what that decided readout looks like on today's frames, so you can confirm it or drop it.</p>`)
+	fmt.Fprintf(&b, `<p class="nt"><b>The text percentage.</b> A dim figure of what is left appears under the body from `+
+		`%.0f%% used (his ruling, 2026-09-05), and turns into a warm &ldquo;NN%% left&rdquo; from %.0f%%. It stays in the sky `+
+		`even when the moon reaches the waterline. Before that the sky carries no digits: the reveal is the first warning.</p>`,
+		ReadoutFrom*100, ReadoutWarn*100)
 
 	levels := []float64{0, 0.10, 0.25, 0.40, 0.55, 0.65, 0.75, 0.85, 0.95, 1.0}
-	b.WriteString(`<table><tr><th>used</th><th>left</th><th>phase (lit)</th><th>readout, decided</th></tr>`)
+	b.WriteString(`<table><tr><th>used</th><th>left</th><th>phase (lit)</th><th>readout</th></tr>`)
 	for _, u := range levels {
 		ro := "silent"
-		if u >= 0.85 {
+		if u >= ReadoutWarn {
 			ro = "warm: \"NN% left\""
-		} else if u >= 0.65 {
+		} else if u >= ReadoutFrom {
 			ro = "dim number"
 		}
 		fmt.Fprintf(&b, `<tr><td>%.0f%%</td><td>%.0f%%</td><td>%.0f%%</td><td>%s</td></tr>`, u*100, (1-u)*100, (1-u)*100, ro)
@@ -87,19 +80,14 @@ func ctxCyclePage(seed int64) string {
 		name string
 		tod  float64
 	}{{"22:20, night", 0.931}, {"11:30, midday", 0.479}} {
-		fmt.Fprintf(&b, `<h2>%s</h2><h3>as it ships today</h3><div class="row">`, hr.name)
+		fmt.Fprintf(&b, `<h2>%s</h2><h3>as it ships</h3><div class="row">`, hr.name)
 		for _, u := range levels {
-			c, mx, _, hy := frame(hr.tod, u, false)
-			cell(fmt.Sprintf("%.0f%% used", u*100), c.HTMLFragmentCropAs(mx-14, 0, mx+15, hy+3, 18, term.Profile256))
-		}
-		b.WriteString(`</div><h3>with the decided readout (not built)</h3><div class="row">`)
-		for _, u := range levels {
-			c, mx, _, hy := frame(hr.tod, u, true)
+			c, mx, _, hy := frame(hr.tod, u)
 			cell(fmt.Sprintf("%.0f%% used", u*100), c.HTMLFragmentCropAs(mx-14, 0, mx+15, hy+3, 18, term.Profile256))
 		}
 		b.WriteString(`</div><h3>whole frames</h3><div class="row">`)
-		for _, u := range []float64{0, 0.55, 0.85, 1.0} {
-			c, _, _, _ := frame(hr.tod, u, false)
+		for _, u := range []float64{0, 0.40, 0.85, 1.0} {
+			c, _, _, _ := frame(hr.tod, u)
 			cell(fmt.Sprintf("%.0f%% used", u*100), c.HTMLFragmentAs(8, term.Profile256))
 		}
 		b.WriteString(`</div>`)

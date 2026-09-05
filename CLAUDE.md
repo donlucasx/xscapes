@@ -178,7 +178,7 @@ only if nothing else needs it.
 |---|---|---|
 | agent busy, how hard | **swells**: how many are travelling, how tall, whitecaps above half | done |
 | something is broken | **the companion**, not the weather: ears back, hunched, tail flat, amber eyes; persists until it clears | done |
-| context remaining | **moon** phase *and* altitude; numeric readout silent until 65%, brightens at 85% | done |
+| context remaining | **moon** phase *and* altitude; numeric readout of what is LEFT under the moon from **40% used** (his ruling 2026-09-05), warm &ldquo;NN% left&rdquo; from 85% | done &mdash; the readout was decided in s6 and marked done, but was never in the live scene until 2026-09-05 (`drawReadout`, `ReadoutFrom`) |
 | time of day | **sky colour**, real wall clock | done |
 | weather | **deferred, not rejected** &mdash; no rain, clouds, fog or sync in v1; the thinking is parked in `ideas.md` | deferred 2026-08-30 |
 | needs you | **bubble**, rare: needs_input, error, done. Nothing else | done — distinct cues shipped 2026-08-31: ask = warm SOLID box + alert pose; done = cool DOTTED knock + content `^ ^` pose, bounded by DoneHold |
