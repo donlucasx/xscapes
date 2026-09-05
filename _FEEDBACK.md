@@ -892,3 +892,7 @@ automation, the scroll glitch); his answers:
   as two blue holes in the head. Terminal.app shows the same holes, darker, in his 12:06 screengrab.
   Option: give the two eye cells the body's own colour (or a darker fur tone) as background before
   the glyph, so the eye is a mark on fur at every hour. Small. **His pick.**
+- *"ok, /wrap and make sure the parallel session (now idle) is aware of all the updates and things
+  that need testing"* (14:10) ⇒ nothing changed since `d0c6b74`; the peer `xscapes-aa` was sent a
+  live-test checklist (restart in Ghostty · resize both ways · the sun · the eyes · a trace for the
+  blank rows · a Terminal.app regression pass) with what to look for on each.
