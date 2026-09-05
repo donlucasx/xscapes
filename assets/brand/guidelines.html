@@ -1,0 +1,403 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>xscapes Brand Guidelines</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Geist+Mono:wght@400;700&family=Geist:wght@400;500;600&display=swap">
+<style>
+:root{--g:#eeeeee;--s:#e4e4e4;--ln:#d0d0d0;--d:#626262;--i:#121212;--acc:#005f87;--rule:#5f87af;--bk:#121212;--bx:#eeeeee;--gold:#af8700;--goldtx:#875f00;
+  --mono:"Geist Mono",ui-monospace,"SF Mono",Menlo,monospace;--sans:"Geist",-apple-system,BlinkMacSystemFont,"Segoe UI",Helvetica,Arial,sans-serif}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--g:#121212;--s:#1c1c1c;--ln:#303030;--d:#8a8a8a;--i:#eeeeee;--acc:#87afff;--rule:#87afff;--bk:#eeeeee;--bx:#121212;--gold:#d7af5f;--goldtx:#d7af5f}}
+:root[data-theme="dark"]{--g:#121212;--s:#1c1c1c;--ln:#303030;--d:#8a8a8a;--i:#eeeeee;--acc:#87afff;--rule:#87afff;--bk:#eeeeee;--bx:#121212;--gold:#d7af5f;--goldtx:#d7af5f}
+*{box-sizing:border-box}
+body{margin:0;background:var(--g);color:var(--i);font:15px/1.55 var(--sans)}
+.wrap{max-width:1080px;margin:0 auto;padding:0 28px}
+a{color:var(--acc);text-decoration:none;border-bottom:1px solid var(--ln)}
+code{font:.92em var(--mono)}
+header{padding:56px 0 30px;border-bottom:1px solid var(--ln)}
+.brandline{display:flex;align-items:center;gap:22px;flex-wrap:wrap;margin-bottom:26px}
+.lockup{font:700 64px/1.2 var(--mono);letter-spacing:0;white-space:nowrap}
+.blk{display:inline-block;width:1ch;line-height:1.2em;text-align:center;vertical-align:top;background:var(--bk);color:var(--bx)}
+.blk.off{background:transparent;color:var(--bk);box-shadow:inset 0 0 0 .04em var(--bk)}
+.blk.gold{background:var(--gold);color:#121212}
+.sym{font:700 64px/1.2 var(--mono);display:inline-block;width:1ch;text-align:center;background:var(--bk);color:var(--bx);animation:blink 1.06s steps(1) infinite}
+@keyframes blink{0%,50%{background:var(--bk);color:var(--bx);box-shadow:none}50.01%,100%{background:transparent;color:var(--bk);box-shadow:inset 0 0 0 .04em var(--bk)}}
+.meta{font:12px/1.6 var(--mono);color:var(--d);letter-spacing:.04em}
+h1{font:600 36px/1.1 var(--sans);letter-spacing:-.02em;margin:0 0 12px;text-wrap:balance}
+.lede{font-size:18px;max-width:62ch;margin:0 0 22px}
+nav{font:13px/1.8 var(--mono);color:var(--d)}
+nav a{color:var(--i);border:0;margin-right:18px}
+nav a:hover{color:var(--acc)}
+section{padding:44px 0 8px;border-bottom:1px solid var(--ln)}
+section:last-of-type{border:0;padding-bottom:64px}
+h2{font:600 26px/1.15 var(--sans);letter-spacing:-.015em;margin:0 0 8px}
+.sub{color:var(--d);max-width:64ch;margin:0 0 26px}
+h3{font:600 12px/1 var(--mono);letter-spacing:.08em;text-transform:uppercase;color:var(--d);margin:0 0 12px}
+p{max-width:66ch}
+.cols{display:grid;grid-template-columns:1fr 1fr;gap:36px}
+.cols3{display:grid;grid-template-columns:repeat(3,1fr);gap:20px}
+.cols4{display:grid;grid-template-columns:repeat(4,1fr);gap:16px}
+@media (max-width:820px){.cols,.cols3{grid-template-columns:1fr}.cols4{grid-template-columns:1fr 1fr}}
+.block{margin-bottom:36px;min-width:0}
+.panel{background:var(--s);border:1px solid var(--ln);padding:34px 30px;overflow-x:auto}
+.panel.dk{background:#121212;border-color:#303030;color:#eeeeee;--bk:#eeeeee;--bx:#121212;--gold:#d7af5f}
+.panel.lt{background:#eeeeee;border-color:#d0d0d0;color:#121212;--bk:#121212;--bx:#eeeeee;--gold:#af8700}
+.cap{font:12px/1.55 var(--mono);color:var(--d);margin:10px 0 0}
+.cap b{color:var(--i);font-weight:400}
+.typed{background:var(--s);border:1px solid var(--ln);border-top:0;padding:12px 16px;font:13px/1.6 var(--mono);color:var(--d);white-space:pre;overflow-x:auto}
+.typed b{color:var(--i);font-weight:400}
+.rules{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-bottom:36px}
+.rule{background:var(--s);border:1px solid var(--ln);padding:16px 16px 18px}
+.rule b{display:block;font:600 14px/1.3 var(--sans);margin:0 0 8px}
+.rule p{margin:0;color:var(--d);font-size:13.5px;line-height:1.5}
+@media (max-width:820px){.rules{grid-template-columns:1fr 1fr}}
+.geo{display:flex;gap:36px;align-items:flex-start;flex-wrap:wrap}
+.geo svg{display:block;height:300px;width:auto}
+.geo .txt{max-width:40ch;font-size:14px;color:var(--d)}
+.geo .txt b{color:var(--i);font-weight:600}
+.geo .txt p{margin:0 0 10px}
+.grid{font:700 52px/1.2 var(--mono);display:inline-block;padding:1.2em 1ch;background-color:var(--s);background-image:linear-gradient(to right,var(--ln) 1px,transparent 1px),linear-gradient(to bottom,var(--ln) 1px,transparent 1px);background-size:1ch 1.2em;border:1px solid var(--ln)}
+.grid .inner{outline:1px dashed var(--acc);display:inline-block;white-space:nowrap}
+.icons{display:flex;align-items:flex-end;gap:22px;flex-wrap:wrap}
+.icon{display:flex;flex-direction:column;align-items:center;gap:8px}
+.icon .sq{background:var(--g);border:1px solid var(--ln);display:flex;align-items:center;justify-content:center}
+.icon .sq .blk{font:700 1em/1.2 var(--mono)}
+.icon small{font:11px var(--mono);color:var(--d)}
+.donts{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:8px}
+.dont{background:var(--s);border:1px solid var(--ln);padding:20px 14px 12px;text-align:center;min-width:0;overflow:hidden}
+.dont .ex{font:700 40px/1.2 var(--mono);white-space:nowrap;margin-bottom:12px}
+.dont small{font:11px/1.4 var(--mono);color:var(--d);display:block}
+@media (max-width:820px){.donts{grid-template-columns:1fr 1fr}}
+.dodont{display:grid;grid-template-columns:1fr 1fr;gap:28px}
+.dodont h4{font:600 14px/1.3 var(--sans);margin:0 0 8px}
+.dodont ul{margin:0;padding-left:18px;color:var(--d);font-size:14px}
+.dodont li{margin:0 0 6px}
+@media (max-width:820px){.dodont{grid-template-columns:1fr}}
+table{border-collapse:collapse;width:100%;font-size:13.5px;margin:0 0 8px}
+th{font:600 11px/1.2 var(--mono);letter-spacing:.06em;text-transform:uppercase;color:var(--d);text-align:left;padding:0 10px 10px 0;border-bottom:1px solid var(--ln)}
+td{padding:9px 10px 9px 0;border-bottom:1px solid var(--ln);vertical-align:top;font-variant-numeric:tabular-nums}
+td.m{font:12.5px var(--mono)}
+td.c{width:44px}
+.chip{display:inline-block;width:32px;height:22px;border:1px solid var(--ln);vertical-align:middle}
+.tw{overflow-x:auto}
+.ok{color:var(--acc)}
+.no{color:var(--d)}
+.pal{display:grid;grid-template-columns:repeat(6,1fr);gap:8px;margin-bottom:8px}
+.sw{display:flex;flex-direction:column;gap:5px;min-width:0}
+.sw .c{aspect-ratio:4/3;border:1px solid var(--ln)}
+.sw .n{font:600 12px/1.2 var(--sans)}
+.sw .h{font:11px/1.4 var(--mono);color:var(--d)}
+@media (max-width:820px){.pal{grid-template-columns:repeat(3,1fr)}}
+.spec{background:var(--s);border:1px solid var(--ln);padding:26px 28px}
+.spec .t34{font:600 34px/1.1 var(--sans);letter-spacing:-.02em;margin:0 0 8px;text-wrap:balance}
+.spec .t22{font:500 22px/1.25 var(--sans);margin:0 0 12px}
+.spec .t15{font:400 15px/1.55 var(--sans);margin:0 0 12px;max-width:52ch}
+.spec .t13{font:400 13px/1.6 var(--mono);color:var(--d);margin:0 0 6px}
+.spec .t11{font:400 11px/1.2 var(--mono);letter-spacing:.06em;text-transform:uppercase;color:var(--d);margin:0}
+.voice td:first-child{width:50%}
+.term{background:#000;border:1px solid var(--ln);padding:14px 18px 16px;font:14px/1.6 var(--mono);color:#c6c6c6;white-space:pre;overflow-x:auto;--bk:#c6c6c6;--bx:#000}
+.term .p{color:#585858}.term .dm{color:#8a8a8a}
+.readme{background:var(--s);border:1px solid var(--ln);padding:22px 24px}
+.readme .lockup{font-size:40px}
+.readme p{margin:10px 0 0;font-size:14px;color:var(--d)}
+.slides{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.slide{aspect-ratio:16/9;border:1px solid var(--ln);padding:6.5% 7%;display:flex;flex-direction:column;justify-content:space-between;overflow:hidden;min-width:0;font-family:var(--sans)}
+.slide .k{font:1em/1.2 var(--mono);font-size:clamp(10px,1vw,13px);letter-spacing:.04em;opacity:.8}
+.slide .k .blk{letter-spacing:0;font-weight:700}
+.slide .t{font-size:clamp(16px,2.4vw,30px);font-weight:600;line-height:1.1;letter-spacing:-.015em;margin:0;text-wrap:balance}
+.slide .su{font-size:clamp(11px,1.2vw,15px);opacity:.75;margin:6px 0 0}
+.slide .f{font:1em var(--mono);font-size:clamp(9px,1vw,12px);opacity:.65;display:flex;justify-content:space-between}
+.slide.dk{background:#121212;color:#eeeeee;--bk:#eeeeee;--bx:#121212}
+.slide.lt{background:#eeeeee;color:#121212;--bk:#121212;--bx:#eeeeee}
+.slide .accent{color:#87afff}.slide.lt .accent{color:#005f87}
+.slide .goldtx{color:#d7af5f}
+@media (max-width:820px){.slides{grid-template-columns:1fr}}
+.files{display:grid;grid-template-columns:repeat(4,1fr);gap:14px}
+.file{background:var(--s);border:1px solid var(--ln);padding:14px;min-width:0}
+.file .pv{height:76px;display:flex;align-items:center;justify-content:center;background:var(--g);border:1px solid var(--ln);margin-bottom:10px;padding:8px}
+.file .pv.dkbg{background:#121212}.file .pv.ltbg{background:#eeeeee}
+.file .pv svg{max-height:100%;max-width:100%;width:auto;height:auto}
+.file .pv.mk svg{height:56px}
+.file .pv.av svg{height:60px}
+.file code{display:block;font-size:11.5px;color:var(--i);word-break:break-all}
+.file small{font:11px/1.4 var(--mono);color:var(--d);display:block;margin-top:4px}
+@media (max-width:820px){.files{grid-template-columns:1fr 1fr}}
+pre.snip{background:var(--s);border:1px solid var(--ln);padding:14px 16px;font:12.5px/1.6 var(--mono);color:var(--i);overflow-x:auto;margin:0}
+.foot{color:var(--d);font-size:12.5px;max-width:70ch}
+@media (prefers-reduced-motion:reduce){.sym{animation:none}}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="wrap">
+    <div class="brandline"><span class="lockup"><span class="blk">x</span>scapes</span><span class="meta">brand guidelines &middot; version 1.0 &middot; 5 September 2026</span></div>
+    <h1>xscapes Brand Guidelines</h1>
+    <p class="lede">The identity is a block cursor over the x. This page is the whole rulebook: the mark and its geometry, the colours and where each one may go, the type, the voice, and the files in the repository.</p>
+    <nav><a href="#idea">The idea</a><a href="#rules">Rules</a><a href="#mark">The mark</a><a href="#colour">Colour</a><a href="#reverse">Reverse</a><a href="#type">Type</a><a href="#voice">Voice</a><a href="#apps">Applications</a><a href="#files">Files</a></nav>
+  </div>
+</header>
+
+<section id="idea">
+  <div class="wrap">
+    <h2>The idea</h2>
+    <p class="sub">The oldest waiting screen in computing is a blinking block cursor. xscapes is what that cursor turns into while an agent works. So the mark is the terminal's own cursor, drawn over the x by reverse video, and any terminal can print it without an image:</p>
+    <div class="block"><div class="typed" style="border-top:1px solid var(--ln)"><b>printf '\e[7mx\e[0mscapes'</b></div></div>
+  </div>
+</section>
+
+<section id="rules">
+  <div class="wrap">
+    <h2>Four rules</h2>
+    <p class="sub">They come from the product, not from taste. Every decision below follows from one of them.</p>
+    <div class="rules">
+      <div class="rule"><b>Every colour is an xterm-256 index, 16 to 255.</b><p>The product never emits below 16, because those sixteen are the only colours a terminal profile can repaint. The brand keeps the rule. Every swatch here carries its index and the SGR parameter that paints it.</p></div>
+      <div class="rule"><b>Every mark can be typed.</b><p>The logo is characters in monospace cells. The lockup is one printf. If a version cannot be produced by a terminal or pasted into a README, it is not the logo.</p></div>
+      <div class="rule"><b>Claude's oranges are out.</b><p>Terracotta and ginger read as Claude's mark, ruled out for the companion on 31 August 2026 and out for brand accents too. The dawn and dusk horizons stay in the scene, because they are the sky.</p></div>
+      <div class="rule"><b>Plain words.</b><p>Concrete over conceptual, evidence over claim, no clever umbrella terms. The name is lowercase everywhere, including the start of a sentence.</p></div>
+    </div>
+  </div>
+</section>
+
+<section id="mark">
+  <div class="wrap">
+    <h2>The mark</h2>
+    <p class="sub">One terminal cell with the x drawn in reverse video, followed by the rest of the word in the same face. The cell is the text colour of its context; the x is the ground showing through. There is never a third colour in the cell.</p>
+
+    <div class="cols">
+      <div class="block"><h3>Lockup on the dark ground, 233</h3><div class="panel dk"><div class="lockup"><span class="blk">x</span>scapes</div></div><div class="typed"><b>xscapes</b>                    plain text
+<b>printf '\e[7mx\e[0mscapes'</b> any terminal</div></div>
+      <div class="block"><h3>Lockup on the light ground, 255</h3><div class="panel lt"><div class="lockup"><span class="blk">x</span>scapes</div></div><p class="cap">Same rule reversed: the cell is ink 233, the x is the ground 255.</p></div>
+    </div>
+
+    <div class="block">
+      <h3>Geometry</h3>
+      <div class="panel"><div class="geo">
+        <svg viewBox="-260 -60 1230 1340" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="one cell, 600 by 1200 units, baseline at 955">
+          <rect x="0" y="0" width="600" height="1200" fill="var(--bk)"/>
+          <path transform="translate(0 955)" d="M34 0 224 -274 42 -536H190L300 -367L409 -536H557L378 -274L566 0H419L300 -183L182 0Z" fill="var(--bx)"/>
+          <g stroke="var(--d)" stroke-width="4" fill="none">
+            <line x1="0" y1="-30" x2="600" y2="-30"/><line x1="0" y1="-50" x2="0" y2="-10"/><line x1="600" y1="-50" x2="600" y2="-10"/>
+            <line x1="-40" y1="0" x2="-40" y2="1200"/><line x1="-60" y1="0" x2="-20" y2="0"/><line x1="-60" y1="1200" x2="-20" y2="1200"/>
+            <line x1="600" y1="955" x2="820" y2="955" stroke-dasharray="14 12"/>
+          </g>
+          <g font-family="Geist Mono, monospace" font-size="52" fill="var(--d)">
+            <text x="300" y="-70" text-anchor="middle">0.6 em</text>
+            <text x="-90" y="620" text-anchor="middle" transform="rotate(-90 -90 620)">1.2 em</text>
+            <text x="640" y="1010">baseline</text>
+            <text x="640" y="1062" font-size="40">955 / 1200</text>
+          </g>
+        </svg>
+        <div class="txt">
+          <p><b>The cell is 0.6 em wide and 1.2 em tall</b>, a ratio of exactly 1:2. Those are Geist Mono 700's advance width and a line height of 1.2, the same cell the terminal draws.</p>
+          <p><b>The x sits on the terminal's baseline</b>, 955 units from the top of a 1200-unit cell, which is where a terminal centres the font's ascent and descent. It is not centred on the glyph; that would move it 22 units up and it would stop matching the real cursor.</p>
+          <p><b>No tracking.</b> The word is set at the font's own advance, as a terminal would. On the web that means <code>letter-spacing: 0</code>.</p>
+          <p><b>Files:</b> the SVGs in <code>assets/brand/</code> are built from the font's real outlines by <code>make-brand.py</code>, so nothing downstream depends on the font being installed.</p>
+        </div>
+      </div></div>
+    </div>
+
+    <div class="cols">
+      <div class="block"><h3>Symbol, and the blink</h3><div class="panel"><div class="icons" style="align-items:center;gap:32px"><span class="sym">x</span><span class="lockup"><span class="blk off">x</span></span><span class="cap" style="margin:0;max-width:26ch">On, and off. The off state is the hollow cell an unfocused window shows. The symbol blinks about twice a second, only when it is the only thing moving on the page. The lockup never blinks.</span></div></div></div>
+      <div class="block"><h3>Favicon and avatar</h3><div class="panel"><div class="icons">
+        <div class="icon"><div class="sq" style="width:128px;height:128px;font-size:76px"><span class="blk">x</span></div><small>128</small></div>
+        <div class="icon"><div class="sq" style="width:64px;height:64px;font-size:38px"><span class="blk">x</span></div><small>64</small></div>
+        <div class="icon"><div class="sq" style="width:32px;height:32px;font-size:19px"><span class="blk">x</span></div><small>32</small></div>
+        <div class="icon"><div class="sq" style="width:16px;height:16px;font-size:9.5px"><span class="blk">x</span></div><small>16</small></div>
+      </div></div><p class="cap">On a square canvas the cell keeps its proportion and stands 74% of the height. <code>avatar.svg</code> is this at 512.</p></div>
+    </div>
+
+    <div class="cols">
+      <div class="block"><h3>Clear space and minimum size</h3><div class="panel" style="padding:22px"><div class="grid"><span class="inner"><span class="blk">x</span>scapes</span></div></div><p class="cap">Clear space is <b>one cell</b> on every side: 0.6 em left and right, 1.2 em above and below. Minimum size for the lockup is 12 px, where the cell is 7 px wide. Below that, use the symbol alone; it holds to 8 px.</p></div>
+      <div class="block dodont" style="margin-bottom:0">
+      <div><h4>Do</h4><ul><li>Set the lockup in Geist Mono 700 with no tracking, and nothing else.</li><li>Keep the cell the text colour and the x the ground.</li><li>Keep one cell of clear space around it.</li><li>Blink the symbol only, and only when nothing else moves.</li><li>Write it as <code>xscapes</code> everywhere plain text goes.</li></ul></div>
+      <div><h4>Do not</h4><ul><li>Recolour the x, or put a third colour in the cell.</li><li>Set "scapes" in the sans, or in any weight but 700.</li><li>Stretch, rotate, outline, or add a shadow.</li><li>Put the mark over the scene. The brand stays off the picture.</li><li>Capitalise it, even at the start of a sentence, even in a title.</li></ul></div>
+    </div>
+    </div>
+
+    <div class="block"><h3>Not this</h3><div class="donts">
+        <div class="dont"><div class="ex">x<span class="blk">s</span>capes</div><small>the cell is the x, never another letter</small></div>
+        <div class="dont"><div class="ex"><span class="blk">x</span> scapes</div><small>no space: the cell is part of the word</small></div>
+        <div class="dont"><div class="ex"><span class="blk" style="width:1.2em">x</span>scapes</div><small>not a square: a cell is 1:2</small></div>
+        <div class="dont"><div class="ex"><span class="blk" style="border-radius:.3em">x</span>scapes</div><small>no rounded corners, no outline</small></div>
+      </div></div>
+  </div>
+</section>
+
+<section id="colour">
+  <div class="wrap">
+    <h2>Colour</h2>
+    <p class="sub">Greys and one accent, on a dark ground first. Every value is a cube entry, so a swatch on a slide is the exact colour on every terminal. Each is named with its index and the SGR parameter that paints it: 38 for text, 48 for a background.</p>
+
+    <div class="cols">
+      <div class="block"><h3>Dark, the default</h3><div class="pal">
+        <div class="sw"><div class="c" style="background:#121212"></div><div class="n">ground</div><div class="h">#121212<br>233 &middot; 48;5;233</div></div>
+        <div class="sw"><div class="c" style="background:#1c1c1c"></div><div class="n">surface</div><div class="h">#1c1c1c<br>234 &middot; 48;5;234</div></div>
+        <div class="sw"><div class="c" style="background:#303030"></div><div class="n">line</div><div class="h">#303030<br>236 &middot; 38;5;236</div></div>
+        <div class="sw"><div class="c" style="background:#8a8a8a"></div><div class="n">dim</div><div class="h">#8a8a8a<br>245 &middot; 38;5;245</div></div>
+        <div class="sw"><div class="c" style="background:#eeeeee"></div><div class="n">ink</div><div class="h">#eeeeee<br>255 &middot; 38;5;255</div></div>
+        <div class="sw"><div class="c" style="background:#87afff"></div><div class="n">shallow</div><div class="h">#87afff<br>111 &middot; 38;5;111</div></div>
+      </div><p class="cap">The accent is the sea at noon. One highlight per surface: a link colour, a footer line, one word. Never a fill behind text.</p></div>
+      <div class="block"><h3>Light, for print and light decks</h3><div class="pal">
+        <div class="sw"><div class="c" style="background:#eeeeee"></div><div class="n">ground</div><div class="h">#eeeeee<br>255 &middot; 48;5;255</div></div>
+        <div class="sw"><div class="c" style="background:#e4e4e4"></div><div class="n">surface</div><div class="h">#e4e4e4<br>254 &middot; 48;5;254</div></div>
+        <div class="sw"><div class="c" style="background:#d0d0d0"></div><div class="n">line</div><div class="h">#d0d0d0<br>252 &middot; 38;5;252</div></div>
+        <div class="sw"><div class="c" style="background:#626262"></div><div class="n">dim</div><div class="h">#626262<br>241 &middot; 38;5;241</div></div>
+        <div class="sw"><div class="c" style="background:#121212"></div><div class="n">ink</div><div class="h">#121212<br>233 &middot; 38;5;233</div></div>
+        <div class="sw"><div class="c" style="background:#005f87"></div><div class="n">dawn</div><div class="h">#005f87<br>24 &middot; 38;5;24</div></div>
+      </div><p class="cap">On light the accent is the pre-dawn sky, 24, because the noon blue fails as text there. Sea 67 <code>#5f87af</code> may still draw rules and graphics on light, never words.</p></div>
+    </div>
+
+    <div class="cols">
+      <div class="block"><h3>Contrast, measured</h3><div class="tw"><table>
+        <tr><th></th><th>pair</th><th>ratio</th><th>use</th></tr>
+        <tr><td class="c"><span class="chip" style="background:#121212"><span style="display:block;width:14px;height:22px;background:#eeeeee;margin:0 auto"></span></span></td><td>ink 255 on ground 233</td><td class="m">16.15</td><td class="ok">text</td></tr>
+        <tr><td class="c"><span class="chip" style="background:#121212"><span style="display:block;width:14px;height:22px;background:#8a8a8a;margin:0 auto"></span></span></td><td>dim 245 on ground 233</td><td class="m">5.43</td><td class="ok">text</td></tr>
+        <tr><td class="c"><span class="chip" style="background:#121212"><span style="display:block;width:14px;height:22px;background:#87afff;margin:0 auto"></span></span></td><td>shallow 111 on ground 233</td><td class="m">8.57</td><td class="ok">text</td></tr>
+        <tr><td class="c"><span class="chip" style="background:#121212"><span style="display:block;width:14px;height:22px;background:#d7af5f;margin:0 auto"></span></span></td><td>gold 179 on ground 233</td><td class="m">9.09</td><td class="ok">text</td></tr>
+        <tr><td class="c"><span class="chip" style="background:#d7af5f"><span style="display:block;width:14px;height:22px;background:#121212;margin:0 auto"></span></span></td><td>x 233 in a gold 179 cell</td><td class="m">9.09</td><td class="ok">text</td></tr>
+        <tr><td class="c"><span class="chip" style="background:#eeeeee"><span style="display:block;width:14px;height:22px;background:#121212;margin:0 auto"></span></span></td><td>ink 233 on light 255</td><td class="m">16.15</td><td class="ok">text</td></tr>
+        <tr><td class="c"><span class="chip" style="background:#eeeeee"><span style="display:block;width:14px;height:22px;background:#626262;margin:0 auto"></span></span></td><td>dim 241 on light 255</td><td class="m">5.26</td><td class="ok">text</td></tr>
+        <tr><td class="c"><span class="chip" style="background:#eeeeee"><span style="display:block;width:14px;height:22px;background:#005f87;margin:0 auto"></span></span></td><td>dawn 24 on light 255</td><td class="m">6.06</td><td class="ok">text</td></tr>
+        <tr><td class="c"><span class="chip" style="background:#eeeeee"><span style="display:block;width:14px;height:22px;background:#5f87af;margin:0 auto"></span></span></td><td>sea 67 on light 255</td><td class="m">3.25</td><td class="ok">large</td></tr>
+        <tr><td class="c"><span class="chip" style="background:#eeeeee"><span style="display:block;width:14px;height:22px;background:#87afff;margin:0 auto"></span></span></td><td>shallow 111 on light 255</td><td class="m">1.88</td><td class="no">no</td></tr>
+        <tr><td class="c"><span class="chip" style="background:#eeeeee"><span style="display:block;width:14px;height:22px;background:#d7af5f;margin:0 auto"></span></span></td><td>gold 179 on light 255</td><td class="m">1.78</td><td class="no">no</td></tr>
+        <tr><td class="c"><span class="chip" style="background:#eeeeee"><span style="display:block;width:14px;height:22px;background:#875f00;margin:0 auto"></span></span></td><td>gold 94 on light 255</td><td class="m">4.94</td><td class="ok">text</td></tr>
+        <tr><td class="c"><span class="chip" style="background:#af8700"><span style="display:block;width:14px;height:22px;background:#121212;margin:0 auto"></span></span></td><td>x 233 in a gold 136 cell</td><td class="m">5.61</td><td class="ok">text</td></tr>
+      </table></div><p class="cap">WCAG 2 ratios. <b>text</b> means 4.5 or more, fine for any size; <b>large</b> means 3 or more, fine for headings, rules and fills; <b>no</b> means do not.</p></div>
+      <div class="block"><h3>The scene palette, secondary</h3><div class="pal">
+        <div class="sw"><div class="c" style="background:#005f5f"></div><div class="n">deep</div><div class="h">#005f5f<br>23</div></div>
+        <div class="sw"><div class="c" style="background:#5f87af"></div><div class="n">sea</div><div class="h">#5f87af<br>67</div></div>
+        <div class="sw"><div class="c" style="background:#87afff"></div><div class="n">shallow</div><div class="h">#87afff<br>111</div></div>
+        <div class="sw"><div class="c" style="background:#d7af87"></div><div class="n">sand</div><div class="h">#d7af87<br>180</div></div>
+        <div class="sw"><div class="c" style="background:#af875f"></div><div class="n">sand low</div><div class="h">#af875f<br>137</div></div>
+        <div class="sw"><div class="c" style="background:#ffd7af"></div><div class="n">cream</div><div class="h">#ffd7af<br>223</div></div>
+      </div><p class="cap">The shore's own colours, from <code>internal/scape/palette.go</code>. They appear only where the deck or the page shows the shore, as the shore. They are never brand accents, and the sand is never a background for text.</p></div>
+    </div>
+  </div>
+</section>
+
+<section id="reverse">
+  <div class="wrap">
+    <h2>Reverse, the alternate colour application</h2>
+    <p class="sub">The same cell filled with gold instead of ink. The x stays the ground and the word stays ink. Nothing else about the mark changes, and none of the rules above relax.</p>
+    <div class="cols">
+      <div class="block"><h3>On dark: gold 179</h3><div class="panel dk"><div class="lockup"><span class="blk gold">x</span>scapes</div></div><div class="typed"><b>printf '\e[48;5;179;38;5;233mx\e[0mscapes'</b></div></div>
+      <div class="block"><h3>On light: gold 136 in the cell</h3><div class="panel lt"><div class="lockup"><span class="blk gold">x</span>scapes</div></div><p class="cap">179 fails against a light ground (1.78:1), so on light the cell takes 136 <code>#af8700</code>, and gold used as text takes 94 <code>#875f00</code>. Both are cube entries; the measured ratios are in the table above.</p></div>
+    </div>
+    <div class="cols">
+      <div class="block"><h3>When</h3><p style="margin:0 0 10px">Where the brand is the subject rather than a label: the deck's title and closing slides, the header of the Commons page, the avatar and the social image. It is the warm hand; use it once per surface.</p><p style="margin:0">Everywhere the mark labels something else, the cell is ink: section headers, the README, footers, captions. In the terminal it is always plain reverse video, so it takes the user's own colours.</p></div>
+      <div class="block"><h3>Never</h3><ul style="margin:0;padding-left:18px;color:var(--d);font-size:14px"><li style="margin:0 0 6px">Both cells on one surface. A slide has an ink mark or a gold mark, not one of each.</li><li style="margin:0 0 6px">Gold on "scapes". Only the cell is gold; the word is always ink.</li><li style="margin:0 0 6px">Gold as a text colour on light except 94, and never as a fill behind text.</li><li>Gold in the sea. The scene keeps its own palette.</li></ul></div>
+    </div>
+    <div class="block"><h3>Gold</h3><div class="pal">
+      <div class="sw"><div class="c" style="background:#d7af5f"></div><div class="n">gold</div><div class="h">#d7af5f<br>179 &middot; 48;5;179 on dark</div></div>
+      <div class="sw"><div class="c" style="background:#af8700"></div><div class="n">gold, cell on light</div><div class="h">#af8700<br>136 &middot; 48;5;136</div></div>
+      <div class="sw"><div class="c" style="background:#875f00"></div><div class="n">gold, text on light</div><div class="h">#875f00<br>94 &middot; 38;5;94</div></div>
+    </div></div>
+  </div>
+</section>
+
+<section id="type">
+  <div class="wrap">
+    <h2>Type</h2>
+    <p class="sub">Two faces from one family. Geist Mono carries the mark, code, labels and captions; Geist carries everything people read. Both are on Google Fonts under the OFL; the fallbacks are SF Mono or Menlo, and the system sans.</p>
+    <div class="cols">
+      <div class="block"><h3>Specimen</h3><div class="spec">
+        <p class="t34">Waiting for an agent is dead time.</p>
+        <p class="t22">The sea rises with the work, the sand records it, and the cat knocks when it needs you.</p>
+        <p class="t15">You fire off a prompt, the terminal goes quiet, you tab away, and then you forget to come back. xscapes gives that dead time a face: a small living shoreline that runs with your agent.</p>
+        <p class="t13">go install github.com/donlucasx/xscapes@latest</p>
+        <p class="t11">one go binary &middot; no dependencies &middot; any 256-colour terminal</p>
+      </div></div>
+      <div class="block"><h3>Scale</h3><div class="tw"><table>
+        <tr><th>role</th><th>face</th><th>size / line</th><th>notes</th></tr>
+        <tr><td>lockup</td><td class="m">Geist Mono 700</td><td class="m">any / 1.2</td><td>no tracking; the cell is the line height</td></tr>
+        <tr><td>label, eyebrow</td><td class="m">Geist Mono 400</td><td class="m">11 / 1.2</td><td>tracking .06 em; uppercase allowed here only, never on the name</td></tr>
+        <tr><td>code, caption</td><td class="m">Geist Mono 400</td><td class="m">13 / 1.6</td><td>dim colour for captions, ink for code</td></tr>
+        <tr><td>body</td><td class="m">Geist 400</td><td class="m">15 / 1.55</td><td>measure 60 to 66 characters</td></tr>
+        <tr><td>subhead</td><td class="m">Geist 500</td><td class="m">22 / 1.25</td><td></td></tr>
+        <tr><td>title</td><td class="m">Geist 600</td><td class="m">34 / 1.1</td><td>tracking -.02 em</td></tr>
+        <tr><td>deck title</td><td class="m">Geist 600</td><td class="m">72 / 1.05</td><td>at 1920 by 1080; subtitle 32 / 1.3, body 26 / 1.45, footer 16 mono</td></tr>
+      </table></div><p class="cap">In the terminal none of this applies. The mark is drawn in whatever font the user runs, which is the point.</p></div>
+    </div>
+  </div>
+</section>
+
+<section id="voice">
+  <div class="wrap">
+    <h2>Voice</h2>
+    <p class="sub">Say what it does. Plain over poetic, concrete over conceptual, evidence over claim. Sentences a person would say out loud, with the number in them if there is one.</p>
+    <div class="cols">
+      <div class="block"><h3>Fixed lines</h3><div class="tw"><table>
+        <tr><td>the name</td><td class="m">xscapes</td></tr>
+        <tr><td>what it is</td><td class="m">a thinking screen for terminal agents</td></tr>
+        <tr><td>the pitch</td><td class="m">the waiting layer for terminal agents</td></tr>
+        <tr><td>the rule of the scene</td><td class="m">the water is the work, the sky is the world</td></tr>
+        <tr><td>the command</td><td class="m">xscapes claude</td></tr>
+      </table></div><p class="cap">The first two are the CLI's own help header, so the deck and the binary say the same thing.</p></div>
+      <div class="block"><h3>Say, and do not say</h3><div class="tw"><table class="voice">
+        <tr><th>say</th><th>not</th></tr>
+        <tr><td>a thinking screen for terminal agents</td><td class="no">an AI-powered ambient companion experience</td></tr>
+        <tr><td>the sea rises with the work</td><td class="no">delightful real-time activity visualisation</td></tr>
+        <tr><td>one Go binary, no dependencies</td><td class="no">get started in seconds!</td></tr>
+        <tr><td>measured at 124 by 27, all 48 half-hours</td><td class="no">beautifully smooth gradients</td></tr>
+      </table></div><p class="cap">No em dashes, no exclamation marks, no "AI-powered", no "delightful". Numbers go with their units. Nothing is described by how it feels when it can be described by what it does.</p></div>
+    </div>
+  </div>
+</section>
+
+<section id="apps">
+  <div class="wrap">
+    <h2>Applications</h2>
+    <p class="sub">The mark in the four places it will actually appear, in the order a user meets them.</p>
+    <div class="cols">
+      <div class="block"><h3>1 &middot; The terminal, reverse video</h3><div class="term"><span class="p">$</span> xscapes
+<span class="blk">x</span>scapes  a thinking screen for terminal agents
+
+<span class="dm">  xscapes claude          Claude Code inside the scape
+  xscapes claude -beside  the older tmux layout
+  xscapes install claude  print the hook plan</span></div><p class="cap">The help header. The terminal draws the cell in the user's own foreground and background, which is the only version of the mark most users will ever see.</p></div>
+      <div class="block"><h3>2 &middot; The README</h3><div class="readme"><span class="lockup"><span class="blk">x</span>scapes</span><p>A thinking screen for terminal agents. Claude Code runs inside a shoreline: the sea rises with the work, the sand records it, and a cat knocks when it needs you.</p></div><pre class="snip" style="border-top:0;font-size:11.5px">&lt;picture&gt;
+  &lt;source media="(prefers-color-scheme: dark)"
+          srcset="assets/brand/lockup-dark.svg"&gt;
+  &lt;img src="assets/brand/lockup-light.svg"
+       alt="xscapes" height="48"&gt;
+&lt;/picture&gt;</pre></div>
+    </div>
+    <div class="block"><h3>3 &middot; The deck: title in Reverse, everything after it in ink</h3><div class="slides">
+      <div class="slide dk"><div class="k"><span class="blk" style="background:#d7af5f;color:#121212">x</span>scapes</div><div><p class="t">The waiting layer for terminal agents.</p><p class="su">An event protocol, pluggable adapters, and one reference scape.</p></div><div class="f"><span>Commons &middot; Make Waiting for AI Fun</span><span class="goldtx">September 2026</span></div></div>
+      <div class="slide dk"><div class="k"><span class="blk">x</span>scapes &middot; what a glance tells you</div><table style="font-size:clamp(10px,1.1vw,14px);margin-top:4%;color:#eeeeee"><tr><td style="border-color:#eeeeee;opacity:.7;width:38%">how hard it is working</td><td style="border-color:#eeeeee">the swells: how many, how tall</td></tr><tr><td style="border-color:#eeeeee;opacity:.7">what it is doing now</td><td style="border-color:#eeeeee">written in the sand, newest brightest</td></tr><tr><td style="border-color:#eeeeee;opacity:.7">something broke</td><td style="border-color:#eeeeee">the companion, not the weather</td></tr><tr><td style="border-color:#eeeeee;opacity:.7">it needs you</td><td style="border-color:#eeeeee">a knock, and a sound</td></tr></table><div class="f"><span class="accent">the water is the work, the sky is the world</span><span>04</span></div></div>
+    </div><p class="cap">The deck is dark throughout, so it looks like the thing it is about. Gold once, on the title and again on the last slide; the noon blue for the one highlight on every other slide.</p></div>
+    <div class="cols">
+      <div class="block"><h3>4 &middot; Avatar and social</h3><div class="panel" style="padding:24px"><div class="icons" style="gap:28px"><div class="icon" style="width:128px"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><rect width="512" height="512" fill="#121212"/><g transform="translate(161.28 66.56) scale(0.315733)"><rect width="600" height="1200" fill="#eeeeee"/><path transform="translate(0 955.0)" d="M34 0 224 -274 42 -536H190L300 -367L409 -536H557L378 -274L566 0H419L300 -183L182 0Z" fill="#121212"/></g></svg><small>avatar.svg</small></div><div class="icon" style="width:128px"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><rect width="512" height="512" fill="#121212"/><g transform="translate(161.28 66.56) scale(0.315733)"><rect width="600" height="1200" fill="#d7af5f"/><path transform="translate(0 955.0)" d="M34 0 224 -274 42 -536H190L300 -367L409 -536H557L378 -274L566 0H419L300 -183L182 0Z" fill="#121212"/></g></svg><small>avatar-gold.svg</small></div></div></div><p class="cap">The GitHub avatar is the gold one, because there the brand is the subject. Export to PNG at 512 from the SVG; GitHub does not take SVG.</p></div>
+      <div class="block"><h3>The Commons page</h3><p style="margin:0 0 8px">When the page is rebuilt it takes this system whole: ground 233, the lockup in gold at the top as the one Reverse instance, the noon blue for links, Geist and Geist Mono, and the shore shown only as itself. Its current accent <code>#e8c27a</code> is not a cube entry and goes.</p></div>
+    </div>
+  </div>
+</section>
+
+<section id="files">
+  <div class="wrap">
+    <h2>Files</h2>
+    <p class="sub">Everything lives in <code>assets/brand/</code>. The SVGs are the font's real outlines on the 600 by 1200 cell, written by <code>make-brand.py</code>; run it again if the font or a colour changes. The dark and light files are transparent and assume grounds 233 and 255; the <code>-bg</code> files carry their own ground for places that cannot promise one.</p>
+    <div class="files">
+      <div class="file"><div class="pv dkbg"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 4200 1200"><rect width="600" height="1200" fill="#eeeeee"/><path transform="translate(0 955.0)" d="M34 0 224 -274 42 -536H190L300 -367L409 -536H557L378 -274L566 0H419L300 -183L182 0Z" fill="#121212"/><path transform="translate(600 955.0)" d="M305 12Q228 12 176.0 -12.5Q124 -37 96.5 -77.5Q69 -118 64 -168L198 -174Q207 -141 232.0 -121.5Q257 -102 306 -102Q353 -102 375.0 -113.0Q397 -124 397 -146Q397 -162 389.0 -171.5Q381 -181 359.0 -189.5Q337 -198 293 -206Q212 -223 164.5 -244.5Q117 -266 96.5 -298.5Q76 -331 76 -380Q76 -426 100.0 -464.0Q124 -502 173.0 -525.0Q222 -548 296 -548Q376 -548 425.5 -522.0Q475 -496 500.0 -455.0Q525 -414 532 -368L397 -362Q393 -384 380.0 -400.0Q367 -416 346.0 -425.0Q325 -434 296 -434Q253 -434 234.0 -417.5Q215 -401 215 -380Q215 -361 225.0 -349.0Q235 -337 261.5 -328.0Q288 -319 336 -309Q414 -294 457.0 -273.5Q500 -253 518.0 -223.5Q536 -194 536 -149Q536 -99 508.5 -63.0Q481 -27 429.5 -7.5Q378 12 305 12Z" fill="#eeeeee"/><path transform="translate(1200 955.0)" d="M309 12Q233 12 174.5 -23.0Q116 -58 83.5 -121.5Q51 -185 51 -268Q51 -351 83.5 -414.0Q116 -477 174.5 -512.5Q233 -548 309 -548Q372 -548 424.0 -523.0Q476 -498 509.5 -452.0Q543 -406 552 -342L417 -335Q407 -380 379.0 -404.0Q351 -428 310 -428Q255 -428 223.5 -385.5Q192 -343 192 -268Q192 -193 223.5 -150.5Q255 -108 310 -108Q352 -108 380.5 -133.0Q409 -158 418 -206L553 -199Q545 -136 511.0 -88.5Q477 -41 425.0 -14.5Q373 12 309 12Z" fill="#eeeeee"/><path transform="translate(1800 955.0)" d="M224 12Q175 12 134.0 -6.0Q93 -24 69.5 -58.0Q46 -92 46 -139Q46 -207 89.5 -245.0Q133 -283 209 -299L370 -334Q370 -385 349.5 -412.0Q329 -439 283 -439Q243 -439 221.0 -419.0Q199 -399 192 -366L52 -374Q67 -453 127.5 -500.5Q188 -548 281 -548Q397 -548 451.5 -489.5Q506 -431 506 -326V-137Q506 -117 513.0 -109.5Q520 -102 534 -102H556V0Q550 1 536.0 2.5Q522 4 507 4Q467 4 439.0 -10.0Q411 -24 396.5 -51.0Q382 -78 380 -116H395Q390 -80 368.0 -50.5Q346 -21 309.0 -4.5Q272 12 224 12ZM252 -90Q290 -90 316.0 -103.5Q342 -117 356.0 -143.5Q370 -170 370 -206V-238L251 -212Q215 -204 200.0 -189.0Q185 -174 185 -146Q185 -120 202.0 -105.0Q219 -90 252 -90Z" fill="#eeeeee"/><path transform="translate(2400 955.0)" d="M56 150V-536H187L191 -412L178 -418Q199 -481 242.0 -514.5Q285 -548 350 -548Q421 -548 468.0 -511.0Q515 -474 538.5 -410.5Q562 -347 562 -268Q562 -190 538.5 -126.0Q515 -62 468.0 -25.0Q421 12 350 12Q307 12 273.0 -1.0Q239 -14 215.5 -40.5Q192 -67 177 -106L192 -119V150ZM308 -108Q362 -108 391.5 -147.0Q421 -186 421 -268Q421 -350 391.5 -389.0Q362 -428 308 -428Q274 -428 247.5 -411.0Q221 -394 206.5 -358.5Q192 -323 192 -268Q192 -213 206.5 -177.5Q221 -142 247.5 -125.0Q274 -108 308 -108Z" fill="#eeeeee"/><path transform="translate(3000 955.0)" d="M302 12Q227 12 169.5 -22.5Q112 -57 80.0 -120.0Q48 -183 48 -268Q48 -351 80.0 -414.0Q112 -477 168.5 -512.5Q225 -548 301 -548Q375 -548 431.5 -513.0Q488 -478 520.0 -414.5Q552 -351 552 -265V-231H188Q193 -171 224.5 -139.5Q256 -108 305 -108Q343 -108 369.0 -125.5Q395 -143 405 -173L541 -164Q514 -80 453.5 -34.0Q393 12 302 12ZM189 -324H407Q402 -376 373.0 -402.0Q344 -428 300 -428Q254 -428 225.5 -401.5Q197 -375 189 -324Z" fill="#eeeeee"/><path transform="translate(3600 955.0)" d="M305 12Q228 12 176.0 -12.5Q124 -37 96.5 -77.5Q69 -118 64 -168L198 -174Q207 -141 232.0 -121.5Q257 -102 306 -102Q353 -102 375.0 -113.0Q397 -124 397 -146Q397 -162 389.0 -171.5Q381 -181 359.0 -189.5Q337 -198 293 -206Q212 -223 164.5 -244.5Q117 -266 96.5 -298.5Q76 -331 76 -380Q76 -426 100.0 -464.0Q124 -502 173.0 -525.0Q222 -548 296 -548Q376 -548 425.5 -522.0Q475 -496 500.0 -455.0Q525 -414 532 -368L397 -362Q393 -384 380.0 -400.0Q367 -416 346.0 -425.0Q325 -434 296 -434Q253 -434 234.0 -417.5Q215 -401 215 -380Q215 -361 225.0 -349.0Q235 -337 261.5 -328.0Q288 -319 336 -309Q414 -294 457.0 -273.5Q500 -253 518.0 -223.5Q536 -194 536 -149Q536 -99 508.5 -63.0Q481 -27 429.5 -7.5Q378 12 305 12Z" fill="#eeeeee"/></svg></div><code>lockup-dark.svg</code><small>transparent, for ground 233</small></div>
+      <div class="file"><div class="pv ltbg"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 4200 1200"><rect width="600" height="1200" fill="#121212"/><path transform="translate(0 955.0)" d="M34 0 224 -274 42 -536H190L300 -367L409 -536H557L378 -274L566 0H419L300 -183L182 0Z" fill="#eeeeee"/><path transform="translate(600 955.0)" d="M305 12Q228 12 176.0 -12.5Q124 -37 96.5 -77.5Q69 -118 64 -168L198 -174Q207 -141 232.0 -121.5Q257 -102 306 -102Q353 -102 375.0 -113.0Q397 -124 397 -146Q397 -162 389.0 -171.5Q381 -181 359.0 -189.5Q337 -198 293 -206Q212 -223 164.5 -244.5Q117 -266 96.5 -298.5Q76 -331 76 -380Q76 -426 100.0 -464.0Q124 -502 173.0 -525.0Q222 -548 296 -548Q376 -548 425.5 -522.0Q475 -496 500.0 -455.0Q525 -414 532 -368L397 -362Q393 -384 380.0 -400.0Q367 -416 346.0 -425.0Q325 -434 296 -434Q253 -434 234.0 -417.5Q215 -401 215 -380Q215 -361 225.0 -349.0Q235 -337 261.5 -328.0Q288 -319 336 -309Q414 -294 457.0 -273.5Q500 -253 518.0 -223.5Q536 -194 536 -149Q536 -99 508.5 -63.0Q481 -27 429.5 -7.5Q378 12 305 12Z" fill="#121212"/><path transform="translate(1200 955.0)" d="M309 12Q233 12 174.5 -23.0Q116 -58 83.5 -121.5Q51 -185 51 -268Q51 -351 83.5 -414.0Q116 -477 174.5 -512.5Q233 -548 309 -548Q372 -548 424.0 -523.0Q476 -498 509.5 -452.0Q543 -406 552 -342L417 -335Q407 -380 379.0 -404.0Q351 -428 310 -428Q255 -428 223.5 -385.5Q192 -343 192 -268Q192 -193 223.5 -150.5Q255 -108 310 -108Q352 -108 380.5 -133.0Q409 -158 418 -206L553 -199Q545 -136 511.0 -88.5Q477 -41 425.0 -14.5Q373 12 309 12Z" fill="#121212"/><path transform="translate(1800 955.0)" d="M224 12Q175 12 134.0 -6.0Q93 -24 69.5 -58.0Q46 -92 46 -139Q46 -207 89.5 -245.0Q133 -283 209 -299L370 -334Q370 -385 349.5 -412.0Q329 -439 283 -439Q243 -439 221.0 -419.0Q199 -399 192 -366L52 -374Q67 -453 127.5 -500.5Q188 -548 281 -548Q397 -548 451.5 -489.5Q506 -431 506 -326V-137Q506 -117 513.0 -109.5Q520 -102 534 -102H556V0Q550 1 536.0 2.5Q522 4 507 4Q467 4 439.0 -10.0Q411 -24 396.5 -51.0Q382 -78 380 -116H395Q390 -80 368.0 -50.5Q346 -21 309.0 -4.5Q272 12 224 12ZM252 -90Q290 -90 316.0 -103.5Q342 -117 356.0 -143.5Q370 -170 370 -206V-238L251 -212Q215 -204 200.0 -189.0Q185 -174 185 -146Q185 -120 202.0 -105.0Q219 -90 252 -90Z" fill="#121212"/><path transform="translate(2400 955.0)" d="M56 150V-536H187L191 -412L178 -418Q199 -481 242.0 -514.5Q285 -548 350 -548Q421 -548 468.0 -511.0Q515 -474 538.5 -410.5Q562 -347 562 -268Q562 -190 538.5 -126.0Q515 -62 468.0 -25.0Q421 12 350 12Q307 12 273.0 -1.0Q239 -14 215.5 -40.5Q192 -67 177 -106L192 -119V150ZM308 -108Q362 -108 391.5 -147.0Q421 -186 421 -268Q421 -350 391.5 -389.0Q362 -428 308 -428Q274 -428 247.5 -411.0Q221 -394 206.5 -358.5Q192 -323 192 -268Q192 -213 206.5 -177.5Q221 -142 247.5 -125.0Q274 -108 308 -108Z" fill="#121212"/><path transform="translate(3000 955.0)" d="M302 12Q227 12 169.5 -22.5Q112 -57 80.0 -120.0Q48 -183 48 -268Q48 -351 80.0 -414.0Q112 -477 168.5 -512.5Q225 -548 301 -548Q375 -548 431.5 -513.0Q488 -478 520.0 -414.5Q552 -351 552 -265V-231H188Q193 -171 224.5 -139.5Q256 -108 305 -108Q343 -108 369.0 -125.5Q395 -143 405 -173L541 -164Q514 -80 453.5 -34.0Q393 12 302 12ZM189 -324H407Q402 -376 373.0 -402.0Q344 -428 300 -428Q254 -428 225.5 -401.5Q197 -375 189 -324Z" fill="#121212"/><path transform="translate(3600 955.0)" d="M305 12Q228 12 176.0 -12.5Q124 -37 96.5 -77.5Q69 -118 64 -168L198 -174Q207 -141 232.0 -121.5Q257 -102 306 -102Q353 -102 375.0 -113.0Q397 -124 397 -146Q397 -162 389.0 -171.5Q381 -181 359.0 -189.5Q337 -198 293 -206Q212 -223 164.5 -244.5Q117 -266 96.5 -298.5Q76 -331 76 -380Q76 -426 100.0 -464.0Q124 -502 173.0 -525.0Q222 -548 296 -548Q376 -548 425.5 -522.0Q475 -496 500.0 -455.0Q525 -414 532 -368L397 -362Q393 -384 380.0 -400.0Q367 -416 346.0 -425.0Q325 -434 296 -434Q253 -434 234.0 -417.5Q215 -401 215 -380Q215 -361 225.0 -349.0Q235 -337 261.5 -328.0Q288 -319 336 -309Q414 -294 457.0 -273.5Q500 -253 518.0 -223.5Q536 -194 536 -149Q536 -99 508.5 -63.0Q481 -27 429.5 -7.5Q378 12 305 12Z" fill="#121212"/></svg></div><code>lockup-light.svg</code><small>transparent, for ground 255</small></div>
+      <div class="file"><div class="pv"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 4200 1200"><rect width="4200" height="1200" fill="#121212"/><rect width="600" height="1200" fill="#eeeeee"/><path transform="translate(0 955.0)" d="M34 0 224 -274 42 -536H190L300 -367L409 -536H557L378 -274L566 0H419L300 -183L182 0Z" fill="#121212"/><path transform="translate(600 955.0)" d="M305 12Q228 12 176.0 -12.5Q124 -37 96.5 -77.5Q69 -118 64 -168L198 -174Q207 -141 232.0 -121.5Q257 -102 306 -102Q353 -102 375.0 -113.0Q397 -124 397 -146Q397 -162 389.0 -171.5Q381 -181 359.0 -189.5Q337 -198 293 -206Q212 -223 164.5 -244.5Q117 -266 96.5 -298.5Q76 -331 76 -380Q76 -426 100.0 -464.0Q124 -502 173.0 -525.0Q222 -548 296 -548Q376 -548 425.5 -522.0Q475 -496 500.0 -455.0Q525 -414 532 -368L397 -362Q393 -384 380.0 -400.0Q367 -416 346.0 -425.0Q325 -434 296 -434Q253 -434 234.0 -417.5Q215 -401 215 -380Q215 -361 225.0 -349.0Q235 -337 261.5 -328.0Q288 -319 336 -309Q414 -294 457.0 -273.5Q500 -253 518.0 -223.5Q536 -194 536 -149Q536 -99 508.5 -63.0Q481 -27 429.5 -7.5Q378 12 305 12Z" fill="#eeeeee"/><path transform="translate(1200 955.0)" d="M309 12Q233 12 174.5 -23.0Q116 -58 83.5 -121.5Q51 -185 51 -268Q51 -351 83.5 -414.0Q116 -477 174.5 -512.5Q233 -548 309 -548Q372 -548 424.0 -523.0Q476 -498 509.5 -452.0Q543 -406 552 -342L417 -335Q407 -380 379.0 -404.0Q351 -428 310 -428Q255 -428 223.5 -385.5Q192 -343 192 -268Q192 -193 223.5 -150.5Q255 -108 310 -108Q352 -108 380.5 -133.0Q409 -158 418 -206L553 -199Q545 -136 511.0 -88.5Q477 -41 425.0 -14.5Q373 12 309 12Z" fill="#eeeeee"/><path transform="translate(1800 955.0)" d="M224 12Q175 12 134.0 -6.0Q93 -24 69.5 -58.0Q46 -92 46 -139Q46 -207 89.5 -245.0Q133 -283 209 -299L370 -334Q370 -385 349.5 -412.0Q329 -439 283 -439Q243 -439 221.0 -419.0Q199 -399 192 -366L52 -374Q67 -453 127.5 -500.5Q188 -548 281 -548Q397 -548 451.5 -489.5Q506 -431 506 -326V-137Q506 -117 513.0 -109.5Q520 -102 534 -102H556V0Q550 1 536.0 2.5Q522 4 507 4Q467 4 439.0 -10.0Q411 -24 396.5 -51.0Q382 -78 380 -116H395Q390 -80 368.0 -50.5Q346 -21 309.0 -4.5Q272 12 224 12ZM252 -90Q290 -90 316.0 -103.5Q342 -117 356.0 -143.5Q370 -170 370 -206V-238L251 -212Q215 -204 200.0 -189.0Q185 -174 185 -146Q185 -120 202.0 -105.0Q219 -90 252 -90Z" fill="#eeeeee"/><path transform="translate(2400 955.0)" d="M56 150V-536H187L191 -412L178 -418Q199 -481 242.0 -514.5Q285 -548 350 -548Q421 -548 468.0 -511.0Q515 -474 538.5 -410.5Q562 -347 562 -268Q562 -190 538.5 -126.0Q515 -62 468.0 -25.0Q421 12 350 12Q307 12 273.0 -1.0Q239 -14 215.5 -40.5Q192 -67 177 -106L192 -119V150ZM308 -108Q362 -108 391.5 -147.0Q421 -186 421 -268Q421 -350 391.5 -389.0Q362 -428 308 -428Q274 -428 247.5 -411.0Q221 -394 206.5 -358.5Q192 -323 192 -268Q192 -213 206.5 -177.5Q221 -142 247.5 -125.0Q274 -108 308 -108Z" fill="#eeeeee"/><path transform="translate(3000 955.0)" d="M302 12Q227 12 169.5 -22.5Q112 -57 80.0 -120.0Q48 -183 48 -268Q48 -351 80.0 -414.0Q112 -477 168.5 -512.5Q225 -548 301 -548Q375 -548 431.5 -513.0Q488 -478 520.0 -414.5Q552 -351 552 -265V-231H188Q193 -171 224.5 -139.5Q256 -108 305 -108Q343 -108 369.0 -125.5Q395 -143 405 -173L541 -164Q514 -80 453.5 -34.0Q393 12 302 12ZM189 -324H407Q402 -376 373.0 -402.0Q344 -428 300 -428Q254 -428 225.5 -401.5Q197 -375 189 -324Z" fill="#eeeeee"/><path transform="translate(3600 955.0)" d="M305 12Q228 12 176.0 -12.5Q124 -37 96.5 -77.5Q69 -118 64 -168L198 -174Q207 -141 232.0 -121.5Q257 -102 306 -102Q353 -102 375.0 -113.0Q397 -124 397 -146Q397 -162 389.0 -171.5Q381 -181 359.0 -189.5Q337 -198 293 -206Q212 -223 164.5 -244.5Q117 -266 96.5 -298.5Q76 -331 76 -380Q76 -426 100.0 -464.0Q124 -502 173.0 -525.0Q222 -548 296 -548Q376 -548 425.5 -522.0Q475 -496 500.0 -455.0Q525 -414 532 -368L397 -362Q393 -384 380.0 -400.0Q367 -416 346.0 -425.0Q325 -434 296 -434Q253 -434 234.0 -417.5Q215 -401 215 -380Q215 -361 225.0 -349.0Q235 -337 261.5 -328.0Q288 -319 336 -309Q414 -294 457.0 -273.5Q500 -253 518.0 -223.5Q536 -194 536 -149Q536 -99 508.5 -63.0Q481 -27 429.5 -7.5Q378 12 305 12Z" fill="#eeeeee"/></svg></div><code>lockup-dark-bg.svg</code><small>with its own ground</small></div>
+      <div class="file"><div class="pv"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 4200 1200"><rect width="4200" height="1200" fill="#eeeeee"/><rect width="600" height="1200" fill="#121212"/><path transform="translate(0 955.0)" d="M34 0 224 -274 42 -536H190L300 -367L409 -536H557L378 -274L566 0H419L300 -183L182 0Z" fill="#eeeeee"/><path transform="translate(600 955.0)" d="M305 12Q228 12 176.0 -12.5Q124 -37 96.5 -77.5Q69 -118 64 -168L198 -174Q207 -141 232.0 -121.5Q257 -102 306 -102Q353 -102 375.0 -113.0Q397 -124 397 -146Q397 -162 389.0 -171.5Q381 -181 359.0 -189.5Q337 -198 293 -206Q212 -223 164.5 -244.5Q117 -266 96.5 -298.5Q76 -331 76 -380Q76 -426 100.0 -464.0Q124 -502 173.0 -525.0Q222 -548 296 -548Q376 -548 425.5 -522.0Q475 -496 500.0 -455.0Q525 -414 532 -368L397 -362Q393 -384 380.0 -400.0Q367 -416 346.0 -425.0Q325 -434 296 -434Q253 -434 234.0 -417.5Q215 -401 215 -380Q215 -361 225.0 -349.0Q235 -337 261.5 -328.0Q288 -319 336 -309Q414 -294 457.0 -273.5Q500 -253 518.0 -223.5Q536 -194 536 -149Q536 -99 508.5 -63.0Q481 -27 429.5 -7.5Q378 12 305 12Z" fill="#121212"/><path transform="translate(1200 955.0)" d="M309 12Q233 12 174.5 -23.0Q116 -58 83.5 -121.5Q51 -185 51 -268Q51 -351 83.5 -414.0Q116 -477 174.5 -512.5Q233 -548 309 -548Q372 -548 424.0 -523.0Q476 -498 509.5 -452.0Q543 -406 552 -342L417 -335Q407 -380 379.0 -404.0Q351 -428 310 -428Q255 -428 223.5 -385.5Q192 -343 192 -268Q192 -193 223.5 -150.5Q255 -108 310 -108Q352 -108 380.5 -133.0Q409 -158 418 -206L553 -199Q545 -136 511.0 -88.5Q477 -41 425.0 -14.5Q373 12 309 12Z" fill="#121212"/><path transform="translate(1800 955.0)" d="M224 12Q175 12 134.0 -6.0Q93 -24 69.5 -58.0Q46 -92 46 -139Q46 -207 89.5 -245.0Q133 -283 209 -299L370 -334Q370 -385 349.5 -412.0Q329 -439 283 -439Q243 -439 221.0 -419.0Q199 -399 192 -366L52 -374Q67 -453 127.5 -500.5Q188 -548 281 -548Q397 -548 451.5 -489.5Q506 -431 506 -326V-137Q506 -117 513.0 -109.5Q520 -102 534 -102H556V0Q550 1 536.0 2.5Q522 4 507 4Q467 4 439.0 -10.0Q411 -24 396.5 -51.0Q382 -78 380 -116H395Q390 -80 368.0 -50.5Q346 -21 309.0 -4.5Q272 12 224 12ZM252 -90Q290 -90 316.0 -103.5Q342 -117 356.0 -143.5Q370 -170 370 -206V-238L251 -212Q215 -204 200.0 -189.0Q185 -174 185 -146Q185 -120 202.0 -105.0Q219 -90 252 -90Z" fill="#121212"/><path transform="translate(2400 955.0)" d="M56 150V-536H187L191 -412L178 -418Q199 -481 242.0 -514.5Q285 -548 350 -548Q421 -548 468.0 -511.0Q515 -474 538.5 -410.5Q562 -347 562 -268Q562 -190 538.5 -126.0Q515 -62 468.0 -25.0Q421 12 350 12Q307 12 273.0 -1.0Q239 -14 215.5 -40.5Q192 -67 177 -106L192 -119V150ZM308 -108Q362 -108 391.5 -147.0Q421 -186 421 -268Q421 -350 391.5 -389.0Q362 -428 308 -428Q274 -428 247.5 -411.0Q221 -394 206.5 -358.5Q192 -323 192 -268Q192 -213 206.5 -177.5Q221 -142 247.5 -125.0Q274 -108 308 -108Z" fill="#121212"/><path transform="translate(3000 955.0)" d="M302 12Q227 12 169.5 -22.5Q112 -57 80.0 -120.0Q48 -183 48 -268Q48 -351 80.0 -414.0Q112 -477 168.5 -512.5Q225 -548 301 -548Q375 -548 431.5 -513.0Q488 -478 520.0 -414.5Q552 -351 552 -265V-231H188Q193 -171 224.5 -139.5Q256 -108 305 -108Q343 -108 369.0 -125.5Q395 -143 405 -173L541 -164Q514 -80 453.5 -34.0Q393 12 302 12ZM189 -324H407Q402 -376 373.0 -402.0Q344 -428 300 -428Q254 -428 225.5 -401.5Q197 -375 189 -324Z" fill="#121212"/><path transform="translate(3600 955.0)" d="M305 12Q228 12 176.0 -12.5Q124 -37 96.5 -77.5Q69 -118 64 -168L198 -174Q207 -141 232.0 -121.5Q257 -102 306 -102Q353 -102 375.0 -113.0Q397 -124 397 -146Q397 -162 389.0 -171.5Q381 -181 359.0 -189.5Q337 -198 293 -206Q212 -223 164.5 -244.5Q117 -266 96.5 -298.5Q76 -331 76 -380Q76 -426 100.0 -464.0Q124 -502 173.0 -525.0Q222 -548 296 -548Q376 -548 425.5 -522.0Q475 -496 500.0 -455.0Q525 -414 532 -368L397 -362Q393 -384 380.0 -400.0Q367 -416 346.0 -425.0Q325 -434 296 -434Q253 -434 234.0 -417.5Q215 -401 215 -380Q215 -361 225.0 -349.0Q235 -337 261.5 -328.0Q288 -319 336 -309Q414 -294 457.0 -273.5Q500 -253 518.0 -223.5Q536 -194 536 -149Q536 -99 508.5 -63.0Q481 -27 429.5 -7.5Q378 12 305 12Z" fill="#121212"/></svg></div><code>lockup-light-bg.svg</code><small>with its own ground</small></div>
+      <div class="file"><div class="pv dkbg"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 4200 1200"><rect width="600" height="1200" fill="#d7af5f"/><path transform="translate(0 955.0)" d="M34 0 224 -274 42 -536H190L300 -367L409 -536H557L378 -274L566 0H419L300 -183L182 0Z" fill="#121212"/><path transform="translate(600 955.0)" d="M305 12Q228 12 176.0 -12.5Q124 -37 96.5 -77.5Q69 -118 64 -168L198 -174Q207 -141 232.0 -121.5Q257 -102 306 -102Q353 -102 375.0 -113.0Q397 -124 397 -146Q397 -162 389.0 -171.5Q381 -181 359.0 -189.5Q337 -198 293 -206Q212 -223 164.5 -244.5Q117 -266 96.5 -298.5Q76 -331 76 -380Q76 -426 100.0 -464.0Q124 -502 173.0 -525.0Q222 -548 296 -548Q376 -548 425.5 -522.0Q475 -496 500.0 -455.0Q525 -414 532 -368L397 -362Q393 -384 380.0 -400.0Q367 -416 346.0 -425.0Q325 -434 296 -434Q253 -434 234.0 -417.5Q215 -401 215 -380Q215 -361 225.0 -349.0Q235 -337 261.5 -328.0Q288 -319 336 -309Q414 -294 457.0 -273.5Q500 -253 518.0 -223.5Q536 -194 536 -149Q536 -99 508.5 -63.0Q481 -27 429.5 -7.5Q378 12 305 12Z" fill="#eeeeee"/><path transform="translate(1200 955.0)" d="M309 12Q233 12 174.5 -23.0Q116 -58 83.5 -121.5Q51 -185 51 -268Q51 -351 83.5 -414.0Q116 -477 174.5 -512.5Q233 -548 309 -548Q372 -548 424.0 -523.0Q476 -498 509.5 -452.0Q543 -406 552 -342L417 -335Q407 -380 379.0 -404.0Q351 -428 310 -428Q255 -428 223.5 -385.5Q192 -343 192 -268Q192 -193 223.5 -150.5Q255 -108 310 -108Q352 -108 380.5 -133.0Q409 -158 418 -206L553 -199Q545 -136 511.0 -88.5Q477 -41 425.0 -14.5Q373 12 309 12Z" fill="#eeeeee"/><path transform="translate(1800 955.0)" d="M224 12Q175 12 134.0 -6.0Q93 -24 69.5 -58.0Q46 -92 46 -139Q46 -207 89.5 -245.0Q133 -283 209 -299L370 -334Q370 -385 349.5 -412.0Q329 -439 283 -439Q243 -439 221.0 -419.0Q199 -399 192 -366L52 -374Q67 -453 127.5 -500.5Q188 -548 281 -548Q397 -548 451.5 -489.5Q506 -431 506 -326V-137Q506 -117 513.0 -109.5Q520 -102 534 -102H556V0Q550 1 536.0 2.5Q522 4 507 4Q467 4 439.0 -10.0Q411 -24 396.5 -51.0Q382 -78 380 -116H395Q390 -80 368.0 -50.5Q346 -21 309.0 -4.5Q272 12 224 12ZM252 -90Q290 -90 316.0 -103.5Q342 -117 356.0 -143.5Q370 -170 370 -206V-238L251 -212Q215 -204 200.0 -189.0Q185 -174 185 -146Q185 -120 202.0 -105.0Q219 -90 252 -90Z" fill="#eeeeee"/><path transform="translate(2400 955.0)" d="M56 150V-536H187L191 -412L178 -418Q199 -481 242.0 -514.5Q285 -548 350 -548Q421 -548 468.0 -511.0Q515 -474 538.5 -410.5Q562 -347 562 -268Q562 -190 538.5 -126.0Q515 -62 468.0 -25.0Q421 12 350 12Q307 12 273.0 -1.0Q239 -14 215.5 -40.5Q192 -67 177 -106L192 -119V150ZM308 -108Q362 -108 391.5 -147.0Q421 -186 421 -268Q421 -350 391.5 -389.0Q362 -428 308 -428Q274 -428 247.5 -411.0Q221 -394 206.5 -358.5Q192 -323 192 -268Q192 -213 206.5 -177.5Q221 -142 247.5 -125.0Q274 -108 308 -108Z" fill="#eeeeee"/><path transform="translate(3000 955.0)" d="M302 12Q227 12 169.5 -22.5Q112 -57 80.0 -120.0Q48 -183 48 -268Q48 -351 80.0 -414.0Q112 -477 168.5 -512.5Q225 -548 301 -548Q375 -548 431.5 -513.0Q488 -478 520.0 -414.5Q552 -351 552 -265V-231H188Q193 -171 224.5 -139.5Q256 -108 305 -108Q343 -108 369.0 -125.5Q395 -143 405 -173L541 -164Q514 -80 453.5 -34.0Q393 12 302 12ZM189 -324H407Q402 -376 373.0 -402.0Q344 -428 300 -428Q254 -428 225.5 -401.5Q197 -375 189 -324Z" fill="#eeeeee"/><path transform="translate(3600 955.0)" d="M305 12Q228 12 176.0 -12.5Q124 -37 96.5 -77.5Q69 -118 64 -168L198 -174Q207 -141 232.0 -121.5Q257 -102 306 -102Q353 -102 375.0 -113.0Q397 -124 397 -146Q397 -162 389.0 -171.5Q381 -181 359.0 -189.5Q337 -198 293 -206Q212 -223 164.5 -244.5Q117 -266 96.5 -298.5Q76 -331 76 -380Q76 -426 100.0 -464.0Q124 -502 173.0 -525.0Q222 -548 296 -548Q376 -548 425.5 -522.0Q475 -496 500.0 -455.0Q525 -414 532 -368L397 -362Q393 -384 380.0 -400.0Q367 -416 346.0 -425.0Q325 -434 296 -434Q253 -434 234.0 -417.5Q215 -401 215 -380Q215 -361 225.0 -349.0Q235 -337 261.5 -328.0Q288 -319 336 -309Q414 -294 457.0 -273.5Q500 -253 518.0 -223.5Q536 -194 536 -149Q536 -99 508.5 -63.0Q481 -27 429.5 -7.5Q378 12 305 12Z" fill="#eeeeee"/></svg></div><code>lockup-gold-dark.svg</code><small>Reverse, cell 179</small></div>
+      <div class="file"><div class="pv ltbg"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 4200 1200"><rect width="600" height="1200" fill="#af8700"/><path transform="translate(0 955.0)" d="M34 0 224 -274 42 -536H190L300 -367L409 -536H557L378 -274L566 0H419L300 -183L182 0Z" fill="#eeeeee"/><path transform="translate(600 955.0)" d="M305 12Q228 12 176.0 -12.5Q124 -37 96.5 -77.5Q69 -118 64 -168L198 -174Q207 -141 232.0 -121.5Q257 -102 306 -102Q353 -102 375.0 -113.0Q397 -124 397 -146Q397 -162 389.0 -171.5Q381 -181 359.0 -189.5Q337 -198 293 -206Q212 -223 164.5 -244.5Q117 -266 96.5 -298.5Q76 -331 76 -380Q76 -426 100.0 -464.0Q124 -502 173.0 -525.0Q222 -548 296 -548Q376 -548 425.5 -522.0Q475 -496 500.0 -455.0Q525 -414 532 -368L397 -362Q393 -384 380.0 -400.0Q367 -416 346.0 -425.0Q325 -434 296 -434Q253 -434 234.0 -417.5Q215 -401 215 -380Q215 -361 225.0 -349.0Q235 -337 261.5 -328.0Q288 -319 336 -309Q414 -294 457.0 -273.5Q500 -253 518.0 -223.5Q536 -194 536 -149Q536 -99 508.5 -63.0Q481 -27 429.5 -7.5Q378 12 305 12Z" fill="#121212"/><path transform="translate(1200 955.0)" d="M309 12Q233 12 174.5 -23.0Q116 -58 83.5 -121.5Q51 -185 51 -268Q51 -351 83.5 -414.0Q116 -477 174.5 -512.5Q233 -548 309 -548Q372 -548 424.0 -523.0Q476 -498 509.5 -452.0Q543 -406 552 -342L417 -335Q407 -380 379.0 -404.0Q351 -428 310 -428Q255 -428 223.5 -385.5Q192 -343 192 -268Q192 -193 223.5 -150.5Q255 -108 310 -108Q352 -108 380.5 -133.0Q409 -158 418 -206L553 -199Q545 -136 511.0 -88.5Q477 -41 425.0 -14.5Q373 12 309 12Z" fill="#121212"/><path transform="translate(1800 955.0)" d="M224 12Q175 12 134.0 -6.0Q93 -24 69.5 -58.0Q46 -92 46 -139Q46 -207 89.5 -245.0Q133 -283 209 -299L370 -334Q370 -385 349.5 -412.0Q329 -439 283 -439Q243 -439 221.0 -419.0Q199 -399 192 -366L52 -374Q67 -453 127.5 -500.5Q188 -548 281 -548Q397 -548 451.5 -489.5Q506 -431 506 -326V-137Q506 -117 513.0 -109.5Q520 -102 534 -102H556V0Q550 1 536.0 2.5Q522 4 507 4Q467 4 439.0 -10.0Q411 -24 396.5 -51.0Q382 -78 380 -116H395Q390 -80 368.0 -50.5Q346 -21 309.0 -4.5Q272 12 224 12ZM252 -90Q290 -90 316.0 -103.5Q342 -117 356.0 -143.5Q370 -170 370 -206V-238L251 -212Q215 -204 200.0 -189.0Q185 -174 185 -146Q185 -120 202.0 -105.0Q219 -90 252 -90Z" fill="#121212"/><path transform="translate(2400 955.0)" d="M56 150V-536H187L191 -412L178 -418Q199 -481 242.0 -514.5Q285 -548 350 -548Q421 -548 468.0 -511.0Q515 -474 538.5 -410.5Q562 -347 562 -268Q562 -190 538.5 -126.0Q515 -62 468.0 -25.0Q421 12 350 12Q307 12 273.0 -1.0Q239 -14 215.5 -40.5Q192 -67 177 -106L192 -119V150ZM308 -108Q362 -108 391.5 -147.0Q421 -186 421 -268Q421 -350 391.5 -389.0Q362 -428 308 -428Q274 -428 247.5 -411.0Q221 -394 206.5 -358.5Q192 -323 192 -268Q192 -213 206.5 -177.5Q221 -142 247.5 -125.0Q274 -108 308 -108Z" fill="#121212"/><path transform="translate(3000 955.0)" d="M302 12Q227 12 169.5 -22.5Q112 -57 80.0 -120.0Q48 -183 48 -268Q48 -351 80.0 -414.0Q112 -477 168.5 -512.5Q225 -548 301 -548Q375 -548 431.5 -513.0Q488 -478 520.0 -414.5Q552 -351 552 -265V-231H188Q193 -171 224.5 -139.5Q256 -108 305 -108Q343 -108 369.0 -125.5Q395 -143 405 -173L541 -164Q514 -80 453.5 -34.0Q393 12 302 12ZM189 -324H407Q402 -376 373.0 -402.0Q344 -428 300 -428Q254 -428 225.5 -401.5Q197 -375 189 -324Z" fill="#121212"/><path transform="translate(3600 955.0)" d="M305 12Q228 12 176.0 -12.5Q124 -37 96.5 -77.5Q69 -118 64 -168L198 -174Q207 -141 232.0 -121.5Q257 -102 306 -102Q353 -102 375.0 -113.0Q397 -124 397 -146Q397 -162 389.0 -171.5Q381 -181 359.0 -189.5Q337 -198 293 -206Q212 -223 164.5 -244.5Q117 -266 96.5 -298.5Q76 -331 76 -380Q76 -426 100.0 -464.0Q124 -502 173.0 -525.0Q222 -548 296 -548Q376 -548 425.5 -522.0Q475 -496 500.0 -455.0Q525 -414 532 -368L397 -362Q393 -384 380.0 -400.0Q367 -416 346.0 -425.0Q325 -434 296 -434Q253 -434 234.0 -417.5Q215 -401 215 -380Q215 -361 225.0 -349.0Q235 -337 261.5 -328.0Q288 -319 336 -309Q414 -294 457.0 -273.5Q500 -253 518.0 -223.5Q536 -194 536 -149Q536 -99 508.5 -63.0Q481 -27 429.5 -7.5Q378 12 305 12Z" fill="#121212"/></svg></div><code>lockup-gold-light.svg</code><small>Reverse, cell 136</small></div>
+      <div class="file"><div class="pv dkbg mk"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 1200"><rect width="600" height="1200" fill="#eeeeee"/><path transform="translate(0 955.0)" d="M34 0 224 -274 42 -536H190L300 -367L409 -536H557L378 -274L566 0H419L300 -183L182 0Z" fill="#121212"/></svg></div><code>mark-dark.svg</code><small>the cell alone</small></div>
+      <div class="file"><div class="pv ltbg mk"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 1200"><rect width="600" height="1200" fill="#121212"/><path transform="translate(0 955.0)" d="M34 0 224 -274 42 -536H190L300 -367L409 -536H557L378 -274L566 0H419L300 -183L182 0Z" fill="#eeeeee"/></svg></div><code>mark-light.svg</code><small>the cell alone</small></div>
+      <div class="file"><div class="pv dkbg mk"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 1200"><rect width="600" height="1200" fill="#d7af5f"/><path transform="translate(0 955.0)" d="M34 0 224 -274 42 -536H190L300 -367L409 -536H557L378 -274L566 0H419L300 -183L182 0Z" fill="#121212"/></svg></div><code>mark-gold-dark.svg</code><small>Reverse</small></div>
+      <div class="file"><div class="pv ltbg mk"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 1200"><rect width="600" height="1200" fill="#af8700"/><path transform="translate(0 955.0)" d="M34 0 224 -274 42 -536H190L300 -367L409 -536H557L378 -274L566 0H419L300 -183L182 0Z" fill="#eeeeee"/></svg></div><code>mark-gold-light.svg</code><small>Reverse</small></div>
+      <div class="file"><div class="pv av"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><rect width="512" height="512" fill="#121212"/><g transform="translate(161.28 66.56) scale(0.315733)"><rect width="600" height="1200" fill="#eeeeee"/><path transform="translate(0 955.0)" d="M34 0 224 -274 42 -536H190L300 -367L409 -536H557L378 -274L566 0H419L300 -183L182 0Z" fill="#121212"/></g></svg></div><code>avatar.svg</code><small>512 square, ground 233</small></div>
+      <div class="file"><div class="pv av"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><rect width="512" height="512" fill="#121212"/><g transform="translate(161.28 66.56) scale(0.315733)"><rect width="600" height="1200" fill="#d7af5f"/><path transform="translate(0 955.0)" d="M34 0 224 -274 42 -536H190L300 -367L409 -536H557L378 -274L566 0H419L300 -183L182 0Z" fill="#121212"/></g></svg></div><code>avatar-gold.svg</code><small>512 square, Reverse</small></div>
+    </div>
+    <p class="cap" style="margin-top:18px">Also there: <code>make-brand.py</code> (the generator), <code>guidelines.html</code> (this page, standalone) and <code>README.md</code> (these rules in plain text, for anyone who does not open the page).</p>
+    <p class="foot" style="margin-top:28px">Sources: palette values from <code>internal/scape/palette.go</code> and <code>shore.go</code>; cell geometry from Geist Mono 700's own metrics (advance 600, ascent 1005, descent 295 per 1000); contrast ratios computed, not estimated. Decisions and their dates are in <code>_FEEDBACK.md</code> under session 17.</p>
+  </div>
+</section>
+
+</body>
+</html>
