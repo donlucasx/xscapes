@@ -110,6 +110,14 @@ switches) · the SITE rebuilt on the brand with five ANIMATED CLIPS from the rea
 (`assets/deck/make-deck.py`, PDF re-printed). The brand session (s17) locked the identity and
 wrapped; its files ride in `assets/brand/` and `assets/deck/`.
 
+**14:05–14:30, his six notes on the first pass → second pass SHIPPED (`f4fc084`):** swimmers never
+share columns (real defect, slotted per lane before) · the clips in TRUECOLOR at a 14px cell, boxes
+cut to the art · the page opens on a COVER (the b&w mark centered over six glyph-only frames of the
+real night sea, CSS-stepped) then ONE PAGE (synopsis, four reasons to care, the hero clip full width,
+install) · the deck has the same cover and one page, no gold. Pipeline: `go run . -site site &&
+python3 site/make-gifs.py && python3 assets/deck/make-deck.py`, then the Chrome PDF print in
+`make-deck.py`'s docstring.
+
 **▶ NEXT:** 0. HIS LOOK at `site/index.html` and `assets/deck/index.html` (both open locally; the
 clips play) · then Commons: publish the page (the clips are files: upload `anim/` or host `site/`
 on GitHub Pages, `site/COMMONS-PROMPT.md`), his 45–60 s Terminal.app recording, SUBMIT (closes
