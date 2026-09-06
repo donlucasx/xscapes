@@ -137,7 +137,10 @@ https://donlucasx.github.io/xscapes/ (his ask, `site/publish.sh`; rerun it after
 study he asked for is up: "Five Scenes, Five Companions"
 https://claude.ai/code/artifact/c9d41f7c-1b09-4a79-a262-32b9696bd3b9 (`go run ./notes/scapestudy`;
 five scenes at night/noon/dusk, five companions beside the cat, all at 256 through the real pipeline;
-nothing chosen). ▶ HIS PICKS on it are item 0a: which scene, if any, before 09-17 (my read: none before
+nothing chosen). 19:05: the Commons RULES re-read signed in (`research/commons-submission.md`, last section):
+unchanged, and the entry picker takes ONLY a published Commons build. The agent's brief is `site/commons-brief.md`;
+the paste kit is on his Desktop (`~/Desktop/xscapes-commons/`: `brief.md`, `index.html` with absolute clip URLs,
+`message.md` = both). Model: Default · Quick; STOP the Expert run that is building a "submission guide". ▶ HIS PICKS on it are item 0a: which scene, if any, before 09-17 (my read: none before
 the entry ships), and which companion to draw properly, if any.** 0. HIS LOOK at the live page and `assets/deck/index.html` (both open locally; the
 clips play) · then Commons: publish the page (the clips are files: upload `anim/` or host `site/`
 on GitHub Pages, `site/COMMONS-PROMPT.md`), his 45–60 s Terminal.app recording, SUBMIT (closes

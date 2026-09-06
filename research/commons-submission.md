@@ -193,3 +193,26 @@ Playwright, signed out, against live apps. Supersedes the "inferred" parts of §
   the builder can be told to write the Durable Object + WebSocket worker (Capability
   Probe is evidence it can). An endpoint-enumeration probe for the source of
   `sourceVisible` apps was blocked by tool policy and not retried.
+
+## Rules re-read signed in, 2026-09-05 19:05 (the "before submitting" check)
+
+Read from the live event home (`/hackathons` → Open hackathon → rules →), verbatim headings:
+
+- **What to build**: "Today, users send a prompt and stare at a loading screen. Make use of that time and build something for users while the agent is thinking."
+- **No limits**: "There are no limits to what you can build: creative, fun, productive — anything."
+- **The point**: "You are designing what happens while the agent thinks."
+- **What we want**: "We care more about the creativity than polish."
+- **Everything counts**: "Every token you spend from the moment you join counts toward the board — no toggles, no attribution."
+- **Paid APIs are on us**: 50 credits of x402 calls on a curated catalog. Not needed.
+- **One entry**: "One build per builder, changeable right up to the deadline. Your group is for help, not a shared entry."
+- **The deadline**: "Entries close Sep 17. The board settles to submitted builds only; anything unsubmitted drops off."
+
+The entry picker under **Your entry** (due Sep 17) says: *"No public builds yet — publish one from its
+manage page first."* So the entry can only be a PUBLISHED Commons build; an external URL or a repo cannot
+be submitted on its own. Judging criteria dialog: the same five weights as §2 of this document (30 · 25 ·
+20 · 15 · 10). Judges still "to be announced". Winners announced Sep 19. Our row on the token board:
+"you · no entry yet · 160K".
+
+Consequence, unchanged: the Commons app is the submission page served verbatim (`site/commons-brief.md`
+is the agent's brief; `site/publish.sh` keeps the clips live on GitHub Pages). Nothing in the rules asks
+the product to run in the Space.
