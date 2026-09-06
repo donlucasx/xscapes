@@ -129,12 +129,15 @@ install) · the deck has the same cover and one page, no gold. Pipeline: `go run
 python3 site/make-gifs.py && python3 assets/deck/make-deck.py`, then the Chrome PDF print in
 `make-deck.py`'s docstring.
 
-**▶ NEXT:** 0. HIS LOOK at `site/index.html` and `assets/deck/index.html` (both open locally; the
+**▶ NEXT** (his answers of ~16:40, `_FEEDBACK.md` s18: the cover KEEPS its headline over the sea ·
+the clips go on GitHub Pages, `site/publish.sh` (orphan `gh-pages` branch) → https://donlucasx.github.io/xscapes/ ·
+the coat is CREAM, locked · the long kittens were SEEN · the corrupted session was CLOSED before any
+read-back, so the next launch is traced from cold): 0. HIS LOOK at `site/index.html` and `assets/deck/index.html` (both open locally; the
 clips play) · then Commons: publish the page (the clips are files: upload `anim/` or host `site/`
 on GitHub Pages, `site/COMMONS-PROMPT.md`), his 45–60 s Terminal.app recording, SUBMIT (closes
 09-17) · 1. **the scrollback corruption REPRODUCED a third time, 2026-09-05 ~15:55, UNTRACED** (the peer
 session `xscapes-0a`, Terminal.app 132x53, host started 13:49 without `XSCAPES_TRACE`; his screenshot:
-table rules struck through prose rows, `sc-ne` inside a doubled header = the s14 #2 merge). Order for
+table rules struck through prose rows, `sc-ne` inside a doubled header = the s14 #2 merge). **He closed that session at ~16:40 before any read-back; the buffer is gone.** Order for
 the next one: (a) read back the LIVE window first, by tty, with his OK (`1049l` discards most mirrored
 rows, s14 probe 3, so a restart destroys the evidence) · (b) the traced restart that keeps the
 conversation: `XSCAPES_TRACE=/tmp/apple2.bin xscapes claude -- --continue`; the `--` is REQUIRED,

@@ -34,11 +34,19 @@ Then: publish it (manage page -> publish, visibility public), open
 `/hackathons` signed in, tick it under "Your entry", and confirm the text
 "Entry submitted." appears. Screenshot that.
 
-The clips are separate files, so the paste alone is not the whole page: upload
-`site/anim/*.gif` as the app's static assets at the path `anim/`, or host the
-whole `site/` folder on GitHub Pages from the repo (Settings -> Pages -> deploy
-from `main`, folder `/site`) and give Commons a one-line app that redirects
-there. The entry is the Commons app either way.
+The clips are separate files, so the paste alone is not the whole page. They
+are served from GitHub Pages (his pick, 2026-09-05): `site/publish.sh` pushes
+`site/index.html` and `site/anim/*.gif` as the `gh-pages` branch, which Pages
+serves at https://donlucasx.github.io/xscapes/. Run it after every rebuild of
+the page so the live copy matches the repo. Before pasting, point the page's
+clips at it and paste THAT file:
+
+```sh
+sed 's#src="anim/#src="https://donlucasx.github.io/xscapes/anim/#g' site/index.html > /tmp/commons-paste.html
+```
+
+The entry is the Commons app; the Pages URL is where a judge who will not use
+Commons can still see the page.
 
 ## Before submitting
 

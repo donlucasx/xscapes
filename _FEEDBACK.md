@@ -1258,3 +1258,16 @@ at 22:10 (lgarzoli out of tokens → donlucasx); artifact ownership checked, see
     installed through a new inode. His session must restart to show it.
   ⇒ **The brief corrected** (`CLAUDE.md`): the companion is 12 columns by 7 rows as shipped, and the
     kittens row of the locked table carries the dwell.
+- Prompted with options for every open decision (his ask, ~16:40). His answers, verbatim:
+  the corrupted window — *"i closed the other session already"* ⇒ the buffer is gone; the next
+  launch is traced from cold (`XSCAPES_TRACE=/tmp/apple2.bin xscapes claude`) · the cover's headline
+  over the sea — *"Keep it (Recommended)"* ⇒ **LOCKED, the cover stays** · the clips beside the
+  Commons page — *"GitHub Pages from the repo (Recommended)"* ⇒ `site/publish.sh` pushes
+  `site/index.html` + `anim/*.gif` as an orphan `gh-pages` branch that Pages serves at
+  https://donlucasx.github.io/xscapes/ (a workflow file needs a token scope the stored credential
+  lacks); `COMMONS-PROMPT.md` says how the paste points there · the 2.5 and 4.7 min
+  subagents — *"Yes, saw them"* ⇒ the channel works for long subagents, the dwell covers short ones ·
+  the coat — *"Cream, as shipped (Recommended)"* ⇒ **LOCKED cream**, the table row updated ·
+  a second scape before 09-17 — *"have you mocked up any of these yet"* · the next companion —
+  *"have you mocked up any others yet"* ⇒ both answered below with the inventory (nothing beyond
+  the shore and the cat has ever been drawn); his call on mockups follows.
