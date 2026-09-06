@@ -141,7 +141,11 @@ nothing chosen). 19:05: the Commons RULES re-read signed in (`research/commons-s
 unchanged, and the entry picker takes ONLY a published Commons build. The agent's brief is `site/commons-brief.md`;
 the paste kit is on his Desktop (`~/Desktop/xscapes-commons/`: `brief.md`, `index.html` with absolute clip URLs,
 `message.md` = both). Model: Default · Quick; STOP the Expert run that is building a "submission guide". ▶ HIS PICKS on it are item 0a: which scene, if any, before 09-17 (my read: none before
-the entry ships), and which companion to draw properly, if any.** 0. **the page was REWRITTEN on his logline round and is LIVE** (21:20–21:45): logline *"Cozy ASCII scenes that
+the entry ships), and which companion to draw properly, if any.** 0. **the page carries the FULL-WINDOW clip, "Choose your xscape" and ASCII section rules, LIVE**
+(2026-09-06 01:40–02:10, `_FEEDBACK.md` s18): `window.gif` 108x40 = the agent's own rows above its scape, one clip,
+`agentPane` in `gifs.go`; clips now carry their own `cols`/`rows` through the manifest into `make-gifs.py` · the rainy
+window at dusk with the FROG and the aquarium at night with the OWL (`sceneCompanion` in the study) · "Any agent, any
+terminal" is a bullet · copy cut, protocol simplified. Earlier the same session the page was REWRITTEN on his logline round (21:20–21:45): logline *"Cozy ASCII scenes that
 react to your agent while it works"* (his pick of four angles) · the glance table promoted to subtitles and reordered
 most-useful-first · a new **"The next scapes"** roadmap section (rainy window · aquarium · frog · otter, from
 `go run ./notes/scapestudy -frames <dir>` + a Chrome shot at 672x336) · the protocol section carries the stack ·

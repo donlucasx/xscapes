@@ -1340,3 +1340,32 @@ at 22:10 (lgarzoli out of tokens → donlucasx); artifact ownership checked, see
     colours each, measured). ⚠ `site/publish.sh` copied only `*.gif`, so the stills would have 404'd;
     fixed and all five assets verified 200 live. ⚠ Told him his own example logline said
     *"interactive"* and the live loop reads no keys, so the word stays off the page.
+- *"can xscapes run with any agent on any type of terminal? if so, we should capitalize on that fact
+  on the pitch. a couple more thoughts a) we need to include a full animated screenshot of a terminal
+  window with an agent working on xscapes with xscapes active ... b) lets synthesize all the copy and
+  remove anything not completely relevant. the paragraph "Each landscape is a scape ..." can go
+  altogether. The protocol section should also be simpler and easier to digest. No need to explain
+  everything. c) change "the next scapes" to "choose your xscape" and reframe the section accordingly.
+  Imply additional scenes and companions will be available. keep it to only 2 images, stacked
+  vertically, on top the rainy window (use dusk version) with the frog, and underneath the aquarium,
+  with the owl instead. d) identify the sections across and lets lean on ASCII related art to stylize
+  them and help define/elevate the visual theme"* (2026-09-06, 01:40)
+  ⇒ **The answer, and it is now a bullet ("Any agent, any terminal")**: it HOSTS anything
+    (`xscapes inside <cmd>`, shipped since s11), Claude Code arrives WIRED through its hooks, and any
+    other agent that can run one command (`xscapes emit ...`) drives the scene. ⚠ The honest limit,
+    told to him: there is no generic process adapter yet, so a non-Claude agent needs that one line.
+    Terminals: it standardises on the 256 cube everywhere on purpose, and Terminal.app and Ghostty
+    are the two measured.
+  ⇒ (a) **The full-window clip SHIPPED as the hero**: `window.gif`, 108x40, the agent's own output in
+    the top 16 rows and the scape in the 24 under it, ONE clip through the real renderer
+    (`agentPane` in `gifs.go`) so the halves land on the same grid cell for cell; the macOS chrome
+    (traffic lights, title) is CSS around it. Clips carry their own geometry now (`cols`,
+    `agentRows`, `rowsOf`, `colsOf`, manifest `rows`/`cols`, and `make-gifs.py` sizes its capture
+    from them). 60 frames, 911x560, 871 KB. (b) The scape paragraph is GONE, the protocol section
+    says what it does rather than how, and the copy is cut throughout. (c) **"Choose your xscape"**:
+    two scapes stacked, each with the companion drawn for it — the rainy window at DUSK with the
+    frog, the aquarium at night with the owl. A study scene can now take a companion other than the
+    cat (`sceneCompanion` in `notes/scapestudy/scenes.go`). The four shore-and-companion stills are
+    gone. (d) Every section header carries an **ASCII rule** made from the scene's own glyphs,
+    trailing off to the right: stars for the clock, waves for the glance, rain and bubbles for the
+    scapes, dashes for the protocol, foam for the session.
