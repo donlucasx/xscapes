@@ -132,7 +132,13 @@ python3 site/make-gifs.py && python3 assets/deck/make-deck.py`, then the Chrome 
 **▶ NEXT** (his answers of ~16:40, `_FEEDBACK.md` s18: the cover KEEPS its headline over the sea ·
 the clips go on GitHub Pages, `site/publish.sh` (orphan `gh-pages` branch) → https://donlucasx.github.io/xscapes/ ·
 the coat is CREAM, locked · the long kittens were SEEN · the corrupted session was CLOSED before any
-read-back, so the next launch is traced from cold): 0. HIS LOOK at `site/index.html` and `assets/deck/index.html` (both open locally; the
+read-back, so the next launch is traced from cold). **Later, ~17:50: the page is LIVE at
+https://donlucasx.github.io/xscapes/ (his ask, `site/publish.sh`; rerun it after every page rebuild) and the
+study he asked for is up: "Five Scenes, Five Companions"
+https://claude.ai/code/artifact/c9d41f7c-1b09-4a79-a262-32b9696bd3b9 (`go run ./notes/scapestudy`;
+five scenes at night/noon/dusk, five companions beside the cat, all at 256 through the real pipeline;
+nothing chosen). ▶ HIS PICKS on it are item 0a: which scene, if any, before 09-17 (my read: none before
+the entry ships), and which companion to draw properly, if any.** 0. HIS LOOK at the live page and `assets/deck/index.html` (both open locally; the
 clips play) · then Commons: publish the page (the clips are files: upload `anim/` or host `site/`
 on GitHub Pages, `site/COMMONS-PROMPT.md`), his 45–60 s Terminal.app recording, SUBMIT (closes
 09-17) · 1. **the scrollback corruption REPRODUCED a third time, 2026-09-05 ~15:55, UNTRACED** (the peer
