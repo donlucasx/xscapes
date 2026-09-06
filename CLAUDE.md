@@ -10,7 +10,11 @@
 > them on one another as one kitten — the exit lane now queues them (`exitSpans`, red-first test).
 > Page, clips (the resting clip is 8 s: the litter swims off at dawn), deck and PDF regenerated;
 > the binary installed through a new inode. Earlier in the session: the brand guidelines say ink on
-> the page and deck (`fb6d9ee`), and the corruption's third repro is recorded with the
+> the page and deck (`fb6d9ee`); **the page's copy was RESCOPED on his four notes (19:20) and is live**:
+> xscapes is for any agent that runs in a terminal (not Claude Code alone; `xscapes inside <cmd>` is on the
+> page now), a *scape* is any of the ASCII landscapes and the shoreline is the FIRST one (not the product),
+> and "four states" is gone — the feature is that the scape keeps your real time of day, no theme switch.
+> ⏸ the DECK and the README still carry the old narrow scope. Also: the corruption's third repro is recorded with the
 > read-back-first order. **Later the same session:** the submission page is LIVE at
 > https://donlucasx.github.io/xscapes/ (`site/publish.sh`, an orphan `gh-pages` branch; the Commons
 > paste points its clips there) · his answers: cover KEEPS its headline over the sea, coat CREAM locked,

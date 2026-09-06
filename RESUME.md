@@ -141,7 +141,10 @@ nothing chosen). 19:05: the Commons RULES re-read signed in (`research/commons-s
 unchanged, and the entry picker takes ONLY a published Commons build. The agent's brief is `site/commons-brief.md`;
 the paste kit is on his Desktop (`~/Desktop/xscapes-commons/`: `brief.md`, `index.html` with absolute clip URLs,
 `message.md` = both). Model: Default · Quick; STOP the Expert run that is building a "submission guide". ▶ HIS PICKS on it are item 0a: which scene, if any, before 09-17 (my read: none before
-the entry ships), and which companion to draw properly, if any.** 0. HIS LOOK at the live page and `assets/deck/index.html` (both open locally; the
+the entry ships), and which companion to draw properly, if any.** 0. **the page's copy is RESCOPED and LIVE** (his four notes, 19:20, `_FEEDBACK.md` s18): any terminal agent ·
+a scape is any landscape, the shore is the first · "four states" → "It runs on your clock". ⏸ **the DECK
+(`deck.tpl.html`) still has the old synopsis verbatim and the README still opens Claude-first — both need
+the same rescope on his go-ahead.** Then HIS LOOK at the live page and `assets/deck/index.html` (both open locally; the
 clips play) · then Commons: publish the page (the clips are files: upload `anim/` or host `site/`
 on GitHub Pages, `site/COMMONS-PROMPT.md`), his 45–60 s Terminal.app recording, SUBMIT (closes
 09-17) · 1. **the scrollback corruption REPRODUCED a third time, 2026-09-05 ~15:55, UNTRACED** (the peer

@@ -1291,3 +1291,25 @@ at 22:10 (lgarzoli out of tokens → donlucasx); artifact ownership checked, see
   ⇒ DONE: https://donlucasx.github.io/xscapes/ — `site/publish.sh` force-pushes `site/index.html` +
     `anim/*.gif` as an orphan `gh-pages` branch; Pages set to that branch by API (the workflow route
     was refused: the stored token has no `workflow` scope). Verified 200 on the page and on a clip.
+- *"Lets polish the site first and that will trickle into our submission. A couple notes for the
+  existing site https://donlucasx.github.io/xscapes/ --- 1) i love the splash screen, and the slogan
+  underneath "a thinking scren for terminal agents" 2) xscapes is intended for all agents running on
+  terminals, not just claude code 3) xscapes refers to the ASCII interactive landscapes, not just the
+  current shoreline landscape / cat companion. The concept is broader: a cozy landscape and companion
+  who keep you company and visualize your agent while it works. Dont quote me literally, Im just
+  trying to help you rescope it conceptually. 4) "four states" is not quite accurate. The feature here
+  is that the xscapes evolve through the day like a regular landscape would- an organic light/dark
+  theme if you would. Communicate it in simple terms."* (19:20, after switching to Opus)
+  ⇒ All four, SHIPPED and LIVE. (1) The cover and its line are untouched, and the rest of the page is
+    now written to agree with them. (2) **Scope**: the hero said *"Claude Code runs inside a
+    shoreline"*; it now says a terminal agent works inside an ASCII landscape, the protocol section
+    says "any agent that runs in a terminal", and the install block shows
+    `xscapes inside <any command>` beside the Claude Code hooks — the general case already ships, it
+    was just never on the page. (3) **The name is the category**: a new line under the synopsis says
+    each landscape is a scape and the shoreline is the first one, the fourth feature no longer reads
+    as if kittens and the moon WERE the product, and the glance table is introduced as the
+    shoreline's vocabulary. (4) **"Four states" is gone**: the section is "It runs on your clock",
+    says there is no theme setting and no dark mode switch, and the four clips are captioned as one
+    session at four hours (afternoon, dusk, night, dawn). Bullet trimmed after the look because it
+    outgrew its column. ⚠ The DECK still carries the old synopsis word for word and the README still
+    opens Claude-first; both are for his go-ahead, not touched here.
