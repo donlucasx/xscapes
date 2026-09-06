@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>xscapes</title>
-<meta name="description" content="A thinking screen for terminal agents. Claude Code runs inside a shoreline: the sea rises while it works, the sand records what it did, and a cat knocks when it needs you.">
+<meta name="description" content="A thinking screen for terminal agents. Your agent works inside a living ASCII landscape: the scene moves with the work, and the companion who lives there knocks when it needs you.">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Geist+Mono:wght@400;700&family=Geist:wght@400;500;600&display=swap">
 <style>
 :root{--g:#121212;--s:#1c1c1c;--ln:#303030;--d:#8a8a8a;--i:#eeeeee;--acc:#87afff;
@@ -328,30 +328,33 @@ li{margin-bottom:6px}
 <section class="hero">
 <div>
 <div class="lockup"><span class="blk">x</span>scapes</div>
-<h1 class="syn">Claude Code runs inside a shoreline. The sea rises while it works, the sand records what it did, and a cat knocks when it needs you.</h1>
+<h1 class="syn">Your terminal agent works inside a small ASCII landscape. The scene moves with the work, and the companion who lives there knocks when the agent needs you.</h1>
 </div>
 <p class="why">You send a prompt and the terminal goes quiet. Agents now think for minutes at a time, and that time has no face. xscapes gives it one.</p>
+<p class="why">Each landscape is a scape. The first one is a shoreline: a sea that rises while the agent thinks, the last few actions written in the sand, and a cat who sits with you until it is done. Everything on this page is that scape, running.</p>
 <ul class="feats">
 <li><b>A glance is enough.</b> How hard it is working, what it is doing right now, whether something broke, whether it is waiting on you. Nothing to read.</li>
 <li><b>Two knocks you can tell apart from across the room.</b> A solid balloon and a chime when it needs you, a dotted one and a low note when it is done. Silent while it works.</li>
 <li><b>It lives where the agent lives.</b> The same window, no browser tab, nothing to configure, and the agent's own screen untouched.</li>
-<li><b>Subagents are kittens, context is the moon.</b> Every fact about the session has its own place in the scene, and no two share one.</li>
+<li><b>One fact, one place.</b> Activity, subagents, finished todos, context left: each owns its own part of the scene. On the shore those are the swells, the kittens, the stars and the moon.</li>
 </ul>
 <div class="clip big"><img src="anim/hero.gif" width="672" height="336" alt="Six seconds of a turn at noon: the sea busy, five kittens on the beach and in the water, the last tool calls written in the sand"></div>
-<p class="cap">Fourteen seconds into a turn, at noon. Edits landing, five subagents out, the sand carrying the last tool calls. Every clip on this page is the real engine folding the same events a Claude Code hook emits. Nothing is posed.</p>
-<div class="cmd">go install github.com/donlucasx/xscapes@latest<br>xscapes install claude --apply&nbsp;&nbsp;<span class="c"># writes the hooks after a backup; uninstall restores byte for byte</span><br>xscapes claude&nbsp;&nbsp;<span class="c"># Claude Code in the top of the window, the shoreline underneath</span></div>
+<p class="cap">Fourteen seconds into a turn, at noon. Edits landing, five subagents out, the sand carrying the last tool calls. Every clip on this page is the real engine folding the same events the Claude Code adapter emits. Nothing is posed.</p>
+<div class="cmd">go install github.com/donlucasx/xscapes@latest<br>xscapes install claude --apply&nbsp;&nbsp;<span class="c"># Claude Code: writes its hooks after a backup, uninstall restores them byte for byte</span><br>xscapes claude&nbsp;&nbsp;<span class="c"># the agent in the top of the window, the scape underneath</span><br>xscapes inside &lt;any command&gt;&nbsp;&nbsp;<span class="c"># anything else: host it the same way</span></div>
 </section>
 
-<h2>Four states</h2>
+<h2>It runs on your clock</h2>
+<p>The scape keeps the time of day where you are. There is no theme setting and no dark mode switch: the sky goes dark because it is dark outside, the sun crosses it, and the light on the water follows. You look up from your work and the landscape has moved on with the afternoon, the way one outside the window would.</p>
+<p>Below is one session at four hours.</p>
 <div class="states">
-<div><div class="clip"><img src="anim/worried.gif" width="672" height="336" alt="A command exited 1 in the afternoon: the companion hunched with its ears back, the sea still moving"></div><p class="cap">A command exited 1. The companion carries it, ears back and tail flat, until you come back. The weather never does.</p></div>
+<div><div class="clip"><img src="anim/worried.gif" width="672" height="336" alt="A command exited 1 in the afternoon: the companion hunched with its ears back, the sea still moving"></div><p class="cap">Afternoon. A command exited 1. The companion carries it, ears back and tail flat, until you come back. The weather never does.</p></div>
 <div><div class="clip"><img src="anim/ask.gif" width="672" height="336" alt="Dusk: the agent needs permission, a solid balloon over the companion in its alert pose"></div><p class="cap">Dusk. The agent needs permission. A solid balloon, the alert pose, and a chime.</p></div>
 <div><div class="clip"><img src="anim/done.gif" width="672" height="336" alt="Night: the turn is done, a dotted balloon, the constellation lit, the moon with a number under it"></div><p class="cap">Night. Done, every todo lit. A dotted balloon and a low note. The moon has waned and sunk with the context, and the number under it says what is left.</p></div>
 <div><div class="clip"><img src="anim/resting.gif" width="672" height="336" alt="Dawn, half a minute after the turn: a flat sea, the writing in the sand fading"></div><p class="cap">Dawn, half a minute later. Flat sea, the writing receding, the companion dozing.</p></div>
 </div>
 
 <h2>What a glance tells you</h2>
-<p>Everything on screen means one thing, and no two things share a channel. The water is the work. The sky is the world.</p>
+<p>Everything on screen means one thing, and no two things share a channel. The water is the work. The sky is the world. What follows is the shoreline's vocabulary; a different scape spends the same channels on its own scenery.</p>
 <table>
 <tr><td>how hard the agent is working</td><td><b>the sea</b>: how many swells are travelling, how tall, whitecaps above half</td></tr>
 <tr><td>what it is doing right now</td><td><b>writing in the sand</b>: newest brightest, older lines taken by the tide</td></tr>
@@ -366,12 +369,12 @@ li{margin-bottom:6px}
 <p>Sea state always means the agent. Sky, light and time always mean reality. You never have to ask which of two meanings a change is carrying.</p>
 
 <h2>Underneath, a protocol</h2>
-<p>xscapes is two things. Below is an event protocol with pluggable adapters, which works for any agent. On top is one reference scape, which is what that protocol looks like when you give it a sea and a cat.</p>
+<p>xscapes is two things. Below is an event protocol with pluggable adapters, which works for any agent that runs in a terminal. On top are the scapes, which are what that protocol looks like once you give it a landscape and something living in it.</p>
 <div class="events">session_start &nbsp;prompt &nbsp;tool_start &nbsp;tool_end &nbsp;error &nbsp;test_pass &nbsp;test_fail &nbsp;sub_start &nbsp;sub_end &nbsp;needs_input &nbsp;done &nbsp;compact &nbsp;context &nbsp;todo &nbsp;session_end</div>
-<p style="margin-top:12px">Tool events do not each get their own weather. Every one feeds a single activity level, and the sand names the tool and the file. The sea says how much, the sand says what. Claude Code is wired through its hooks; <code>xscapes emit needs_input -text "allow Bash?"</code> from a shell script is a complete adapter for anything else.</p>
+<p style="margin-top:12px">Tool events do not each get their own weather. Every one feeds a single activity level, and the sand names the tool and the file. The sea says how much, the sand says what. Claude Code is wired through its hooks, and <code>xscapes emit needs_input -text "allow Bash?"</code> from a shell script is a complete adapter for anything else. If an agent can run a command, it can drive a scape.</p>
 
 <h2>A companion for the session, not a toy for the task</h2>
-<p>It runs for the whole session. Tasks move the scene and the day passes over it. The same repository always gets the same shoreline, seeded from its git root, and the companion is yours across all of them. One Go binary, no dependencies, every colour an xterm-256 index, so it looks the same in Terminal.app, iTerm2 and Ghostty. Running daily; next is a recording of a real turn, the campsite and the rainy window, and an adapter for any process.</p>
+<p>It runs for the whole session. Tasks move the scene and the day passes over it. The same repository always gets the same shoreline, seeded from its git root, and the companion is yours across all of them. One Go binary, no dependencies, every colour an xterm-256 index, so it looks the same in Terminal.app, iTerm2 and Ghostty. Running daily. The next landscapes and companions are drawn and waiting to be picked.</p>
 
 <p class="foot">Built for the Commons "Make Waiting for AI Fun" hackathon, September 2026. Go, standard library only. MIT. Source and issues at <a href="https://github.com/donlucasx/xscapes">github.com/donlucasx/xscapes</a>.</p>
 
