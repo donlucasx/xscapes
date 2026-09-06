@@ -11,7 +11,13 @@
 > Page, clips (the resting clip is 8 s: the litter swims off at dawn), deck and PDF regenerated;
 > the binary installed through a new inode. Earlier in the session: the brand guidelines say ink on
 > the page and deck (`fb6d9ee`), and the corruption's third repro is recorded with the
-> read-back-first order. Details in `RESUME.md`, `_FEEDBACK.md` s18.
+> read-back-first order. **Later the same session:** the submission page is LIVE at
+> https://donlucasx.github.io/xscapes/ (`site/publish.sh`, an orphan `gh-pages` branch; the Commons
+> paste points its clips there) · his answers: cover KEEPS its headline over the sea, coat CREAM locked,
+> long kittens SEEN, the corrupted session CLOSED unread · **the study "Five Scenes, Five Companions"**
+> (`notes/scapestudy`): hearth/cabin, rainy window, café table, aquarium, snow cabin at night/noon/dusk,
+> and owl, rabbit, frog, hedgehog, otter beside the cat, all through the real pipeline at 256 —
+> **his picks pending, nothing chosen.** Details in `RESUME.md`, `_FEEDBACK.md` s18.
 >
 > **Session 19 (2026-09-05), WRAPPED. No code changed; three things wait on him.** A live features
 > test run INSIDE `xscapes claude` at his ask, plus two research streams. **The scrollback corruption

@@ -1271,3 +1271,23 @@ at 22:10 (lgarzoli out of tokens → donlucasx); artifact ownership checked, see
   a second scape before 09-17 — *"have you mocked up any of these yet"* · the next companion —
   *"have you mocked up any others yet"* ⇒ both answered below with the inventory (nothing beyond
   the shore and the cat has ever been drawn); his call on mockups follows.
+- *"\" as I asked, I want to do a parallel mokcup exploration w all the landscapes and companions
+  proposed- at least 5 of each, before we decide wether and which to add to the current build.\""*
+  (~16:50, to the "which scenes" prompt) · companions to mock: *"Owl, Frog, Rabbit, Otter"* (hedgehog
+  added to make five) · format: *"One study page, stills (Recommended)"* · the design put back to him:
+  *"Yes, build it"* · hours: *"Three: night, noon, dusk (Recommended)"* · colour: *"256 colours, as
+  shipped (Recommended)"*
+  ⇒ **BUILT: `notes/scapestudy`** → artifact "Five Scenes, Five Companions" (and
+    `assets/frames/scapestudy.html`, ignored, regenerable). Five scenes (hearth and cabin · rainy
+    window · café table · aquarium · snow cabin) at 80x24, night/noon/dusk, each filling the six
+    slots with the shipped cream cat in place and the same three lines of writing on the scene's own
+    surface; five companions (owl slate · rabbit fog · frog sage · hedgehog charcoal · otter taupe)
+    at the cat's 12x7 through the cat's own pipeline (quadrants, coat, `PlotRim`, plotted eyes) with
+    two young each at the kittens' size, on the shore at night and noon beside the real cat. Every
+    colour a cube entry by construction (the study panics otherwise). One look, one fixing pass:
+    the café's table and wall shared a tone at dusk · the snow cabin's cat sat on its own window ·
+    the owl had no neck · the noon skyline read as hanging blocks. **Nothing chosen; his picks next.**
+- *"also, lets push the current index page (submission) online so I can review it remotely"* (~16:45)
+  ⇒ DONE: https://donlucasx.github.io/xscapes/ — `site/publish.sh` force-pushes `site/index.html` +
+    `anim/*.gif` as an orphan `gh-pages` branch; Pages set to that branch by API (the workflow route
+    was refused: the stored token has no `workflow` scope). Verified 200 on the page and on a clip.
