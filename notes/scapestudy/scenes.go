@@ -131,8 +131,18 @@ func skyWindow(c *canvas.Canvas, x0, y0, x1, y1 int, p scape.Palette, t float64,
 	}
 }
 
-// catAt draws the shipped companion, working, at a cell.
+// sceneCompanion, when set, is drawn in the cat's place in every scene, so a
+// scape can be shown with the companion drawn for it rather than always with
+// the one that ships.
+var sceneCompanion *animal
+
+// catAt draws the scene's companion, working, at a cell.
 func catAt(c *canvas.Canvas, x, y int, faceLeft bool, t float64) {
+	if a := sceneCompanion; a != nil {
+		drawAnimal(c.Near(), a.body, 24, 28, a.name, companion.Coats[a.coat],
+			a.eyes, a.eyeRow, a.eyeGlyph, a.nose, a.noseRow, x, y, faceLeft)
+		return
+	}
 	cat := companion.NewCat()
 	cat.FaceLeft(faceLeft)
 	cat.Draw(c.Near(), x, y, t, companion.Working)

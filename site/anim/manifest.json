@@ -1,11 +1,23 @@
 [
   {
+    "name": "window",
+    "frames": 60,
+    "fps": 10,
+    "note": "the whole window at noon: the agent's own output above, the scape below it",
+    "secs": 6,
+    "px": 14,
+    "cols": 108,
+    "rows": 40
+  },
+  {
     "name": "hero",
     "frames": 60,
     "fps": 10,
     "note": "the fan-out at noon: busy sea, five kittens, the sand carrying the tool calls",
     "secs": 6,
-    "px": 14
+    "px": 14,
+    "cols": 80,
+    "rows": 24
   },
   {
     "name": "worried",
@@ -13,7 +25,9 @@
     "fps": 10,
     "note": "a command exited 1: the companion carries it",
     "secs": 4,
-    "px": 14
+    "px": 14,
+    "cols": 80,
+    "rows": 24
   },
   {
     "name": "ask",
@@ -21,7 +35,9 @@
     "fps": 10,
     "note": "dusk: the agent needs permission, solid balloon, alert pose",
     "secs": 4,
-    "px": 14
+    "px": 14,
+    "cols": 80,
+    "rows": 24
   },
   {
     "name": "done",
@@ -29,7 +45,9 @@
     "fps": 10,
     "note": "night: done, dotted balloon, the constellation, the moon with its readout",
     "secs": 5,
-    "px": 14
+    "px": 14,
+    "cols": 80,
+    "rows": 24
   },
   {
     "name": "resting",
@@ -37,6 +55,8 @@
     "fps": 10,
     "note": "dawn, half a minute later: flat sea, the writing receding, the litter swims off as its dwell ends",
     "secs": 8,
-    "px": 14
+    "px": 14,
+    "cols": 80,
+    "rows": 24
   }
 ]

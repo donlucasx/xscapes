@@ -119,16 +119,17 @@ p{max-width:66ch;color:var(--d);margin:0 0 12px}
 // size, so a screenshot of it drops straight in beside them.
 type framePick struct {
 	file, scene, animal string
-	tod                 float64
+	// with names the companion drawn INTO the scene, in the cat's place.
+	with string
+	tod  float64
 }
 
-// sitePicks are the four the roadmap section shows. His pick, 2026-09-05:
-// the rainy window and the aquarium, the frog and the otter.
+// sitePicks are what the page shows. His pick, 2026-09-06: two scapes, each
+// with the companion drawn for it, the rainy window at dusk and the aquarium
+// at night.
 var sitePicks = []framePick{
-	{file: "next-rain.png", scene: "Rainy window", tod: 0.0245},
-	{file: "next-aquarium.png", scene: "Aquarium", tod: 0.0245},
-	{file: "next-frog.png", animal: "Frog", tod: 0.5},
-	{file: "next-otter.png", animal: "Otter", tod: 0.5},
+	{file: "scape-rain.png", scene: "Rainy window", with: "Frog", tod: 0.75},
+	{file: "scape-aquarium.png", scene: "Aquarium", with: "Owl", tod: 0.0245},
 }
 
 // FramePx is the clips' cell size: 14px Menlo is 8.4 by 14, so 80x24 lands on
@@ -152,9 +153,21 @@ func writeFrames(dir string, seed int64, level, t float64) error {
 			if sc == nil {
 				return fmt.Errorf("no scene %q", p.scene)
 			}
+			sceneCompanion = nil
+			if p.with != "" {
+				for i := range animals {
+					if animals[i].name == p.with {
+						sceneCompanion = &animals[i]
+					}
+				}
+				if sceneCompanion == nil {
+					return fmt.Errorf("no companion %q", p.with)
+				}
+			}
 			c = canvas.New(80, 24, canvas.AlphaFar, canvas.AlphaMid, canvas.AlphaNear)
 			c.Clear()
 			sc.paint(c, p.tod, t, level, seed)
+			sceneCompanion = nil
 		case p.animal != "":
 			var a *animal
 			for i := range animals {

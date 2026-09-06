@@ -18,10 +18,10 @@ ANIM = os.path.join(HERE, 'anim')
 CHROME = '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome'
 MAGENTA = (255, 0, 255)
 
-def capture(page, png, height):
+def capture(page, png, width, height):
     subprocess.run([CHROME, '--headless=new', '--disable-gpu', '--use-mock-keychain',
                     '--password-store=basic', '--hide-scrollbars', '--force-device-scale-factor=1',
-                    f'--window-size=900,{height}', f'--screenshot={png}', f'file://{page}'],
+                    f'--window-size={width},{height}', f'--screenshot={png}', f'file://{page}'],
                    check=True, capture_output=True)
 
 def slices(im):
@@ -57,9 +57,12 @@ def main():
     manifest = json.load(open(os.path.join(ANIM, 'manifest.json')))
     for clip in manifest:
         name, n, fps, px_ = clip['name'], clip['frames'], clip['fps'], clip.get('px', 12)
+        # Each clip carries its own geometry: the window clip is wider than the
+        # design size and taller, because it shows the agent's rows too.
+        rows, cols = clip.get('rows', 24), clip.get('cols', 80)
         page = os.path.join(ANIM, name + '.html')
         png = os.path.join(ANIM, name + '.png')
-        capture(page, png, n * (24 * px_ + 4) + 8)
+        capture(page, png, max(900, int(cols * px_ * 0.6) + 80), n * (rows * px_ + 4) + 8)
         im = Image.open(png).convert('RGB')
         boxes = slices(im)
         if len(boxes) != n:
