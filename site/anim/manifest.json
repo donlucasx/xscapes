@@ -1,13 +1,14 @@
 [
   {
     "name": "window",
-    "frames": 60,
+    "frames": 160,
     "fps": 10,
-    "note": "the whole window at noon: the agent's own output above, the scape below it",
-    "secs": 6,
+    "note": "one whole session in one loop, the day turning under it",
+    "secs": 16,
     "px": 14,
     "cols": 108,
-    "rows": 40
+    "rows": 40,
+    "pages": 7
   },
   {
     "name": "hero",
@@ -17,7 +18,8 @@
     "secs": 6,
     "px": 14,
     "cols": 80,
-    "rows": 24
+    "rows": 24,
+    "pages": 2
   },
   {
     "name": "worried",
@@ -27,7 +29,8 @@
     "secs": 4,
     "px": 14,
     "cols": 80,
-    "rows": 24
+    "rows": 24,
+    "pages": 1
   },
   {
     "name": "ask",
@@ -37,7 +40,8 @@
     "secs": 4,
     "px": 14,
     "cols": 80,
-    "rows": 24
+    "rows": 24,
+    "pages": 1
   },
   {
     "name": "done",
@@ -47,7 +51,8 @@
     "secs": 5,
     "px": 14,
     "cols": 80,
-    "rows": 24
+    "rows": 24,
+    "pages": 2
   },
   {
     "name": "resting",
@@ -57,6 +62,106 @@
     "secs": 8,
     "px": 14,
     "cols": 80,
-    "rows": 24
+    "rows": 24,
+    "pages": 2
+  },
+  {
+    "name": "g-ask",
+    "frames": 40,
+    "fps": 10,
+    "note": "the balloon rises and the companion turns to face you",
+    "secs": 4,
+    "px": 14,
+    "cols": 36,
+    "rows": 11,
+    "pages": 1
+  },
+  {
+    "name": "g-done",
+    "frames": 40,
+    "fps": 10,
+    "note": "the finish knock, and the companion holds the pose",
+    "secs": 4,
+    "px": 14,
+    "cols": 36,
+    "rows": 11,
+    "pages": 1
+  },
+  {
+    "name": "g-worried",
+    "frames": 40,
+    "fps": 10,
+    "note": "a command exits 1 and the companion carries it",
+    "secs": 4,
+    "px": 14,
+    "cols": 36,
+    "rows": 11,
+    "pages": 1
+  },
+  {
+    "name": "g-sea",
+    "frames": 50,
+    "fps": 10,
+    "note": "the sea gets up as the work does, and settles after",
+    "secs": 5,
+    "px": 14,
+    "cols": 36,
+    "rows": 11,
+    "pages": 1
+  },
+  {
+    "name": "g-sand",
+    "frames": 50,
+    "fps": 10,
+    "note": "each tool call is written at the waterline, and taken",
+    "secs": 5,
+    "px": 14,
+    "cols": 36,
+    "rows": 11,
+    "pages": 1
+  },
+  {
+    "name": "g-moon",
+    "frames": 60,
+    "fps": 10,
+    "note": "the disc wanes and sinks as the window fills",
+    "secs": 6,
+    "px": 14,
+    "cols": 36,
+    "rows": 11,
+    "pages": 1
+  },
+  {
+    "name": "g-kittens",
+    "frames": 50,
+    "fps": 10,
+    "note": "one kitten per subagent, and each swims off when it is done",
+    "secs": 5,
+    "px": 14,
+    "cols": 36,
+    "rows": 11,
+    "pages": 1
+  },
+  {
+    "name": "g-sky",
+    "frames": 50,
+    "fps": 10,
+    "note": "the sky on your own clock, a day in five seconds",
+    "secs": 5,
+    "px": 14,
+    "cols": 36,
+    "rows": 11,
+    "pages": 1
+  },
+  {
+    "name": "g-stars",
+    "frames": 50,
+    "fps": 10,
+    "note": "a star for every finished item, and a new list clears them",
+    "secs": 5,
+    "px": 14,
+    "cols": 36,
+    "rows": 11,
+    "pages": 1
   }
 ]

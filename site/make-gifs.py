@@ -60,14 +60,21 @@ def main():
         # Each clip carries its own geometry: the window clip is wider than the
         # design size and taller, because it shows the agent's rows too.
         rows, cols = clip.get('rows', 24), clip.get('cols', 80)
-        page = os.path.join(ANIM, name + '.html')
-        png = os.path.join(ANIM, name + '.png')
-        capture(page, png, max(900, int(cols * px_ * 0.6) + 80), n * (rows * px_ + 4) + 8)
-        im = Image.open(png).convert('RGB')
-        boxes = slices(im)
-        if len(boxes) != n:
-            sys.exit(f'{name}: sliced {len(boxes)} frames, manifest says {n}')
-        frames = [im.crop(b) for b in boxes]
+        # A long clip is split over several pages, each captured and sliced on
+        # its own, because one page of every frame outgrows what a headless
+        # screenshot will take.
+        width = max(900, int(cols * px_ * 0.6) + 80)
+        frames = []
+        for p in range(clip.get('pages', 1)):
+            page = os.path.join(ANIM, f'{name}.{p}.html')
+            png = os.path.join(ANIM, f'{name}.{p}.png')
+            here = min(n - len(frames), (15000 // (rows * px_ + 4)) or 1)
+            capture(page, png, width, here * (rows * px_ + 4) + 8)
+            im = Image.open(png).convert('RGB')
+            frames += [im.crop(b) for b in slices(im)]
+            os.remove(png)
+        if len(frames) != n:
+            sys.exit(f'{name}: sliced {len(frames)} frames, manifest says {n}')
         pal = frames[0].quantize(colors=255, method=Image.Quantize.MEDIANCUT, dither=Image.Dither.NONE)
         q = [f.quantize(palette=pal, dither=Image.Dither.NONE) for f in frames]
         raw = os.path.join(ANIM, name + '.raw.gif')
@@ -75,7 +82,7 @@ def main():
                   optimize=False, disposal=1)
         out = os.path.join(ANIM, name + '.gif')
         subprocess.run(['gifsicle', '-O3', '--no-warnings', '-o', out, raw], check=True)
-        os.remove(raw); os.remove(png)
+        os.remove(raw)
         print(f'{name}.gif  {n} frames  {frames[0].size[0]}x{frames[0].size[1]}  {os.path.getsize(out)//1024} KB')
 
 if __name__ == '__main__':
