@@ -1369,3 +1369,28 @@ at 22:10 (lgarzoli out of tokens → donlucasx); artifact ownership checked, see
     gone. (d) Every section header carries an **ASCII rule** made from the scene's own glyphs,
     trailing off to the right: stars for the clock, waves for the glance, rain and bubbles for the
     scapes, dashes for the protocol, foam for the session.
+- *"a) ok. But it needs to be more exciting. This is our hero moment.would like to see the context moon
+  filling up, stars appearing as tasks are done, sub agents coming in and out, the tides moving, and
+  the companion promting the user right it all loops back again. --- Also, a small animated infographic
+  would be a fun way to add some visuals to the feature breakdown section (what a glance tells you-
+  could use a better title too). Either an infographic or dissected ascii animations next to each (for
+  example, the moons conext filling up)"* (2026-09-06, 02:20)
+  ⇒ **The hero is now ONE WHOLE SESSION THAT LOOPS** (`window.gif`, 160 frames, 16 s, 911x560, 1.9 MB):
+    sea up and down with the work · kittens in and out (arrive, dwell, swim off) · stars lighting as
+    todos finish · the moon waning and sinking as context fills, with the readout · the companion
+    asking permission and later reporting done · then a COMPACT + a fresh list, which is what lands
+    the scene back where it opened so the loop closes · the day turning dawn-to-dawn underneath ·
+    the agent's own transcript scrolling above, printed from the same events. Three machinery
+    changes made it possible: `gifScene.speed` (the session runs on its own clock while the waves
+    keep real time), `gifScene.todEnd` (a day ramp), and **page chunking** — one page of every frame
+    outgrew a headless screenshot, so `gifPages` writes `name.N.html` and `make-gifs.py` captures and
+    slices each, concatenating. `loopclips.go` holds the timelines.
+  ⇒ **The legend is retitled "How to read it"** (his *"could use a better title too"*) and every row
+    now carries a **dissected clip**: the same renderer cropped (`gifScene.crop` →
+    `HTMLFragmentCropAs`) to the one part of the scene that carries that fact — balloon, finish
+    knock, worried pose, sea, sand, moon, kittens, stars, sky. All 36x11 cells, 304x154.
+    ⚠ **The first cut of g-moon and g-stars came back EMPTY** (5 KB and 2 KB): the moon and the
+    constellation are held at a visibility floor and are washed out at midday BY DESIGN, so their
+    clips must run at night. ⚠ The balloon opens to the companion's LEFT, so a crop starting at the
+    cat cut the words off; every legend crop is 36 wide now.
+  ⇒ The page is ~6 MB of animation, so everything below the hero is `loading="lazy"`.

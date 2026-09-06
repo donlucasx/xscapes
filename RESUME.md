@@ -141,7 +141,13 @@ nothing chosen). 19:05: the Commons RULES re-read signed in (`research/commons-s
 unchanged, and the entry picker takes ONLY a published Commons build. The agent's brief is `site/commons-brief.md`;
 the paste kit is on his Desktop (`~/Desktop/xscapes-commons/`: `brief.md`, `index.html` with absolute clip URLs,
 `message.md` = both). Model: Default · Quick; STOP the Expert run that is building a "submission guide". ▶ HIS PICKS on it are item 0a: which scene, if any, before 09-17 (my read: none before
-the entry ships), and which companion to draw properly, if any.** 0. **the page carries the FULL-WINDOW clip, "Choose your xscape" and ASCII section rules, LIVE**
+the entry ships), and which companion to draw properly, if any.** 0. **the hero is A WHOLE SESSION THAT LOOPS and the legend is DISSECTED, LIVE** (2026-09-06 02:20–03:00,
+`_FEEDBACK.md` s18): `window.gif` 160 frames/16 s — sea, kittens in and out, stars lighting, the moon filling and
+sinking, the companion asking and finishing, a compact that closes the loop, the day turning, the transcript
+scrolling above · nine cropped clips beside the legend, now **"How to read it"** · `loopclips.go` holds every
+timeline · new machinery: `speed`, `todEnd`, `crop`, and PAGE CHUNKING in `gifPages`/`make-gifs.py` · lazy loading.
+⚠ the moon and stars clips MUST run at night, they are washed out at midday by design.
+Earlier: the page carried the FULL-WINDOW clip, "Choose your xscape" and ASCII section rules, LIVE
 (2026-09-06 01:40–02:10, `_FEEDBACK.md` s18): `window.gif` 108x40 = the agent's own rows above its scape, one clip,
 `agentPane` in `gifs.go`; clips now carry their own `cols`/`rows` through the manifest into `make-gifs.py` · the rainy
 window at dusk with the FROG and the aquarium at night with the OWL (`sceneCompanion` in the study) · "Any agent, any
