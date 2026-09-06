@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>xscapes</title>
-<meta name="description" content="A thinking screen for terminal agents. Your agent works inside a living ASCII landscape: the scene moves with the work, and the companion who lives there knocks when it needs you.">
+<meta name="description" content="Cozy ASCII scenes that react to your agent while it works. The tide rises as it gets busy, kittens paddle out for subagents, and the moon thins as the context fills.">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Geist+Mono:wght@400;700&family=Geist:wght@400;500;600&display=swap">
 <style>
 :root{--g:#121212;--s:#1c1c1c;--ln:#303030;--d:#8a8a8a;--i:#eeeeee;--acc:#87afff;
@@ -45,9 +45,12 @@ main{max-width:1080px;margin:0 auto;padding:56px 24px 80px}
 
 h2{font-size:26px;font-weight:600;margin:64px 0 14px;letter-spacing:-.01em}
 p{margin:0 0 12px;max-width:66ch}
-table{border-collapse:collapse;width:100%;margin:12px 0 8px;font-size:15px}
-td{padding:9px 12px 9px 0;border-top:1px solid var(--ln);vertical-align:top}
-td:first-child{color:var(--d);width:34%}
+table{border-collapse:collapse;width:100%;margin:20px 0 14px;font-size:15px}
+td{padding:15px 12px 15px 0;border-top:1px solid var(--ln);vertical-align:top;line-height:1.5}
+td:first-child{color:var(--i);font-weight:600;font-size:18px;letter-spacing:-.01em;width:30%;padding-right:28px}
+td:last-child{color:var(--d)}
+td:last-child b{color:var(--i);font-weight:600}
+@media (max-width:820px){td{display:block;border-top:none;padding:0}td:first-child{border-top:1px solid var(--ln);padding-top:16px;width:auto}td:last-child{padding:4px 0 16px}}
 .states{display:grid;grid-template-columns:repeat(2,1fr);gap:26px 28px;margin-top:18px}
 .states .clip{width:100%}
 @media (max-width:820px){.states{grid-template-columns:1fr}.feats{grid-template-columns:1fr}.hero .lockup{font-size:44px}}
@@ -70,14 +73,15 @@ li{margin-bottom:6px}
 <section class="hero">
 <div>
 <div class="lockup"><span class="blk">x</span>scapes</div>
-<h1 class="syn">Your terminal agent works inside a small ASCII landscape. The scene moves with the work, and the companion who lives there knocks when the agent needs you.</h1>
+<h1 class="syn">Cozy ASCII scenes that react to your agent while it works.</h1>
 </div>
-<p class="why">You send a prompt and the terminal goes quiet. Agents now think for minutes at a time, and that time has no face. xscapes gives it one.</p>
-<p class="why">Each landscape is a scape. The first one is a shoreline: a sea that rises while the agent thinks, the last few actions written in the sand, and a cat who sits with you until it is done. Everything on this page is that scape, running.</p>
+<p class="why">Your agent goes off to think for a few minutes at a time. Sit back and watch it work. The tide rises as it gets busy and settles when it stops. Kittens paddle out when it sends subagents, and swim off when they report back. The moon thins and sinks as the context window fills. The last few files it touched are written in the sand, and the water takes them as they get old.</p>
+<p class="why">It runs in the same window as the agent, just under its output, so nothing leaves your screen and there is nothing to open or read. Glance at it the way you would glance out a window, and you know how the work is going.</p>
+<p class="why">Each landscape is a scape. The first one is a shoreline, with a cat who dozes through the quiet and comes over to knock when the agent needs you. Everything on this page is that scape, running.</p>
 <ul class="feats">
 <li><b>A glance is enough.</b> How hard it is working, what it is doing right now, whether something broke, whether it is waiting on you. Nothing to read.</li>
 <li><b>Two knocks you can tell apart from across the room.</b> A solid balloon and a chime when it needs you, a dotted one and a low note when it is done. Silent while it works.</li>
-<li><b>It lives where the agent lives.</b> The same window, no browser tab, nothing to configure, and the agent's own screen untouched.</li>
+<li><b>Two commands and it is on.</b> It backs up your agent's hooks before writing its own, and puts them back byte for byte if you take it off. No browser tab, no config file, no account.</li>
 <li><b>One fact, one place.</b> Activity, subagents, finished todos, context left: each owns its own part of the scene. On the shore those are the swells, the kittens, the stars and the moon.</li>
 </ul>
 <div class="clip big"><img src="anim/hero.gif" width="672" height="336" alt="Six seconds of a turn at noon: the sea busy, five kittens on the beach and in the water, the last tool calls written in the sand"></div>
@@ -96,27 +100,38 @@ li{margin-bottom:6px}
 </div>
 
 <h2>What a glance tells you</h2>
-<p>Everything on screen means one thing, and no two things share a channel. The water is the work. The sky is the world. What follows is the shoreline's vocabulary; a different scape spends the same channels on its own scenery.</p>
+<p>Every question you would normally interrupt yourself to answer has one place in the scene, and no two share a place. Nothing here is a number you have to read. This is the shoreline's vocabulary, most useful first.</p>
 <table>
-<tr><td>how hard the agent is working</td><td><b>the sea</b>: how many swells are travelling, how tall, whitecaps above half</td></tr>
-<tr><td>what it is doing right now</td><td><b>writing in the sand</b>: newest brightest, older lines taken by the tide</td></tr>
-<tr><td>something is broken</td><td><b>the companion</b>: ears back, tail flat, amber eyes, until you come back</td></tr>
-<tr><td>it needs you</td><td><b>a solid balloon</b> in a warm colour, plus a bright chime</td></tr>
-<tr><td>it finished</td><td><b>a dotted balloon</b> in a cool colour, plus a low sonar note</td></tr>
-<tr><td>subagents</td><td><b>kittens</b>, one per agent, on the sand or in the water; they swim off when they finish</td></tr>
-<tr><td>todos completed</td><td><b>stars</b> in the upper sky, one lit per finished item</td></tr>
-<tr><td>context left</td><td><b>the sun by day, the moon by night</b>: it wanes and sinks as context is used, with a number under it from 40% used</td></tr>
-<tr><td>time of day</td><td><b>the sky</b>, from your actual clock</td></tr>
+<tr><td>It needs you</td><td>A <b>solid balloon</b> over the companion, in a warm colour, with a bright chime. It says what is being asked.</td></tr>
+<tr><td>It finished</td><td>A <b>dotted balloon</b> in a cool colour and a low note. The cat sits up, content, and holds the pose so you see it when you get back.</td></tr>
+<tr><td>Something broke</td><td>The <b>companion</b> goes worried: ears back, tail flat, amber eyes. It stays that way until the trouble clears, so a failure you missed is still on screen ten minutes later.</td></tr>
+<tr><td>How hard it is working</td><td>The <b>sea</b>. How many swells are travelling and how tall, with whitecaps once it is going flat out. Flat water means it is waiting on you.</td></tr>
+<tr><td>What it is doing right now</td><td><b>Writing in the sand</b>: the tool and the file, newest and brightest at the waterline, older lines fading as the tide takes them.</td></tr>
+<tr><td>How much context is left</td><td>The <b>sun by day and the moon by night</b>. It wanes and sinks toward the horizon as the window fills, and from 40% used it carries the number underneath.</td></tr>
+<tr><td>How many subagents are out</td><td><b>Kittens</b>, one each. Some sit on the sand, some paddle in the shallows, and each swims off along the horizon when its agent reports back.</td></tr>
+<tr><td>How much of the plan is done</td><td><b>Stars</b> in the upper sky, one lit per finished item on the agent's list. They come out as the evening does.</td></tr>
+<tr><td>What time it is</td><td>The <b>sky</b>, on your actual clock.</td></tr>
 </table>
-<p>Sea state always means the agent. Sky, light and time always mean reality. You never have to ask which of two meanings a change is carrying.</p>
+<p>There is one rule underneath all of it: the water is the work, and the sky is the world. Anything moving on the sea is your agent. Anything in the light and the sky is just the day going by. You never have to work out which of two meanings a change is carrying.</p>
+
+<h2>The next scapes</h2>
+<p>A landscape works with all of this as long as it can offer six things: a light, a sky, something that moves with the work, a surface, somewhere the work piles up, and a companion to live in it. The shoreline is the one that runs today. These are next, drawn at the same size in the same renderer.</p>
+<div class="states">
+<div><div class="clip"><img src="anim/next-rain.png" width="672" height="336" alt="A rainy window at night: rain on the glass, a lit city skyline behind it, the cat on the inside sill"></div><p class="cap"><b>The rainy window.</b> Rain on the glass carries the work, and it comes down harder the busier the agent gets. The city behind it carries the hour. The cat moves to the inside sill.</p></div>
+<div><div class="clip"><img src="anim/next-aquarium.png" width="672" height="336" alt="An aquarium at night: lit tank, fish, plants and gravel, the cat watching through the glass"></div><p class="cap"><b>The aquarium.</b> The fish are the work: more of them come out as it picks up. The tank's lamp is the light, the gravel is where the work piles up, and the cat watches from the front.</p></div>
+<div><div class="clip"><img src="anim/next-frog.png" width="672" height="336" alt="A frog and two froglets on the shore at noon, beside the same sea the cat lives on"></div><p class="cap"><b>The frog</b>, drawn for the rainy window, where it sits on the sill and its young swim. Its eyes are domes on top of its head rather than gaps in a face, which is why it survives being three characters tall.</p></div>
+<div><div class="clip"><img src="anim/next-otter.png" width="672" height="336" alt="An otter and two pups on the shore at noon"></div><p class="cap"><b>The otter</b>, for the shore, where its pups can swim with the tide instead of sitting it out on the sand. Shown here beside the cat's own sea so you can compare them at the same size.</p></div>
+</div>
 
 <h2>Underneath, a protocol</h2>
 <p>xscapes is two things. Below is an event protocol with pluggable adapters, which works for any agent that runs in a terminal. On top are the scapes, which are what that protocol looks like once you give it a landscape and something living in it.</p>
 <div class="events">session_start &nbsp;prompt &nbsp;tool_start &nbsp;tool_end &nbsp;error &nbsp;test_pass &nbsp;test_fail &nbsp;sub_start &nbsp;sub_end &nbsp;needs_input &nbsp;done &nbsp;compact &nbsp;context &nbsp;todo &nbsp;session_end</div>
-<p style="margin-top:12px">Tool events do not each get their own weather. Every one feeds a single activity level, and the sand names the tool and the file. The sea says how much, the sand says what. Claude Code is wired through its hooks, and <code>xscapes emit needs_input -text "allow Bash?"</code> from a shell script is a complete adapter for anything else. If an agent can run a command, it can drive a scape.</p>
+<p style="margin-top:12px">Fifteen events, sent over a Unix socket with a JSON-lines file as the fallback. Tool events do not each get their own weather: every one feeds a single activity level, and the sand names the tool and the file. The sea says how much, the sand says what. Claude Code is wired through its hooks, and one line in a shell script, <code>xscapes emit needs_input -text "allow Bash?"</code>, is a complete adapter for anything else. If an agent can run a command, it can drive a scape.</p>
+<p>Underneath: one Go binary, standard library only, nothing to install beside it. The renderer is a three-layer canvas with real alpha, composited and then matched to the xterm-256 palette, so the picture is the same in Terminal.app, iTerm2 and Ghostty instead of changing with your colour settings. It runs on the alternate screen and hosts your agent inside it, so the agent's own output is untouched and scrolls the way it always did. The clips on this page are the same renderer with the colour left alone.</p>
+<p>Getting the same picture everywhere took knowing where the terminals differ. Terminal.app draws a half-block glyph five pixels below the top of the cell and Ghostty does not, so the scene is drawn from the bottom half there instead, and the seams disappear. They move your content in opposite directions when the window changes, so each one gets its own set of moves. Drag the window and the shoreline reflows live: the sky, the sea and the beach take their share of whatever height you gave it, the companion keeps its distance from the edge, and the agent's transcript above is never touched. It is composed for 80 by 24 and still readable at 40 by 12.</p>
 
-<h2>A companion for the session, not a toy for the task</h2>
-<p>It runs for the whole session. Tasks move the scene and the day passes over it. The same repository always gets the same shoreline, seeded from its git root, and the companion is yours across all of them. One Go binary, no dependencies, every colour an xterm-256 index, so it looks the same in Terminal.app, iTerm2 and Ghostty. Running daily. The next landscapes and companions are drawn and waiting to be picked.</p>
+<h2>It stays for the session</h2>
+<p>You start it once and it runs until you are done. Tasks move the scene and the day passes over it. Every repository gets its own shoreline, the same one every time, shaped from the repo itself, and your companion comes with you to all of them. It has been running here daily since the start of September.</p>
 
 <p class="foot">Built for the Commons "Make Waiting for AI Fun" hackathon, September 2026. Go, standard library only. MIT. Source and issues at <a href="https://github.com/donlucasx/xscapes">github.com/donlucasx/xscapes</a>.</p>
 

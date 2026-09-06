@@ -6,8 +6,8 @@
 # credential has no `workflow` scope and a push carrying one is refused.
 #
 # Run it from the repo root after `go run . -site site && python3
-# site/make-gifs.py`. The frame pages under anim/ stay home; only the page
-# and the GIFs travel.
+# site/make-gifs.py`. The frame pages under anim/ stay home; the page, the
+# GIFs and the roadmap stills travel.
 set -eu
 root=$(git rev-parse --show-toplevel)
 cd "$root"
@@ -15,7 +15,7 @@ stage=$(mktemp -d)
 trap 'rm -rf "$stage"' EXIT
 mkdir -p "$stage/anim"
 cp site/index.html "$stage/"
-cp site/anim/*.gif "$stage/anim/"
+cp site/anim/*.gif site/anim/*.png "$stage/anim/"
 touch "$stage/.nojekyll"
 git -C "$stage" init -q -b gh-pages
 git -C "$stage" add -A

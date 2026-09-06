@@ -24,3 +24,5 @@
 .playwright-mcp/
 site/anim/*.html
 site/anim/*.png
+# except the roadmap stills, which the page serves and publish.sh uploads
+!site/anim/next-*.png

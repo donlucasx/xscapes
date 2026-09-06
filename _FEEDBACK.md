@@ -1313,3 +1313,30 @@ at 22:10 (lgarzoli out of tokens → donlucasx); artifact ownership checked, see
     session at four hours (afternoon, dusk, night, dawn). Bullet trimmed after the look because it
     outgrew its column. ⚠ The DECK still carries the old synopsis word for word and the README still
     opens Claude-first; both are for his go-ahead, not touched here.
+- *"I think we need to workshop some better loglines for what xscapes is ... lets test a couple
+  different angles to see which one is more appealing/gets the message across best. Beneath it, it
+  should elaborate and postulate the problem it solves w simple relatable language. "you send a prompt
+  and the terminal goes quiet" is not great as its has a negative connotation. Something along the
+  lines of "Sit back, relax and enjoy watching your agents at work through the lens of a cozy ASCII
+  scene ..." dont use that verbatim but improve upon it and expand. Throughout, the language should be
+  easy to digest. The protocol section can expand on the tech stack. Additionally, the section "what a
+  glance tells you" is one of the most important stuff of the pitch IMO ... Also, include a section
+  with alternative scenes. Refer to the 'five scenes five companions' study and pull the rainy window
+  and the aquarium, and do a micro section featuring those, as well as the frog and the otter"* (21:20)
+  and *"also, I want all the gifs and mockups to be shown in truecolor instead of 256"* (21:34)
+  ⇒ Four angles put to him as previews; **his pick: "Watch it work"** ⇒ the logline is *"Cozy ASCII
+    scenes that react to your agent while it works."* Under it, three short paragraphs: what you see
+    (tide, kittens, moon, sand), where it lives, and the scape/shore distinction. The negative opener
+    is GONE. **The glance table**, his ruling: *"the left column could stand out as subtitles ... Order
+    them in terms of relevance"* ⇒ left column is now an 18px subtitle in full ink, right column dim,
+    reordered most-useful-first (needs you · finished · broke · working · doing now · context ·
+    subagents · plan · time), each answer written out rather than clipped, and it stacks on narrow
+    screens. **"The next scapes"**, his framing pick: *"As the roadmap"* ⇒ the rainy window, the
+    aquarium, the frog and the otter, rendered from the study by a new `-frames` flag at the clips'
+    own 672x336, with the six-slot rule as the lead. **Protocol**: fifteen events, socket with a
+    JSON-lines fallback, and a stack paragraph (one Go binary, stdlib only, three-layer alpha canvas
+    matched to the 256 cube, alternate screen hosting the agent, 80x24 down to 40x12). **Truecolor**:
+    the clips already were; the four new stills were 256 and are now truecolor (863–2,866 distinct
+    colours each, measured). ⚠ `site/publish.sh` copied only `*.gif`, so the stills would have 404'd;
+    fixed and all five assets verified 200 live. ⚠ Told him his own example logline said
+    *"interactive"* and the live loop reads no keys, so the word stays off the page.

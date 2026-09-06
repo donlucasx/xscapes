@@ -141,7 +141,11 @@ nothing chosen). 19:05: the Commons RULES re-read signed in (`research/commons-s
 unchanged, and the entry picker takes ONLY a published Commons build. The agent's brief is `site/commons-brief.md`;
 the paste kit is on his Desktop (`~/Desktop/xscapes-commons/`: `brief.md`, `index.html` with absolute clip URLs,
 `message.md` = both). Model: Default · Quick; STOP the Expert run that is building a "submission guide". ▶ HIS PICKS on it are item 0a: which scene, if any, before 09-17 (my read: none before
-the entry ships), and which companion to draw properly, if any.** 0. **the page's copy is RESCOPED and LIVE** (his four notes, 19:20, `_FEEDBACK.md` s18): any terminal agent ·
+the entry ships), and which companion to draw properly, if any.** 0. **the page was REWRITTEN on his logline round and is LIVE** (21:20–21:45): logline *"Cozy ASCII scenes that
+react to your agent while it works"* (his pick of four angles) · the glance table promoted to subtitles and reordered
+most-useful-first · a new **"The next scapes"** roadmap section (rainy window · aquarium · frog · otter, from
+`go run ./notes/scapestudy -frames <dir>` + a Chrome shot at 672x336) · the protocol section carries the stack ·
+everything truecolor. ⚠ `publish.sh` now copies `*.png` too. Earlier the same session the copy was RESCOPED and LIVE (his four notes, 19:20, `_FEEDBACK.md` s18): any terminal agent ·
 a scape is any landscape, the shore is the first · "four states" → "It runs on your clock". ⏸ **the DECK
 (`deck.tpl.html`) still has the old synopsis verbatim and the README still opens Claude-first — both need
 the same rescope on his go-ahead.** Then HIS LOOK at the live page and `assets/deck/index.html` (both open locally; the

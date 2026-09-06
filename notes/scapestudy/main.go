@@ -18,11 +18,20 @@ import (
 
 func main() {
 	out := flag.String("html", "assets/frames/scapestudy.html", "write the page here")
+	frames := flag.String("frames", "", "instead of the page, write standalone frame pages here for screenshotting")
 	px := flag.Int("px", 9, "cell font size in the page")
 	seed := flag.Int64("seed", 7, "scene seed")
 	level := flag.Float64("level", 0.5, "the work, 0..1, carried by each scene's motion slot")
 	t := flag.Float64("t", 3.0, "the frame's time, seconds")
 	flag.Parse()
+
+	if *frames != "" {
+		if err := writeFrames(*frames, *seed, *level, *t); err != nil {
+			fmt.Fprintln(os.Stderr, err)
+			os.Exit(1)
+		}
+		return
+	}
 
 	hours := []struct {
 		name string
@@ -103,4 +112,71 @@ p{max-width:66ch;color:var(--d);margin:0 0 12px}
 		os.Exit(1)
 	}
 	fmt.Println(*out)
+}
+
+// framePick names one frame the site wants: a scene at an hour, or a companion
+// on the shore at an hour. Rendered on its own page at the clips' own cell
+// size, so a screenshot of it drops straight in beside them.
+type framePick struct {
+	file, scene, animal string
+	tod                 float64
+}
+
+// sitePicks are the four the roadmap section shows. His pick, 2026-09-05:
+// the rainy window and the aquarium, the frog and the otter.
+var sitePicks = []framePick{
+	{file: "next-rain.png", scene: "Rainy window", tod: 0.0245},
+	{file: "next-aquarium.png", scene: "Aquarium", tod: 0.0245},
+	{file: "next-frog.png", animal: "Frog", tod: 0.5},
+	{file: "next-otter.png", animal: "Otter", tod: 0.5},
+}
+
+// FramePx is the clips' cell size: 14px Menlo is 8.4 by 14, so 80x24 lands on
+// 672x336, which is what site/anim/*.gif already are.
+const FramePx = 14
+
+func writeFrames(dir string, seed int64, level, t float64) error {
+	if err := os.MkdirAll(dir, 0o755); err != nil {
+		return err
+	}
+	for _, p := range sitePicks {
+		var c *canvas.Canvas
+		switch {
+		case p.scene != "":
+			var sc *scene
+			for i := range scenes {
+				if scenes[i].name == p.scene {
+					sc = &scenes[i]
+				}
+			}
+			if sc == nil {
+				return fmt.Errorf("no scene %q", p.scene)
+			}
+			c = canvas.New(80, 24, canvas.AlphaFar, canvas.AlphaMid, canvas.AlphaNear)
+			c.Clear()
+			sc.paint(c, p.tod, t, level, seed)
+		case p.animal != "":
+			var a *animal
+			for i := range animals {
+				if animals[i].name == p.animal {
+					a = &animals[i]
+				}
+			}
+			if a == nil {
+				return fmt.Errorf("no animal %q", p.animal)
+			}
+			c = companionFrame(a, p.tod, t, seed)
+		}
+		// Truecolor, his direction of 2026-09-05, the same as the clips: the
+		// page shows the scene at its best rather than as the cube rounds it.
+		page := `<meta charset="utf-8"><style>html,body{margin:0;padding:0;background:#000}` +
+			`pre{margin:0;font-family:Menlo,"SF Mono",monospace;line-height:1;letter-spacing:0}</style>` +
+			c.HTMLFragment(FramePx)
+		name := strings.TrimSuffix(p.file, ".png") + ".html"
+		if err := os.WriteFile(dir+"/"+name, []byte(page), 0o644); err != nil {
+			return err
+		}
+		fmt.Println(dir + "/" + name)
+	}
+	return nil
 }
