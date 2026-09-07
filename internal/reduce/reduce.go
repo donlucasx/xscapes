@@ -239,7 +239,29 @@ func (r *Reducer) Apply(e event.Event, now time.Time) {
 		if e.ID != "" {
 			delete(r.flight, e.ID)
 		}
-		r.worried = true
+		// MAIN-THREAD ERRORS ONLY -- his ruling of 2026-09-07. The companion was
+		// Worried 44.6% of active time, measured over 330 hours of his own
+		// recordings, which is nearly as much as it was Working; a face that
+		// says "something is broken" for half the session says nothing.
+		//
+		// 590 of those 675 errors -- 87% -- fired inside a SUBAGENT: a fan-out
+		// grepping for something that was not there, a probe exiting 1. That is
+		// the subagent's business, and it almost always carried on: 99.4% of all
+		// errors are followed by a successful tool call, median 1.7s later, and
+		// only 3 of 675 had nothing happen after them at all.
+		//
+		// Event.Agent is set only when the hook fires inside a subagent
+		// (notes/claude-hooks-verified.md), so the main thread is exactly
+		// Agent == "". Folded back through the real spools: worried 44.6% ->
+		// 16.4%, working 49.6% -> 77.7%, episodes 90 -> 50, needs-you and done
+		// unchanged.
+		//
+		// The error is still recorded everywhere else -- it drives the sea and
+		// it goes on the sand. Only the FACE is quiet, because the face is the
+		// channel that was crying wolf.
+		if e.Agent == "" {
+			r.worried = true
+		}
 		r.heat += Impulse
 		r.tail.push(line{
 			at: now, op: e.Op, tool: e.Tool, target: e.Target,

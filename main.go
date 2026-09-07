@@ -5,6 +5,7 @@
 package main
 
 import (
+	"io"
 	"flag"
 	"fmt"
 	"os"
@@ -16,6 +17,31 @@ import (
 	"github.com/donlucasx/xscapes/internal/scape"
 	"github.com/donlucasx/xscapes/internal/term"
 )
+
+// wantsHelp is the bare help gesture and nothing else: `xscapes -h`, `-help`,
+// `--help` or `help` with no other argument. `-h 30` is still the canvas
+// height, which every study command and the whole test suite passes.
+func wantsHelp(args []string) bool {
+	if len(args) != 1 {
+		return false
+	}
+	switch args[0] {
+	case "-h", "-help", "--help", "help":
+		return true
+	}
+	return false
+}
+
+// helpText is what someone sees one second after installing: the subcommands
+// first, because `xscapes claude` is the product and the renderer's twenty
+// flags are for the studies. It runs after the flags are registered so
+// PrintDefaults has something to print.
+func helpText(w io.Writer) {
+	usage(w)
+	fmt.Fprintln(w, "The renderer's flags:")
+	flag.CommandLine.SetOutput(w)
+	flag.PrintDefaults()
+}
 
 func main() {
 	warnLegacyEnv(os.Args[1:])
@@ -80,6 +106,17 @@ func main() {
 		site    = flag.String("site", "", "write the submission page: reads <dir>/template.html, writes <dir>/index.html")
 		gifsDir = flag.String("gifs", "", "write the animated clips of the demo turn as frame pages into <dir> (then site/make-gifs.py encodes them)")
 	)
+	// `-h` is the canvas HEIGHT, so the one gesture everybody tries first --
+	// `xscapes -h` -- printed "flag needs an argument: -h" and then the usage
+	// block, which reads as a crash one second after installing. dispatch()
+	// has a `case "-h", "--help"` but it can never run: dispatch returns early
+	// on any argument starting with "-", so only the bare word `help` ever
+	// reached it. The height flag keeps its name -- every study command and the
+	// test suite pass -h N -- and a BARE -h is the help nobody was serving.
+	if wantsHelp(os.Args[1:]) {
+		helpText(os.Stdout)
+		return
+	}
 	flag.Parse()
 
 	// The half-block that smooths a gradient is Unicode, so ASCII-only output

@@ -1777,3 +1777,33 @@ at 22:10 (lgarzoli out of tokens → donlucasx); artifact ownership checked, see
       almost always about something the agent had already handled before the pose finished changing.
       That points at the CLEAR rule, which he ruled out as option B; recording it here because the
       measurement says it and he should not have to rediscover it.
+
+- **His four rulings, 2026-09-07 ~13:00, on the open-threads sweep** (150 items across four sources
+  plus a completeness critic; deduplicated and put to him as four questions):
+  1. **Submission: *"Insurance first"*** — I fix the judge-visible defects and rebuild the page TODAY;
+     he publishes + submits tonight with whatever it looks like then. Entries stay editable to the
+     17th, so the deadline stops being the risk and everything after is upside.
+  2. **The worry bar: *"Main-thread errors only"*** — raise Worried only when the error is NOT inside
+     a subagent. **44.6% → 16.4%**, working 49.6% → 77.7%, no new events; `Event.Agent` is already on
+     every event. He passed over main-thread+N=2, counting alone (N=2/15m, 27.9%), and leaving it.
+  3. **Next work, his multi-select:** the right-edge DL fix · records + dead code + the lying
+     instrument · the README and deck rescope. **He did NOT pick the scrollback mirror journal** —
+     the one open product defect is deliberately parked behind the submission.
+  4. **The demo video: *"Skip the video."*** ⚠ This costs the ~30% of the rubric that rides on the
+     waiting experience, and he took that knowingly after being shown that `needs_input` fires 44
+     times in 59,000 events so the cue barely happens by chance. **Consequence to carry out:
+     `site/commons-brief.md` still says "Demo video: (added when recorded)" — that promise has to go.**
+
+  ⇒ **The three judge-visible defects, verified today before being put to him:**
+    - **`go install github.com/donlucasx/xscapes@latest` installs v0.2.1 — 115 commits behind HEAD**,
+      and that exact command is on `README.md:28` and in the live page's install block. Anyone
+      following the entry installs a build from before almost everything.
+    - **`xscapes -h` errors** — `-h` is the height flag, so the universal help gesture prints
+      `flag needs an argument: -h`.
+    - **Uninstall leaves the statusline wired**, which both the page and the README promise it does not.
+    - (Also: `xscapes claude` never checks `claude` exists before taking the terminal.)
+  ⇒ **The live page is three renderer commits stale** — `site/index.html` was built 09-06 02:32,
+    before the crescent sun (`8d84eeb`) and before the star fix (`2e440be`), so **the page a judge
+    opens still shows the star-on-the-disc defect he personally reported.**
+  ⇒ Checked and CLEARED, so nobody re-raises it: `research/commons-submission.md` is a factual rules
+    survey, not anything that would embarrass him publicly.

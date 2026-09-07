@@ -48,17 +48,17 @@ func dispatch(args []string) bool {
 	case "tune":
 		runTune(args[1:])
 	case "help", "-h", "--help":
-		usage()
+		usage(os.Stderr)
 	default:
 		fmt.Fprintf(os.Stderr, "xscapes: unknown command %q\n\n", args[0])
-		usage()
+		usage(os.Stderr)
 		os.Exit(2)
 	}
 	return true
 }
 
-func usage() {
-	fmt.Fprint(os.Stderr, `xscapes — a thinking screen for terminal agents
+func usage(w io.Writer) {
+	fmt.Fprint(w, `xscapes — a thinking screen for terminal agents
 
   xscapes claude          run Claude Code INSIDE the scape, in this window
   xscapes claude -beside  the older layout: agent in its own tmux pane
@@ -76,7 +76,7 @@ func usage() {
   xscapes hook [Event]    adapter; reads a Claude Code hook payload on stdin
   xscapes statusline      adapter for the context moon; chains to your statusline
 
-Run with -h for the renderer's flags.
+Run 'xscapes help' for the renderer's twenty demo flags as well.
 `)
 }
 
