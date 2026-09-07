@@ -1871,3 +1871,19 @@ reducer already emits a companion-agnostic pose) · narrow panes cost nothing (*
 whole to 12 columns and both first lose ink at 11**) · the swim lane geometry is free · and
 **`DrawWalk` is NOT required — live.go never walks the companion**, it is called only from `anim.go`
 and `strip.go`, both studies. That last one was on my blocker list until I checked.
+
+- *"ah yes, be aware we are working on a new companion (the crab) in parallel. lets /wrap this
+  session. I will implement the new companion on the other session and then we ll resume a fresh
+  session after thats done"* (2026-09-07, ~14:30, with a screenshot of the parallel session)
+  ⇒ **OWNERSHIP MOVED: `internal/companion` belongs to the PARALLEL session.** This session had told
+    that session it would take the change; his instruction reverses it, and the correction was sent
+    immediately so nobody sat blocked. This session touched no `internal/` file after that point.
+  ⇒ **The replace-vs-join question is still unmade** and it is the one thing that sizes the job: there
+    is **no companion interface anywhere in the tree**, and `companion.NewCat()` is concrete at **25
+    production call sites plus 13 in tests**. Replace = bitmaps and poses inside the existing type.
+    Join = an interface threaded through all of them.
+  ⚠ **The worry bar shipped today changes the ground under the crab's poses**: `Worried` is now raised
+    only for MAIN-THREAD errors, so the face is quiet for 87% of the errors it used to react to. Any
+    pose work keyed on Worried is working against a much rarer, and differently-meant, signal.
+  ⇒ Also visible in his screenshot, and it is the parallel session's thread, not this one's:
+    *"they could be pacing a bit. Should be tied up to an actual agent action so its not random"*.

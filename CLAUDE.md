@@ -2,6 +2,31 @@
 
 *(Renamed end to end on 2026-09-03: directory, env vars, state path and hook marker. Two names are kept on purpose and are not leftovers -- `internal/envx` still reads `ASCIISCAPES_*` and warns, and `install.go` still RECOGNISES the `# asciiscapes:v1` marker so the hooks it wrote before the rename can be found and removed.)*
 
+> **Session 21 (2026-09-07), WRAPPED. The entry stopped being the thing that could kill this.**
+> ⚠ **`internal/companion` BELONGS TO THE PARALLEL SESSION** — he is implementing the crab ("Hero")
+> there and will open a fresh session here when it lands. Do not touch it. Brief and pick in
+> `_FEEDBACK.md` §"Session 21 (parallel)". The unmade question that sizes it is his: does Hero
+> **replace** the cat or **join** it as a choice? No companion interface exists; `NewCat()` is
+> concrete at 25 production sites + 13 in tests.
+>
+> **Shipped:** **v0.3.0 tagged** — `go install …@latest` was serving **v0.2.1, 115 commits behind**,
+> and that is the command on the README and the live page · **the worry bar on his ruling
+> "main-thread errors only"** (`reduce.go` raises `Worried` only when `e.Agent == ""`): over his real
+> 330h, **worried 44.6% → 16.0%, working 49.6% → 78.1%**, because 590 of 675 errors fire inside a
+> subagent — the error still drives the sea and still lands on the sand, only the FACE is quiet ·
+> **`xscapes -h` serves help** (it printed a flag error; `dispatch`'s own `case "-h"` could never run,
+> it returns early on any `-` argument) · **the live page and clips rebuilt and republished**, having
+> served the star-on-the-disc bug he reported for a day and a half · the Commons brief rescoped and
+> the demo-video promise removed.
+>
+> **His rulings, closed:** the worried eye **stays amber** (red is darker than the ground — WCAG 5.03
+> → 1.24 at night) · the disc keeps its **flat caps** · the **shoreline stays split** · **no demo
+> video**, taken knowingly against the ~30% of the rubric that rides on the waiting experience.
+>
+> ⚠ **The 37% worry figure below is stale — it is 44.6% before the fix, 16.0% after.**
+> ⏰ **Commons closes 2026-09-17.** The paste kit is current at `~/Desktop/xscapes-commons/`; the
+> **publish** step is the blocker, not the submit click.
+
 > **Session 19 (2026-09-06, ~17:50–18:45), his three reports — the machine CRASHED mid-session; recovered
 > 19:00.** (Not the 09-05 "Session 19" further down; that was a parallel session.) He ran long live
 > sessions and reported: (a) *"the Sun seems to break sometimes, and fix itself"*, (b) unintentional

@@ -4,7 +4,8 @@
 
 ```
 cd ~/Documents/claude/xscapes/ and read CLAUDE.md (the brief, authoritative)
-and RESUME.md before responding. notes/claude-hooks-verified.md is the Claude Code hook schema — trust it, do not
+and RESUME.md before responding. ⚠ Check first whether the CRAB has landed:
+internal/companion belongs to a parallel session until he says otherwise. notes/claude-hooks-verified.md is the Claude Code hook schema — trust it, do not
 re-derive it. Skim origin-chat.md only if you need the why; ignore ideas.md — it
 is parked. Tell me where we left off, then pick up from ▶ NEXT — item 0 is a
 question for me, not work for you.
@@ -66,6 +67,43 @@ and upload (his hands).
 ⚠ Housekeeping learned today: the Playwright MCP writes screenshots into the REPO ROOT and a `-A` commit
 from the other session swept three in (`bff64d1`, since removed). Render previews with headless Chrome
 `--screenshot=` straight into the scratchpad instead.
+
+## Where we left off (2026-09-07 ~14:30, session 21 WRAPPED. HEAD `4047b24`, pushed, clean, INSTALLED, v0.3.0 tagged)
+
+**Session 21 in one line:** the entry stopped being the thing that could kill this — a release tag, a
+working `-h`, a page that no longer shows the bug he photographed, and the companion's alarm cut from
+44.6% of active time to 16.0%; then he handed the crab to the parallel session and wrapped this one.
+
+⚠ **`internal/companion` IS THE PARALLEL SESSION'S.** He is implementing the crab ("Hero") there and
+will start a fresh session here afterwards. **Do not touch `internal/companion` in this line of work
+until he says it has landed.** Its brief, his three rounds of notes and the pick are in `_FEEDBACK.md`
+§"Session 21 (parallel)". The open question that sizes it is HIS and unmade: does Hero **replace** the
+cat or **join** it as a choice? There is no companion interface anywhere and `NewCat()` is concrete at
+**25 production call sites + 13 in tests**.
+
+**SHIPPED TODAY, all pushed and installed:**
+- **v0.3.0 TAGGED.** `go install github.com/donlucasx/xscapes@latest` was serving **v0.2.1, 115 commits
+  behind** — and that exact command is on the README and in the live page's install block. Anyone who
+  followed the entry installed a build from before almost everything.
+- **The worry bar, his ruling "main-thread errors only":** `reduce.go` raises `Worried` only when
+  `e.Agent == ""`. Folded through his real 330h: **worried 44.6% → 16.0%, working 49.6% → 78.1%**,
+  needs-you and done unchanged. 590 of 675 errors fired inside a subagent. The error still drives the
+  sea and still lands on the sand; only the FACE is quiet.
+- **`xscapes -h` serves help.** It printed `flag needs an argument: -h` because `-h` is the height.
+  `dispatch()` has had a `case "-h", "--help"` all along that could never run — it returns early on any
+  `-` argument, so only the bare word `help` reached it.
+- **The live page and clips rebuilt and republished.** They had been serving the star-on-the-disc
+  defect he personally reported, for a day and a half. Verified live, byte-identical to the repo.
+- **The Commons brief rescoped** (it still said "runs Claude Code inside a living shoreline"), the
+  demo-video promise removed on his ruling, clip counts corrected 5/1.3MB → 15/5.4MB, and the Desktop
+  paste kit regenerated from today's page.
+- Earlier in the same session: the sky/sea ramp collapsed to one tone a cell on Terminal.app
+  (`term.NoSplitCells`), the star-on-the-disc fix, and the crash recovery.
+
+**HIS RULINGS TODAY, so nobody re-opens them:** the worried eye **stays amber** (red is darker than the
+ground it sits on — WCAG 5.03 → 1.24 at night); the disc keeps its **flat caps**; the **shoreline stays
+split**; **no demo video**; and of the four worry-bar families he took **A or D**, then the main-thread
+variant of D.
 
 ## Where we left off (2026-09-06 ~22:30, session 20 — his two reports off the first live run. HEAD after the star fix, clean, installed)
 
@@ -206,18 +244,32 @@ the paste kit is on his Desktop at `~/Desktop/xscapes-commons/` (`brief.md`, `in
 URLs, `message.md` = both), regenerated whenever the page is. **Use Default · Quick, not Expert.**
 
 **▶ NEXT**
-0a. **ASK HIM: did lowering Terminal.app's line spacing kill the hairlines?** (Re-confirmed still open
-   on 09-06 22:30: his 20:39 frame still has a 30 px row pitch and all five hairlines.) That is his own open
-   experiment from session 19 and the cheapest possible fix for the thin lines — nothing ships on that
-   report until he answers. If it did not work, he picks one of the three costed options in
-   `_FEEDBACK.md` §Session 19; if it did, the fix is a terminal setting and no code changes.
-0b. **The scrollback (c)** — the only open defect. Build the always-on mirror journal so the next
+0. ⏸ **WAIT ON THE CRAB.** He is implementing Hero in the parallel session and will open a fresh
+   session here when it lands. Do not start work in `internal/companion`.
+0A. **HIS: publish + submit the Commons entry.** Everything is staged: `~/Desktop/xscapes-commons/`
+   (brief.md · index.html with 16 absolute clip URLs · message.md), regenerated 09-07 14:02 from the
+   live page. Fresh chat in the Commons Space, **Default · Quick, not Expert** → paste → publish the
+   app public from its manage page → hackathons → Open hackathon → Your entry → Submit → screenshot.
+   ⚠ **The publish step is the blocker, not the submit click** — the entry picker only accepts a
+   PUBLISHED Commons build. **Closes 2026-09-17.**
+0B. **His three picks for me, unstarted:** the **right-edge DL fix** (designed and measured GREEN on
+   the real terminal, `notes/width-audit.md` item 5, not built) · the **records + dead code + lying
+   instrument** sweep (`tune`'s WORRY EPISODES block is hard-coded to the old rule and prints
+   identical output under any change; `test_fail`/`test_pass` have no producer; `-ascii` ships
+   Unicode) · the **README + deck rescope** (both still say "Claude Code runs inside a shoreline").
+0a. ~~ASK HIM: did lowering Terminal.app's line spacing kill the hairlines?~~ **ANSWERED 09-07: "no,
+   it didnt."** The hairline cannot be removed inside half blocks, only not drawn. ⏸ One untested
+   lever left: the FONT. Menlo's block glyphs fill **85.4%** of the line box, Andale Mono **97.8%** —
+   if that holds live it removes the hairline AND gives the gradient back, better than the trade he
+   took. `Terminal → Settings → Profiles → Text → Font`.
+0b. **The scrollback** — the one open product defect, and he did NOT pick it from the four he was
+   offered on 09-07, so it is deliberately parked behind the submission. Build the always-on mirror journal so the next
    occurrence settles bad-bytes-vs-bad-drawing by itself (design in the session 19 block above).
    ⚠ `/tmp/apple.bin` is GONE; a fresh trace must live outside `/tmp`.
-0. **HIS LOOK at the live page**, https://donlucasx.github.io/xscapes/ — everything since 19:00 was built
-   to his notes without him seeing the result.
-1. **Commons: submit.** Fresh chat in the Space → send `brief.md` with `index.html` attached → publish the
-   app public from its manage page → hackathons → Open hackathon → Your entry → Submit → screenshot
+1. **HIS LOOK at the live page**, https://donlucasx.github.io/xscapes/ — rebuilt and republished
+   2026-09-07 14:00 from HEAD, so what is up there is finally current.
+2. **Commons: submit** — see 0A above, which supersedes this with the current paste kit and the
+   publish-first warning
    "Entry submitted." **Closes 09-17.**
 2. **His 45–60 s Terminal.app recording** of a real turn, no narration. The one deliverable nothing else
    can substitute for.
