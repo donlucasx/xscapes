@@ -67,6 +67,74 @@ and upload (his hands).
 from the other session swept three in (`bff64d1`, since removed). Render previews with headless Chrome
 `--screenshot=` straight into the scratchpad instead.
 
+## Where we left off (2026-09-06, session 18 WRAPPED ~03:10, HEAD `e07d82f`, pushed, clean)
+
+**Session 18 in one line:** the submission page went online and was then rewritten three times on his
+notes, ending with a hero clip that plays a whole session and a legend with the scene dissected;
+his two rulings from the features test shipped; nothing about the product's behaviour is open.
+
+**The page is LIVE and is the submission**: https://donlucasx.github.io/xscapes/ (`site/publish.sh`
+force-pushes `site/index.html` + `anim/*` as an orphan `gh-pages` branch; **rerun it after every page
+rebuild**). ⚠ The stored GitHub token has no `workflow` scope, so an Actions workflow cannot be pushed;
+that is why it is a branch and not a workflow. ⚠ `.gitignore` excludes `site/anim/*.png` with a
+NAME-SPECIFIC exception (`!site/anim/scape-*.png`) — rename a still and it silently stops being committed.
+
+**Shipped to the product** (installed, `fd6a43c`): **`reduce.KittenDwell` 60 s**, so a subagent that
+finishes in seconds still leaves a visible kitten — he had twice reported seeing none — and an **exit
+queue rule** (`exitSpans`), because the dwell makes a fan-out leave at one instant and the old painter
+drew all of them on top of each other. `CLAUDE.md` now says the companion is **12 columns by 7 rows**;
+the "3–4 lines" figure was stale.
+
+**Shipped to the page**, in the order he asked for it: the brand guidelines say ink, not gold · the copy
+RESCOPED (any terminal agent, not Claude Code; a *scape* is any landscape and the shore is the FIRST;
+"four states" replaced by "It runs on your clock") · the logline he picked from four
+(*"Cozy ASCII scenes that react to your agent while it works"*) with the negative opener gone · the legend
+promoted, reordered most-useful-first, and retitled **"How to read it"** · **"Choose your xscape"** with the
+rainy window at dusk and the frog, the aquarium at night and the owl · ASCII rules on every section header ·
+everything truecolor · **the hero clip is one whole session that loops**, 160 frames over 16 s: the sea, the
+kittens arriving and swimming off, stars lighting, the moon sinking with the context, the companion asking
+and finishing, then a **compact and a fresh list, which is what closes the loop**, with the day turning
+underneath and the agent's transcript scrolling above · **nine dissected clips** beside the legend rows.
+
+**How the clips are built** (`gifs.go`, `loopclips.go`, `site/make-gifs.py`): a clip carries its own
+`cols`/`agentRows`/`crop`, runs its session on its own clock (`speed`) while the waves keep real time, can
+ramp the day (`todEnd`), and is captured **across several pages** because one page of every frame outgrows a
+headless screenshot. ⚠ **The moon and the constellation are washed out at midday by design**, so their clips
+run at night — the first cut of both came back as empty frames.
+
+**Commons is ready to submit and needs only him.** The rules were re-read signed in on 09-05
+(`research/commons-submission.md`, last section): unchanged, and the entry picker takes **only a published
+Commons build**, so the entry is this page served verbatim. The agent's brief is `site/commons-brief.md`;
+the paste kit is on his Desktop at `~/Desktop/xscapes-commons/` (`brief.md`, `index.html` with absolute clip
+URLs, `message.md` = both), regenerated whenever the page is. **Use Default · Quick, not Expert.**
+
+**▶ NEXT**
+0. **HIS LOOK at the live page**, https://donlucasx.github.io/xscapes/ — everything since 19:00 was built
+   to his notes without him seeing the result.
+1. **Commons: submit.** Fresh chat in the Space → send `brief.md` with `index.html` attached → publish the
+   app public from its manage page → hackathons → Open hackathon → Your entry → Submit → screenshot
+   "Entry submitted." **Closes 09-17.**
+2. **His 45–60 s Terminal.app recording** of a real turn, no narration. The one deliverable nothing else
+   can substitute for.
+3. **HIS PICKS from the study** "Five Scenes, Five Companions"
+   https://claude.ai/code/artifact/c9d41f7c-1b09-4a79-a262-32b9696bd3b9 — which scene, if any, before the
+   deadline (my read: none), and which companion to draw properly. Two are already on the page as roadmap.
+4. ⏸ **The DECK (`assets/deck/deck.tpl.html`) and the README still carry the old narrow scope** — the deck
+   repeats *"Claude Code runs inside a shoreline"* verbatim. Both need the same rescope, his go-ahead.
+5. The scrollback corruption, **reproduced a third time on 09-05 and still untraced**. He closed that
+   session before any read-back, so the next launch starts cold:
+   `XSCAPES_TRACE=/tmp/apple2.bin xscapes claude` (the `--` separator is only needed when passing the
+   agent flags, e.g. `xscapes claude -- --continue`). Then read the window back BY TTY with his OK
+   (`1049l` discards most mirrored rows, so read BEFORE any restart), and offline
+   `XSCAPES_TRACE=… KEPT_OUT=/tmp/kept.txt go test ./internal/host -run TestReplayTraceKept -v`:
+   interleaved in the model ⇒ the model diverges, clean ⇒ the write side.
+6. Still open from session 16, all needing him: the 6-column patch above the band (a scripted
+   width+height drag, Terminal automation, his OK) · the two 2 AM stale rows · the transcript-start
+   garble diff · the worry trigger's bar (the alarm was measured on 37% of active time) · the working-
+   session items still unseen live: bubbles + sound, the mirror during work and its exit replay.
+7. Small and mine whenever he wants them: the README header via `<picture>` with the two lockup SVGs ·
+   the CLI help header mark in `cmd.go` `usage()` · the GitHub avatar PNG at 512 (his upload).
+
 ## Where we left off (2026-09-05, session 16 WRAPPED 14:40, HEAD `2f28667`+wrap, INSTALLED, pushed, clean)
 
 **Session 16 in one line:** the live tests passed; shipped and installed: kitten swim-off · the
@@ -129,66 +197,12 @@ install) · the deck has the same cover and one page, no gold. Pipeline: `go run
 python3 site/make-gifs.py && python3 assets/deck/make-deck.py`, then the Chrome PDF print in
 `make-deck.py`'s docstring.
 
-**▶ NEXT** (his answers of ~16:40, `_FEEDBACK.md` s18: the cover KEEPS its headline over the sea ·
-the clips go on GitHub Pages, `site/publish.sh` (orphan `gh-pages` branch) → https://donlucasx.github.io/xscapes/ ·
-the coat is CREAM, locked · the long kittens were SEEN · the corrupted session was CLOSED before any
-read-back, so the next launch is traced from cold). **Later, ~17:50: the page is LIVE at
-https://donlucasx.github.io/xscapes/ (his ask, `site/publish.sh`; rerun it after every page rebuild) and the
-study he asked for is up: "Five Scenes, Five Companions"
-https://claude.ai/code/artifact/c9d41f7c-1b09-4a79-a262-32b9696bd3b9 (`go run ./notes/scapestudy`;
-five scenes at night/noon/dusk, five companions beside the cat, all at 256 through the real pipeline;
-nothing chosen). 19:05: the Commons RULES re-read signed in (`research/commons-submission.md`, last section):
-unchanged, and the entry picker takes ONLY a published Commons build. The agent's brief is `site/commons-brief.md`;
-the paste kit is on his Desktop (`~/Desktop/xscapes-commons/`: `brief.md`, `index.html` with absolute clip URLs,
-`message.md` = both). Model: Default · Quick; STOP the Expert run that is building a "submission guide". ▶ HIS PICKS on it are item 0a: which scene, if any, before 09-17 (my read: none before
-the entry ships), and which companion to draw properly, if any.** 0. **the hero is A WHOLE SESSION THAT LOOPS and the legend is DISSECTED, LIVE** (2026-09-06 02:20–03:00,
-`_FEEDBACK.md` s18): `window.gif` 160 frames/16 s — sea, kittens in and out, stars lighting, the moon filling and
-sinking, the companion asking and finishing, a compact that closes the loop, the day turning, the transcript
-scrolling above · nine cropped clips beside the legend, now **"How to read it"** · `loopclips.go` holds every
-timeline · new machinery: `speed`, `todEnd`, `crop`, and PAGE CHUNKING in `gifPages`/`make-gifs.py` · lazy loading.
-⚠ the moon and stars clips MUST run at night, they are washed out at midday by design.
-Earlier: the page carried the FULL-WINDOW clip, "Choose your xscape" and ASCII section rules, LIVE
-(2026-09-06 01:40–02:10, `_FEEDBACK.md` s18): `window.gif` 108x40 = the agent's own rows above its scape, one clip,
-`agentPane` in `gifs.go`; clips now carry their own `cols`/`rows` through the manifest into `make-gifs.py` · the rainy
-window at dusk with the FROG and the aquarium at night with the OWL (`sceneCompanion` in the study) · "Any agent, any
-terminal" is a bullet · copy cut, protocol simplified. Earlier the same session the page was REWRITTEN on his logline round (21:20–21:45): logline *"Cozy ASCII scenes that
-react to your agent while it works"* (his pick of four angles) · the glance table promoted to subtitles and reordered
-most-useful-first · a new **"The next scapes"** roadmap section (rainy window · aquarium · frog · otter, from
-`go run ./notes/scapestudy -frames <dir>` + a Chrome shot at 672x336) · the protocol section carries the stack ·
-everything truecolor. ⚠ `publish.sh` now copies `*.png` too. Earlier the same session the copy was RESCOPED and LIVE (his four notes, 19:20, `_FEEDBACK.md` s18): any terminal agent ·
-a scape is any landscape, the shore is the first · "four states" → "It runs on your clock". ⏸ **the DECK
-(`deck.tpl.html`) still has the old synopsis verbatim and the README still opens Claude-first — both need
-the same rescope on his go-ahead.** Then HIS LOOK at the live page and `assets/deck/index.html` (both open locally; the
-clips play) · then Commons: publish the page (the clips are files: upload `anim/` or host `site/`
-on GitHub Pages, `site/COMMONS-PROMPT.md`), his 45–60 s Terminal.app recording, SUBMIT (closes
-09-17) · 1. **the scrollback corruption REPRODUCED a third time, 2026-09-05 ~15:55, UNTRACED** (the peer
-session `xscapes-0a`, Terminal.app 132x53, host started 13:49 without `XSCAPES_TRACE`; his screenshot:
-table rules struck through prose rows, `sc-ne` inside a doubled header = the s14 #2 merge). **He closed that session at ~16:40 before any read-back; the buffer is gone.** Order for
-the next one: (a) read back the LIVE window first, by tty, with his OK (`1049l` discards most mirrored
-rows, s14 probe 3, so a restart destroys the evidence) · (b) the traced restart that keeps the
-conversation: `XSCAPES_TRACE=/tmp/apple2.bin xscapes claude -- --continue`; the `--` is REQUIRED,
-verified with `-print`: bare `xscapes claude --continue` dies with "flag provided but not defined" ·
-(c) work in it until the rows corrupt, read back the same window, then offline
-`XSCAPES_TRACE=/tmp/apple2.bin KEPT_OUT=/tmp/kept.txt go test ./internal/host -run TestReplayTraceKept -v`
-and diff the kept rows against the buffer: interleaved in the model ⇒ the model diverges; clean ⇒ the
-write side (`MirrorBatch`) ·
-2. **kittens, the SECOND report** (s19, *"i did not see any multi agents at work"*): measured, not a
-channel bug — his two subagents lived 6.9 s and 15.7 s, and a kitten lives from SubStart to 6 s past
-SubEnd (`reduce.KittenExit`), so the whole lifecycle passed before he looked; a re-run with 2.5 and
-4.7 min agents is unanswered. HIS RULING (*"agreed with your rec"*) → **SHIPPED + INSTALLED, s18**:
-`reduce.KittenDwell` 60 s, and the exit queue rule the regenerated clips exposed (`exitSpans`, a fan-out
-now leaves as a queue, not one stacked shape); page, clips, deck, PDF regenerated. `_FEEDBACK.md` s18 ·
-3. **the brief's companion figure is stale** (s19, measured here too): `CLAUDE.md` says "3–4 lines
-tall"; `CatBody` is 24x28 px and `Size()` is W/2, H/4, so the shipped cat is **12 cols x 7 rows**. HIS call
-which figure is right — HIS RULING *"fix it"* → **DONE, s18**: `CLAUDE.md` says 12 columns by 7 rows as shipped ·
-4. his picks on the s19 research, none chosen (five scenes: hearth/cabin · rainy window · café table ·
-aquarium · snow cabin; five companions: owl · rabbit · frog · hedgehog · otter; `_FEEDBACK.md` s19) ·
-the patch above the band (a hosted probe under scripted width+height drags, pixels via
-`screencapture -l` of the script's own window) · the working-session items still unseen:
-bubbles + sound, kittens live (now with the swim-off), the mirror during work and its exit
-replay, the transcript start · then the Commons sequence: rebuild both binaries after any fix → `xscapes -site site` →
-his 45–60 s Terminal.app recording → `site/COMMONS-PROMPT.md` → he prompts the rebuild (page +
-gallery only, no web twin) → publish → SUBMIT (closes 09-17).
+**▶ NEXT (as session 16 left it, now superseded by the session 18 block above):** his look at the
+page and the deck · the Commons sequence · a TRACED working session in Terminal.app
+(`XSCAPES_TRACE=/tmp/apple.bin xscapes claude`) for the scrollback corruption · the 6-column patch
+above the band · the working-session items still unseen: bubbles + sound, kittens live, the mirror
+during work and its exit replay, the transcript start.
+
 
 ## Where we left off (2026-09-04 afternoon, session 15 continued, INSTALLED, committed `b9d65e7`, pushed)
 

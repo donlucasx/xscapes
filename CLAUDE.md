@@ -2,26 +2,39 @@
 
 *(Renamed end to end on 2026-09-03: directory, env vars, state path and hook marker. Two names are kept on purpose and are not leftovers -- `internal/envx` still reads `ASCIISCAPES_*` and warns, and `install.go` still RECOGNISES the `# asciiscapes:v1` marker so the hooks it wrote before the rename can be found and removed.)*
 
-> **Session 18 (2026-09-05, the hub session), his two rulings SHIPPED + INSTALLED.** *"decision 1:
-> agreed with your rec. Decision 2: fix it"* ⇒ **a kitten stays at least 60 s after its subagent
-> starts** (`reduce.KittenDwell`; an end inside the dwell is remembered, the swim-off waits for it),
-> and **the companion is 12 columns by 7 rows** in the table and the Companion bullet below (the
-> "3–4 lines" was stale). The dwell makes a fan-out leave at one instant, and the exit painter drew
-> them on one another as one kitten — the exit lane now queues them (`exitSpans`, red-first test).
-> Page, clips (the resting clip is 8 s: the litter swims off at dawn), deck and PDF regenerated;
-> the binary installed through a new inode. Earlier in the session: the brand guidelines say ink on
-> the page and deck (`fb6d9ee`); **the page's copy was RESCOPED on his four notes (19:20) and is live**:
-> xscapes is for any agent that runs in a terminal (not Claude Code alone; `xscapes inside <cmd>` is on the
-> page now), a *scape* is any of the ASCII landscapes and the shoreline is the FIRST one (not the product),
-> and "four states" is gone — the feature is that the scape keeps your real time of day, no theme switch.
-> ⏸ the DECK and the README still carry the old narrow scope. Also: the corruption's third repro is recorded with the
-> read-back-first order. **Later the same session:** the submission page is LIVE at
-> https://donlucasx.github.io/xscapes/ (`site/publish.sh`, an orphan `gh-pages` branch; the Commons
-> paste points its clips there) · his answers: cover KEEPS its headline over the sea, coat CREAM locked,
-> long kittens SEEN, the corrupted session CLOSED unread · **the study "Five Scenes, Five Companions"**
-> (`notes/scapestudy`): hearth/cabin, rainy window, café table, aquarium, snow cabin at night/noon/dusk,
-> and owl, rabbit, frog, hedgehog, otter beside the cat, all through the real pipeline at 256 —
-> **his picks pending, nothing chosen.** Details in `RESUME.md`, `_FEEDBACK.md` s18.
+> **Session 18 (2026-09-05 into 09-06), WRAPPED. The submission page is LIVE and is the entry.**
+> https://donlucasx.github.io/xscapes/ — `site/publish.sh` force-pushes `site/index.html` + `anim/*` as an
+> orphan `gh-pages` branch; **rerun it after every page rebuild.**
+>
+> **Shipped to the product** (installed, `fd6a43c`), from his two rulings on the features test: **a kitten
+> stays at least 60 s after its subagent starts** (`reduce.KittenDwell`; an end inside the dwell is
+> remembered and the swim-off waits), because a subagent that finished in seconds was invisible and he had
+> reported seeing none twice; and an **exit queue** (`exitSpans`), because the dwell makes a fan-out leave at
+> one instant and the painter drew them all on one another. **The companion is 12 columns by 7 rows** in the
+> table and the bullet below; the "3–4 lines" figure was stale.
+>
+> **Shipped to the page**, in the order he asked: the brand guidelines say ink, not gold · the copy
+> **RESCOPED** — xscapes is for **any agent that runs in a terminal**, not Claude Code alone (`xscapes inside
+> <cmd>` has always done this and was never on the page), a ***scape* is any of the ASCII landscapes and the
+> shoreline is the FIRST one**, not the product, and "four states" is gone because the real feature is that
+> the scape keeps your own time of day · the logline he picked from four, *"Cozy ASCII scenes that react to
+> your agent while it works"*, with the negative opener dropped at his word · the legend promoted, reordered
+> most-useful-first and retitled **"How to read it"**, each row with a **dissected clip** of the one part of
+> the scene that carries it · **"Choose your xscape"**: the rainy window at dusk with the frog, the aquarium
+> at night with the owl · ASCII rules on every section header · everything **truecolor** · and **the hero is
+> one whole session that loops**, 160 frames over 16 seconds — the sea rising and settling, kittens arriving
+> and swimming off, stars lighting, the moon sinking with the context, the companion asking and finishing,
+> then a **compact and a fresh list, which is what closes the loop**, the day turning underneath, the agent's
+> own transcript scrolling above.
+>
+> ⚠ Three traps this session set: the stored GitHub token has **no `workflow` scope**, so Pages is a branch
+> and not an Action · `.gitignore` excludes `site/anim/*.png` with a **name-specific** exception, so a renamed
+> still silently stops being committed · **the moon and the constellation are washed out at midday by
+> design**, so any clip of them must run at night.
+>
+> **Commons needs only him now**: the rules were re-read signed in and the entry picker takes only a
+> published Commons build, so the entry is this page served verbatim. Brief in `site/commons-brief.md`, paste
+> kit on his Desktop, **Default · Quick, not Expert**. Closes **09-17**. Details in `RESUME.md`.
 >
 > **Session 19 (2026-09-05), WRAPPED. No code changed; three things wait on him.** A live features
 > test run INSIDE `xscapes claude` at his ask, plus two research streams. **The scrollback corruption
