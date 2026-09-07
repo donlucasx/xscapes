@@ -1705,3 +1705,75 @@ at 22:10 (lgarzoli out of tokens → donlucasx); artifact ownership checked, see
   something, and the colour was never the thing standing in the way.** The brief locks the worried
   pose as a channel, so raising the bar is his call. On file: require two errors in a window, or one
   the agent does not recover from.
+
+- *"what are my options"* → four families were put to him (A: N errors in a window · B: change what
+  CLEARS it · C: stop Worried outranking NeedsYou · D: only worry about errors that matter).
+  ⇒ **His ruling: *"either A or D or both."*** So **B and C are OUT** — the clear rule stays as it is
+    (the next prompt, and nothing else), and Worried keeps outranking NeedsYou. What moves is the
+    TRIGGER: how many errors, and/or which errors.
+  ⚠ Worth recording what he declined, because both were live options and one of them was measured as
+    a real defect: **C would have recovered the needs-you pose**, which the same fold shows squeezed
+    to **0.6%** of active time while worried holds 44.6%. He has left that alone.
+  ⇒ **The baseline is worse than the docs said.** Re-measured 2026-09-07 with `xscapes tune` over his
+    LIVE spools — 25 sessions, 57,087 events, 330h6m, 210,440 one-second samples:
+    working **49.6%** · **worried 44.6%** · resting 3.9% · done 1.3% · needs you **0.6%**.
+    90 episodes, median **15m25s**, 90th **1h11m12s**, longest **10h8m47s**, 41% raised by a single
+    error. The figure carried in CLAUDE.md and RESUME.md is 37%; on today's larger log it is 44.6%.
+  ⇒ **MEASURED, 2026-09-07, over the same 330h.** Every variant was folded through the real reducer in
+    a scratchpad copy, each with a positive control that had to reproduce 44.6% before its numbers
+    counted.
+
+    ⚠ **First, two corrections to what was put to him.**
+    1. **"Worried is squeezing needs-you" is REFUTED.** Of the 93,960 seconds the companion is
+       Worried, **96.6% mask WORKING** and only **495 seconds — 8m15s across 58.5h** — mask NeedsYou.
+       Needs-you is 0.6% and would be 0.8% if Worried never outranked it. The reason is in the log:
+       `needs_input` fires **44 times in the whole archive**. The pose is not eating the ask; the ask
+       barely happens. This was my premise and it was wrong.
+    2. ⚠ **THE INSTRUMENT LIES.** `tune`'s WORRY EPISODES block (`tune.go:148-159`) is computed off
+       the RAW stream — it opens on `Error||TestFail` and closes on `Prompt`, entirely outside the
+       Reducer — so it is hard-coded to the CURRENT rule and cannot see a change to it. Proven by
+       mutation: under four different raising rules the pose distribution moved (44.6 / 16.4 / 43.9 /
+       20.9) and the episode block printed **byte-identical output every time**. Anyone tuning the bar
+       with `tune` would read the frozen block as "the episodes did not improve". Episode counts must
+       be recomputed outside it.
+
+    ⇒ **RULE A — N errors within W.** Sweep (worried% · episodes caught of 90 · median episode):
+      | rule | worried | caught | median |
+      |---|---|---|---|
+      | N=1 (today) | **44.6%** | 90/90 | 15m25s |
+      | N=2 W=2m | 25.5% | 43 (48%) | 13m51s |
+      | N=2 W=15m | 27.9% | 51 (57%) | 13m41s |
+      | N=3 W=5m | 22.4% | 32 (36%) | 16m19s |
+      ⚠ **A cannot reach ~10% except by deleting the feature**: the first setting under 10% is N=8/W=2m
+      — 4.9%, but it fires on 9 of 90 episodes and is silent in 20 of the 22 sessions that had an
+      error at all. **And here is why A stalls: the duty cycle is DURATION, not count.** The median
+      episode barely moves anywhere in the sweep (13m41s–16m19s) because the clear rule is untouched.
+      The hours sit in a few very long episodes and every long episode has many errors, so every N
+      catches them — the 10 longest carry 41.3% of all worried time, and two of them have 2 errors
+      and 1 error respectively.
+
+    ⇒ **RULE D — which errors count.**
+      - **D1 (TestFail only) is not a rule, it is deletion.** `test_fail` has **no producer anywhere in
+        the repo** and has fired **0 times in 330 hours**; `case event.Error, event.TestFail` at
+        reduce.go:238 can only ever be reached by Error. A red `go test` arrives as an ordinary Bash
+        error with Detail "Exit code 1" — indistinguishable from a grep that found nothing.
+      - **Severity is barely discriminable.** `Detail` is "Exit code N", `Target` is only the first
+        token of the command (`cd` 119 · `echo` 92 · `cat` 83 · `mkdir` 55 · `sed` 51 · `ls` 43 ·
+        `grep` 42), and the error TEXT is never recorded. `cd repo && go test` records `cd`. 22% of
+        the real failures have no recoverable program name.
+      - D2 (build/test/run only) 18.5% and D3 (exclude noise programs) 22.5% were both REFUTED on
+        verification; D3 fails OPEN. Dropping the worktree refusals alone moves 44.6% → **43.8%**.
+      - ⭐ **THE ONE THAT WORKS, and it was not on the menu: MAIN-THREAD ERRORS ONLY.**
+        **87% of his errors (590 of 675) fire inside a SUBAGENT**, and `Event.Agent` already carries
+        that on every event (`notes/claude-hooks-verified.md:25` — the field is present only for
+        subagent hooks). Raising Worried only when `e.Agent == ""`, measured end to end:
+        **44.6% → 16.4%**, working 49.6% → 77.7%, episodes 90 → 50, total worried time 49.4h → 30.8h,
+        needs-you and done unchanged. Positive control reproduces 44.6% to the decimal.
+
+    ⇒ ⚠ **The finding that reframes all of it: 99.4% of errors are followed by a successful tool call,
+      median 1.7 seconds later** (97.9% on the same thread; 68.1% see the SAME tool and target
+      succeed). **Only 3 errors of 675 — 0.4% — had nothing happen after them at all.** The
+      unrecovered error the current rule is built for is three events in 330 hours. The alarm is
+      almost always about something the agent had already handled before the pose finished changing.
+      That points at the CLEAR rule, which he ruled out as option B; recording it here because the
+      measurement says it and he should not have to rediscover it.
