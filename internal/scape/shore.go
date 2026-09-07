@@ -18,6 +18,10 @@ type Shore struct {
 	// The disc's reach in cells from its centre, columns and rows, so a
 	// caller can keep clear of it (the context readout).
 	moonRX, moonRY int
+	// The disc's radius in rows, and whether it is painted at all this frame.
+	// Fixed by discGeom BEFORE the star fields run, so they can keep off it.
+	moonRR      float64
+	moonPainted bool
 	// litTone and darkTone are the quad disc's two colours this frame, one
 	// each for the whole disc (sampled against the sky at its centre), so
 	// the lit face never rounds to two yellows across the sky's rows.
@@ -304,6 +308,7 @@ func (s *Shore) Update(c *canvas.Canvas, t float64, act Activity) {
 	s.writeTop = writeTop
 
 	s.paintBG(c, hy, edge)
+	s.discGeom(c, hy, scale, 1-clamp01(act.ContextUsed))
 	s.stars(c, hy, t)
 	s.moon(c, hy, scale, 1-clamp01(act.ContextUsed), moonVis(s.pal))
 	s.todoStars(c, hy, act.TodoDone, act.TodoTotal)
@@ -498,6 +503,14 @@ func (s *Shore) stars(c *canvas.Canvas, hy int, t float64) {
 			if HashF(x, y, s.Seed) > density {
 				continue
 			}
+			// Never on the disc. moon() paints backgrounds, so a glyph left
+			// under it survives and composites against the body -- his report
+			// of 2026-09-06, one tan speck on the sun's face at 143x62. The
+			// checklist field has kept off the disc since it was written; the
+			// ambient field never did.
+			if s.DiscCovers(x, y) {
+				continue
+			}
 			ph := HashF(x, y, s.Seed+7) * 2 * math.Pi
 			twinkle := (0.55 + 0.45*math.Sin(t*0.9+ph)) * s.pal.StarVis
 			if twinkle <= 0.02 {
@@ -577,9 +590,12 @@ func (s *Shore) todoStars(c *canvas.Canvas, hy, done, total int) {
 			continue
 		}
 		// Never on the moon: it carries context remaining, and a star inside
-		// the disc would be read as part of it. Cells are twice as tall as they
-		// are wide, so the exclusion is an ellipse, not a circle.
-		if dx, dy := x-s.moonX, y-s.moonY; dx*dx+4*dy*dy <= 16 {
+		// the disc would be read as part of it. This was a hand-fitted ellipse
+		// (dx*dx+4*dy*dy <= 16) measured against a disc of one particular size,
+		// and it drifted: at the cap it excluded only the centre column while
+		// the disc reached two either side. DiscCovers is moon()'s own
+		// sampling, so the guard cannot fall out of step with the shape again.
+		if s.DiscCovers(x, y) {
 			continue
 		}
 		// Only finished todos are drawn. An unfinished one used to leave a
@@ -592,21 +608,60 @@ func (s *Shore) todoStars(c *canvas.Canvas, hy, done, total int) {
 	}
 }
 
-func (s *Shore) moon(c *canvas.Canvas, hy int, scale, lit, vis float64) {
+// discGeom fixes the disc's centre and radius for the frame. It has to run
+// BEFORE the star fields, and that is the whole reason it exists apart from
+// moon(): moon() paints only BACKGROUNDS, so a glyph already plotted under the
+// disc survives and composites against the body instead of the sky. That is
+// his report of 2026-09-06 from a live 143x62 window -- one tan speck on the
+// sun's face, an ambient dust glyph in the centre column.
+func (s *Shore) discGeom(c *canvas.Canvas, hy int, scale, lit float64) {
 	frac := s.MoonX
 	if frac <= 0 {
 		frac = 0.72
 	}
-	mx := int(float64(c.W) * frac)
-	// Altitude carries context too, alongside phase. Shape alone is hard to
-	// judge on a five-cell disc; height above the horizon is easy, because the
-	// horizon is a reference line right there. Two cues for one variable is
-	// what makes it readable at a glance rather than on inspection.
 	my := int(float64(hy) * (0.22 + 0.62*(1-lit)))
 	if my < 1 {
 		my = 1
 	}
-	rr := 2.0 * scale
+	s.moonX, s.moonY = int(float64(c.W)*frac), my
+	s.moonRR = 2.0 * scale
+	s.moonPainted = s.MoonEdge != "none"
+}
+
+// DiscCovers says the disc reaches this cell, by the SAME half-row sampling
+// moon() paints with: a cell counts when either half-row is inside. Testing
+// whole rows instead misses the ring of cells the disc touches with only one
+// of them -- and misses none at all at 143x27, which is the trap, because a
+// guard measured against his screenshot alone would look complete and still
+// leak a row taller.
+//
+// The test is the disc's FOOTPRINT, not its lit face: by day the terminator is
+// not painted, so a star inside the crescent's dark side would technically be
+// over sky. Excluding it anyway keeps the field still. Tying it to the phase
+// would make specks blink in and out along the terminator as the context
+// filled, which is a worse thing to see than a slightly emptier patch of sky.
+func (s *Shore) DiscCovers(x, y int) bool {
+	if !s.moonPainted || s.moonRR <= 0 {
+		return false
+	}
+	fx := float64(x-s.moonX) / 2.0
+	for _, off := range [2]float64{-0.25, 0.25} {
+		if math.Hypot(fx, float64(y-s.moonY)+off) < s.moonRR {
+			return true
+		}
+	}
+	return false
+}
+
+func (s *Shore) moon(c *canvas.Canvas, hy int, scale, lit, vis float64) {
+	mx := s.moonX
+	// Altitude carries context too, alongside phase. Shape alone is hard to
+	// judge on a five-cell disc; height above the horizon is easy, because the
+	// horizon is a reference line right there. Two cues for one variable is
+	// what makes it readable at a glance rather than on inspection.
+	// (Centre and radius are fixed in discGeom, which runs before the stars.)
+	my := s.moonY
+	rr := s.moonRR
 	rim := 0.6 * scale
 	// The terminator is approximated by a second disc sliding across the face:
 	// fully clear of it at full, concentric at new.
@@ -628,7 +683,6 @@ func (s *Shore) moon(c *canvas.Canvas, hy int, scale, lit, vis float64) {
 	// a moon one column into its phase reading as bitten rather than shaded.
 	noShadow := !s.night() && s.SunShadow != "slate"
 
-	s.moonX, s.moonY = mx, my
 	ry := int(rr+rim) + 1
 	rx := int((rr+rim)*2) + 1
 	s.moonRX, s.moonRY = rx, ry

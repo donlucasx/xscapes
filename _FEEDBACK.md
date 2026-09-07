@@ -1473,3 +1473,81 @@ at 22:10 (lgarzoli out of tokens → donlucasx); artifact ownership checked, see
   derived from it is recorded above and at `8d84eeb`, so nothing is lost analytically — but **it cannot
   be replayed again**, and the lines above that read "the one long trace on disk" describe a file that
   is gone. **Capture any future trace outside `/tmp`.**
+
+## Session 20 — 2026-09-06 20:39, two reports off the first live session after the crash
+
+- *"on a first glance, two issues [image] - first is a regression, a vertical pixel column on the far
+  right broke, probably after a resize. secondly, the sun does not seem pixel perfect, do you see the
+  issue [images]"* (2026-09-06, ~20:45, four screenshots: the full 143x62 window at 20:39, two sun
+  crops, and a heavy magnification of the disc's top-left. Preserved in `notes/s20-shots/`.)
+
+  ⚠ **First, a measurement of ours that was WRONG and got quoted into this session:** the cell pitch
+  is **exactly 14.000 device px** with column 0 at **x=132**, rows 30.0 px from **y=154**; the text
+  grid is 143 x 14 = 2002 px sitting in a 2042 px content view, so Terminal.app holds a **20 px inset
+  on each side**. The first reading here divided the whole content view by 143 and got 14.28, which
+  silently absorbed those margins — and by that arithmetic the bad strip lands INSIDE the grid, the
+  opposite conclusion. Derived properly from 2107 background transitions: 44 of the 59 strong
+  positions are at x ≡ 6 (mod 14) exactly, min 132, max 2134, residual zero. Two independent
+  witnesses agree (Claude's full-width rule inks x130–2136; its status line lands on the same grid).
+
+  ⇒ **The right-hand column is NOT ours, and he is right that it is new.** The strip is at
+    x2134–2147 and x2148–2152 — **columns 144 and 145, in Terminal.app's right inset, outside the 143
+    columns the terminal reports.** Our renderer paints all 143: a real render emits exactly 143
+    visible cells on every row, and column 143 carries current-frame content on all 27 scape rows.
+    What is in the strip is **our own earlier frames**, retained — one frozen about 2 rows higher, the
+    other 4–5, from when the window was 145 and then 144 columns wide; each column froze the moment
+    the width dropped past it. Controls are clean: the left inset, the rows above the scape and the
+    rows below it carry nothing, and the companion stops seven columns short.
+    **It really is new tonight**: fourteen earlier Terminal.app screenshots have a clean right inset,
+    including 09-06 15:56 (134x71) and 17:44 (134x54) — the frames session 19 measured from. So it
+    appeared between 17:44 and 20:39, the window in which he resized and in which no painting code
+    was installed. **Nothing shipped.** The periodic full repaint only rewrites columns 1–143; erase
+    stops at the visible width (the same rule that put the cells there); and a longer line would wrap
+    onto the next row and damage the LEFT edge, since autowrap is never disabled. Widening a couple of
+    columns and going back clears it until the next narrowing. ⚠ Do NOT use that as a diagnostic: a
+    widening drag exposes those columns so the band repaints them, and the strip would vanish for an
+    unrelated reason. ⚠ Also REFUTED from 09-05: the window IS snapped to the cell grid (143 x 14 =
+    2002 exactly); the earlier "not snapped" reading was the 14.28 error.
+
+  ⇒ **The sun is three separate things, and only one is a bug.**
+    1. **A star is drawn on the sun's face** — his "one yellow pixel", a 5x5 tan dot at cell (40,1),
+       one row above the disc centre. `stars()` plots into the FAR layer at `shore.go:307` and
+       `moon()` paints only BACKGROUNDS at `:308`, so the glyph survives and composites against the
+       body instead of the sky. `todoStars()` has carried a guard against exactly this since it was
+       written — *"Never on the moon: it carries context remaining"* — and the ambient field never
+       had one. Across 6000 frames a glyph lands inside the disc in **53%** of them, visible in 35%.
+       **FIXED**, see below.
+    2. **The caps are pure rim** — a flat rose bar 5 cells (70 px) wide across the top and bottom with
+       zero lit pixels, reproduced cell-for-cell by his installed binary. The rim band at
+       `shore.go:693` is **0.55 rows** wide while the half-row sampler steps **0.5**, so the disc's
+       outermost half-row can never hold lit body — at ANY window size. That, not the hue rim itself,
+       is why the disc reads as a rounded square. NOT FIXED: at the cap the disc is exactly one
+       half-row thick, so that row is either rim or body; moving the threshold trades the closed ring
+       for a lit tip and cannot buy both. A real fix has to be per-axis or chord-relative and must be
+       re-measured at scape 24–28, where the flip lives. **His ruling, below, parks it.**
+    3. **The hairlines are still there**, five of them on the disc. The clearest is NOT the seam at
+       the top: it is **y=1353, a rosy 1 px rule floating 12 px BELOW the disc in flat sky**, 70 px
+       wide, with nothing to explain it. Ink profile measured off his own screenshot: coverage 0.965
+       at offset 17, **0.426 at offset 29** — the same 17.0 → 29.4 of 30 recorded on 09-06,
+       independently reconfirmed. The top seam is not sky either: it is 43% rim over 57% sky, and the
+       identical artifact runs the full width of the scape (0.432 coverage at x=200 through x=2000),
+       so it is not sun-specific. **The row pitch has not moved, so his line-spacing test is still
+       open.**
+
+- **His ruling** (2026-09-06, 22:2x, a four-option menu): ***"Just the star"*** — *"Give stars() the
+  disc guard todoStars() already has. The disc's shape is untouched, so the caps stay flat and the
+  hairlines stay. Smallest correct change; no taste decision in it."* The three he passed over:
+  *"The star and the caps"* (also let the outermost half-row carry lit body — opens the rim ring at
+  top and bottom, needs re-measuring at window heights 54–63), *"Star now, caps as a study"* (ship the
+  star fix and build a study page of cap thresholds for him to pick from), and *"Nothing yet"*.
+  ⇒ **SHIPPED**: `Shore.DiscCovers`, one predicate for both star fields, and the disc's centre and
+    radius hoisted into `discGeom()` so it runs BEFORE `stars()` — it did not, so a guard reading
+    `s.moonX/moonY` would have tested the PREVIOUS frame's disc and (0,0) on frame one.
+    ⚠ The obvious predicate is wrong: `hypot(dx/2, dy) < rr` tests whole rows, but `moon()` paints a
+    cell when EITHER half-row is inside. At **his exact 143x27 it misses nothing**, so a fix measured
+    against his screenshot alone passes and still leaks a row taller — 6 cells of 27 at 80x24, 8 of 37
+    at 120x26, 4 of 41 at 143x28. `DiscCovers` samples both half-rows, as `moon()` does.
+    The `todoStars` hand-fitted ellipse (`dx*dx+4*dy*dy <= 16`) is gone with it: it was measured
+    against a disc of one particular size and had drifted, excluding only the centre column at the cap
+    while the disc reached two either side. One predicate now, so the two cannot part company again.
+    At his frame the change moves **exactly one cell**: row 1 col 100, `.` becomes a space.

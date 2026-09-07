@@ -67,6 +67,53 @@ and upload (his hands).
 from the other session swept three in (`bff64d1`, since removed). Render previews with headless Chrome
 `--screenshot=` straight into the scratchpad instead.
 
+## Where we left off (2026-09-06 ~22:30, session 20 — his two reports off the first live run. HEAD after the star fix, clean, installed)
+
+**Session 20 in one line:** he launched a session, and inside a minute had two reports: a broken
+column at the far right and a sun that is not pixel perfect. The right edge is Terminal.app's, not
+ours, and nothing shipped for it; the sun turned out to be three separate things, and his ruling
+shipped the one that is a bug.
+
+⚠ **A measurement of ours was wrong and is now corrected everywhere:** the cell pitch is **exactly
+14.000 device px**, column 0 at **x=132**, rows 30.0 px from **y=154**. The 14.28 figure divided the
+whole content view by 143 and absorbed Terminal.app's 20 px inset on each side — and by that
+arithmetic the bad strip lands INSIDE the grid, the opposite conclusion. Use 14/30 for every future
+pixel reading of a Terminal.app shot at this profile. Also **REFUTED from 09-05**: the window IS
+snapped to the cell grid (143 x 14 = 2002 exactly).
+
+**The right edge — NOT OURS, ship nothing, and he is right that it is new.** The strip is columns
+**144 and 145, in Terminal.app's right inset**, outside the 143 columns it reports. Our renderer
+paints all 143 (a real render emits exactly 143 visible cells per row). The strip holds **our own
+earlier frames**, retained — one frozen ~2 rows higher, the other 4–5, from when the window was 145
+then 144 wide. Fourteen earlier screenshots have a clean inset, including two from 09-06 itself, so it
+did appear tonight — during a resize, not a deploy. No fix is available: the periodic repaint only
+rewrites columns 1–143, erase stops at the visible width, and a longer line would wrap and damage the
+LEFT edge. Widening a couple of columns and back clears it until the next narrowing.
+⚠ **Do not offer that as a diagnostic** — widening exposes those columns so the band repaints them,
+and the strip vanishes for an unrelated reason.
+
+**The sun — his ruling was "Just the star", and that shipped.** `stars()` plotted into the far layer
+while `moon()` paints only backgrounds, so a dust glyph survived and composited onto the disc — in
+53% of frames across a 6000-frame sweep. `Shore.DiscCovers` is now the single predicate for BOTH star
+fields, and `discGeom()` fixes the disc's centre and radius BEFORE `stars()` runs (it did not, so a
+naive guard would have read the previous frame's disc). ⚠ The predicate must sample BOTH half-rows —
+whole rows miss nothing at his 143x27 and leak a row taller, which is why the test sweeps 4 widths x 6
+heights x 5 seeds. Three mutations go red. At his frame exactly one cell changes.
+
+**Still open on the sun, by his ruling, not by omission:**
+- **The caps are pure rim** — a flat rose bar 5 cells wide top and bottom, zero lit pixels, because the
+  rim band at `shore.go:693` is 0.55 rows while the sampler steps 0.5, so the outermost half-row can
+  never hold lit body at ANY size. This is why the disc reads as a rounded square. He passed over "the
+  star and the caps" and "star now, caps as a study"; the trade is a closed ring against a lit tip and
+  it needs re-measuring at scape 24–28.
+- **The hairlines** — five on the disc; the clearest is a rosy 1 px rule floating 12 px BELOW it in
+  flat sky. Ink re-measured off his own screenshot: 0.965 at offset 17, **0.426 at offset 29**,
+  confirming 17.0 → 29.4 of 30 a second time. **The row pitch has not moved, so his line-spacing test
+  is still the open question.**
+
+⚠ **A parallel session is live in this tree** (`notes/charstudy/`, a companion study served on
+localhost:8777). **Stage by path.**
+
 ## Where we left off (2026-09-06, session 19 — his three reports; the MACHINE CRASHED mid-session, recovered 19:00. HEAD `8d84eeb`, pushed, clean, installed)
 
 **Session 19 in one line:** he brought three defects out of long live sessions, all three were measured
@@ -159,7 +206,8 @@ the paste kit is on his Desktop at `~/Desktop/xscapes-commons/` (`brief.md`, `in
 URLs, `message.md` = both), regenerated whenever the page is. **Use Default · Quick, not Expert.**
 
 **▶ NEXT**
-0a. **ASK HIM: did lowering Terminal.app's line spacing kill the hairlines?** That is his own open
+0a. **ASK HIM: did lowering Terminal.app's line spacing kill the hairlines?** (Re-confirmed still open
+   on 09-06 22:30: his 20:39 frame still has a 30 px row pitch and all five hairlines.) That is his own open
    experiment from session 19 and the cheapest possible fix for the thin lines — nothing ships on that
    report until he answers. If it did not work, he picks one of the three costed options in
    `_FEEDBACK.md` §Session 19; if it did, the fix is a terminal setting and no code changes.
