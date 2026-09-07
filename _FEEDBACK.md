@@ -1807,3 +1807,67 @@ at 22:10 (lgarzoli out of tokens → donlucasx); artifact ownership checked, see
     opens still shows the star-on-the-disc defect he personally reported.**
   ⇒ Checked and CLEARED, so nobody re-raises it: `research/commons-submission.md` is a factual rules
     survey, not anything that would embarrass him publicly.
+
+---
+
+## Session 21 (parallel) — 2026-09-07, the crab companion
+
+Ran alongside the submission/worry-bar work. **No product code was touched**; everything lives in the
+untracked `notes/charstudy/` served on `:8777`, and `internal/companion` was deliberately left alone
+because the other session was in it.
+
+**His brief, verbatim:** *"Lets make a new character- a crab. Ideally it will live on the beach, so
+color it accordingly to stand out- maybe a salmon pink? lets approach it on the same style as the
+existing companions, give me a few alts to choose from. Lets start w the main companion and we can
+work on the sub companions after"*
+
+**Round one, four silhouettes + six coats.** His verdict: *"i like broad and stalker, but they are
+looking more like a lobster than a crab. Lets try a few more approaches, I think we need to see the
+claws so it looks more like a crab, but try keep similar aspect ratio and overall size as the rest of
+the companions. Also, let me see how it will look on a full frame of the beach"*
+
+**Round two** diagnosed the lobster read: the claws sat IN LINE with the shell at its sides, which is
+a lobster's profile exactly. Two fixes, both measured: an **open pincer** (the gap must be a WHOLE
+EMPTY CELL — a sub-cell is 1px wide by 2px tall, and two of the four shapes silently lost their notch
+to a one-pixel-row gap before the text dump caught it), and **claws held up and forward** of the shell.
+
+**His question, and the answer is measured not asserted:** *"Are they as big as the cat?"*
+- the cat: ink **9 x 7** cells, 60 of 84 cells inked (71%)
+- Pincer / Hero: ink **12 x 7**, 66 and 64 cells (79% / 76%)
+- ⇒ **same height, three cells wider, within a tenth of the same weight of ink.** Not bigger — the
+  same size arranged sideways. The three extra columns are FREE: `compose()` already reserves the full
+  12 from `cat.Size()`, which returns the BOX and not the ink. **The cat has never used its last three
+  columns.**
+
+**His two gaps:** *"companions need eyes too, and what do they look like when they are in the water?"*
+- Crablets now carry two sockets in a dimmer green than the parent's (parent lands on idx **121**,
+  crablet on **114**), each blinking on its OWN PERIOD so a litter never falls into step; bodies all
+  drawn before any face, which is the seam-steals-an-eye defect kittens.go already records.
+- **A crab does not swim.** It walks in until the water closes over the shell and the eyestalks carry
+  on above the surface. `crabletSwim` is the same **10x8 box as `KittenSwim`**, so a crablet takes
+  exactly a kitten's room in a lane and the shipped lane logic needs no new numbers. The bob shifts
+  the SOURCE ROWS before parsing (reading a pixel back needs an unexported accessor; shifting strings
+  needs nothing) — the shell sinks and returns and **the eyes never move.**
+
+**HIS PICK, 2026-09-07: *"hero"*** — claws raised high on visible arms, clear of the shell. Pincer is
+out. **Coat is NOT locked**; salmon (idx 210, survives the glyph boost unchanged) is what everything
+is drawn in because it is what his brief asked for.
+
+**The exit queue is BUILT for it** (`notes/charstudy/crab/water.go`, `drawExits`): the cat's exit
+swims the surface and fades; the crab walks sideways into the surf and **goes under**, so the leaving
+is carried by the shell sinking as well as by travel, and the stalks are the last thing to go.
+
+⚠ **What is left before Hero can ship**, from an audit of what live.go actually calls (365-378):
+- `Draw` ✅ · `Size` ✅ · `DrawKittenExits` ✅ · **`DrawKittens` PARTIAL** — needs the size ladder with
+  its hysteresis (6/10 up, 4/8 down) and the real lane spans.
+- **There is NO companion interface.** `companion.NewCat()` is concrete at **22 call sites**, so
+  nothing in the product can construct anything but a cat. Size of the job depends on a decision that
+  is HIS: does Hero **replace** the cat or **join** it as a choice?
+- The balloon pointer: `MirrorTail` puts the `v` under the cat's right shoulder; Hero has an arm there.
+- Six cat tests need crab equivalents (kitten eyes · swimmer columns · exit columns · edge distance).
+
+⇒ **Measured and NOT a problem, so nobody re-raises it:** the state machine needs no change (the
+reducer already emits a companion-agnostic pose) · narrow panes cost nothing (**cat and crab both stay
+whole to 12 columns and both first lose ink at 11**) · the swim lane geometry is free · and
+**`DrawWalk` is NOT required — live.go never walks the companion**, it is called only from `anim.go`
+and `strip.go`, both studies. That last one was on my blocker list until I checked.
