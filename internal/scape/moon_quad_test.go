@@ -61,7 +61,14 @@ func TestTheQuadDiscIsOneCleanContainer(t *testing.T) {
 			if n := regions(disc); n != 1 {
 				t.Errorf("used %.0f%% tod %.3f: the disc is %d regions, want one silhouette", used*100, tod, n)
 			}
-			if n := regions(darks); used > 0.1 && n != 1 {
+			// By day there is no unlit face to keep whole: the sun wanes as a
+			// crescent (his ruling, 2026-09-06). At night the moon still has
+			// one, and it must be ONE piece.
+			if !sh.night() {
+				if len(darks) != 0 {
+					t.Errorf("used %.0f%% tod %.3f: the sun carries %d unlit cells, want none", used*100, tod, len(darks))
+				}
+			} else if n := regions(darks); used > 0.1 && n != 1 {
 				var cells []cellPt
 				for p := range darks {
 					cells = append(cells, cellPt{p.x - mx, p.y - my})

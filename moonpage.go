@@ -23,8 +23,8 @@ func moonPage(seed int64) string {
 	variants := []variant{
 		{"ships today", func(*scape.Shore) {}},
 		{"quad edge", func(s *scape.Shore) { s.MoonEdge = "quad" }},
-		{"quad + sun without shadow", func(s *scape.Shore) { s.MoonEdge = "quad"; s.SunShadow = "sky" }},
-		{"quad + no shadow + night halo", func(s *scape.Shore) { s.MoonEdge = "quad"; s.SunShadow = "sky"; s.MoonHalo = true }},
+		{"quad + the old slate face", func(s *scape.Shore) { s.MoonEdge = "quad"; s.SunShadow = "slate" }},
+		{"quad + night halo", func(s *scape.Shore) { s.MoonEdge = "quad"; s.MoonHalo = true }},
 		{"hue rim (halves)", func(s *scape.Shore) { s.MoonRim = "hue" }},
 	}
 	frame := func(tod, used float64, v variant) (*canvas.Canvas, int, int) {
@@ -61,8 +61,9 @@ func moonPage(seed int64) string {
 		`its soft edge rounds to grey fringes and its navy sky has no entry, so the disc went solid and the night went grey. ` +
 		`What the cube can still carry: <b>quad edge</b> samples the disc at four quarters per cell instead of two half-rows, ` +
 		`doubling the horizontal resolution of the edge (exact in Ghostty; in Terminal.app a cell whose two top quarters ` +
-		`differ takes a five-pixel notch). <b>sun without shadow</b> paints no unlit face by day, so the sun wanes as a crescent ` +
-		`rather than showing a slate bite. <b>night halo</b> lightens the grey sky in a soft ring around the moon, the one ` +
+		`differ takes a five-pixel notch). <b>the old slate face</b> is what shipped until 2026-09-06: the moon\u0026rsquo;s ` +
+		`terminator painted on the sun as well, which is the slate bite he reported. The sun wanes as a crescent now. ` +
+		`<b>night halo</b> lightens the grey sky in a soft ring around the moon, the one ` +
 		`piece of the mockup's softness the grey ramp has steps for. <b>hue rim</b> is the session 15 option: the outer ring ` +
 		`one tone darker in the disc's own hue. Frames at 130 columns, 22 scape rows; crops of the sky at twice the size.</p>`)
 

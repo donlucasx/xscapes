@@ -1394,3 +1394,39 @@ at 22:10 (lgarzoli out of tokens → donlucasx); artifact ownership checked, see
     clips must run at night. ⚠ The balloon opens to the companion's LEFT, so a crop starting at the
     cat cut the words off; every legend crop is 36 wide now.
   ⇒ The page is ~6 MB of animation, so everything below the hero is `loading="lazy"`.
+
+## Session 19 — 2026-09-06, his three reports from long live sessions
+
+- *"a) the Sun seems to break sometimes, and fix itself- mostly has to do when the context depletes,
+  the shadow underneath [image] Also, on 256 (terminal.app) it shows some thin lines that seem not
+  intentional [images] It should be pixel perfect. b) after a longer session, scrolling back on the
+  text some of it seems corrupted, striked through- check it [image]"* (2026-09-06, ~18:05, six
+  screenshots: 3.56.23 PM 134x71 at 49% context, two day crops, one night crop, 5.56.45 PM the
+  post-exit scrollback)
+  ⇒ **The sun.** MEASURED in his 3.56 PM frame: the warm body sits at x594-677 and a slate mass at
+    x650-719, so the unlit face hangs 2.6 cells past the lit body. `shore.go` `moon()`:
+    `lit = 1 - ContextUsed` and `shadow = 2*rr*lit`, so the terminator slides across the disc as the
+    context fills and snaps back at a compaction — that is exactly "breaks sometimes, and fixes
+    itself". By DAY the same unlit face is painted on the SUN. `SunShadow = "sky"` already exists as
+    a study switch and paints no unlit face by day; it has never been the default.
+  ⇒ **The thin lines.** MEASURED from the same frame: 5 hairlines across the scape (y=1503, 1533,
+    1743, 1773, 2027) plus 4 more inside the disc, each exactly ONE device pixel and each a 50/50
+    blend of the cell's two half-colours. Cause: U+2584's ink runs from 17 to **29.4** of a 30px row,
+    not to 30 — the "bottom-exact" measurement of 2026-09-05 was half a logical pixel out. The last
+    device pixel row of every split cell is therefore the cell's BACKGROUND (the upper colour), and
+    the row below carries the lower colour by construction, so it reads as a rule drawn across a flat
+    band. It is not the sun and not the ramp specifically: it is EVERY two-colour cell — the sky
+    ramp's split rows (`canvas.resolve`, gated on `term.Shading`) and the disc's half-row edges and
+    hue rim (`SetBGHalves`). ⚠ U+2580 is worse, not better: its ink starts 5px down. Within half
+    blocks on Terminal.app the hairline cannot be removed, only not drawn.
+    Instrument: `notes/lineprobe` renders a frame with Terminal.app's measured cell geometry, so the
+    hairline is visible in a browser; a page that paints a split cell as two flat halves cannot show it.
+  ⇒ **The scrollback.** Same defect as reports #2 (s14) and the 09-05 repro, now with a sharper
+    signature, measured off the 5.56 PM screenshot: it is NOT a strikethrough attribute — the marks
+    sit in their own cells and do NOT cross the letterforms (the 'o' hole stays dark at the mark's
+    scanline). The corrupted rows are a CELL-LEVEL MERGE: a dash-shaped glyph, in the body text's own
+    colour (229,229,229), stands in cells the terminal showed as spaces, in contiguous runs; and past
+    the text's end the previous content survives ("u63racode" = "ultracode" with "63" written over two
+    of its cells). Replaying the one long trace on disk (`/tmp/apple.bin`, 34 MB, 09-05) through the
+    model keeps 36 rows with no interleave, so it does not reproduce there. Still needs a traced
+    session that shows it: `XSCAPES_TRACE=/tmp/t.bin xscapes claude`.

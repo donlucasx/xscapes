@@ -96,9 +96,9 @@ type Shore struct {
 	// companion's own block glyphs used as two backgrounds -- twice the
 	// horizontal resolution of the edge).
 	MoonEdge string
-	// SunShadow is a STUDY switch for the unlit face by day: "" (the slate
-	// tone, what ships) or "sky" (the sky's own colour, so the sun wanes as a
-	// crescent with no dark bite).
+	// SunShadow is a STUDY switch for the unlit face by day: "" (not painted,
+	// what ships -- the sun wanes as a crescent) or "slate" (the dim tone the
+	// moon uses at night, which is what shipped until 2026-09-06).
 	SunShadow string
 	// MoonHalo is a STUDY switch: a soft lightening of the sky around the
 	// disc at night, the one piece of the s7 mockup's softness the grey ramp
@@ -618,10 +618,15 @@ func (s *Shore) moon(c *canvas.Canvas, hy int, scale, lit, vis float64) {
 	// 133x27 and 9% context. Three steps above the night sky now, still well
 	// under the lit body, still darker than a daylight sky.
 	dark := term.RGB{R: 80, G: 80, B: 96}
-	// By day the body is the sun (the palette's warm body), and a slate
-	// sliver on it read as a bite; with SunShadow "sky" the unlit face is
-	// simply not painted, so the sun wanes as a crescent.
-	noShadow := s.SunShadow == "sky" && !s.night()
+	// By day the body is the SUN, and a sun has no unlit face. Painting the
+	// moon's terminator on it made a slate mass that grew as the context
+	// filled and cleared at a compaction -- his report of 2026-09-06 from a
+	// long session, "the Sun seems to break sometimes, and fix itself".
+	// Measured in that frame at 49%: the lit body ended at x677 and the slate
+	// ran on to x719, 2.6 cells past it. His ruling: the sun WANES AS A
+	// CRESCENT. At night the moon keeps its shaded face, which is what stops
+	// a moon one column into its phase reading as bitten rather than shaded.
+	noShadow := !s.night() && s.SunShadow != "slate"
 
 	s.moonX, s.moonY = mx, my
 	ry := int(rr+rim) + 1
