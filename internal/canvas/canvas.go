@@ -422,7 +422,18 @@ func (c *Canvas) resolve(x, y int, p term.Profile) resolved {
 		rr := c.ramp[i]
 		mid := rr.r.Tone((rr.t0 + rr.t1) / 2)
 		if !set {
-			if term.Shading {
+			// term.NoSplitCells: one tone a cell on Terminal.app, where the
+			// half block leaves a 1px rule at the cell's bottom edge. The mid
+			// tone below is what the split collapses to, and it costs almost
+			// nothing: measured against the true ramp across twelve hours, the
+			// mean CIE76 error moves between -0.48 and +1.28 and is BETTER
+			// collapsed at four of them, and the distinct-tone count down a sky
+			// column is identical at every hour. Only 2-4 of the sky's rows are
+			// split at all, and a split cell's two halves are adjacent entries
+			// on the same path, so the mid tone is usually one of them. What
+			// does change is where a band edge sits: a 40-luma step at noon can
+			// move by half a row.
+			if term.Shading && !term.NoSplitCells {
 				up := rr.r.Tone(rr.t0 + 0.25*(rr.t1-rr.t0))
 				down := rr.r.Tone(rr.t0 + 0.75*(rr.t1-rr.t0))
 				if up != down {
@@ -597,10 +608,32 @@ func (c *Canvas) HTMLFragmentCropAs(x0, y0, x1, y1, fontPx int, p term.Profile) 
 	if x1 <= x0 || y1 <= y0 {
 		return ""
 	}
+	was := term.NoSplitCells
+	term.NoSplitCells = false
+	defer func() { term.NoSplitCells = was }()
 	return c.htmlFragmentRect(fontPx, p, true, nil, x0, y0, x1, y1)
 }
 
 func (c *Canvas) htmlFragmentWith(fontPx int, p term.Profile, quantise bool, pal *HTMLPalette) string {
+	// Every HTML writer funnels through here, and that is deliberate: it is the
+	// one seam where term.NoSplitCells can be taken out of the picture. main()
+	// sets that flag from TERM_PROGRAM before any subcommand dispatch, so
+	// without this, `go run . -site site` from Terminal.app would bake the
+	// collapsed sky into the published page and the same command from Ghostty
+	// would bake the split one -- the page changing with the machine it was
+	// built on. A page is not a terminal; it has no half-block hairline to
+	// avoid, and the studies exist precisely to show the split.
+	//
+	// ⚠ term.LowerHalf is NOT cleared here and must not be. Measured in
+	// headless Chrome at the clips' own CSS (Menlo, 14px, line-height 1):
+	// U+2580 has the same gap in the browser that it has in Terminal.app --
+	// two device pixel rows of the lower colour above the upper half -- so
+	// clearing it would put a wrong-coloured band above all 500 split cells in
+	// the sky clip. The published page is the good one because it was built
+	// under LowerHalf; that stays.
+	was := term.NoSplitCells
+	term.NoSplitCells = false
+	defer func() { term.NoSplitCells = was }()
 	return c.htmlFragmentRect(fontPx, p, quantise, pal, 0, 0, c.W, c.H)
 }
 

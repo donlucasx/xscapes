@@ -32,9 +32,17 @@ func rampError(c *Canvas, x int, a, b term.RGB) float64 {
 	total := 0.0
 	for y := 0; y < c.H; y++ {
 		ch, fg, bg := c.ResolveAt(x, y, term.Profile256)
+		// Both orientations. term.Split emits U+2584 with the colours the other
+		// way up under LowerHalf, which is what Terminal.app gets -- and every
+		// test in this tree runs at LowerHalf's zero value, so a check written
+		// for U+2580 alone reads a ▄ cell as a FLAT background and measures the
+		// wrong thing on the only machine the defect appears on.
 		up, dn := bg, bg
-		if ch == '\u2580' {
+		switch ch {
+		case '\u2580':
 			up = fg
+		case '\u2584':
+			dn = fg
 		}
 		// the gradient's true colour at the centre of each half-row
 		for i, got := range []term.RGB{up, dn} {

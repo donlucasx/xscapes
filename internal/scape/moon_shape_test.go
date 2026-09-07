@@ -44,6 +44,14 @@ func TestTheMoonIsRoundAtEveryHeight(t *testing.T) {
 					continue
 				}
 				ch, fg, bg := c.ResolveAt(x, y, term.Profile256)
+				// ▄ counts as a half cell too: under LowerHalf the same split is
+				// drawn the other way up, and this suite runs at LowerHalf's
+				// zero value, so counting only ▀ would report a Terminal.app
+				// disc as having no half cells at all.
+				if ch == '▄' {
+					fg, bg = bg, fg
+					ch = '▀'
+				}
 				switch {
 				case ch == '▀':
 					if bright(fg, y) != bright(bg, y) {

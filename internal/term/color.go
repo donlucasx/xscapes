@@ -97,6 +97,42 @@ func DetectProfile() Profile {
 // notes/lineprobe renders a frame at this geometry so it is visible.
 var LowerHalf bool
 
+// NoSplitCells says a cell of the sky/sea RAMP is painted in one tone rather
+// than split into two half-rows. His ruling of 2026-09-07, after testing his
+// terminal's line spacing and reporting "no, it didnt": the hairline cannot be
+// removed inside half blocks, only NOT DRAWN. The ramp is where it shows worst
+// -- 432 cells a frame at 143x27, whole rows of the sky and the sea, which is
+// why it reads as a rule ACROSS the frame rather than as an edge.
+//
+// He ruled the DISC and the SHORELINE stay split ("leave the disc split, do the
+// rest", then "leave the shoreline split"): no whole-cell rule keeps the disc
+// round at every window size -- measured over 184 (width, rows) pairs, the
+// shipped half-row rule is a rectangle at 0 of them and every collapse is a
+// rectangle somewhere -- and collapsing the shoreline hardens the waterline,
+// which is the axis of an earlier ruling of his.
+//
+// Bare, with NO initialiser, and never read from the ambient TERM_PROGRAM at
+// package init: `go test` runs with TERM_PROGRAM=Apple_Terminal in this very
+// project, and a self-initialising flag would make the suite collapse here and
+// split in CI. main() assigns it; the HTML writers save and restore it.
+var NoSplitCells bool
+
+// DetectNoSplit picks NoSplitCells for the terminal in TERM_PROGRAM. It has its
+// own switch rather than reusing DetectSplit: XSCAPES_SPLIT=upper on
+// Apple_Terminal still wants no split cells, and =lower on Ghostty still wants
+// them, so the two questions cannot share an answer.
+func DetectNoSplit(termProgram string) bool {
+	switch strings.ToLower(envx.Lookup("SPLIT")) {
+	case "none":
+		return true
+	case "upper", "lower":
+		if termProgram != "Apple_Terminal" {
+			return false
+		}
+	}
+	return termProgram == "Apple_Terminal"
+}
+
 // DetectSplit picks LowerHalf for the terminal in TERM_PROGRAM.
 func DetectSplit(termProgram string) bool {
 	switch strings.ToLower(envx.Lookup("SPLIT")) {

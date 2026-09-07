@@ -22,6 +22,11 @@ func main() {
 	// Before dispatch: the host paints too, and Terminal.app draws U+2580
 	// with a gap above it (see term.LowerHalf).
 	term.LowerHalf = term.DetectSplit(os.Getenv("TERM_PROGRAM"))
+	// And Terminal.app's half block leaves a 1px rule at the cell's bottom
+	// edge whichever way up it is drawn, so the ramp is painted one tone a
+	// cell there. Every HTML writer saves and restores this: the published
+	// page must not change with the terminal it was built from.
+	term.NoSplitCells = term.DetectNoSplit(os.Getenv("TERM_PROGRAM"))
 
 	// Subcommands are checked before the flag set is parsed. The renderer has
 	// twenty demo flags and the adapters have their own; keeping them in

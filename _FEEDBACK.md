@@ -1628,3 +1628,37 @@ at 22:10 (lgarzoli out of tokens → donlucasx); artifact ownership checked, see
   ⇒ Also corrected: **width-audit item 4 was WRONG.** The window IS snapped to the cell grid; the
     "123.6 columns" reading divided the content view by the column count and absorbed the two 20 px
     insets, the same arithmetic that produced the bogus 14.28 pitch. Measured on five frames now.
+  ⇒ **SHIPPED**: `term.NoSplitCells` + `term.DetectNoSplit`, gating the ramp split at
+    `canvas.go:426`. Measured on a real 143x27 frame, half-block cells before → after:
+    tod 0.05 **401 → 18** · 0.30 **853 → 40** · 0.50 **464 → 43** · 0.865 **558 → 23** — about
+    **94% of them gone**, and what remains is the disc and the shoreline he ruled to keep.
+    Ghostty frames are byte-identical before and after.
+    ⚠ Three traps the design had to clear, each proven rather than argued:
+    1. **The flag must not be a package `init()`.** `go test` runs with
+       `TERM_PROGRAM=Apple_Terminal` in this very project, so a self-initialising flag would make
+       the suite collapse here and split in CI. It is bare, and `main()` assigns it.
+    2. **It gets its own detector**, not `DetectSplit`: `XSCAPES_SPLIT=upper` on Terminal.app still
+       wants no split cells, and `=lower` on Ghostty still wants them, so the two questions cannot
+       share an answer.
+    3. **Every HTML writer is pinned to split**, in the one seam all four entry points funnel
+       through (`htmlFragmentWith` / `HTMLFragmentCropAs`). Without it `go run . -site site` from
+       Terminal.app would bake the collapsed sky into the published page and the same command from
+       Ghostty would bake the split one. Verified: with the orientation held constant the pages are
+       byte-identical from both terminals; removing the guard makes the test go red (484 vs 724
+       bytes). ⚠ `term.LowerHalf` is deliberately NOT cleared there — headless Chrome at the clips'
+       own CSS has the same U+2580 gap Terminal.app has, so clearing it would put a wrong-coloured
+       2px band above all 500 split cells in the sky clip.
+    ⚠ Also fixed, found on the way: **three of the repo's own tests were blind to the glyph that
+    actually ships.** Every test runs at `LowerHalf`'s zero value, which is `▀`; his machine draws
+    `▄`. `smoothing_test.go` read a `▄` cell as a FLAT background, so the gradient-accuracy test was
+    measuring the wrong thing on the only machine the defect appears on, and `moon_shape_test.go`
+    would have counted a Terminal.app disc as having no half cells at all. Both now read either
+    orientation, and the new guard sweeps both.
+    ⚠ **NOT delivered, and he should know:** "zero hairlines anywhere" cannot be literal. The
+    companion IS block glyphs — `Bitmap.ToQuadrant` packs 2x2 pixels into quadrant characters, 38
+    `█` plus 18 partial-block cells a frame — and collapsing a sprite means deleting the sprite. The
+    ruling is delivered on BACKGROUNDS.
+    ⚠ Still open, unrelated to his ruling: **`-ascii` emits 14 `▄` a frame today.** `main.go:82-84`
+    sets `term.Shading = false` for it, but the disc's half cells go through a branch that is not
+    gated on Shading at all, so `xscapes -ascii` promises ASCII and ships Unicode. Not fixed here:
+    the fix runs through the disc, which he ruled untouched.
