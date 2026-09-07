@@ -1662,3 +1662,46 @@ at 22:10 (lgarzoli out of tokens → donlucasx); artifact ownership checked, see
     sets `term.Shading = false` for it, but the disc's half cells go through a branch that is not
     gated on Shading at all, so `xscapes -ascii` promises ASCII and ships Unicode. Not fixed here:
     the fix runs through the disc, which he ruled untouched.
+
+## Session 21 — 2026-09-07, the companion's states
+
+- *"looking at the companion 'states'. I think when 'something broke', eyes should go red, not orange
+  (urgency)."* (2026-09-07, ~12:10)
+  ⇒ **His ruling after the measurement: *"ok, keep it as is then."* NOTHING SHIPPED — the worried eye
+    stays amber.** He asked for red, was shown what red costs, and reversed. That is the measurement
+    doing its job, and the reason is worth keeping so nobody proposes it again without new evidence.
+  ⇒ **Why red loses: red is intrinsically dark.** Luminance weights R at 0.2126, so `rgb(255,0,0)` is
+    DARKER than the `#444444` ground the eye sits on at night. Measured off the rendered frame at
+    22:20, whole 120-column composition, WCAG contrast of the eye against its own ground:
+    **amber 215 → 5.03 · darker red 160 → 1.40 · pure red 196 → 1.24.** A red eye at night reads by
+    HUE, not brightness, so it is the wrong direction for a mark meant to catch the eye from across
+    the room — which is exactly what "urgency" asks for. By chromatic distance 196 is the best red
+    (dE 210 vs 160's 176), so the two measures disagree and both are true; the luminance one is the
+    one that matters for a two-cell mark in a 120-column frame.
+  ⇒ **Measured and kept for the record**, all confirmed twice (computed, then read back off the
+    rendered frame with `ResolveAt(..., Profile256)`):
+    - **Glyph colours are NOT quantised like backgrounds.** `term/color.go:606-616`:
+      `Quantise(c, fg=true)` is `FromIndex256(c.Saturate(GlyphBoost).Index256())` — a 2.6x chroma
+      boost, and it drops the `Keeping` variant backgrounds get. Judging a glyph colour by its source
+      RGB is judging the wrong colour.
+    - **Exact cube entries are fixed points of that pipeline; off-cube colours move and collide.**
+      `rgb(236,90,70)` and `rgb(255,95,95)` both land on 203. So candidates must be chosen ON the
+      cube or two "different" reds paint identically.
+    - **`eyeCol` lands on 121 `rgb(135,255,175)`, not 157.** The boost saturates the resting green
+      too, so "how far is this from the everyday eye" must be measured against 121.
+    - ⚠ **The amber is the only OFF-CUBE colour of the nine.** `rgb(244,176,96)` is painted as
+      `rgb(255,175,95)`. Today's worried eye is the one eye colour in the product that is not what was
+      authored. Not enough to change it, but worth knowing it is a near-miss rather than a choice.
+  ⇒ The study lives in the parallel session's `notes/charstudy/07-worried-red.html` (his :8777), eight
+    candidates at 11:30 / 18:40 / 22:20 plus a whole-frame night row.
+
+- ⚠ **STILL OPEN AND STILL HIS: the worry trigger fires far too often.** Confirmed live in the code,
+  not quoted from a doc: `reduce.go:242` `case event.Error, event.TestFail: r.worried = true` — ANY
+  single error — cleared only at `reduce.go:209` on his next `Prompt`. Nothing since 2026-09-01 has
+  touched it. Measured: **Worried is on 37% of active time**, 31 episodes, median 15m27s, longest
+  2h02m, 65% raised by a single error. `Worried` also OUTRANKS `NeedsYou` in `pose()`
+  (`reduce.go:469-479`), so while it is up the pose never shows that he is being asked for
+  permission — only the bubble does. **This is the lever that would have made "urgency" mean
+  something, and the colour was never the thing standing in the way.** The brief locks the worried
+  pose as a channel, so raising the bar is his call. On file: require two errors in a window, or one
+  the agent does not recover from.
