@@ -1551,3 +1551,80 @@ at 22:10 (lgarzoli out of tokens → donlucasx); artifact ownership checked, see
     against a disc of one particular size and had drifted, excluding only the centre column at the cap
     while the disc reached two either side. One predicate now, so the two cannot part company again.
     At his frame the change moves **exactly one cell**: row 1 col 100, `.` becomes a space.
+
+- **The line-spacing test FAILED.** *"no, it didnt. Just ran a fresh session, here are three
+  screenshots w the terminal window resized differently"* (2026-09-06 ~23:58, three frames at
+  120x30, 116x37 and 76x41, seconds apart, preserved in `notes/s20-shots/`).
+  ⇒ **The cheapest route to pixel-perfect is closed.** Lowering Terminal.app's line spacing does not
+    close the 0.6 px the ▄ glyph leaves, so the hairline cannot be removed inside half blocks — only
+    not drawn. **The three costed options from 09-06 are now the whole menu, and the choice is his.**
+
+  ⇒ **The right-hand strip: NARROWING dirties it, and a clean frame proves the mechanism.** Measured
+    over the scape band in all three frames, as a percentage of the 20 px inset that is not terminal
+    background:
+
+    | frame | how he got there | left inset | right inset |
+    |---|---|---|---|
+    | 120x30 | not narrowed | 5.1% | **5.4% — CLEAN** |
+    | 116x37 | narrowed from 120 | 5.1% | **48.6%** |
+    | 76x41  | narrowed from 116 | 5.1% | **50.4%** |
+
+    The left inset is 5.1% in all three, which is the baseline. So the defect is not "the right inset
+    is always dirty": it is **narrowing leaves cells behind in the inset, and a frame that was not
+    narrowed into is clean.** That is the retained-cell rule, now demonstrated with its own control
+    rather than argued from one screenshot.
+    ⚠ The grid is confirmed a third, fourth and fifth time: content width minus columns x 14 is
+    **exactly 40 px in every one of the three** (1720-1680, 1664-1624, 1104-1064) — a 20 px inset
+    each side, cell pitch 14.000. Dividing content width by columns gives 14.33 / 14.34 / 14.53, all
+    different, which is how the original 14.28 error happened.
+
+  ⇒ **One candidate fix survives, and it is unmeasured.** Of the three the screen model says would
+    drop the retained tail, two are unshippable whatever the terminal does:
+    - `ESC[2J` (whole screen) — `host.go:475-479` already records this being tried and rejected:
+      *"whole-screen loses the transcript, this does not."* Shipping it re-opens a defect this project
+      fixed.
+    - a `1049` round trip — `notes/scrollback-audit.md:102` measured Terminal.app keeping only 4 of 30
+      mirrored rows across `1049l`; it discards the very scrollback the mirror exists to build, and
+      `band_control.go:158-161` says production uses DECSET 47 for round trips for exactly that reason.
+    - **`DL` over the scape's own rows** — the only arm with no known cost. It touches the band only,
+      leaves the transcript alone, and has a plausible mechanism: DL reallocates row storage and
+      inserts genuinely new rows rather than erasing cells, and **no column-addressed sequence can
+      name columns 144 and 145 of a 143-column terminal**, so only something that moves row storage
+      could plausibly drop them. **Put this one on the rig.**
+    ⚠ The model cannot answer this: `screen.go`'s `final == 'K'` case 2 carries the retain guard and
+    the `final == 'J'` case has none, so a test written against the model goes GREEN whether or not
+    Terminal.app cooperates — the project's own "tests that cannot fail" shape. And
+    `notes/width-audit.md` item 3 already measured a full-width repaint at the narrow width leaving
+    the tail, which raises the prior that ED fails too.
+    ⚠ Latent, found on the way: `host.go:583` emits `\x1b[0m\x1b[J` on exit and the model's ED branch
+    has no retain guard, so the model's **exit replay may be predicting a width shrink the real
+    terminal does not perform.**
+
+- **His two rulings, 2026-09-07 ~00:10, verbatim:**
+  1. **The thin lines — *"Pixel perfect, no exceptions"***: *"No two-colour cells at all on
+     Terminal.app. Zero hairlines anywhere. Cost: coarser sky gradient, and the disc loses its
+     half-row tips - at your geometry that risks it reading as a rectangle again."* The preview he
+     took: `sky ramp  split rows -> one tone a row · hue rim  half-row -> whole cell · disc edge
+     half-row -> whole rows  <- the disc gets blockier`. He passed over "Sky + rim, keep the disc's
+     outline" (4 of 9 lines go, disc tips survive, 2 lines remain at the rim), "Sky only" (rim and
+     disc untouched), and "Build me a tuner first".
+     ⚠ **He accepted the stated risk: the disc may read as a rectangle again at his geometry.** That
+     is the thing to check before calling it done, and it is his own words that name it.
+  2. **The right edge — *"Yes, in its own window"***: the rig may open **its own** Terminal window,
+     paint a marked full-width frame on the alt screen, narrow it, fire `DL` over the band's rows and
+     read the cells back. *GREEN: a real fix exists, contained to the band. RED: documented and
+     closed, like the 123x55 sliver.*
+
+- ⇒ **The DL probe came back GREEN** (2026-09-07, in a window the script opened and closed;
+  his three windows were never named). Painted 120 wide → narrowed to 74 → DL over rows 10–20 and
+  repaint → widened back to 120 → read the cells back:
+  - **rows 10–20: 74 cells.** The retained tail is GONE.
+  - **control rows 1–4, 8–9, 21–24: 120 cells**, tails intact — the read-back can see tails.
+  - **row 7 (the narrow-repaint arm): 120 cells**, `R07` + 70 `g` + `<` + 45 `G` + `<` — new cells
+    then the old tail, reproducing width-audit item 3 exactly.
+  ⇒ **A fix exists.** Erase cannot reach those cells and a repaint cannot, but replacing the row
+    can: DL allocates a new row at the visible width. Contained to the band's own rows, so the
+    agent's transcript is untouched — the objection that killed `ESC[2J`.
+  ⇒ Also corrected: **width-audit item 4 was WRONG.** The window IS snapped to the cell grid; the
+    "123.6 columns" reading divided the content view by the column count and absorbed the two 20 px
+    insets, the same arithmetic that produced the bogus 14.28 pitch. Measured on five frames now.

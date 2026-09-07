@@ -26,11 +26,29 @@ been measured; session 13 measured height only.
    kept `R0` and the same tail. Widening to 100 showed the tail in columns 75–100.
 3. **A repaint at the narrow width leaves the tail.** Row 7 rewritten at 74 columns
    read back as the new 74 cells followed by the old 46 (`R07ggg…gGGG…G<`).
-4. **The window is not snapped to the cell grid.** His screenshot's content spans
-   123.6 columns: Terminal.app draws the partial 124th column, and that column holds
-   RETAINED cells from the 130-wide layout -- the "last column painted from rows
-   below". The model with the rule on (`TRACE_RETAIN=1`) reproduces exactly those
-   cells at columns 124–130 of the band rows.
+4. ~~**The window is not snapped to the cell grid.**~~ **WRONG, corrected 2026-09-07.**
+   The window IS snapped: Terminal.app holds a fixed **20 px inset on each side** and the
+   text grid is an exact multiple of the 14.000 px cell. Measured on five frames --
+   143x62, 120x30, 116x37, 76x41 -- content width minus columns x 14 is **exactly 40 px
+   in every one**. The 123.6-column reading came from dividing the whole content view by
+   the column count, which absorbs the two insets; it is the same arithmetic that later
+   produced a bogus 14.28 px pitch. What is true, and is the load-bearing half: the inset
+   is DRAWABLE, Terminal.app paints RETAINED cells into it, and those cells sit at columns
+   W+1 and W+2 of a W-column terminal -- outside the grid, so no column-addressed sequence
+   can name them.
+
+5. **DL DROPS THE RETAINED CELLS.** (2026-09-07, `notes/widthprobe` + `drive-dl.sh`, his
+   OK: *"Yes, in its own window"*.) Painted 120 wide, narrowed to 74, then deleted rows
+   10-20 inside a scroll region and repainted them at 74; widened back to 120 and read the
+   cells back.
+   - **Rows 10-20 came back 74 cells long.** The retained tail is gone.
+   - **Control rows 1-4, 8-9, 21-24 came back 120 cells long**, tails intact -- so the
+     read-back can see tails, and the narrow/widen really happened.
+   - **Row 7, the narrow-repaint arm, came back 120**: `R07` + 70 `g` + `<` + 45 `G` + `<`
+     -- the new cells followed by the old tail, reproducing item 3 exactly.
+   So erase cannot reach those cells and a repaint cannot, but **replacing the row can**: DL
+   allocates a genuinely new row at the visible width. It is the one mechanism that works,
+   and it is contained to rows we own.
 
 ## Consequences for the host
 
