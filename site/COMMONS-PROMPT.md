@@ -12,10 +12,10 @@ python3 site/make-gifs.py      # captures and encodes site/anim/*.gif (Chrome, P
 open site/index.html           # look at it first
 ```
 
-The copy lives in `site/template.html`. The five clips are the demo turn in
+The copy lives in `site/template.html`. The clips are the demo turn in
 `site.go` (`demoTurn`, shared with `-wired`) folded through the real reducer, as
 a 256-colour terminal shows it, at 10 frames a second. Edit the template, rerun,
-done. The page is `index.html` plus `anim/*.gif` (about 1.3 MB together).
+done. The page is `index.html` plus `anim/*.gif` (about 5.4 MB together).
 
 ## On Commons
 

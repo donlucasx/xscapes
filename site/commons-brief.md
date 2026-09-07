@@ -4,11 +4,11 @@ You are building the hackathon ENTRY for xscapes, not xscapes itself. Read all o
 
 ## What xscapes is
 
-xscapes is a cozy ASCII thinking screen for terminal AI agents. It is a Go program that runs Claude Code inside a living shoreline in the user's own terminal: the sea rises with the agent's work, the last actions are written in the sand, a companion cat reacts, kittens appear for subagents, the moon carries the context window, and the cat knocks when the agent is done or needs you. It installs with one command from a public repo. It runs in Terminal.app or Ghostty. It cannot run in a browser and must not be rebuilt as a web app.
+xscapes is a cozy ASCII thinking screen for terminal AI agents. It is a Go program that runs ANY terminal agent inside a living landscape in the user's own terminal -- Claude Code through its hooks, anything else through `xscapes inside <cmd>`. The shoreline is the first scape, not the product: the sea rises with the agent's work, the last actions are written in the sand, a companion cat reacts, kittens appear for subagents, the moon carries the context window, and the cat knocks when the agent is done or needs you. It installs with one command from a public repo. It runs in Terminal.app or Ghostty. It cannot run in a browser and must not be rebuilt as a web app.
 
 - Source, public, MIT: https://github.com/donlucasx/xscapes
 - The page, live: https://donlucasx.github.io/xscapes/
-- Demo video: (added when recorded)
+- No demo video. The page's animated clips are the demonstration; they are real renderer output, not mockups.
 
 ## What to build here: one static page, exactly as given
 
@@ -16,7 +16,7 @@ The entry is a single-page static web app. Its entire content is the file `index
 
 - Do not change, reformat, restyle, summarise, translate or add to any of its content, markup or CSS.
 - Do not add a framework, a build step, a router, analytics, your own fonts, a favicon, a footer, or a second page.
-- The five animated clips are referenced by absolute URL at https://donlucasx.github.io/xscapes/anim/ . Leave them as links. Do not download, re-encode or inline them.
+- The animated clips (fifteen of them, ~5.4 MB) are referenced by absolute URL at https://donlucasx.github.io/xscapes/anim/ . Leave them as links. Do not download, re-encode or inline them.
 - The file is self-contained apart from those clips and one Google Fonts stylesheet link. Keep both as they are.
 - Name the app `xscapes`.
 - You are done when the app renders the same as https://donlucasx.github.io/xscapes/ . Do not offer improvements.
