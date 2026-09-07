@@ -67,6 +67,56 @@ and upload (his hands).
 from the other session swept three in (`bff64d1`, since removed). Render previews with headless Chrome
 `--screenshot=` straight into the scratchpad instead.
 
+## Where we left off (2026-09-06, session 19 — his three reports; the MACHINE CRASHED mid-session, recovered 19:00. HEAD `8d84eeb`, pushed, clean, installed)
+
+**Session 19 in one line:** he brought three defects out of long live sessions, all three were measured
+off his screenshots, one ruling SHIPPED (the sun wanes as a crescent), one he PARKED on his own
+terminal test (the thin lines), and the third — the scrollback corruption — was still being worked when
+his Mac rebooted at **18:51:32**.
+
+**Nothing was lost.** The tree was clean and `8d84eeb` was already committed at 18:44, seven minutes
+before the crash; it is now pushed. The session transcript survived intact and everything that lived
+only in it has been written down — his two rulings verbatim, the pre-costed menu he'd return to, the
+line-spacing hypothesis and the two byte-level scrollback measurements, all in `_FEEDBACK.md`
+§Session 19. What the reboot did destroy: `/tmp/apple.bin` (34 MB, 09-05) and eight other traces, and
+two of his six pasted screenshots that were only ever in macOS temp dirs. All the numbers derived from
+them are on disk; the corpus itself is gone.
+
+**SHIPPED (`8d84eeb`, installed):** his ruling ***"Sun wanes as a crescent."*** `shore.go` had
+`lit = 1 - ContextUsed` with the terminator a second disc sliding across at `2*rr*lit`, so a slate mass
+grew on the SUN as context filled and cleared at a compaction — his *"the Sun seems to break sometimes,
+and fix itself"*. Measured in his 134x71 frame at 49%: the lit body ends at x677, the slate ran on to
+x719, **2.6 cells past it**. Now no unlit face is painted by day; at night the moon keeps its shaded
+face (which is what stopped a moon one column into its phase reading as bitten). `SunShadow = "slate"`
+keeps the old look for the study pages. Tests: `sun_crescent_test.go` + the changed `moon_quad_test.go`,
+**both mutation-checked — 9 mutations, 9 RED.**
+
+**PARKED BY HIS RULING — the thin lines.** He answered ***"Leave it, I'll try line spacing first"***:
+ship nothing, **he tests Terminal.app's line spacing and reports back**. The block glyph is ~25.4px in
+a 30px cell so the gap is leading — **Terminal → Settings → Profiles → Text → Font "Change…" → Line
+Spacing** may kill the hairlines at no cost. Not verified; do not drive his terminal. If it fails, the
+three costed alternatives are in `_FEEDBACK.md` — **do not re-derive them.**
+⚠ **The 09-05 "U+2584 is bottom-exact" finding is REFUTED** (ink runs 17 → 29.4 of 30, half a logical
+pixel out). ▄ took the hairline 5px → 1px, not to zero. Corrected in `internal/term/color.go`,
+`CLAUDE.md` and the session 16 block below. `notes/lineprobe` draws a frame at the real geometry so the
+hairline is visible in a browser — a page that paints a split cell as two flat halves cannot show it.
+
+**OPEN, and the next work — the scrollback (c).** It is **not** a strikethrough: the marks sit in their
+own cells and do not cross the letterforms. It is a **cell-level merge** — a dash glyph in the body
+text's own colour (229,229,229) standing in cells the terminal showed as spaces, and past the text's end
+the old content survives (`u63racode` = "ultracode" with "63" over two cells). New from the trace, before
+it was destroyed: **SGR 9 never appears** (84 distinct SGR bodies, no strike) and **the agent emits no
+cell-shifting sequences at all** (no ICH/DCH/IL/DL/ECH in 34 MB). So the merge is **ours or the
+terminal's**, not the agent's. The session died designing the instrument for it, its own words:
+*"whether the bad rows are bad **bytes** or bad **drawing** — so let me make the next occurrence answer
+that by itself."* It was reading `host.go` 560–625 (replay/exit) and 320–360, `Close`/`keepFinalScreen`/
+`replay()`, `event/paths.go` 1–45 and `mirror_test.go` `TestExitReplayCarriesTheTranscript`.
+⚠ **Do not answer this with `XSCAPES_TRACE` alone** — it is opt-in and launch-time only, and the defect
+only shows *after a longer session*, which is exactly why the third occurrence went untraced. The
+proposal on the table is an **always-on mirror journal** written under `event.Home()` (`~/.config/xscapes`,
+NOT `/tmp`, which this reboot proved volatile), recording each mirrored row so one grep answers the fork:
+is the bad row already bad in `h.mirrored` (bad bytes, ours) or not (bad drawing, the terminal)?
+
 ## Where we left off (2026-09-06, session 18 WRAPPED ~03:10, HEAD `e07d82f`, pushed, clean)
 
 **Session 18 in one line:** the submission page went online and was then rewritten three times on his
@@ -109,6 +159,13 @@ the paste kit is on his Desktop at `~/Desktop/xscapes-commons/` (`brief.md`, `in
 URLs, `message.md` = both), regenerated whenever the page is. **Use Default · Quick, not Expert.**
 
 **▶ NEXT**
+0a. **ASK HIM: did lowering Terminal.app's line spacing kill the hairlines?** That is his own open
+   experiment from session 19 and the cheapest possible fix for the thin lines — nothing ships on that
+   report until he answers. If it did not work, he picks one of the three costed options in
+   `_FEEDBACK.md` §Session 19; if it did, the fix is a terminal setting and no code changes.
+0b. **The scrollback (c)** — the only open defect. Build the always-on mirror journal so the next
+   occurrence settles bad-bytes-vs-bad-drawing by itself (design in the session 19 block above).
+   ⚠ `/tmp/apple.bin` is GONE; a fresh trace must live outside `/tmp`.
 0. **HIS LOOK at the live page**, https://donlucasx.github.io/xscapes/ — everything since 19:00 was built
    to his notes without him seeing the result.
 1. **Commons: submit.** Fresh chat in the Space → send `brief.md` with `index.html` attached → publish the
@@ -121,11 +178,13 @@ URLs, `message.md` = both), regenerated whenever the page is. **Use Default · Q
    deadline (my read: none), and which companion to draw properly. Two are already on the page as roadmap.
 4. ⏸ **The DECK (`assets/deck/deck.tpl.html`) and the README still carry the old narrow scope** — the deck
    repeats *"Claude Code runs inside a shoreline"* verbatim. Both need the same rescope, his go-ahead.
-5. The scrollback corruption, **reproduced a third time on 09-05 and still untraced**. He closed that
-   session before any read-back, so the next launch starts cold:
-   `XSCAPES_TRACE=/tmp/apple2.bin xscapes claude` (the `--` separator is only needed when passing the
-   agent flags, e.g. `xscapes claude -- --continue`). Then read the window back BY TTY with his OK
-   (`1049l` discards most mirrored rows, so read BEFORE any restart), and offline
+5. The scrollback corruption — **now item 0b above, and seen a FOURTH time on 09-06.** Still untraced.
+   The old recipe stands as the second-stage tool, but ⚠ **it is not the answer on its own**:
+   `XSCAPES_TRACE` is opt-in and read once at launch, and the defect only appears after a long session,
+   which is precisely why occurrences three and four went untraced. Capture outside `/tmp` now:
+   `XSCAPES_TRACE=~/.config/xscapes/t.bin xscapes claude` (the `--` separator is only needed when
+   passing the agent flags, e.g. `xscapes claude -- --continue`). Then read the window back BY TTY with
+   his OK (`1049l` discards most mirrored rows, so read BEFORE any restart), and offline
    `XSCAPES_TRACE=… KEPT_OUT=/tmp/kept.txt go test ./internal/host -run TestReplayTraceKept -v`:
    interleaved in the model ⇒ the model diverges, clean ⇒ the write side.
 6. Still open from session 16, all needing him: the 6-column patch above the band (a scripted
@@ -170,9 +229,12 @@ Companion's Eyes") — **LOCKED: the eyes stay holes.** Login flip 7 (donlucasx)
 artifacts are read-only here.
 
 **Later the same afternoon (his *"go ahead"* + a saved printf screenshot):** defect (3) is
-FIXED — U+2584 is bottom-exact in Terminal.app, so split cells are drawn as ▄ with the colours
-the other way up there (`term.LowerHalf`, `DetectSplit`, `XSCAPES_SPLIT`); the hairlines on the
-disc and across the sky are gone. Defect (2) is EXPLAINED and documented, not fixable:
+REDUCED — split cells are drawn as ▄ with the colours the other way up on Terminal.app
+(`term.LowerHalf`, `DetectSplit`, `XSCAPES_SPLIT`). ⚠ **This paragraph said "FIXED … the hairlines
+are gone" and that was wrong.** Re-measured 2026-09-06 (session 19): U+2584's ink runs 17 → **29.4**
+of a 30px row, not to 30, so the ▄ swap took the hairline from 5px to **1px and no further**. It is
+still there on every two-colour cell — 5 across his sky, 4 inside the disc. See the session 19
+block at the top of this file. Defect (2) is EXPLAINED and documented, not fixable:
 Terminal.app's alt screen RETAINS rows at their widest on a width change, erase reaches the
 visible width only, and his 123.6-column window drew a partial 124th column of retained cells
 (`notes/width-audit.md`, `notes/widthprobe`, model switch `screen.retainWidth`,

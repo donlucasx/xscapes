@@ -2,6 +2,31 @@
 
 *(Renamed end to end on 2026-09-03: directory, env vars, state path and hook marker. Two names are kept on purpose and are not leftovers -- `internal/envx` still reads `ASCIISCAPES_*` and warns, and `install.go` still RECOGNISES the `# asciiscapes:v1` marker so the hooks it wrote before the rename can be found and removed.)*
 
+> **Session 19 (2026-09-06, ~17:50–18:45), his three reports — the machine CRASHED mid-session; recovered
+> 19:00.** (Not the 09-05 "Session 19" further down; that was a parallel session.) He ran long live
+> sessions and reported: (a) *"the Sun seems to break sometimes, and fix itself"*, (b) unintentional
+> thin lines on 256-colour Terminal.app — *"It should be pixel perfect"*, (c) scrollback text
+> *"corrupted, striked through"*. All three are measured and logged in `_FEEDBACK.md` §Session 19.
+>
+> **His two rulings, verbatim.** The sun: **"Sun wanes as a crescent"** — SHIPPED and installed in
+> `8d84eeb`; no unlit face is painted by day, the moon keeps its shaded face at night, and
+> `SunShadow = "slate"` keeps the old look for the study pages. The thin lines: **"Leave it, I'll try
+> line spacing first"** — *ship nothing here yet*; **he is testing Terminal.app's line-spacing setting
+> and reporting back**. The block glyph is ~25.4px in a 30px cell, so the gap is leading and a terminal
+> setting may fix it for free: **Terminal → Settings → Profiles → Text → Font "Change…" → Line Spacing.**
+> If that fails he picks from a pre-costed menu of three (in `_FEEDBACK.md`); do not re-derive it.
+>
+> ⚠ **The 09-05 "U+2584 is bottom-exact" measurement is REFUTED.** Its ink runs 17 → **29.4** of a 30px
+> row, half a logical pixel short. The last device pixel row falls back to the cell's background, so a
+> 1px rule reads across every two-colour cell — 5 in his sky, 4 inside the disc. ▄ reduces the hairline
+> from 5px to 1px; **it does not remove it**, and within half blocks on Terminal.app it cannot be.
+> `notes/lineprobe` renders a frame at that geometry so it is visible in a browser.
+>
+> **(c) the scrollback is OPEN and is the next work.** It is NOT a strikethrough attribute — the marks
+> sit in their own cells and do not cross the letterforms. It is a cell-level merge. The fork nobody
+> has settled: **bad bytes or bad drawing.** ⚠ `/tmp/apple.bin` and eight other traces were DESTROYED
+> by the 09-06 18:51:32 reboot; capture any new trace outside `/tmp`.
+
 > **Session 18 (2026-09-05 into 09-06), WRAPPED. The submission page is LIVE and is the entry.**
 > https://donlucasx.github.io/xscapes/ — `site/publish.sh` force-pushes `site/index.html` + `anim/*` as an
 > orphan `gh-pages` branch; **rerun it after every page rebuild.**
@@ -58,7 +83,8 @@
 >
 > **Session 16 (2026-09-05), WRAPPED.** Live tests PASSED in both terminals. Shipped + installed:
 > kitten swim-off · the context READOUT from 40% used (his ruling; it had never been in the live
-> scene) · ▄ split cells on Terminal.app (no hairlines) · the disc-tip sky half through the ramp ·
+> scene) · ▄ split cells on Terminal.app (⚠ **re-measured 09-06: the hairline went 5px → 1px, it is
+> NOT gone** — see the session 19 block above) · the disc-tip sky half through the ramp ·
 > **the disc's edge is the HUE RIM** (his pick from "The Moon, Four Ways"; quad edge, shadowless sun,
 > night halo stay as study switches) · the outstanding-todo ring REMOVED (his ruling) · swimmers
 > never share columns. Measured: Terminal.app's alt screen RETAINS rows at their widest on a width

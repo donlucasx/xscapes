@@ -81,11 +81,20 @@ func DetectProfile() Profile {
 // starts 5px below the cell top and stops 13px above the bottom, so every
 // split cell showed a hairline of the LOWER colour above its upper half --
 // "thin lines through the sun", a sloppy moon. U+2584's ink runs from 17px
-// down to the cell's bottom edge exactly, so the same two colours drawn the
-// other way up meet with no hairline at all; the split sits at 57% instead
-// of 50%, which nothing can see. Ghostty draws both blocks pixel-exact, so
+// down to 29.4 of the 30, so the same two colours drawn the other way up
+// leave ONE device pixel instead of five; the split sits at 57% instead of
+// 50%, which nothing can see. Ghostty draws both blocks pixel-exact, so
 // there it is a matter of indifference. Set by DetectSplit from TERM_PROGRAM;
 // XSCAPES_SPLIT=upper|lower overrides.
+//
+// ⚠ Re-measured 2026-09-06 from his 134x71 frame: the 09-05 reading that
+// called U+2584 "bottom-exact" was half a logical pixel out. That last
+// device pixel row falls back to the cell's BACKGROUND (the upper colour)
+// while the row below carries the lower colour by construction, so a 1px
+// rule still reads across a flat band -- 5 in his sky, 4 more inside the
+// disc. ▄ REDUCES the hairline 5px -> 1px; it does not remove it. Within
+// half blocks on Terminal.app it cannot be removed, only not drawn.
+// notes/lineprobe renders a frame at this geometry so it is visible.
 var LowerHalf bool
 
 // DetectSplit picks LowerHalf for the terminal in TERM_PROGRAM.

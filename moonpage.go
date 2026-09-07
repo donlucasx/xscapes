@@ -61,7 +61,7 @@ func moonPage(seed int64) string {
 		`its soft edge rounds to grey fringes and its navy sky has no entry, so the disc went solid and the night went grey. ` +
 		`What the cube can still carry: <b>quad edge</b> samples the disc at four quarters per cell instead of two half-rows, ` +
 		`doubling the horizontal resolution of the edge (exact in Ghostty; in Terminal.app a cell whose two top quarters ` +
-		`differ takes a five-pixel notch). <b>the old slate face</b> is what shipped until 2026-09-06: the moon\u0026rsquo;s ` +
+		`differ takes a five-pixel notch). <b>the old slate face</b> is what shipped until 2026-09-06: the moon's ` +
 		`terminator painted on the sun as well, which is the slate bite he reported. The sun wanes as a crescent now. ` +
 		`<b>night halo</b> lightens the grey sky in a soft ring around the moon, the one ` +
 		`piece of the mockup's softness the grey ramp has steps for. <b>hue rim</b> is the session 15 option: the outer ring ` +

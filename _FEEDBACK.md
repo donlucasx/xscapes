@@ -1430,3 +1430,46 @@ at 22:10 (lgarzoli out of tokens → donlucasx); artifact ownership checked, see
     of its cells). Replaying the one long trace on disk (`/tmp/apple.bin`, 34 MB, 09-05) through the
     model keeps 36 rows with no interleave, so it does not reproduce there. Still needs a traced
     session that shows it: `XSCAPES_TRACE=/tmp/t.bin xscapes claude`.
+
+- **His two rulings on those reports** (2026-09-06 18:40, a two-question menu; recovered from the
+  session transcript after the crash — they had never reached this file):
+
+  **The sun** — *"Sun wanes as a crescent"*, with the preview he saw: `day  lit crescent on the sky,
+  no slate mass · night  unchanged - lit face + earthshine · Context still readable: shape + altitude,
+  same as now.` ⇒ SHIPPED and installed in `8d84eeb`. Of the two he passed over: *"Keep the shadow,
+  warm it"* (unlit face = body hue x 0.6 rather than slate 80,80,96 — the disc stays one shape) and
+  *"No shadow at all, day or night"* (context carried by altitude and the readout alone).
+
+  **The thin lines** — *"Leave it, I'll try line spacing first"*, whose own option text reads: *"Ship
+  nothing here yet. You test the terminal's line-spacing setting and report back; I fix the sun and
+  the scrollback meanwhile."* ⇒ **NOTHING was shipped for the lines, by his ruling.** The prompt that
+  produced it, verbatim: *"the block glyph is ~25.4px tall in a 30px cell, so the gap is leading.
+  **Terminal → Settings → Profiles → Text → Font "Change…" → Line Spacing**, lower it, and look at the
+  sun. If the blocks fill the cell the lines go away at no cost. I haven't verified that, and I won't
+  drive your terminal without your say-so."* **This is the open item: he is testing it and reporting
+  back.** If it fails, he picks from the three costed options he did NOT take — do not re-derive them:
+  - *"Sky + rim, keep the disc's outline"* — sky ramp split rows → one tone a row (loses ~2-3
+    half-steps a frame) · hue rim half-row → whole cell (no lines through the body) · disc edge
+    UNCHANGED (tips survive; 2 lines remain at the rim). Ghostty unaffected either way.
+  - *"Pixel perfect, no exceptions"* — the above plus disc edge half-row → whole rows. Zero hairlines
+    anywhere; **the disc is the thing at risk** — at his geometry it may read as a rectangle again.
+  - *"Sky only"* — sky ramp split rows → one tone a row, rim and disc UNCHANGED. 4 of 9 lines go; the
+    sun still has lines through it.
+
+- **Two byte-level measurements on the scrollback, from the 34 MB trace, recovered from the transcript**
+  (they had never reached this file, and the trace they came from no longer exists):
+  - **SGR 9 (strike-on) appears ZERO times** in the whole trace — 84 distinct SGR bodies, none of them
+    a strike. That kills the strikethrough hypothesis at the byte level, where the paragraph above only
+    argues it from pixels.
+  - **The hosted agent emits NO cell-shifting sequences at all.** CSI finals across 34 MB:
+    `H 39938 · m 2328696 · r 9499 · l 4818 · h 4805 · K 1169 · G 1171 · B 1115 · A 56 · C 54 · D 46 ·
+    S 13 · T 3 · J 1 · n 1 · q 2 · c 2 · u 2` — **no `@` (ICH), `P` (DCH), `L` (IL), `M` (DL) or `X`
+    (ECH)**, and the only erases are `ESC[2K` x1166, `ESC[K` x3, `ESC[J` x1. A cell-level merge therefore
+    cannot come from the agent inserting or deleting cells. **The search space is our own mirror/replay
+    path or Terminal.app itself** — which is the same fork as "bad bytes or bad drawing".
+
+- ⚠ **`/tmp/apple.bin` NO LONGER EXISTS.** His machine rebooted 2026-09-06 18:51:32 and `/private/tmp`
+  was recreated 23 s later; the 34 MB trace of 09-05 and eight other traces died with it. Every result
+  derived from it is recorded above and at `8d84eeb`, so nothing is lost analytically — but **it cannot
+  be replayed again**, and the lines above that read "the one long trace on disk" describe a file that
+  is gone. **Capture any future trace outside `/tmp`.**
