@@ -36,6 +36,47 @@ type frames struct {
 
 	ctxUsed, tod float64
 	start        time.Time
+
+	// nextCompanionCheck paces refreshCompanion; see it for why this is not
+	// read every frame.
+	nextCompanionCheck time.Time
+}
+
+// companionPoll is how often a running scape re-reads the saved companion.
+// Half a second is under the threshold where a switch feels like it did not
+// work, and it is 24x less file reading than doing it every frame.
+const companionPoll = 500 * time.Millisecond
+
+// refreshCompanion swaps the animal when the saved preference changes, so
+// `xscapes companion cat` takes effect in a scape that is already running.
+//
+// It did not, and the CLI and the README both promised it did (2026-09-08, he
+// switched to the cat and the crab stayed on the beach). companionPref() was
+// read exactly once, inside newFrames, which runs at startup; even resize()
+// recomputed the layout from the companion width it already had.
+//
+// The layout is recomputed here exactly as newFrames and resize do it. Today
+// that is a no-op: both animals report the same Size(), because Size() returns
+// the BOX and not the ink, and the cat's ink uses only nine of its twelve
+// columns. It is done anyway because compose() takes the companion's width and
+// places the companion's margin, the litter's room and the moon's column from
+// it -- a companion with a different box would otherwise be drawn into the old
+// one's hole, and nothing in the swap would say so.
+func (f *frames) refreshCompanion(now time.Time) {
+	if now.Before(f.nextCompanionCheck) {
+		return
+	}
+	f.nextCompanionCheck = now.Add(companionPoll)
+	name := companionPref()
+	if name == f.cat.Name() {
+		return
+	}
+	c := companion.New(name)
+	c.FaceLeft(f.mirror)
+	f.cat = c
+	f.ccw, f.chh = c.Size()
+	f.lay = compose(f.c.W, f.ccw, f.mirror)
+	f.sh.MoonX = f.lay.MoonX
 }
 
 func newFrames(w, h int, seed int64, ascii, mirror bool, ctxUsed, tod float64) *frames {
@@ -120,6 +161,7 @@ func (f *frames) state(now time.Time, t float64) reduce.State {
 // demo cycles every state on a timer, and a scape nobody attached to has
 // nothing to announce.
 func (f *frames) frame(now time.Time) string {
+	f.refreshCompanion(now)
 	t := now.Sub(f.start).Seconds()
 	st := f.state(now, t)
 	if f.red != nil {
