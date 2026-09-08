@@ -41,7 +41,7 @@ type frames struct {
 func newFrames(w, h int, seed int64, ascii, mirror bool, ctxUsed, tod float64) *frames {
 	c := canvas.New(w, h, canvas.AlphaFar, canvas.AlphaMid, canvas.AlphaNear)
 	sh := scape.NewShore(seed, ascii)
-	cat := companion.NewCat()
+	cat := companion.New(companionPref())
 	cat.FaceLeft(mirror)
 	ccw, chh := cat.Size()
 	lay := compose(w, ccw, mirror)
