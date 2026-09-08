@@ -275,10 +275,15 @@ type Rules struct {
 	// ShrinkKeepsCursor: a shrink pulls the content up but leaves the cursor
 	// on its absolute row, so the host has to move the cursor itself.
 	ShrinkKeepsCursor bool
+	// RetainsWidth: a row keeps every cell it has ever had, at the widest the
+	// window has been, and erase reaches the visible width only -- so after a
+	// width change the old cells show through in the terminal's own side inset.
+	// Measured on Terminal.app in notes/width-audit.md; see reallocBand.
+	RetainsWidth bool
 }
 
 var (
-	AppleTerminalRules = Rules{GrowPushesDown: true, ShrinkKeepsCursor: true}
+	AppleTerminalRules = Rules{GrowPushesDown: true, ShrinkKeepsCursor: true, RetainsWidth: true}
 	XTermRules         = Rules{}
 )
 
@@ -312,5 +317,41 @@ func RebindShrinkAltFollow(shrink, bandShrink, agentRows int) string {
 	b.WriteString(saveCursor)
 	b.WriteString(EnterBand(agentRows))
 	b.WriteString(restoreCursor)
+	return b.String()
+}
+
+// reallocBand drops the cells Terminal.app retains past the visible width.
+//
+// Measured in notes/width-audit.md: a row keeps every cell it has ever had, at
+// the widest the window has been, and ERASE REACHES THE VISIBLE WIDTH ONLY. At
+// 74 columns an ESC[2K on a 120-cell row left cells 75-120 in place; widening
+// again showed them. A repaint at the narrow width leaves the tail too. Those
+// cells sit at columns W+1 and W+2 of a W-column terminal -- inside Terminal's
+// own 20px inset, which it does paint -- so no column-addressed sequence can
+// even name them, and the strip he has photographed at the frame's right edge
+// is that tail showing through.
+//
+// DL is the one mechanism that reaches them (item 5 of the audit, his OK "Yes,
+// in its own window"): deleting a line inside a scroll region allocates a
+// genuinely NEW row at the visible width. Delete the whole band and the tails
+// go with it; the scape repaints the blanks on its next frame, which is twelve
+// times a second.
+//
+// Only worth doing when the WIDTH changed. A height-only resize leaves every
+// row's tail exactly as it was, so this would be a band-wide flicker for
+// nothing.
+func reallocBand(first, last int) string {
+	n := last - first + 1
+	if n <= 0 {
+		return ""
+	}
+	var b strings.Builder
+	// Origin mode off first: the region is about to move and DECSTBM homes the
+	// cursor, so every position below is absolute.
+	b.WriteString(originOff + "\x1b[0m")
+	fmt.Fprintf(&b, "\x1b[%d;%dr", first, last) // scroll region over the band
+	fmt.Fprintf(&b, "\x1b[%d;1H", first)        // its top row
+	fmt.Fprintf(&b, "\x1b[%dM", n)              // delete them all; blanks shift in
+	b.WriteString(regionReset)
 	return b.String()
 }
