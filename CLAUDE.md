@@ -19,8 +19,38 @@
 > cells against the cat's 60 — same weight, arranged sideways. **The three extra columns were always
 > free**: `cat.Size()` returns the BOX, not the ink, and the cat has never used its last three.
 >
+> **Session 24 (2026-09-08, early hours). ⭐ THE ENTRY IS ON THE CRAB AND IT IS LIVE.**
+> https://donlucasx.github.io/xscapes/ rebuilt and republished, verified with real fetches: the page,
+> **all fifteen clips**, the deck (HTML + PDF) and the README. HEAD `7f68db6`, pushed, tree clean, green.
+> ⇒ The clips render **`companion.New(companion.DefaultName)`**, not `NewCat()` and not
+> `companionPref()` — the SHIPPED default, so the page renders the same on any checkout and shows what
+> a fresh install gets. Confirmed in pixels, not assumed: **(253,134,134) at 3954 px** in `g-worried`
+> (cube 210, two counts off from the GIF quantiser) and **one contiguous salmon run twelve cells wide**,
+> the crab's ink exactly. `g-sea`, `g-sand`, `g-stars` are byte-identical, which is what proves the
+> change is only the companion.
+> ⇒ **The copy describes the animal on screen.** A crab has no ears and no tail: "ears back, tail flat"
+> is now "claws down, stalks short", and the worried pose reads *the widest thing on the beach becomes
+> the smallest*. Kittens are **crablets**, and they do not swim off — a crab walks in and the eyestalks
+> carry on above the surface. "Choose your xscape" now says the companion IS a choice today, with the
+> command, instead of promising one.
+> ⚠ **Three stale facts a reader could have caught first**: the README said the readout "stays quiet
+> until 65%" when `ReadoutFrom` has been **0.40** since 09-05 · `xscapes companion` was undocumented ·
+> the deck's title slide still said "Claude Code runs inside a shoreline" (part of 0B, fixed because
+> the cat was in the same sentence). Also 12 declared clip sizes were wrong BEFORE tonight (the four
+> state clips are 675 px and were declared 672).
+> ⇒ **`go test` no longer writes into his real `~/.config`.** Run from inside a traced session, every
+> test that built a Host inherited `XSCAPES_TRACE=1` and opened a REAL trace — sixteen files in one
+> run — while three replay tests failed on `open 1`. `TestMain` clears it for the package. Same trap as
+> `term.NoSplitCells`, different variable.
+> ⏳ **A trace is RUNNING** (`~/.config/xscapes/traces/20260908-005450.bin`, scape up 00:54:50, window
+> 119x51). ~6.6 MB/min. **When the strikethrough appears: STOP** — no scroll, no resize, no exit.
+> ⏸ **HIS, open:** test **Andale Mono** in Terminal (its block glyph fills **100.0%** of the line box
+> against Menlo's **87.6%**, read from the font files) — if it holds live it kills every remaining
+> hairline AND gives back the split-cell gradient, better than the trade he took · Commons publish +
+> submit, **closes 09-17**.
+
 > **Session 23 (2026-09-07 night), WRAPPED. SESSIONS 22 AND 23 ARE LANDED — eight commits, HEAD
-> `62f2664`, tree clean, all green, installed.** ⚠ **UNPUSHED**; needs his go-ahead.
+> `62f2664`, tree clean, all green, installed.** ~~UNPUSHED~~ **PUSHED 2026-09-08 with his go-ahead.**
 > ⚠ **ONE QUESTION IS OPEN AND IT IS HIS**: the scrollback repro, or rebuilding the entry around the
 > crab? **Ten days to Commons and the live page, its five clips and the deck all still show the CAT.**
 > The corruption damages the agent's SCROLLBACK, not the scape — a judge never sees it. Recommendation

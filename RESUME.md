@@ -246,11 +246,16 @@ the paste kit is on his Desktop at `~/Desktop/xscapes-commons/` (`brief.md`, `in
 URLs, `message.md` = both), regenerated whenever the page is. **Use Default · Quick, not Expert.**
 
 **▶ NEXT**
-0. ⚠ **HIS CALL, ASKED AND UNANSWERED at the end of session 23**: the scrollback repro, or
-   rebuilding the entry around the crab? Ten days to Commons, the live page + five clips + deck all
-   still show the CAT, and the corruption damages the agent's SCROLLBACK, not the scape — a judge
-   never sees it. My recommendation on the table: **the entry first**, with the trace running in the
-   background because it costs him nothing while he works.
+0. ~~HIS CALL: the scrollback repro or the entry?~~ **ANSWERED 2026-09-08: the entry first, trace in
+   the background. DONE — the entry is on the crab and LIVE**, page + 15 clips + deck + README,
+   verified with real fetches. `7f68db6`.
+0-now. ⏸ **HIS, two things, both cheap:**
+   (a) **Test Andale Mono** in Terminal &rarr; Settings &rarr; Profiles &rarr; Text &rarr; Font. Its
+   block glyph fills **100.0%** of the line box against Menlo's **87.6%** (read from the font files,
+   2026-09-08). If Terminal.app adds no leading of its own, that removes EVERY remaining hairline at
+   zero code cost and lets `NoSplitCells` go off, giving back the split-cell gradient he traded away.
+   It also decides whether the "collapse every edge cell" option is needed at all.
+   (b) **Commons publish + submit** — see 0A. **Closes 09-17.**
 0-crab. ~~WAIT ON THE CRAB~~ **DONE.** Hero shipped, is the DEFAULT, and `internal/companion` is ours.
 0A. **HIS: publish + submit the Commons entry.** Everything is staged: `~/Desktop/xscapes-commons/`
    (brief.md · index.html with 16 absolute clip URLs · message.md), regenerated 09-07 14:02 from the
@@ -258,8 +263,9 @@ URLs, `message.md` = both), regenerated whenever the page is. **Use Default · Q
    app public from its manage page → hackathons → Open hackathon → Your entry → Submit → screenshot.
    ⚠ **The publish step is the blocker, not the submit click** — the entry picker only accepts a
    PUBLISHED Commons build. **Closes 2026-09-17.**
-0B. **His three picks for me.** ~~the right-edge DL fix~~ **SHIPPED `65e242e`** (`reallocBand` on a
-   WIDTH change only). Still unstarted: the **records + dead code + lying
+0B. **His three picks for me.** ~~the right-edge DL fix~~ **SHIPPED `65e242e`** · ~~README + deck
+   rescope~~ **DONE `7f68db6`** (the deck's title slide and the README; both said "Claude Code runs
+   inside a shoreline"). Still unstarted: the **records + dead code + lying
    instrument** sweep (`tune`'s WORRY EPISODES block is hard-coded to the old rule and prints
    identical output under any change; `test_fail`/`test_pass` have no producer; `-ascii` ships
    Unicode) · the **README + deck rescope** (both still say "Claude Code runs inside a shoreline").
