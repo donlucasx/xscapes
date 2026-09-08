@@ -250,11 +250,18 @@ URLs, `message.md` = both), regenerated whenever the page is. **Use Default · Q
    the background. DONE — the entry is on the crab and LIVE**, page + 15 clips + deck + README,
    verified with real fetches. `7f68db6`.
 0-now. ⏸ **HIS, in this order:**
-   (0) **Close the two orphan windows** (ttys002 07:16, ttys005 07:21 — empty sessions), then restart
-   THIS one by ID, not `--continue`:
+   (0) ⚠⚠ **DO NOT CLOSE HIS OTHER WINDOWS. An earlier version of this line said to, and it was
+   WRONG and would have killed live work.** Checked by cwd 2026-09-08: ttys002 (pid 49460) is
+   `~/Documents/claude/tyastie`, mid-run with a four-agent audit; ttys005 (pid 56290) is
+   `~/Documents/claude/Validators`. They are `xscapes claude` because he runs the scape everywhere —
+   that is the product working, not orphans. **Check `lsof -a -d cwd -p <pid>` before calling any
+   process stale.**
+   Restart only the xscapes window, by ID:
    `XSCAPES_TRACE=1 xscapes claude -- --resume 2c247007-955d-479f-9266-7d5d4f8d6db1`
-   ⚠ `--continue` resumes the most recent session in this directory, which is one of the empty ones.
-   That restart is what finally delivers the companion live-refresh build.
+   By ID rather than `--continue` as cheap insurance, not because a trap was proven: the other
+   `.jsonl` files in this project's dir are a slash-command session and a security-review
+   sub-session, and the live one is the most recently written, so `--continue` would very likely
+   land right. That restart is what delivers the companion live-refresh build.
    (1) **Regenerate the Commons paste kit FIRST** — all three files at `~/Desktop/xscapes-commons/`
    were built 09-07 from the CAT page. Then publish + submit. **9 days.**
    (2) The two cheap things below.

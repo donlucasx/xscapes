@@ -45,9 +45,14 @@
 > ⇒ **`xscapes companion <name>` now reaches a RUNNING scape** (`957f9f0`): `companionPref()` was read
 > once in `newFrames`; `frame()` re-reads every 500 ms. ⚠ My first test asserted ccw/MoonX would move
 > on a swap and **failed on the truth** — `Size()` returns the BOX and both animals are 12x7.
-> ⚠ **THREE RESTARTS FAILED AND THE INSTRUCTION WAS THE BUG.** This conversation is PID 10648
-> (ttys001, 00:54:50); his restarts made NEW EMPTY sessions because the command was bare `xscapes
-> claude`. **`--continue` is a TRAP here** (three sessions in this dir): resume by id —
+> ⚠⚠ **RETRACTED THE SAME MORNING, AND IT NEARLY COST HIM LIVE WORK.** This banner said "three
+> restarts failed, his restarts made new empty sessions" and told him to close two windows. **Checked
+> by cwd: ttys002 is `~/Documents/claude/tyastie` (mid-run, four-agent audit) and ttys005 is
+> `~/Documents/claude/Validators`.** They are `xscapes claude` because he runs the scape in every
+> project — the product working, not orphans. I saw two processes with the right name and never ran
+> `lsof -a -d cwd`. **Nothing here supports a failed-restart story: PID 10648 has run unbroken since
+> 00:54:50, so this window was never restarted at all.** The real defect was the one that got fixed:
+> the old binary reads the companion once at startup. Still resume by ID as cheap insurance —
 > `XSCAPES_TRACE=1 xscapes claude -- --resume 2c247007-955d-479f-9266-7d5d4f8d6db1`.
 > ⚠ Twice I said "restart" and then installed a new binary minutes later. **Install FIRST, then ask.**
 > ⏰ **9 days. The Commons paste kit at `~/Desktop/xscapes-commons/` is STALE — all three files still
