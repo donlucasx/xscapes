@@ -1,0 +1,412 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>xscapes</title>
+<meta name="description" content="Cozy ASCII scenes that react to your agent while it works. The tide rises as it gets busy, crablets walk into the water when subagents report back, and the moon thins as the context fills.">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Geist+Mono:wght@400;700&family=Geist:wght@400;500;600&display=swap">
+<style>
+:root{--g:#121212;--s:#1c1c1c;--ln:#303030;--d:#8a8a8a;--i:#eeeeee;--acc:#87afff;
+--mono:"Geist Mono",ui-monospace,"SF Mono",Menlo,monospace;--sans:"Geist",-apple-system,BlinkMacSystemFont,"Segoe UI",Helvetica,Arial,sans-serif}
+*{box-sizing:border-box}
+html,body{margin:0;padding:0;background:var(--g);color:var(--i)}
+body{font-family:var(--sans);font-size:16px;line-height:1.55}
+a{color:var(--acc);text-decoration:none;border-bottom:1px solid rgba(135,175,255,.35)}
+a:hover{border-bottom-color:var(--acc)}
+.lockup{font:700 1em/1.2 var(--mono);letter-spacing:0;white-space:nowrap}
+.blk{display:inline-block;width:1ch;line-height:1.2em;text-align:center;vertical-align:top;background:var(--i);color:var(--g)}
+
+/* the cover: the mark over the shore's own glyphs, six frames of the real sea stepping */
+.cover{position:relative;min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;overflow:hidden;border-bottom:1px solid var(--ln)}
+.cover .sea{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;pointer-events:none}
+.cover .sea pre{position:absolute;margin:0;font:700 14px/1 var(--mono);color:#3a3a3a;letter-spacing:0;white-space:pre;opacity:0;animation:step 4.2s steps(1) infinite}
+@keyframes step{0%{opacity:1}16.66%{opacity:0}100%{opacity:0}}
+.cover .lockup{position:relative;font-size:clamp(72px,14vw,168px);text-shadow:0 0 40px #121212,0 0 12px #121212}
+.cover .blk,.blk{text-shadow:none}
+.cover .line{position:relative;margin:18px 0 0;color:var(--d);font-size:clamp(15px,1.6vw,20px);text-shadow:0 0 12px #121212,0 0 24px #121212}
+@media (prefers-reduced-motion:reduce){.cover .sea pre{animation:none}.cover .sea pre:first-child{opacity:1}}
+
+main{max-width:1080px;margin:0 auto;padding:56px 24px 80px}
+.hero{display:grid;grid-template-columns:1fr;gap:26px;margin-bottom:64px}
+.hero .lockup{font-size:56px;margin:0 0 6px}
+.syn{font-size:clamp(24px,3vw,34px);font-weight:600;line-height:1.25;letter-spacing:-.01em;margin:0;max-width:22em;text-wrap:balance}
+.why{color:var(--d);font-size:18px;max-width:40em;margin:0}
+.feats{list-style:none;padding:0;margin:0;display:grid;grid-template-columns:repeat(2,1fr);gap:14px 28px;max-width:60em}
+.feats li{padding-left:18px;position:relative;font-size:16px;line-height:1.5}
+.feats li::before{content:"";position:absolute;left:0;top:.55em;width:8px;height:8px;background:var(--i)}
+.feats b{color:var(--i)}
+.clip{background:#000;border:1px solid var(--ln);border-radius:6px;padding:8px;display:inline-block;max-width:100%}
+.clip img{display:block;width:100%;max-width:1344px;height:auto;image-rendering:pixelated}
+.clip.big{width:100%}
+.cap{color:var(--d);font-size:14px;margin:8px 0 0;max-width:70ch}
+.cmd{background:var(--s);border:1px solid var(--ln);border-radius:6px;padding:14px 16px;margin:0;font-family:var(--mono);font-size:14px;color:var(--i);overflow-x:auto;white-space:nowrap;line-height:1.7}
+.cmd .c{color:var(--d)}
+
+h2{font-size:26px;font-weight:600;margin:0;letter-spacing:-.01em;white-space:nowrap}
+.sec{display:flex;align-items:baseline;gap:18px;margin:78px 0 16px}
+.sec .gl{flex:1;min-width:0;overflow:hidden;white-space:nowrap;font:400 13px/1 var(--mono);color:#333;letter-spacing:3px;user-select:none}
+.win{background:#000;border:1px solid var(--ln);border-radius:8px;padding:10px;overflow:hidden}
+.win img{display:block;width:100%;height:auto;image-rendering:pixelated;border-radius:2px}
+.bar{display:flex;align-items:center;gap:7px;padding:0 2px 10px}
+.bar i{width:11px;height:11px;border-radius:50%;background:#3a3a3a;display:block}
+.bar span{margin-left:8px;font:400 12px/1 var(--mono);color:#5f5f5f;overflow:hidden;white-space:nowrap;text-overflow:ellipsis}
+.pick{display:grid;grid-template-columns:1fr;gap:34px;margin-top:20px}
+.pick .clip{width:100%;max-width:1008px}
+.pick .cap{max-width:80ch}
+p{margin:0 0 12px;max-width:66ch}
+.legend{margin:22px 0 16px}
+.lg{display:grid;grid-template-columns:303px 1fr;gap:30px;align-items:center;padding:22px 0;border-top:1px solid var(--ln)}
+.lg h3{margin:0 0 6px;font-size:18px;font-weight:600;letter-spacing:-.01em}
+.lg p{margin:0;color:var(--d);max-width:58ch}
+.lg p b{color:var(--i);font-weight:600}
+.lg .clip{padding:5px;border-radius:4px;line-height:0}
+.lg .clip img{width:303px;height:154px}
+@media (max-width:820px){.lg{grid-template-columns:1fr;gap:14px}.lg .clip img{width:100%;height:auto}}
+table{border-collapse:collapse;width:100%;margin:20px 0 14px;font-size:15px}
+td{padding:15px 12px 15px 0;border-top:1px solid var(--ln);vertical-align:top;line-height:1.5}
+td:first-child{color:var(--i);font-weight:600;font-size:18px;letter-spacing:-.01em;width:30%;padding-right:28px}
+td:last-child{color:var(--d)}
+td:last-child b{color:var(--i);font-weight:600}
+@media (max-width:820px){td{display:block;border-top:none;padding:0}td:first-child{border-top:1px solid var(--ln);padding-top:16px;width:auto}td:last-child{padding:4px 0 16px}}
+.states{display:grid;grid-template-columns:repeat(2,1fr);gap:26px 28px;margin-top:18px}
+.states .clip{width:100%}
+@media (max-width:820px){.states{grid-template-columns:1fr}.feats{grid-template-columns:1fr}.hero .lockup{font-size:44px}}
+.events{font-family:var(--mono);font-size:13px;color:var(--d);background:var(--s);border:1px solid var(--ln);border-radius:6px;padding:12px 14px;line-height:1.7;overflow-x:auto;white-space:nowrap}
+ul{padding-left:20px;max-width:66ch}
+li{margin-bottom:6px}
+.foot{margin-top:64px;color:var(--d);font-size:14px;border-top:1px solid var(--ln);padding-top:18px}
+</style>
+</head>
+<body>
+
+<section class="cover">
+<div class="sea"><pre style="animation-delay:-0.0s">                                      ·                                  +           .                        +                         ·                               
+                    ·                .  .                              .                                                                 .                           +  
+                                                      .           .                                                                          +       +   · +            
+             +                 ·     .                         ..                    .                                    +   ·   +                                  .  
+           ..                           ·                           +              .    .     .                  .                                                      
+                                                                                       .             ..                                                                 
+                                           ·                                 ·                                        .                       +                         
+                                                                                +    .                .      +                                          .  .            
+         ·                            +           .        .           .             +                                                                  ·               
+                  .                  .                  ·                                                       ·     ..    .                                           
+                                                                              ·     +                                .            .         .                           
+                                            ·    .                                                       .                                                              
+                     ·   ·               ·                ·                   ·                                                                                     . + 
+               .     .                                                                                                              +    .               .      .       
+                             ·                                       .            .                                                         ·          .          ·     
+                                                                                                                                             .         .     ·          
+                                                                                                                                                                        
+      ·                                                                                                                                                                .
+                                                                                                                                                                        
+                       ·~≋≋≋≋≋~·             •  ••               ·-~≋≋≋≋-·              ··                  ·~≋≋≋~-·             ····                 ·-~~~-·           
+               --------------------           • ••            -----------------     ···                 ·-~------            ··-··        -------------------         ·-
+---------------·~≋≋≋≋≋~-           ---------•-•-•--------------≋~-·            -----------------------------·    -------------------------    ·-~~~~-·       -----------
+           ·-≋≋≋≋≋~-                        •  ••     ·-≋≋≋≋≋~·             ···                 ·-~≋≋≋~-·             ·--·                ·-~~~~-·             ·-~~-·   
+        -~≋≋≋≋≋-·                            ••••  -~≋≋≋≋~-·             ···                ·-~≋≋≋≋~·             ·---·               ·-~~~~-·             ·-~~--·      
+    ·~≋≋≋≋≋~-   ~~~~~~~~~~~~~~~~~~~~~~     • ••·•≋≋•≋≋~·            ~~~~~~~~~~~~~~~~~~~~·-~≋≋≋≋~-             ··--·  ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~·          
+~~~~~~~~~~~~~~~~        ··            ~~~~~~••≋•≋•~-•         ~~~~~~·               ·-~≋~~~~~~~~~~    ~~~~~~~~~~~~~~~          ·~~≋~~·            ·--~~~-·   ~~~~~~~~~  
+≋≋≋≋~-              ··                 ·~≋≋≋••~•~~•~•~~~~~~~~~···               ·-~≋≋≋≋~-·        ~~~~ ·---·               ·-~≋≋~-·     ~~~~~~~-~~~~-·                ~~
+≋-·         ~~~~~~~~~~~~~~         -~≋≋≋≋≋••••  •  ••     ····               -~≋≋≋≋~-·             ·---··               ·~~≋~~·    ~~~~~  ·-~~~~~~~~               ·--~-
+        ~~~~···           ~~~~~-~≋≋≋≋≋≋~· • • •  • •   ····              ·~≋≋≋≋~~~~~~~~~~~~~~~~~~~~-·                -~≋≋~-·   ~~~~   ·-~~~~-·      ~~~~       ·--~~-·  
+    ~~~~ ··               ·~≋≋≋~~~~~·    •• •  • •••···   ~~~~~~~~~~~~~~~~~~~~~~          ·-----·  ~~~~~~~       ·~~≋≋~-· ~~~~~   ·-~~≋~-·              ~~~·-~~~--·     
+~~~~ ···              ·~≋≋≋≋≋≋~-·   ~~~~~~~~~~~~~~~~~~~~~~        ·-≋≋≋≋~-·    ≋≋≋≋≋≋≋≋--~--·             ~~~~~~~~~~~~~~~~     ≋≋≋≋≋≋≋≋≋               ·-~~~~~~         
+  ···             ·~≋≋≋≋≋≋~-·           •• ··-··•• •  •        ·~≋≋≋≋~-    ≋≋≋≋   ·-~~-≋≋≋≋               -~≋≋≋~-·         ≋≋≋≋≋~-·     ≋≋≋≋≋≋    ·-~~~~--·    ~~~~~~~~~
+··     ≋≋≋≋≋≋≋≋≋≋≋≋≋≋≋≋≋≋≋≋≋≋≋≋≋≋≋≋≋≋≋≋·---·•  •••  •  •    -~≋≋≋≋~·    ≋≋≋   ·-~~--·      ≋≋≋        -~≋≋≋≋~-          ≋≋≋≋≋~-       °°    ··≋≋≋≋~~-·             ·-~≋≋
+≋≋≋≋≋≋≋     -≋≋≋≋≋≋-· ·      ∘    ·----≋≋≋≋≋ • •• •  • •·~≋≋≋≋≋-·    ≋≋≋  ·-~~~··      ∘      ≋≋ ·-~≋≋≋≋~-·          ≋≋≋≋≋~·   ·   ··°°∘ ··  · ~-·∘≋≋≋≋≋       ·-~≋≋≋≋~-
+        ·~≋≋≋≋ °° · ∘∘ ∘  ∘·∘·°·--·· •• •  •≋≋≋≋•  • -~≋≋≋≋~-     ≋≋≋  ·-~~-∘∘° ·°∘°°···   ° ·-~≋≋≋≋~-·           ≋≋≋≋~-·       °·∘   °°∘  · ° ·   °··  ≋≋≋≋≋≋≋≋≋≋≋≋≋≋≋≋
+     ·°≋°≋·°·° °∘    ·  ∘ · °°  °°°° •°  •  ••• ≋≋≋≋≋≋≋≋~-     ≋≋≋  ·∘~·°°°∘   ∘ °     °   °·≋≋·~-·≋≋≋≋≋     ≋≋≋≋≋≋~-·   ·  · ∘ ·                   ∘∘°°≋≋≋≋≋≋~-·       
+ ·-≋≋∘   · ·°·          ·  ·     ° °°  •  • •-~≋≋≋≋≋≋≋≋≋≋≋≋≋≋≋≋ ·--°∘°· ∘·             ·    ·°·°∘° ·    ≋≋≋≋≋≋≋≋~-     ∘ °··∘                        · · ··- ∘∘         
+   · ·∘                          ·   ∘ ·∘·~≋≋≋≋≋≋~·•••  •    ∘- ∘ ∘ · ·            ·           ∘  ° ∘°°∘∘·≋≋~-°  ·∘ ∘·°  ·°                             · ∘°···         
+  ·             ·      ·                    °°·° •°•· •  ∘· ·∘∘  ·                          ·       ·  °° °·∘  ·   ∘ °°  ·                              ·   ··· ∘∘°∘°·°-
+                                           ·∘  ···°·°· ··°∘  ·                          ·   ·           °°  °°° ·       ·          ·                              ∘  ∘°·
+                                                                                                                                                                        
+                                                                                                                                                                        
+                                                                                                                                                                        
+                                                                                                                                                                        </pre><pre style="animation-delay:-0.7s">                                      ·                                  +           .                        +                         ·                               
+                    ·                .  .                              .                                                                 .                           +  
+                                                      .           .                                                                          +       +   · +            
+             +                 ·     .                         ..                    .                                    +   ·   +                                  .  
+           ..                           ·                           +              .    .     .                  .                                                      
+                                                                                       .             ..                                                                 
+                                           ·                                 ·                                        .                       +                         
+                                                                                +    .                .      +                                          .  .            
+         ·                            +           .        .           .             +                                                                  ·               
+                  .                  .                  ·                                                       ·     ..    .                                           
+                                                                              ·     +                                .            .         .                           
+                                            ·    .                                                       .                                                              
+                     ·   ·               ·                ·                   ·                                                                                     . + 
+               .     .                                                                                                              +    .               .      .       
+                             ·                                       .            .                                                         ·          .          ·     
+                                                                                                                                             .         .     ·          
+                                                                                                                                                                        
+      ·                                                                                                                                                                .
+                                                                                                                                                                        
+                     -~≋≋≋≋≋-·                • ••             ·~≋≋≋≋≋-·                                 ·-~≋≋≋≋~·               ·                  -~≋≋≋~-·            
+                ·-≋≋≋≋≋~-·                    • •          ·~≋≋≋≋≋~·                                  -~≋≋≋≋~·               ·                  -~≋≋≋~-·             ···
+            ·~≋≋≋≋≋~-                        • ••      ·~≋≋≋≋≋~·                                  -~≋≋≋≋~-              ··                 ·-~≋≋≋~-·             ·····  
+        ·~-----------------------            ••••  ·-≋≋≋≋≋~- -------------------             ·-~≋≋≋≋~-·      ---------------------------------------------   ·····      
+----------≋~·                    --------    ••·-•≋≋---------                   -----------------------------   ···               ·-~≋≋≋≋~-              ·--------------
+·-≋≋≋≋≋~-                                ---••-•-•--•                                ·~≋≋≋≋≋≋-·              ··               ·-≋≋≋≋≋-·              ··--·              
+≋≋≋≋-                                  ·-≋≋≋••≋•· • •                ~~~~~~~~~~ ·-≋≋≋≋≋≋~-·              ···             ~~~~~≋≋≋-·             ··--··                ·-
+~·      ~~~~~~~~~~~~~~~~~~~~~~~~~~~·~≋≋≋≋≋≋•••  •  ••       ·   ~~~~~       ·~≋~~~~~~-               ···        ~~~~~~~~~≋≋≋≋-~~~~~~~~~~~~~~·---··                 -~≋≋~
+~~~~~~~~    ··                ·-~≋≋~~~~~- • • •  • •    ·  ~~~~~        -~≋≋≋≋≋≋-·  ~~~~~        ···       ~~~~~   ·~≋≋≋≋~-            ·----·~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        ··≈≈≈≈≈≈≈≈≈≈≈≈   ·-~≋≋≋≋≋≋≋~·   ~••~•~~• •••·~~~~~~         ·~≋≋≋≋≋~-            ~~~~~~~~~~~~~~~~~~     -≋≋≋≋≋-·          ·-≈≈≈≈≈≈≈≈              ·-~≋≋≋~-·     
+    ·· ≈≈≈          ·-≈≈≈≋≋≋≋≋~-         ••  • ~••~•~           ·~≋≋≋≋≋~-               ····                ·~≋≋≋≋~-          ·≈≈≈≈≈        ≈≈≈≈≈     ·-~≋≋≋~-·         
+ ·· ≈≈≈         ·~≋≋≋≋≋≋≋≈≈≈            •• •··· •• •  •    ≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈        ·····                ·-≋≋≋≋≋~·         ≈≈≈≈≈·                 ≈≈≈≋≋≋≋~-·           ·-
+≈≈≈≈        -~≋≋≋≋≋≋~-·     ≈≈≈        •··· •  •••  •≈≈≈≈≈≈≋≋≋≋≋~·         ≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈  -~≋≋≋≋~-       ≈≈≈≈≈≈--≋≋≋≋≋≋≋≋≋       ·~~≋≋≋≋≋≈≈≈≈           --~~~
+        ·~≋°∘≋≋≋~∘° °          ≈≈≈≈····•  •  • ••≈≈≈≈•-~≋≋≋≋≋-           ··--··                 ·-~≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈·---·≋≋≋    ∘∘   ≋°°≋≋≋≋≋≋≋~-·      ≈≈≈    ·-~~~-·  
+ ≋≋≋≋≋≋≋≋∘≋·∘° ∘ °∘°  ·      ····· ≈≈≈≈≈≈≈≈≈≈≈≈≈≈ ·~≋≋≋≋≋≋-           ·-≋∘≋≋≋≋≋≋≋≋≋≋≋≋      ·~≋≋≋≋≋≋~·           ----·≋≋≋∘· ∘∘°·· ···°°∘ ≋·-·             ·≈≈≈≈≈≈≈≈≈≈≈≈≈
+≋ -≋≋···∘∘     °  · ∘∘ ∘  ····       ••  •  •••-≋≋≋≋≋≋~·          ∘·-·  ∘ °∘∘∘  ·°    ≋≋≋≋≋≋≋≋≋≋~-           ·----· ≋≋  ·° °          °°∘∘···°       ·--~~~~-·          
+≋≋∘   ° °·· ··       ·  ∘ · °°≋≋≋≋≋≋≋≋ •  •-≋≋≋≋≋≋≋-••      ∘ ∘·° ∘  ∘        °∘°°  ≋≋≋°≋≋≋~-·            ·-~--   ≋≋ °∘°∘· ·                      ~~≋≋~~-·           ≋≋≋
+∘·                      ·  ·  ∘ ·° ° •≋≋≋≋≋≋≋≋≋~·  •••  ·· ·  ·°·  ° °   ·    ∘∘ ·  · ··   ≋·≋        ·--~-· ∘ ∘·   °                         °  ∘·°··          ≋≋≋≋≋·-°
+                                 °·° ∘≋·∘≋≋~· ≋≋≋≋≋≋≋°≋  ·°  ∘        ·            ·  ∘   · ° ≋∘≋ ·--~°∘∘·   ·°° ·∘ ∘                                  °· ∘≋≋≋·≋  -~≋≋~°
+                ·      ·             ∘∘     • ·° •° · ∘· ∘ ·     ·                              ··  ·∘ °° °·∘            ·                              ·   ··· ∘∘°∘° ° 
+                                           ·∘ ∘···°                                     ·   · ∘         °°  ° ·         ·          ·                        ∘     ∘   ° 
+                                                                                                                                                                        
+                                                                                                                                                                        
+                                                                                                                                                                        
+                                                                                                                                                                        </pre><pre style="animation-delay:-1.4s">                                      ·                                  +           .                        +                         ·                               
+                    ·                .  .                              .                                                                 .                           +  
+                                                      .           .                                                                          +       +   · +            
+             +                 ·     .                         ..                    .                                    +   ·   +                                  .  
+           ..                           ·                           +              .    .     .                  .                                                      
+                                                                                       .             ..                                                                 
+                                           ·                                 ·                                        .                       +                         
+                                                                                +    .                .      +                                          .  .            
+         ·                            +           .        .           .             +                                                                  ·               
+                  .                  .                  ·                                                       ·     ..    .                                           
+                                                                              ·     +                                .            .         .                           
+                                            ·    .                                                       .                                                              
+                     ·   ·               ·                ·                   ·                                                                                     . + 
+               .     .                                                                                                              +    .               .      .       
+                             ·                                       .            .                                                         ·          .          ·     
+                                                                                                                                             .         .     ·          
+                                                                                                                                                                        
+      ·                                                                                                                                                                .
+                                                                                                                                                                        
+  ··               -~≋≋≋≋~-                   • •            -~≋≋≋≋~-                                  ·~≋≋≋≋≋~·                                 ·-≋≋≋≋≋~·              
+--------------·-≋≋≋≋≋-·              ----------•-       ·-≋≋≋≋≋~-       ----------------           ·~≋≋≋≋≋-·      -----------------------    ·~≋≋≋≋≋~·          --------
+         ·-~≋≋-----------------------        •• •-----------------------                --------------------------                      ·-----------------------        
+     ·~≋≋≋≋≋-·                               •• ·•≋≋≋≋≋~·                                  -~≋≋≋≋≋~·                                -~≋≋≋≋≋~-                ·          
+ -~≋≋≋≋~-                                   ·•≋•≋≋•~·            ~~~~                 ·-≋≋≋≋≋≋~·                               -~≋≋≋≋≋~-·               ··              
+≋≋~~~~~~~~~~~~~~~~~~~~~~~~~~~~          ·~≋≋••≋~• • •    ~~~~~~~~    ~~~~~~~~~    -~≋≋≋≋≋≋-·              ~~~~~~~~~~~~~~~~~~~~~~~~~·                ··                ·~
+~~               ···          ~~~~~~~~≋≋≋≋≋•• • • ~••~~~~                    -~~~~~≋≋~-            ~~~~~~~            ·~≋≋≋≋≋~-    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+            ···                ·-≋≋≋≋~~~~~•~•~•~~• •                    -~≋≋≋≋≋≋≋-·~~~~~~~~~~~~~~~~               ·~≋≋≋≋≋~·               ···                 ·~≋≋≋≋~-  
+       ···                ·-~≋≋≋≋≋≋~·    •• •  • •••·            ~~~~~~~~~~~~·                                 -≋~~~~~~~~~~~~~~~    ····                  ·~≋≋≋≋≋-·     
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~-·       •• • •  •• •        ~~~~~≋≋≋≋≋≋~·   ~~~~           ·               -~~~~~~-            ·~~~~~~                -~≋≋≋≋≋-·     ~~~~
+··         ≋≋≋≋·-≋≋≋≋≋≋≋≋~-·  ~~~~~~~~  •• •··• •• •   ~~~~~≋≋≋≋≋≋~-            ~~~~  ··               ·~~~~~≋-·          ·····       ~~~~~~~~   ·-~~~~~~~~~~~~~~~~~  ·-
+      ≋≋≋≋≋~≋≋≋≋≋≋≋≋~·                ~~~~~~~~~~~~~~~~~·~≋≋≋≋≋~·                ··· ~~~~            -≋~~~≋~-          ····                  ·~~~~~~≋~-·           ·---· 
+  ≋≋≋≋-≋≋≋≋≋≋≋~-    ≋≋≋             ··• • •  • •• • -≋≋≋≋≋≋≋≋≋≋≋≋≋≋≋≋     ····          ~~~~~~~~~~~~~~≋-·          ···       ≋≋≋≋≋≋≋≋≋≋≋≋≋≋≋≋≋≋≋~·            ··--·     
+≋≋·~≋·≋≋≋≋-°∘          ≋≋      ···    • •  • •• ·~≋≋≋≋≋≋             ≋≋≋≋                  ·-≋≋≋≋≋≋~·          ····≋≋≋≋≋≋°≋≋≋   ∘-~≋≋≋≋≋≋≋~-≋≋≋≋≋         ··---·        
+≋≋≋∘  ·  ∘ ·∘° ∘        ·≋≋≋·        ••  •  ·~≋≋≋≋≋≋- •        ∘·°··  ·  ≋≋≋≋          -~≋≋≋≋≋≋~-      ≋≋≋≋≋≋≋≋≋≋≋≋    ··∘· ∘∘°··≋≋·≋°°          ≋≋≋  ·----·           ≋
+°°°  · ·∘      °° · ∘··∘    ≋≋≋      • •·-≋≋≋≋≋≋≋·• ••  ° · ·∘° ··∘···      ∘≋≋≋≋≋-≋≋≋≋≋≋≋≋~- ≋≋≋≋≋≋≋≋≋  ·-·        ∘   ·        ·∘ ··°°∘        ··-≋≋≋≋≋          ≋≋≋≋≋
+  ∘     ··  ··  ∘    ·° ∘ ·    ≋≋≋≋ ·~≋≋≋≋≋≋≋≋  •  ••• · °° ∘ ∘      ∘ ·°°°∘ ≋≋∘≋≋≋≋≋≋≋≋≋≋≋≋≋≋       ··-·     ·   ·        ·          ∘·°∘ ··-----·      ≋≋≋≋≋≋≋≋≋≋~≋≋≋~
+                      °  ∘·    ·~≋≋≋≋≋≋≋≋≋••• •  • °°∘ ···       ·      ∘·    ∘∘ ·-·              ·-··    ∘ ∘∘∘∘·                        °   °°  ∘·°         ∘∘~·≋≋ ∘· °
+                          ·   °° ≋·≋~∘ ·∘•• •  ·  ∘° °                ·      ·   °··  ∘       ·--·    °∘∘·°°  °                                  °° °   · ∘-≋··∘°      °
+                ·      ·          ·∘ ∘∘     °°·°  °        ·     ·                   ° °°··--·      ·∘ °°                ·                     °     ·∘ ··  ···  ∘     ·
+                                  °°       ·∘                                           ° ∘∘∘∘∘ ·∘      °     ·         ·          ·                 ·      ∘           
+                                                                                                                                                                        
+                                                                                                                                                                        
+                                                                                                                                                                        
+                                                                                                                                                                        </pre><pre style="animation-delay:-2.1s">                                      ·                                  +           .                        +                         ·                               
+                    ·                .  .                              .                                                                 .                           +  
+                                                      .           .                                                                          +       +   · +            
+             +                 ·     .                         ..                    .                                    +   ·   +                                  .  
+           ..                           ·                           +              .    .     .                  .                                                      
+                                                                                       .             ..                                                                 
+                                           ·                                 ·                                        .                       +                         
+                                                                                +    .                .      +                                          .  .            
+         ·                            +           .        .           .             +                                                                  ·               
+                  .                  .                  ·                                                       ·     ..    .                                           
+                                                                              ·     +                                .            .         .                           
+                                            ·    .                                                       .                                                              
+                     ·   ·               ·                ·                   ·                                                                                     . + 
+               .     .                                                                                                              +    .               .      .       
+                             ·                                       .            .                                                         ·          .          ·     
+                                                                                                                                             .         .     ·          
+                                                                                                                                                                        
+      ·                                                                                                                                                                .
+                                                                                                                                                                        
+---·             ·-~~~~-·                 ···  •           -~≋≋≋≋~·                                  ·~≋≋≋≋~-                                  ·~≋≋≋≋≋~·                
+            ·-~~≋~~·                 ····     •       ·~≋≋≋≋~-                                   -~≋≋≋≋~·                                  -~≋≋≋≋≋-·                    
+       ·-~≋≋~~-                  ····        ••  •-~≋≋≋~-·                                  ·-≋≋≋≋≋~·                                 -~≋≋≋≋≋~-                         
+--------------              ····      -------•-•--•-------             ·                ·~≋≋≋≋≋~·              -----------------------≋≋≋-·                   ----------
+≋≋≋~-         ------------------------   ·~≋••≋~• •       -----------------------------------------------------             -~≋≋≋≋≋≋~·------------------------        -~
+·                 ·····              -~≋≋≋≋•• •  • ••       ···                -~≋≋≋≋≋~-                               -~≋≋≋≋≋≋~·                                 -≋≋≋≋≋
+             ··-··              ·-~≋≋≋≋~· • •  • • •   ··· ~~~~~~~~~~    ·-~≋≋≋≋≋≋~·                        ~~~~~~~~~~~≋≋≋-·                                  -≋≋≋≋≋~·  
+~~~~~~~~~~~~~~~~~~~~~~~~~~  -~≋≋≋≋≋-·    ••  • • ••·~~~~~~~         ·~~~~~≋≋≋~-                        ~~~~~  -≋≋≋≋≋≋~·~~~~~~~                          ~~~~~~~~~~~~~~~~
+  ·---·                -~≋~~~~~~~~~~~~  •• •~•~~••~•          ·-~≋≋≋≋≋≋≋-·~~~~~                    ~~~~   -~≋≋≋≋≋-            ~~~~~~~~~~~~~~~~~~~~~~~~~~≋≋≋≋~-          
+-··              ·-~≋≋≋≋≋≋~·          ~~••~•··• •• •     ·-≋≋≋≋≋≋≋~-           ~~~~~    ·    ~~~~~~   ·~≋≋≋≋≋-   ≈≈≈≈≈≈≈≈    ··                  ·-≋≋≋≋≋≋-            ··
+≈≈≈≈≈≈    ·-~≋≋≋≋≋≋≋~-·                ···  •  •••  •·~≋≋≋≋≋≋-≈≈≈≈≈≈≈≈            ··~~~~~~~~~      -≋≋≋≋≋~·  ≈≈≈≈      ··≈≈≈≈                -~≋≋≋≋≋≋-         ≈≈≈≈≈≈≈≈≈
+     ·≈≈≈≈≈≈≈≋~-·                  ···• • •  • ••·~≋≋≋≈≈≈≈≈≈≈≈        ≈≈≈≈≈≈ ···               -≋≋≋≋≋≋-   ≈≈≈      ··        ≈≈≈≈      ·-~≋≋≋≋≋≋~-        ≈≈≈≈≈··       
+·~≋≋≋≋≋≋~-·  ≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈••              ····  ≈≈≈≈           -~≋≋≋≋≋-    ≈≈≈     ··                ≈≈≈≈≋≋≋≋≋≋≋-·        ≈≈≈≈···           
+≋≋≋~≋·≋≋≋≋≋≋≋≋≋          ·····        •  •-≋≋≋≋≋≋·  ≋≋≋≋≋≋≋≋≋≋≋≋≋···            ≈≈≈   ·-≋≋≋≋≋≋~·    ≈≈≈    ··              ·~≋≋≋≋≋≋≋≋≈≈≈≈≈     ≈≈≈≈≈≈≈····           ·~≋
+° ∘∘  ·  ∘  ∘° ≋≋≋≋······            •·~≋≋≋≋≋- •  ≋≋•∘    ···∘ ∘·°≋              ·-≈≈≈≈≈≋≋~-   ≈≈≈≈≈    ··      ·     -··∘·≋∘≋≋≋~-        ≈≈≈≈≈   ····            -≋∘≋≋≋
+ °   · ·∘∘  ∘∘-°-··≋≋≋            ·~≋≋≋≋≋~·••• ≋≋≋∘•∘°° ° ·° ∘° ··∘·≋·     ·-~≋≋≋≋≋≋≋≋~·≈≈≈≈≈≈≈     ··≋≋≋≋≋·≋≋° ° °∘∘   ·° ° · ≋≋≋≋≋≋         ····             ~∘≋≋· °· 
+        ···°·  °∘    ·≋≋≋     -~≋≋≋≋≋≋-  •• •≋≋ ∘° °   · ·  ∘ ∘   ∘  ∘°≋≋≋≋≋≋≋≋≋≋~-              ·≋≋≋≋   ·°∘  ·    ··    ·    ∘··    ≋∘≋≋≋≋≋≋≋≋≋≋          ·≋∘≋≋ ·°   · 
+                   ° ·° ·≋≋≋≋≋≋≋≋≋-·•  • •• °∘·    °             · ° °· ∘ ≋~-                ·≋≋≋≋ ·   ° ·∘ ∘∘                   ∘ °   · °       ≋≋≋≋≋≋≋≋≋≋≋ ∘∘°·       
+                      ∘° ∘··≋≋≋≋  ·  ∘ ·∘·∘                           ·∘  ·· ·           ·≋≋≋≋ ∘    ∘°°∘∘·                           °  ∘°  °    °  -≋ °· ∘°  ·    ·    
+                ·      ·     ·°   ·∘ ∘∘                    ·     ·           °·° ∘·≋≋≋≋≋°≋      ··  ·                    ·               ·     °·    ·  ·              ·
+                                  °°                                          ·       ° ° ∘∘∘∘∘               ·         ·          ·            ·    ·                  
+                                                                                                                                                                        
+                                                                                                                                                                        
+                                                                                                                                                                        
+                                                                                                                                                                        </pre><pre style="animation-delay:-2.8s">                                      ·                                  +           .                        +                         ·                               
+                    ·                .  .                              .                                                                 .                           +  
+                                                      .           .                                                                          +       +   · +            
+             +                 ·     .                         ..                    .                                    +   ·   +                                  .  
+           ..                           ·                           +              .    .     .                  .                                                      
+                                                                                       .             ..                                                                 
+                                           ·                                 ·                                        .                       +                         
+                                                                                +    .                .      +                                          .  .            
+         ·                            +           .        .           .             +                                                                  ·               
+                  .                  .                  ·                                                       ·     ..    .                                           
+                                                                              ·     +                                .            .         .                           
+                                            ·    .                                                       .                                                              
+                     ·   ·               ·                ·                   ·                                                                                     . + 
+               .     .                                                                                                              +    .               .      .       
+                             ·                                       .            .                                                         ·          .          ·     
+                                                                                                                                             .         .     ·          
+                                                                                                                                                                        
+      ·                                                                                                                                                                .
+                                                                                                                                                                        
+~-·             ·----·                 ·---·  •          ·-~~~~-                  ····             ·-≋≋≋≋-·                                  ·~≋≋≋≋~-·                  
+ -----------------------          ·----·    -••---------------------         ····           ----------------------      ·             -------------------              -
+-     ·-----·           --------------------•• •-~•~~·              ------------------------≋≋≋≋-·                --------------------≋≋≋≋≋-·            -------------- 
+·--~--·                  ·----·           ·-••~~•  •               ··-··             ·-~≋≋≋~-                ··               ·-~≋≋≋≋≋~·                               ·
+~~~~                ·----·            ·~~≋~••~•~~• •         ··--··              ·~≋≋≋≋~·               ···              ·-≋≋≋≋≋≋~-                             ~~~~~~~~
+    ~~~~~~~    ·--~--·           ·~~~~~~~~• •  • •~•~~~~~~~~·               ·-≋≋≋≋≋-·               ··       ~~~~~~~~~~~~~~~~~~~~~                         ~~~~~≋≋≋≋~·  
+         ·-~~~~~~~         ~~~~~~~~-     ••  •  •••---·     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ ·-≋≋≋≋≋≋~-          ~~~~~~~~          ~~~~~~~≋≋≋≋≋-       
+   ·--~~~-·       ~~~~~~~~~≋≋≋~-         • • ·•-••              ·-~≋≋≋≋≋≋~-                ···            -≋≋≋≋≋≋-·                   ·   ~~~~~~~~~~ ·~≋≋≋≋≋-           
+~~~-·               ·-~≋≋~-·            ••---·• •• •   ~~~~~~~~~~≋≋~-·                 ···           ·-≋~~~~~~~~~~~~~           ··               ·~≋≋≋≋≋-~~~~~~~~~~~~~~·
+~~~~          ·-~≋≋≋≋~-              ·---·• ~~~~~~~~~~~≋≋≋≋≋≋-·  ~~~~~~            ···            -≋~~~~-            ~~~~ ···                ·~≋≋≋≋≋~~~~~        ··    ~
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ ••·-≋≋≋≋≋~-·              ~~~~   ····            -≋~~~~-              ····  ~~~~~          ·-≋≋≋≋≋~~~~~         ··         
+ ·-~≋≋≋≋≋~--                 ·---·    • •  ·-≋≋≋≋≋-•  ••                ···~~~~~          -~~~~~~·            ≋≋≋≋≋≋≋         ~~~~~~-≋≋≋~~~~~~~           · ≋≋≋≋≋≋≋≋≋≋≋≋
+≋≋≋~-·                   ·----·       • -≋≋≋≋~·• •  • •         ·······         ~~~~~~~~~~~~≋-            ≋≋≋≋       ≋≋≋≋    ·-~≋≋≋≋~~~~-             ·· ≋≋≋       -≋≋≋≋
+   ≋≋≋              ·----·      ≋≋≋≋≋≋≋≋≋≋≋≋≋≋≋≋≋≋∘≋≋≋∘°≋≋≋≋≋≋≋≋≋≋≋≋≋≋           ·-≋≋≋≋≋≋-            ·≋≋≋            ·-≋≋≋≋≋≋≋≋≋≋~·              ··  ≋≋≋      -≋≋≋≋°≋- 
+   ∘  ≋≋≋≋    ·-----··    ≋≋≋≋≋≋·~≋≋≋≋~·• ••∘∘  ·∘∘· ∘ °·    ∘        ≋≋≋≋≋ ·-≋≋≋≋≋≋≋-            ··≋≋≋    ·    ·~≋≋≋≋≋≋≋≋≋~≋≋≋               ···  ≋≋≋     ·~≋≋≋≋°°·∘   
+°°° ∘···∘-≋≋≋≋≋≋≋≋≋≋≋≋≋≋≋≋  ·-≋≋≋≋≋-  •  •· ∘∘∘°° ∘ ∘   ° ·° ∘       ·-~≋≋≋≋≋≋≋≋~-             ·≋≋≋≋      ∘·  ° ° °∘∘-· ·      ≋≋≋        ···   ≋≋≋     -°≋≋≋  °∘  ·  · 
+  ∘   ° °··°·           ·~≋≋≋≋≋~·  °  °°∘··              ·  ∘ ∘·°≋≋≋≋≋≋≋≋≋≋~·   ≋≋≋≋≋≋≋≋≋≋≋≋≋≋≋≋    ∘°°  ·°   ·     °°∘°∘·        ≋≋≋≋≋·    ≋≋≋≋     -≋°≋·°  ∘   ·    · 
+           ·°·°    -~≋≋≋≋≋≋~·    ° °°        ·                  ·· °∘°· ∘              ····  °   °∘·∘                    °··∘ ···∘·    ≋≋≋≋≋     ∘·°≋·∘·                
+            ° ∘ ·    ≋≋-· ·   °° °·  ∘                              ·∘°∘∘          ····   · °  ∘                          °··    ∘   °       ·~≋≋°° °   ··         ·    
+                ·     ··                                   ·     ·       · ·°°·····     °·∘∘                             ·          ··° °·     °·       ·              ·
+                     °                                                     · ··∘ °    ° ° ∘ ·                 ·         ·          ·      °     ·                       
+                                                                                                                                                                        
+                                                                                                                                                                        
+                                                                                                                                                                        
+                                                                                                                                                                        </pre><pre style="animation-delay:-3.5s">                                      ·                                  +           .                        +                         ·                               
+                    ·                .  .                              .                                                                 .                           +  
+                                                      .           .                                                                          +       +   · +            
+             +                 ·     .                         ..                    .                                    +   ·   +                                  .  
+           ..                           ·                           +              .    .     .                  .                                                      
+                                                                                       .             ..                                                                 
+                                           ·                                 ·                                        .                       +                         
+                                                                                +    .                .      +                                          .  .            
+         ·                            +           .        .           .             +                                                                  ·               
+                  .                  .                  ·                                                       ·     ..    .                                           
+                                                                              ·     +                                .            .         .                           
+                                            ·    .                                                       .                                                              
+                     ·   ·               ·                ·                   ·                                                                                     . + 
+               .     .                                                                                                              +    .               .      .       
+                             ·                                       .            .                                                         ·          .          ·     
+                                                                                                                                             .         .     ·          
+                                                                                                                                                                        
+      ·                                                                                                                                                                .
+                                                                                                                                                                        
+-·              ···                 ·-~~~-·  ••         ·----·                 ·----·            ·-~~~-·                  ····             ·-~≋≋~-·                 ··  
+           ····                ·-~≋~-·      •• •  ··---··                 ·----·            ·-~~~-·                 ··-··             ·-~≋≋≋~-                ···       
+     ·····                ·-~≋~~-           ••--•-·•                 ·--~--·            -~~~~-                 ·--··              -~≋≋≋~-·               ···            
+····     -----------  -~≋≋~-·          ----••-•--•-•--------------~~--·            ·-~~~-·----------------------             -~≋≋≋≋~·     ------------------------------
+---------        -~~-------------------·  • •  • • •     ·--~~~-·------------ ·-----------          ·---·       --------------------------      ···           ·-≋≋≋≋≋≋-·
+            -~≋≋≋~-·           ----·     ••  •  •••·-~~~~-·              ·-~~---·              ·---·             ·-~≋≋≋≋~-·                ···            -≋≋≋≋≋~·      
+      ·-~≋≋≋~-·           ·----·   ~~~~~~•~•~~•~••~~·               ·-~~≋~-·               ·--·            ·-~≋≋≋≋≋~·                  ···           ·~≋≋≋≋~~~~~~~~~~~~~
+~~~~~~~~-·            ·-~--    ~~~~     ·•~~•-• ••  ~~~~~     ·-~~≋≋~-·               ~~~~~~~~~~~~~~~~-~≋≋≋≋~-·                   ····           ·~≋≋≋≋~~~~~            
+~--·   ~~~~~     ·--~--   ~~~~~     ·~~~-·•  • •• •  •·--~~~~~~-·           ~~~~~~~~~~·          -~≋≋≋≋~·~~~~~~~~~~~~~~~~~~~~~~~~~~~~~       ·~≋~~~~~~~          ···    
+            ~~~~~~~~~~~~~~      ·~~~-·  •  • ••·-~≋≋≋≋~~-·     ~~~~~~~~~~~~~  ·---·          -≋≋≋≋~·                  ······          ~~~~~~~~~~·       ≈≈≈≈≈≈≈≈≈       
+      ·--~~~-·              ·~~~-·  ≈≈≈≈≈≈·~≋≋≋≋~-·•  •                  ·----·          -≋≋≋≋~·    ≈≈≈≈≈≈≈≈≈≈≈≈≈·-···               -~≋≋≋≋~·      ≈≈≈≈≈···      ≈≈≈≈≈≈ 
+-~~~~~-·                ·≈≈≈≈≈≈≈≈≈≈≈  -~≋≋≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈ ·-----·           -~≋≋≋~·    ≈≈≈≈     ·---··  ≈≈≈≈           -~≋≋≋≋≋~·       ≈≈≈ ···           -~≋≋≋≈
+≈≈≈                ≈≈≈≈≈≈-        ·~≋≋≋-  • •• •  • ••    ··------≈≈≈≈≈≈         -~≋≋≋~-    ≈≈≈≈    ·--·             ≈≈≈ ·-~≋≋≋≋≋≋≋-·        ≈≈≈ ··       ≋≋≋≋≋≋≋≋≋≋≋~-·
+   ≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈~~-         -≋≋≋≋≋≋≋≋·≋≋·≋≋  •·∘-~~~~---··           ≈≈≈≈≈≈≈≋≋≋≋-  ≈≈≈≈≈≈    ---·              ·-~≋≋≋≈≈≈≈≋~-·          ≈≈≈···       ≋≋≋≋≋≋≋≋~-   °≋≋≋
+         ·-~~≋≋~-·         ·~≋≋≋≋≋  · ∘ ∘·∘ ∘∘  ·∘∘·•∘•                ·~≋≋≋≋≋~≈≈≈≈≈≈≈      ·--·       ≋≋≋≋·≋≋≋≋≋≋≋≋≋≋≋~-   ≈≈≈≈≈   ≈≈≈≈≈≈··         ≋≋≋≋≋≋~  ·  °°·∘   
+≋·-~~≋≋≋≋~~-·          ·-≋≋≋≋≋     ·  ·°  ·       ∘ ∘°° ° ·    ·-~~≋≋≋≋≋≋≋-·            ·--·    ∘°      · ∘·≋≋°-·   ≋≋≋          ≈≈≈ ····         -≋··≋ ·°     °∘  ·  · 
+·~∘≋-·             ·-≋≋≋≋≋≋ °°  °°°°  °                · °° ∘≋∘≋≋≋≋≋~·               ---·  °   · ∘°°∘    ·°   ·°       ≋≋≋      ····           -≋≋≋ ∘∘°°              · 
+ ·°° ∘≋       ·-~≋≋≋≋≋≋≋    ∘ ∘  ° °         ·           ·    ·°·  °≋≋≋≋≋≋≋≋≋≋≋≋≋≋≋≋≋≋≋≋≋ °··°   ° ·        ∘∘ ∘·   °    °≋≋≋··            ·~≋°≋·∘·° · ·                
+   · ·∘ ∘ °≋°≋∘≋·≋≋≋≋  ° ∘··     ·                           ∘  ∘ ∘°·  ∘    ··--·    °∘∘  · °                     ∘ ∘ °° ·°··≋≋≋       ·~≋≋≋° ·  °       ·         ·    
+        ° ∘·°∘°   ·°· ··                                   ·     ·  ° ° ·· -·°·° ∘··    °   ·                         ° ° °  °·    ···° °·     °        ·              ·
+               °·    °                                                 ·   · ··         ·   ·                 ·         ·     ° ·° ·∘°    °                             
+                                                                                                                                                                        
+                                                                                                                                                                        
+                                                                                                                                                                        
+                                                                                                                                                                        </pre></div>
+<div class="lockup"><span class="blk">x</span>scapes</div>
+<p class="line">a thinking screen for terminal agents</p>
+</section>
+
+<main>
+
+<section class="hero">
+<div>
+<div class="lockup"><span class="blk">x</span>scapes</div>
+<h1 class="syn">Cozy ASCII scenes that react to your agent while it works.</h1>
+</div>
+<p class="why">Your agent goes off to think for a few minutes at a time. Sit back and watch it work. The tide rises as it gets busy and settles when it stops. A crablet arrives for each subagent it sends, and walks back into the water when that one reports back. The moon thins and sinks as the context window fills. The last few files it touched are written in the sand, and the water takes them as they get old.</p>
+<p class="why">It runs in the same window as the agent, just under its output. Nothing to open, nothing to read. Glance at it the way you would glance out a window, and you know how the work is going.</p>
+<ul class="feats">
+<li><b>A glance is enough.</b> How hard it is working, what it is doing right now, whether something broke, whether it is waiting on you. Nothing to read.</li>
+<li><b>Two knocks you can tell apart from across the room.</b> A solid balloon and a chime when it needs you, a dotted one and a low note when it is done. Silent while it works.</li>
+<li><b>Any agent, any terminal.</b> It hosts whatever you run. Claude Code arrives already wired; anything that can run one command can drive the scene. It draws in the 256 colours every terminal agrees on, so the picture is the same wherever you work.</li>
+<li><b>One fact, one place.</b> Activity, subagents, finished todos, context left: each owns its own part of the scene. On the shore those are the swells, the crablets, the stars and the moon.</li>
+</ul>
+<div class="win"><div class="bar"><i></i><i></i><i></i><span>xscapes claude &middot; 108&times;40</span></div><img src="anim/window.gif" width="911" height="560" alt="A terminal window: the agent's tool calls scrolling above, the animated shoreline below, the tide rising and falling, crablets arriving and walking into the water, the moon sinking as context fills, and the day turning from dawn to night"></div>
+<p class="cap">One whole session, start to finish, in your own window. The agent works in the top rows exactly as it always has. Underneath, the sea comes up with the work and settles when it stops, subagents arrive as crablets and walk into the water when they report back, stars light as the plan gets done, the moon wanes and sinks as the context window fills, and the companion knocks when it needs you. Then the context is compacted, the list starts over, and it begins again. The day turns the whole time. Every clip on this page is the real renderer folding the events a Claude Code session emits. Nothing is posed.</p>
+<div class="cmd">go install github.com/donlucasx/xscapes@latest<br>xscapes install claude --apply&nbsp;&nbsp;<span class="c"># Claude Code: writes its hooks after a backup, uninstall puts them back</span><br>xscapes claude&nbsp;&nbsp;<span class="c"># the agent in the top of the window, the scape underneath</span><br>xscapes inside &lt;any command&gt;&nbsp;&nbsp;<span class="c"># anything else: host it the same way</span></div>
+</section>
+
+<div class="sec"><h2>It runs on your clock</h2><div class="gl">&#183; . + * &#183; . &#176; &#183; + . &#183; * &#176; . &#183; + . &#183; * &#183; . &#176; &#183; + . &#183; * &#176; . &#183; + . &#183; * &#183; . &#176; &#183; + . &#183; * &#176; . &#183; + . &#183; *</div></div>
+<p>The scape keeps the time of day where you are. There is no theme setting and no dark mode switch: the sky goes dark because it is dark outside, the sun crosses it, and the light on the water follows. You look up from your work and the landscape has moved on with the afternoon, the way one outside the window would.</p>
+<p>Below is one session at four hours.</p>
+<div class="states">
+<div><div class="clip"><img loading="lazy" decoding="async" src="anim/worried.gif" width="675" height="336" alt="A command exited 1 in the afternoon: the companion pulled in small with its claws down, the sea still moving"></div><p class="cap">Afternoon. A command exited 1. The companion carries it, pulled in small with its claws down, until you come back. The weather never does.</p></div>
+<div><div class="clip"><img loading="lazy" decoding="async" src="anim/ask.gif" width="675" height="336" alt="Dusk: the agent needs permission, a solid balloon over the companion in its alert pose"></div><p class="cap">Dusk. The agent needs permission. A solid balloon, the alert pose, and a chime.</p></div>
+<div><div class="clip"><img loading="lazy" decoding="async" src="anim/done.gif" width="675" height="336" alt="Night: the turn is done, a dotted balloon, the constellation lit, the moon with a number under it"></div><p class="cap">Night. Done, every todo lit. A dotted balloon and a low note. The moon has waned and sunk with the context, and the number under it says what is left.</p></div>
+<div><div class="clip"><img loading="lazy" decoding="async" src="anim/resting.gif" width="675" height="336" alt="Dawn, half a minute after the turn: a flat sea, the writing in the sand fading"></div><p class="cap">Dawn, half a minute later. Flat sea, the writing receding, the companion still.</p></div>
+</div>
+
+<div class="sec"><h2>How to read it</h2><div class="gl">&#8776; ~ &#8776;&#8776; ~ &#8776; ~&#8776; &#8776; ~ &#8776;&#8776; ~ &#8776; ~&#8776; &#8776; ~ &#8776;&#8776; ~ &#8776; ~&#8776; &#8776; ~ &#8776;&#8776; ~ &#8776; ~&#8776; &#8776; ~ &#8776;&#8776; ~ &#8776; ~&#8776; &#8776; ~ &#8776;&#8776; ~ &#8776;</div></div>
+<p>Every question you would normally interrupt yourself to answer has one place in the scene, and no two share a place. Nothing here is a number you have to read. Each clip below is the real scape, cropped to the one part that carries that fact, most useful first.</p>
+<div class="legend">
+<div class="lg"><div class="clip"><img loading="lazy" decoding="async" src="anim/g-ask.gif" width="304" height="154" alt="the companion raises a claw and a solid balloon rises with the question in it"></div><div><h3>It needs you</h3><p>A <b>solid balloon</b> over the companion, in a warm colour, with a bright chime. It says what is being asked, and the companion puts a claw up toward the agent's own output.</p></div></div>
+<div class="lg"><div class="clip"><img loading="lazy" decoding="async" src="anim/g-done.gif" width="304" height="154" alt="the finish knock: a dotted balloon and the companion with both claws up"></div><div><h3>It finished</h3><p>A <b>dotted balloon</b> in a cool colour and a low note. Both claws go up and the eyes change, and it holds the pose so you see it when you get back.</p></div></div>
+<div class="lg"><div class="clip"><img loading="lazy" decoding="async" src="anim/g-worried.gif" width="304" height="154" alt="a command exits 1 and the companion pulls in small, claws down"></div><div><h3>Something broke</h3><p>The <b>companion</b> goes worried: claws down, stalks short, amber eyes. The widest thing on the beach becomes the smallest. It stays that way until the trouble clears, so a failure you missed is still on screen ten minutes later.</p></div></div>
+<div class="lg"><div class="clip"><img loading="lazy" decoding="async" src="anim/g-sea.gif" width="304" height="154" alt="the sea getting up as the work lands, then settling again"></div><div><h3>How hard it is working</h3><p>The <b>sea</b>. How many swells are travelling and how tall, with whitecaps once it is going flat out. Flat water means it is waiting on you.</p></div></div>
+<div class="lg"><div class="clip"><img loading="lazy" decoding="async" src="anim/g-sand.gif" width="304" height="154" alt="tool calls appearing at the waterline and fading as the tide reaches them"></div><div><h3>What it is doing right now</h3><p><b>Writing in the sand</b>: the tool and the file, newest and brightest at the waterline, older lines fading as the tide takes them.</p></div></div>
+<div class="lg"><div class="clip"><img loading="lazy" decoding="async" src="anim/g-moon.gif" width="304" height="154" alt="the moon waning and sinking as the context window fills, with the percentage left under it"></div><div><h3>How much context is left</h3><p>The <b>sun by day and the moon by night</b>. It wanes and sinks toward the horizon as the window fills, and from 40% used it carries the number underneath.</p></div></div>
+<div class="lg"><div class="clip"><img loading="lazy" decoding="async" src="anim/g-kittens.gif" width="304" height="154" alt="crablets arriving on the beach one per subagent, then walking into the water"></div><div><h3>How many subagents are out</h3><p><b>Crablets</b>, one each. Some sit on the sand, some are already in the shallows, and each walks into the water when its agent reports back. A crab does not swim: the eyestalks carry on above the surface until it is gone.</p></div></div>
+<div class="lg"><div class="clip"><img loading="lazy" decoding="async" src="anim/g-stars.gif" width="303" height="154" alt="stars lighting one at a time in the night sky as items are finished"></div><div><h3>How much of the plan is done</h3><p><b>Stars</b> in the upper sky, one lit per finished item on the agent's list. They come out as the evening does.</p></div></div>
+<div class="lg"><div class="clip"><img loading="lazy" decoding="async" src="anim/g-sky.gif" width="304" height="154" alt="a whole day passing over the water, dawn through night and back"></div><div><h3>What time it is</h3><p>The <b>sky</b>, on your actual clock. Nothing about it is the agent, which is what makes the rest of the scene unambiguous.</p></div></div>
+</div>
+<p>One rule holds it together: the water is the work, the sky is the world. Anything moving on the sea is your agent. Anything in the light and the sky is the day going by.</p>
+
+<div class="sec"><h2>Choose your xscape</h2><div class="gl">| ~ o | &#8776; o | ~ &#8776; o | ~ o | &#8776; o | ~ &#8776; o | ~ o | &#8776; o | ~ &#8776; o | ~ o | &#8776; o | ~ &#8776; o | ~ o | &#8776; o | ~ &#8776; o</div></div>
+<p>The shoreline is what runs today, and two animals live on it: Hero the crab, who ships as the default, and the cat who came first. <code>xscapes companion cat</code> switches, and a scape already running picks it up on its next frame. A landscape only needs six things to carry the whole system: a light, a sky, something that moves with the work, a surface, somewhere the work piles up, and someone living in it. So there is no reason to stop at one. More scapes are on the way, each with a companion that belongs in it, and you pick the one you want to work next to.</p>
+<div class="pick">
+<div><div class="clip"><img loading="lazy" decoding="async" src="anim/scape-rain.png" width="672" height="336" alt="A rainy window at dusk: rain running down the glass, a city skyline behind it, a frog sitting on the inside sill"></div><p class="cap"><b>The rainy window, with a frog.</b> Rain on the glass carries the work and comes down harder the busier your agent gets. The city behind it carries the hour. The frog keeps the sill, and its young swim.</p></div>
+<div><div class="clip"><img loading="lazy" decoding="async" src="anim/scape-aquarium.png" width="672" height="336" alt="A lit aquarium at night: fish, plants and gravel, an owl watching from in front of the glass"></div><p class="cap"><b>The aquarium, with an owl.</b> More fish come out as the work picks up, the tank's lamp is the light, and the gravel is where the day's work settles. The owl sits very still and blinks, which is most of what an owl does anyway.</p></div>
+</div>
+
+<div class="sec"><h2>Underneath, a protocol</h2><div class="gl">&#183; &#8212; &#183; &#8212;&#8212; &#183; &#8212; &#183; &#8212;&#8212; &#183; &#8212; &#183; &#8212;&#8212; &#183; &#8212; &#183; &#8212;&#8212; &#183; &#8212; &#183; &#8212;&#8212; &#183; &#8212; &#183; &#8212;&#8212; &#183; &#8212; &#183; &#8212;&#8212; &#183; &#8212; &#183;</div></div>
+<p>The scene is the top half of xscapes. The bottom half is a small event protocol, and that is the part that works with anything.</p>
+<div class="events">session_start &nbsp;prompt &nbsp;tool_start &nbsp;tool_end &nbsp;error &nbsp;test_pass &nbsp;test_fail &nbsp;sub_start &nbsp;sub_end &nbsp;needs_input &nbsp;done &nbsp;compact &nbsp;context &nbsp;todo &nbsp;session_end</div>
+<p style="margin-top:14px">Fifteen events over a socket. Claude Code sends them through its hooks the moment you install. For anything else, one line in a script is a complete adapter: <code>xscapes emit needs_input -text "allow Bash?"</code>. Tool events do not each get their own weather, they all feed one activity level, so a new tool needs no new vocabulary.</p>
+<p>One Go binary, standard library only. It runs on the alternate screen and hosts your agent inside it, so your transcript is untouched and scrolls the way it always did. Drag the window and the shoreline reflows live, because each terminal moves your content differently and each one gets its own handling.</p>
+
+<div class="sec"><h2>It stays for the session</h2><div class="gl">. o . &#8728; . o , . &#176; o . &#8728; . o , . &#176; o . &#8728; . o , . &#176; o . &#8728; . o , . &#176; o . &#8728; . o , . &#176; o . &#8728; . o , . &#176; o . &#8728; .</div></div>
+<p>You start it once and it runs until you are done. Tasks move the scene and the day passes over it. Every repository gets its own shoreline, the same one every time, shaped from the repo itself, and your companion comes with you to all of them. It has been running here daily since the start of September.</p>
+
+<p class="foot">Built for the Commons "Make Waiting for AI Fun" hackathon, September 2026. Go, standard library only. MIT. Source and issues at <a href="https://github.com/donlucasx/xscapes">github.com/donlucasx/xscapes</a>.</p>
+
+</main>
+</body>
+</html>
