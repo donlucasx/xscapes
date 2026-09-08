@@ -34,8 +34,23 @@
 > leaves the shoulders split. **Longest run 5 → 1 cell, rule cells 12920 → 4922**, silhouette width
 > profile IDENTICAL. ⚠ `TestTheMoonIsRoundAtEveryHeight` had been running at GHOSTTY's flags; it now
 > runs both, and `TestNoRuleRunsAcrossTheDiscsCap` was checked to FAIL without the fix.
-> ⚠ **The scrollback trace is blocked on a contradiction**: `XSCAPES_TRACE` is read at launch, but only
-> a window that has already lived for hours and been resized corrupts. His 20:27 attempts wrote nothing.
+> ⇒ **Verified against his 9.04.45 PM moon crop**, which is the OLD binary (his scape started 20:28,
+> the fix installed 20:42). Every rule in that crop sits at **+29px of a cell row** — the model
+> confirmed at four independent places — and the runs measure **one 3.0-cell and four ~1-cell**. The
+> instrument at his 107 cols x 22 rows says **6 rules with two 3-wide → 4 rules, all 1-wide**. Same
+> picture. ⚠ **What remains is four 14px dashes at the shoulders, and that is not "pixel perfect".**
+> ⇒ **ZERO rules is reachable and now MEASURED, and it is HIS ruling**: collapse EVERY edge cell by
+> area coverage and the whole sweep goes to **0 rules** — but the disc is a **rectangle at 3 of 13
+> heights (18, 22, 23 rows)**, and ~22 rows is about what his window gives. That is the "Pixel perfect,
+> no exceptions" option from the 09-06 menu, no longer an estimate. The shipped flat-cap fix is round
+> at **13 of 13**.
+> ⭐ **THE "IT NEEDS A LONG-LIVED WINDOW" THEORY IS REFUTED, and it was mine, written an hour earlier
+> in this same file.** His 9.04.44 PM screenshot shows the corruption in a window whose scape started
+> at **20:28:20** — **36 minutes old**. The s22 reading (22-hour window: 210 rows · fresh window: none)
+> was true but the wrong variable: age is not what earns it. ⇒ **The trace is NOT blocked.** Launch
+> traced and work normally; it showed up in half an hour. ⚠ Still UNMEASURED, and it is the one thing
+> that separates the hypotheses: whether that window had been RESIZED. Ask, do not assume — this defect
+> has produced three confident wrong answers already.
 
 > **⭐ THE HAIRLINES: a THIRD path, and it is why two previous fixes survived.** `canvas.resolve` has a
 > branch that takes a cell with **no half state and no ramp** — a plain single-colour background — and

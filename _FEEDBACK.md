@@ -2064,3 +2064,36 @@ window will not show it quickly. **Next attempt must trace the LONG-LIVED window
   210 rows, the fresh one none. The trace has to be started on a window that has already lived and been
   resized, which is a contradiction with `XSCAPES_TRACE` being read at launch. **That is the real
   blocker on the scrollback defect, and it is unsolved.**
+
+### 2026-09-07 21:04, two reports off the current session
+
+- *"striked through lines on the terminal chat history"* (9.04.44 PM, the 107x51 window this session
+  is running in) and *"ongoing art issues (hairlines on the sun/moon)"* (9.04.45 PM, a heavy
+  magnification of the moon at night).
+
+⇒ ⭐ **MY OWN "IT NEEDS A LONG-LIVED WINDOW" CLAIM IS REFUTED, ONE HOUR AFTER I WROTE IT.** The scape
+  in the corrupted window started at **20:28:20**; the screenshot is **21:04:44**. **36 minutes.** The
+  s22 reading was real (22-hour window: 210 corrupted rows · fresh window: none) but it named the
+  wrong variable — age is not what earns the corruption. **So the trace is NOT blocked on a
+  contradiction**: launch traced and work normally, and it showed up inside half an hour.
+  ⚠ **UNMEASURED and it is the question that splits the hypotheses: was that window RESIZED?** I have
+  no evidence either way — the only screenshot of this session is at 107x51 and there is no earlier
+  one to compare. Asked rather than assumed; this defect has produced three confident wrong answers.
+
+⇒ **The moon crop is the OLD binary, and it measures to exactly what tonight's fix targets.** His
+  scape started 20:28; the FlatCaps build installed at **20:42**, fourteen minutes later, and a
+  running scape does not re-exec. Measured off the crop itself: **every rule sits at +29px of a cell
+  row** — the 0.6px bottom sliver, confirmed at four independent places — and the runs are **one 3.0
+  cells and four ~1.0 cells**. The instrument at his 107 cols x 22 rows: **before 6 rules, two of them
+  3 wide · after 4 rules, all 1 wide**. At 24 rows it goes to **0**. Same picture, so the fix is
+  verified against his own screen rather than only against itself.
+
+⇒ ⚠ **WHAT SURVIVES IS FOUR 14px DASHES AT THE SHOULDERS, and he asked for pixel perfect.** The
+  costed menu is now MEASURED rather than estimated, and the choice is his:
+  - **as shipped tonight** (collapse the flat caps only) — longest run **1 cell**, 4922 rule cells
+    over 6 widths x 7 heights x 48 half-hours; the disc is round at **13 of 13** heights.
+  - **collapse EVERY edge cell by area coverage** — **0 rules anywhere in the sweep**; the disc is a
+    **rectangle at 3 of 13 heights (18, 22 and 23 rows)**, and ~22 rows is about what his 107x51
+    window gives. Tried first with an always-grow collapse, which was worse still: rectangles at 18
+    and 21 AND a WAIST at 26 and 27 (rows 10 18 16 18 10), the middle row narrower than its
+    neighbours. Area rounding is the better of the two collapses; it is still a rectangle at his size.
