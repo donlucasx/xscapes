@@ -249,7 +249,15 @@ URLs, `message.md` = both), regenerated whenever the page is. **Use Default · Q
 0. ~~HIS CALL: the scrollback repro or the entry?~~ **ANSWERED 2026-09-08: the entry first, trace in
    the background. DONE — the entry is on the crab and LIVE**, page + 15 clips + deck + README,
    verified with real fetches. `7f68db6`.
-0-now. ⏸ **HIS, two things, both cheap:**
+0-now. ⏸ **HIS, in this order:**
+   (0) **Close the two orphan windows** (ttys002 07:16, ttys005 07:21 — empty sessions), then restart
+   THIS one by ID, not `--continue`:
+   `XSCAPES_TRACE=1 xscapes claude -- --resume 2c247007-955d-479f-9266-7d5d4f8d6db1`
+   ⚠ `--continue` resumes the most recent session in this directory, which is one of the empty ones.
+   That restart is what finally delivers the companion live-refresh build.
+   (1) **Regenerate the Commons paste kit FIRST** — all three files at `~/Desktop/xscapes-commons/`
+   were built 09-07 from the CAT page. Then publish + submit. **9 days.**
+   (2) The two cheap things below.
    (a) **Test Andale Mono** in Terminal &rarr; Settings &rarr; Profiles &rarr; Text &rarr; Font. Its
    block glyph fills **100.0%** of the line box against Menlo's **87.6%** (read from the font files,
    2026-09-08). If Terminal.app adds no leading of its own, that removes EVERY remaining hairline at
@@ -274,8 +282,14 @@ URLs, `message.md` = both), regenerated whenever the page is. **Use Default · Q
    lever left: the FONT. Menlo's block glyphs fill **85.4%** of the line box, Andale Mono **97.8%** —
    if that holds live it removes the hairline AND gives the gradient back, better than the trade he
    took. `Terminal → Settings → Profiles → Text → Font`.
-0b. **The scrollback** — the one open product defect. ⭐ **Two things changed on 2026-09-07 night and
-   they make it TRACTABLE.** (i) The "it needs a long-lived window" claim is REFUTED: the corrupted
+0b. **The scrollback** — the one open product defect. ⚠ **The s24 mechanism is REFUTED (see the
+   session 25 banner): the agent blanks all 33 of its rows before repainting, and the 300 KB
+   "occurrence" cut is ~2.6 seconds.** ⭐ **Next move is `retainWidth`**: `Rules.RetainsWidth` is
+   measured and honoured by `reallocBand`, but `host.go:272` builds the screen model with
+   `newScreen(cols, rows)` and never sets it, so the model that feeds the SCROLLBACK MIRROR runs
+   without Terminal.app's width rule. Wire it, replay, see whether the mirrored rows change. NOT the
+   claimed cause. ⇒ **Then aim the next capture at the MIRROR moment, not the resize.**
+   The older, still-true half: (i) The "it needs a long-lived window" claim is REFUTED: the corrupted
    window's scape started 20:28:20 and his screenshot is 21:04:44 — **36 minutes**. (ii) The RESIZE is
    on the record for the first time: the same window is titled **107x51** at 21:04 and **119x51** at
    21:18, and the corruption came back after. So the trace is NOT blocked on "you cannot trace a

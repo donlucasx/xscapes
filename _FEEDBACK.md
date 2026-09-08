@@ -2125,3 +2125,84 @@ window will not show it quickly. **Next attempt must trace the LONG-LIVED window
   the entry around the crab. Ten days to Commons and the live page, its five clips and the deck all
   still show the cat. My recommendation on the table: the entry first, with the trace running in the
   background because it costs him nothing while he works.
+
+### 2026-09-08 morning — the restart that kept not working, and Kimi's audit
+
+- *"no cat yet [image]"* (07:26), then *"you told me these 2 sessions before, Ive ran it as requested
+  and it has not worked [image]. plz advice"* (07:32), then *"have kimi audit our issues- hairline,
+  corrupted terminal history"*, then *"ok give me a step by step - whats next"*.
+
+⇒ **HE RESTARTED TWICE AND BOTH WORKED. MY INSTRUCTION WAS THE BUG.** Walking the process tree up from
+  a Bash tool call: this conversation is hosted by **PID 10648, ttys001, started 00:54:50** and has
+  never restarted. His restarts opened **ttys002 at 07:16:06 and ttys005 at 07:21:47**, both running
+  bare `xscapes claude` with **no `-- --continue`** — so each was a NEW, EMPTY conversation. He found a
+  stranger, came back to the original window, and nothing shipped could reach it.
+  ⚠ **`--continue` is now a TRAP in this directory**: three sessions exist and it resumes the most
+  recent, which is one of the empty ones. The resume must name the id:
+  `XSCAPES_TRACE=1 xscapes claude -- --resume 2c247007-955d-479f-9266-7d5d4f8d6db1` (verified `-print`).
+  ⚠ **And a sequencing failure of mine, twice**: I told him to restart and then installed a new binary
+  minutes later, so a perfect restart was already stale. Install FIRST, then ask.
+
+⇒ **`xscapes companion cat` did nothing, and the CLI and README both promised it would.**
+  `companionPref()` was read exactly once, inside `newFrames`, which runs at startup; even `resize()`
+  recomputes the layout from the companion width it already holds. FIXED `957f9f0`: `frame()`
+  re-reads at most every 500 ms and rebuilds. ⚠ **My first test for it asserted that ccw and MoonX
+  would MOVE on a swap and failed on the truth** — `Size()` returns the BOX and both animals are 12x7;
+  only the ink differs (9 vs 12). The brief says exactly that and I did not believe it. The test now
+  asserts the invariant (ccw agrees with the companion's own Size()), and was checked to FAIL with the
+  refresh call removed.
+
+### 2026-09-08 — THE KIMI AUDIT. Three of my claims refuted, one of its own wrong.
+
+Run non-interactively (`kimi -p`, v0.39.1, brief at `notes/kimi-audit-brief.md`, written to invite
+falsification and to name the self-contamination trap so it would not be repeated). Tree verified
+unchanged afterwards. **Every finding below I re-verified myself before accepting it.**
+
+⇒ ⭐ **MY SCROLLBACK MECHANISM IS DEAD.** I claimed the agent's post-resize repaint writes
+  column-addressed segments with NO per-row erase, so cells between segments keep stale content.
+  **Counted in the evidence: exactly 33 `ESC[2K ESC[1B` pairs, contiguous, 7 bytes apart, at offsets
+  9843..10106, immediately after `ESC[H` — and 33 is the AGENT ROW COUNT** (`.sizes`: `102 59 33`).
+  The agent homes and blanks every one of its rows before drawing a glyph. **Why I got it wrong: I
+  read a 3 KB window starting at offset 10050, which is INSIDE the erase run, saw its tail, and
+  called it a partial clear.** The same failure as reading a proxy: a window is not the structure.
+⇒ ⭐ **"300 KB of the occurrence" was wrong: the cut is ~2.6 SECONDS of trace** (300 KB at the
+  measured 6.6 MB/min). There is no positive evidence the corruption formed inside it, and I told him
+  we finally had both halves of the defect.
+⇒ **The `wi` at columns 1-2 explanation is implausible**: every repainted row starts at `ESC[3G`, so
+  the agent never writes columns 1-2. I inferred those column numbers off a screenshot.
+⇒ Smaller: my printed calibration arithmetic was wrong (0.43*rim + 0.57*sky = (99,113,133), not the
+  (96,112,133) I published; the corrected value fits the measured (100,113,134) BETTER, so a sloppy
+  derivation carried a sound conclusion) · **"silhouette width profile IDENTICAL" is overstated** —
+  columns unchanged, the caps' vertical fill goes half-height to full-height, and NO test asserts
+  either · `notes/rulecount`'s header comment describes 4 rules and it now prints 2, because
+  `NewShore` sets `FlatCaps: true` — an instrument that cannot reproduce its own documentation.
+
+⚠ **TWO OF KIMI'S OWN CLAIMS ARE WRONG, checked here:**
+  - *"Andale Mono isn't on the machine"* — it is, at `/System/Library/Fonts/Supplemental/Andale
+    Mono.ttf`. Its subagent checked three font directories and missed `Supplemental`. So "the
+    recommendation reduces to installing a third-party font" is false.
+  - *"the corrupted strings appear nowhere in the .bin, which voids assembled-in-cells"* — zero hits
+    is what that hypothesis PREDICTS, and the CLEAN text scores zero too ("growing at 6.6" -> 0),
+    because it is written as column-addressed segments. Its cell-level replay is the real refutation;
+    that grep is not.
+
+⇒ ⭐ **TWO GENUINELY NEW FINDINGS, both verified:**
+  1. **`ESC[8S` exactly undoes Terminal.app's grow-push, net zero.** That closes the open question of
+     session 24: our scroll-up is NOT what moves rows under the agent's repaint.
+  2. ⭐⭐ **`retainWidth` IS A WIRING GAP, and it sits in the mirror path.** `Rules.RetainsWidth`
+     exists, is documented as measured on Terminal.app, and is honoured by `reallocBand`.
+     `screen.retainWidth` exists and documents the same rule. **`host.go:272` builds the model with
+     `newScreen(cols, rows)` and never connects them** — it is true only in tests
+     (`realloc_test.go:17`, `width_rule_test.go:13`, `screen_test.go:51`). So the model that decides
+     what gets MIRRORED INTO SCROLLBACK runs in production with Terminal.app's measured width rule
+     switched OFF, while the same rule is switched ON for `reallocBand`. This resize was a WIDTH
+     change (119 -> 102). **Strongest lead this defect has had. NOT claimed as the cause** — that is
+     the move that has produced four wrong answers here; wire it and replay.
+
+⇒ **The font recommendation is corrected, and I overstated it to him first.** The 87.6% / 100.0%
+  figures hold across hhea AND OS/2 usWin (only sTypo differs, and it exceeds 100% for both, so it is
+  not what drives row height). BUT Menlo's metrics predict **3.7 px** unfilled in a 30 px row and his
+  screen measures **5.2 px**, so Terminal.app adds ~1.5 px of its own leading; Kimi's sharper version
+  is that no Menlo size gives 14x30 with row == line box, and Menlo's ink already overshoots and is
+  clipped at 29.4 where the mapping predicts 30.4. ⇒ **Andale Mono should SHRINK the gap ~3.5x, not
+  close it.** Still his 30-second test; go in expecting improvement, not a clean kill.

@@ -19,6 +19,40 @@
 > cells against the cat's 60 — same weight, arranged sideways. **The three extra columns were always
 > free**: `cat.Size()` returns the BOX, not the ink, and the cat has never used its last three.
 >
+> **Session 25 (2026-09-08 morning), WRAPPED. THE KIMI AUDIT KILLED MY SCROLLBACK MECHANISM.**
+> HEAD `957f9f0`, pushed, tree clean but for `notes/kimi-audit-brief.md`. Page still LIVE (HTTP 200).
+> ⭐ **THE MECHANISM I REPORTED IN S24 IS REFUTED.** I claimed the agent's post-resize repaint writes
+> column-addressed segments with NO per-row erase, so cells between them keep stale content. Counted:
+> **exactly 33 `ESC[2K ESC[1B` pairs, contiguous, at offsets 9843..10106, right after `ESC[H` — and 33
+> is the AGENT ROW COUNT.** It blanks every one of its rows before drawing a glyph. **Why I was wrong:
+> I read a 3 KB window starting at offset 10050, which is INSIDE the erase run.** A window is not the
+> structure. ⚠ And "300 KB of the occurrence" is **~2.6 SECONDS** of trace at 6.6 MB/min — we aimed at
+> the resize; the corrupted rows are written when they are MIRRORED, which is a different moment.
+> ⇒ ⭐⭐ **`retainWidth` IS A WIRING GAP AND IT IS IN THE MIRROR PATH — the strongest lead yet.**
+> `Rules.RetainsWidth` is measured, documented and honoured by `reallocBand`; `screen.retainWidth`
+> documents the same rule; **`host.go:272` calls `newScreen(cols, rows)` and never connects them.** It
+> is true only in tests. So the model that decides what gets mirrored into SCROLLBACK runs with
+> Terminal.app's measured width rule OFF, while `reallocBand` runs with it ON — and this resize was a
+> WIDTH change. ⚠ **NOT claimed as the cause.** Wire it and replay.
+> ⇒ **`ESC[8S` exactly undoes Terminal.app's grow-push, net zero** — s24's open question is closed:
+> our scroll-up does NOT move rows under the repaint.
+> ⚠ **Kimi was wrong twice** (both checked): Andale Mono IS installed (`/System/Library/Fonts/
+> Supplemental/`); and "the corrupted strings are absent from the .bin" refutes nothing, because the
+> CLEAN text is absent too — it is written as column-addressed segments.
+> ⇒ **FONT ADVICE CORRECTED, I overstated it first**: 87.6% vs 100.0% holds across hhea and usWin, but
+> Menlo's metrics predict 3.7px unfilled where his screen measures 5.2px, so Terminal.app adds its own
+> leading. **Andale Mono should SHRINK the gap ~3.5x, not close it.**
+> ⇒ **`xscapes companion <name>` now reaches a RUNNING scape** (`957f9f0`): `companionPref()` was read
+> once in `newFrames`; `frame()` re-reads every 500 ms. ⚠ My first test asserted ccw/MoonX would move
+> on a swap and **failed on the truth** — `Size()` returns the BOX and both animals are 12x7.
+> ⚠ **THREE RESTARTS FAILED AND THE INSTRUCTION WAS THE BUG.** This conversation is PID 10648
+> (ttys001, 00:54:50); his restarts made NEW EMPTY sessions because the command was bare `xscapes
+> claude`. **`--continue` is a TRAP here** (three sessions in this dir): resume by id —
+> `XSCAPES_TRACE=1 xscapes claude -- --resume 2c247007-955d-479f-9266-7d5d4f8d6db1`.
+> ⚠ Twice I said "restart" and then installed a new binary minutes later. **Install FIRST, then ask.**
+> ⏰ **9 days. The Commons paste kit at `~/Desktop/xscapes-commons/` is STALE — all three files still
+> say cat.** Regenerate before he submits.
+
 > **Session 24 (2026-09-08, early hours). ⭐ THE ENTRY IS ON THE CRAB AND IT IS LIVE.**
 > https://donlucasx.github.io/xscapes/ rebuilt and republished, verified with real fetches: the page,
 > **all fifteen clips**, the deck (HTML + PDF) and the README. HEAD `7f68db6`, pushed, tree clean, green.
