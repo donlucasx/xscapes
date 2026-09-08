@@ -4,10 +4,9 @@
 
 ```
 cd ~/Documents/claude/xscapes/ and read CLAUDE.md (the brief, authoritative)
-and RESUME.md before responding. ⚠ FIRST: `git status` — sessions 22 and 23 left
-~6 stories UNCOMMITTED (the crab, THREE rendering fixes, the companion switcher,
-the trace fixes, 15 new tests). All green and installed; land them as separate
-commits before new work. internal/companion is OURS now, the parallel session
+and RESUME.md before responding. Sessions 22 and 23 are LANDED as eight commits,
+HEAD `62f2664`, tree clean, all green and installed. ⚠ FIRST: `git log
+origin/main..HEAD` — those eight are **UNPUSHED** and need his go-ahead. internal/companion is OURS now, the parallel session
 released it. notes/claude-hooks-verified.md is the Claude Code hook schema — trust it, do not
 re-derive it. Skim origin-chat.md only if you need the why; ignore ideas.md — it
 is parked. Tell me where we left off, then pick up from ▶ NEXT — item 0 is a
@@ -247,16 +246,20 @@ the paste kit is on his Desktop at `~/Desktop/xscapes-commons/` (`brief.md`, `in
 URLs, `message.md` = both), regenerated whenever the page is. **Use Default · Quick, not Expert.**
 
 **▶ NEXT**
-0. ⏸ **WAIT ON THE CRAB.** He is implementing Hero in the parallel session and will open a fresh
-   session here when it lands. Do not start work in `internal/companion`.
+0. ⚠ **HIS CALL, ASKED AND UNANSWERED at the end of session 23**: the scrollback repro, or
+   rebuilding the entry around the crab? Ten days to Commons, the live page + five clips + deck all
+   still show the CAT, and the corruption damages the agent's SCROLLBACK, not the scape — a judge
+   never sees it. My recommendation on the table: **the entry first**, with the trace running in the
+   background because it costs him nothing while he works.
+0-crab. ~~WAIT ON THE CRAB~~ **DONE.** Hero shipped, is the DEFAULT, and `internal/companion` is ours.
 0A. **HIS: publish + submit the Commons entry.** Everything is staged: `~/Desktop/xscapes-commons/`
    (brief.md · index.html with 16 absolute clip URLs · message.md), regenerated 09-07 14:02 from the
    live page. Fresh chat in the Commons Space, **Default · Quick, not Expert** → paste → publish the
    app public from its manage page → hackathons → Open hackathon → Your entry → Submit → screenshot.
    ⚠ **The publish step is the blocker, not the submit click** — the entry picker only accepts a
    PUBLISHED Commons build. **Closes 2026-09-17.**
-0B. **His three picks for me, unstarted:** the **right-edge DL fix** (designed and measured GREEN on
-   the real terminal, `notes/width-audit.md` item 5, not built) · the **records + dead code + lying
+0B. **His three picks for me.** ~~the right-edge DL fix~~ **SHIPPED `65e242e`** (`reallocBand` on a
+   WIDTH change only). Still unstarted: the **records + dead code + lying
    instrument** sweep (`tune`'s WORRY EPISODES block is hard-coded to the old rule and prints
    identical output under any change; `test_fail`/`test_pass` have no producer; `-ascii` ships
    Unicode) · the **README + deck rescope** (both still say "Claude Code runs inside a shoreline").
@@ -265,10 +268,25 @@ URLs, `message.md` = both), regenerated whenever the page is. **Use Default · Q
    lever left: the FONT. Menlo's block glyphs fill **85.4%** of the line box, Andale Mono **97.8%** —
    if that holds live it removes the hairline AND gives the gradient back, better than the trade he
    took. `Terminal → Settings → Profiles → Text → Font`.
-0b. **The scrollback** — the one open product defect, and he did NOT pick it from the four he was
-   offered on 09-07, so it is deliberately parked behind the submission. Build the always-on mirror journal so the next
-   occurrence settles bad-bytes-vs-bad-drawing by itself (design in the session 19 block above).
-   ⚠ `/tmp/apple.bin` is GONE; a fresh trace must live outside `/tmp`.
+0b. **The scrollback** — the one open product defect. ⭐ **Two things changed on 2026-09-07 night and
+   they make it TRACTABLE.** (i) The "it needs a long-lived window" claim is REFUTED: the corrupted
+   window's scape started 20:28:20 and his screenshot is 21:04:44 — **36 minutes**. (ii) The RESIZE is
+   on the record for the first time: the same window is titled **107x51** at 21:04 and **119x51** at
+   21:18, and the corruption came back after. So the trace is NOT blocked on "you cannot trace a
+   window that has already lived" — **launch traced, resize, work normally, and it fires inside the
+   hour**:
+   ```
+   XSCAPES_TRACE=1 xscapes claude -- --continue
+   ```
+   ⚠ the `--` is REQUIRED · ⚠ ~7 MB/min, so kill it once it fires · ⚠ NOT `/tmp` (nine traces died in
+   the 09-06 reboot; `=1` now picks `~/.config/xscapes/traces/` itself).
+   **When it fires: STOP.** Do not scroll, resize or exit — read the window back by tty with his OK
+   (`1049l` discards most mirrored rows) and pair it with the trace bytes at that offset. That is the
+   first time we would have both halves.
+   **Offline track, needs nobody**: drive an Ink-style differential redraw through a resize in
+   `internal/host/screen_test.go` — draw a full-width rule, resize, repaint only the changed segments,
+   and see whether the rows merge in the model. Never been done, and it does not depend on catching it
+   live. ⚠ Run it at `AltScreen: true` or it proves nothing (the s13 lesson).
 1. **HIS LOOK at the live page**, https://donlucasx.github.io/xscapes/ — rebuilt and republished
    2026-09-07 14:00 from HEAD, so what is up there is finally current.
 2. **Commons: submit** — see 0A above, which supersedes this with the current paste kit and the
@@ -281,10 +299,9 @@ URLs, `message.md` = both), regenerated whenever the page is. **Use Default · Q
    deadline (my read: none), and which companion to draw properly. Two are already on the page as roadmap.
 4. ⏸ **The DECK (`assets/deck/deck.tpl.html`) and the README still carry the old narrow scope** — the deck
    repeats *"Claude Code runs inside a shoreline"* verbatim. Both need the same rescope, his go-ahead.
-5. The scrollback corruption — **now item 0b above, and seen a FOURTH time on 09-06.** Still untraced.
-   The old recipe stands as the second-stage tool, but ⚠ **it is not the answer on its own**:
-   `XSCAPES_TRACE` is opt-in and read once at launch, and the defect only appears after a long session,
-   which is precisely why occurrences three and four went untraced. Capture outside `/tmp` now:
+5. The scrollback corruption — **now item 0b above, and seen a SIXTH and SEVENTH time on 09-07 night.**
+   Still untraced. ⚠ **The line that used to sit here — "the defect only appears after a long session" —
+   is REFUTED: 36 minutes was enough.** What it wants is RESIZES, not hours. Capture outside `/tmp` now:
    `XSCAPES_TRACE=~/.config/xscapes/t.bin xscapes claude` (the `--` separator is only needed when
    passing the agent flags, e.g. `xscapes claude -- --continue`). Then read the window back BY TTY with
    his OK (`1049l` discards most mirrored rows, so read BEFORE any restart), and offline

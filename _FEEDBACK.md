@@ -2097,3 +2097,31 @@ window will not show it quickly. **Next attempt must trace the LONG-LIVED window
     window gives. Tried first with an always-grow collapse, which was worse still: rectangles at 18
     and 21 AND a WAIST at 26 and 27 (rows 10 18 16 18 10), the middle row narrower than its
     neighbours. Area rounding is the better of the two collapses; it is still a rectangle at his size.
+
+- *"i did not photograph the pre fix, I photographed this very session, which is already showing
+  strikethrough lines again [image] [image] - how to proceed?"* (2026-09-07 ~21:19, the 119x51 window
+  and a second heavy magnification of the moon).
+
+⇒ **He was right and so was the claim; they are not in conflict, and I should have said so the first
+  time instead of leading with "that's the old binary".** It IS this session. This session's scape is
+  also pre-FlatCaps, because a running process does not re-exec. Settled by INODE rather than by
+  argument: the scape (PID 66211) holds `txt REG ... 83591812`, and `~/.local/bin/xscapes` is
+  `83606834`. Different files — the install went to a new inode by design, which is what keeps a
+  running scape alive, and it is also what keeps the fix out of it. **The fix reaches him only on
+  restart.**
+
+⇒ ⭐ **THE RESIZE IS CONFIRMED, and it is the question left open two hours earlier.** His 9.04 PM
+  screenshot titles the window **107x51**; his 9.18 PM screenshot titles the same window **119x51**.
+  He resized it, and the corruption came back after. That is the first time a resize and an occurrence
+  have been tied together in one window with timestamps on both — every earlier claim that resizes are
+  the trigger was inference. ⚠ It is still not proof of CAUSE; it is one window, one grow.
+
+⇒ **The 9.18 screenshot also carries the s14 #6 signature, which had never been claimed as ours**: a
+  prose block appears TWICE, once struck through and once clean ("~22 rows is about what your 107x51
+  window gives..."). s14 read that as Claude Code re-rendering, on the grounds that a plain terminal
+  keeps both copies. Worth re-reading now that a resize is on the record beside it.
+
+⚠ **UNANSWERED, and it is the priorities call only he can make**: the corruption repro, or rebuilding
+  the entry around the crab. Ten days to Commons and the live page, its five clips and the deck all
+  still show the cat. My recommendation on the table: the entry first, with the trace running in the
+  background because it costs him nothing while he works.

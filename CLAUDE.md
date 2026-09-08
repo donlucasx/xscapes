@@ -19,8 +19,24 @@
 > cells against the cat's 60 — same weight, arranged sideways. **The three extra columns were always
 > free**: `cat.Size()` returns the BOX, not the ink, and the cat has never used its last three.
 >
-> **Session 23 (2026-09-07, later evening). THE DISC'S OUTLINE IS CLOSED, and the fix session 22
-> proposed was wrong.** Per-cell half-block ORIENTATION cannot work: Menlo's block ink runs **4.6 →
+> **Session 23 (2026-09-07 night), WRAPPED. SESSIONS 22 AND 23 ARE LANDED — eight commits, HEAD
+> `62f2664`, tree clean, all green, installed.** ⚠ **UNPUSHED**; needs his go-ahead.
+> ⚠ **ONE QUESTION IS OPEN AND IT IS HIS**: the scrollback repro, or rebuilding the entry around the
+> crab? **Ten days to Commons and the live page, its five clips and the deck all still show the CAT.**
+> The corruption damages the agent's SCROLLBACK, not the scape — a judge never sees it. Recommendation
+> on the table: **the entry first**, trace running in the background.
+> ⭐ **THE SCROLLBACK BECAME TRACTABLE TONIGHT, on two measurements.** (i) The corrupted window's scape
+> started **20:28:20** against a **21:04:44** screenshot — **36 minutes**, so "it needs a long-lived
+> window" is REFUTED (it was my own claim, an hour old). (ii) **The RESIZE is on the record for the
+> first time**: the same window is titled **107x51** at 21:04 and **119x51** at 21:18, with an
+> occurrence after. ⇒ `XSCAPES_TRACE=1 xscapes claude -- --continue`, resize, work normally, and it
+> fires inside the hour. **When it fires: STOP** — read the window back and pair it with the bytes.
+> ⚠ Still not proof of CAUSE: one window, one grow.
+> ⚠ **The fix does not reach a running scape.** Settled by inode, not argument: PID 66211 holds
+> `83591812`, `~/.local/bin/xscapes` is `83606834`. The new-inode install is what keeps a running scape
+> alive and it is also what keeps the fix out of it. **Restart, or you re-photograph the old picture.**
+>
+> **THE DISC'S OUTLINE IS CLOSED, and the fix session 22 proposed was wrong.** Per-cell half-block ORIENTATION cannot work: Menlo's block ink runs **4.6 →
 > 29.4 of a 30px row**, so a cell has two achievable partitions and BOTH leave the background at the
 > bottom — `▄` errs 0.6px there, `▀` errs 4.6px at the top. Making the sliver match what is below
 > means `▀` everywhere, which is U+2580, which is the glyph `LowerHalf` exists to avoid. **No glyph
