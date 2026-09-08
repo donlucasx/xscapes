@@ -94,6 +94,9 @@ func (c *Cat) KittenSize() (w, h int) {
 // sea gives the litter somewhere to spread that still reads as one scene.
 func (c *Cat) DrawKittens(near, mid *canvas.Layer, px, py, n, w, seaTop, seaBot int, t float64, seed int64) int {
 	_ = mid // every kitten is on the near layer; kept for call-site stability
+	if c.kind == KindCrab {
+		return c.drawCrabKittens(near, px, py, n, w, seaTop, seaBot, t, seed)
+	}
 	if n <= 0 {
 		return 0
 	}
@@ -519,6 +522,9 @@ func (c *Cat) exitSpans(exits []float64, px, py, w, seaTop, seaBot int) []swimSp
 // it, and the litter count itself dropped the moment the end event came.
 // Returns how many were drawn.
 func (c *Cat) DrawKittenExits(l *canvas.Layer, exits []float64, px, py, w, seaTop, seaBot int, t float64, seed int64) int {
+	if c.kind == KindCrab {
+		return c.drawCrabExits(l, exits, px, w, seaTop, seaBot, t, seed)
+	}
 	spans := c.exitSpans(exits, px, py, w, seaTop, seaBot)
 	if len(spans) == 0 {
 		return 0

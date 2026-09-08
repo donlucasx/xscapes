@@ -54,6 +54,10 @@ var (
 // Cat is the companion. The body is a bitmap; the tail is a curve evaluated per
 // frame, which is why wagging costs no extra authoring.
 type Cat struct {
+	// kind is which animal this is. The sprite data is a field rather than a
+	// hardcoded bitmap, so a second companion needs no interface and no change
+	// at any of the 25 construction sites outside this package.
+	kind     Kind
 	body     *Bitmap
 	walk     *Bitmap
 	worried  *Bitmap
@@ -124,6 +128,10 @@ func (c *Cat) FaceLeft(v bool) { c.mirror = v }
 // Draw composes this frame and plots it. Everything that moves is computed
 // here; nothing is stored between frames.
 func (c *Cat) Draw(l *canvas.Layer, x, y int, t float64, st State) {
+	if c.kind == KindCrab {
+		c.drawCrab(l, x, y, t, st)
+		return
+	}
 	src := c.body
 	if st == Worried {
 		src = c.worried
