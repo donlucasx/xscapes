@@ -102,7 +102,7 @@ func main() {
 	out := flag.String("out", "", "write the HTML page here")
 	flag.Parse()
 
-	term.LowerHalf = true // Terminal.app
+	term.LowerHalf, term.NoSplitCells = true, true // Terminal.app
 
 	if *out == "" {
 		c, _, _ := frame(*cols, *rows, *seed, *tod, 0.49, nil)
@@ -151,10 +151,16 @@ func main() {
 	b.WriteString(`</div>`)
 
 	b.WriteString(`<h2>2 &middot; the disc</h2>`)
-	b.WriteString(`<p>The hue rim is sampled at half rows, so a cell whose upper half is rim and lower half is body ` +
-		`is a split cell and draws a line across the sun.</p><div class="row">`)
+	b.WriteString(`<p>Every split cell leaks about one device pixel of its background at the cell's bottom edge, and ` +
+		`no glyph avoids it &mdash; the full block's ink runs 4.6 to 29.4 of the 30px row, so the last row is the ` +
+		`background whatever is drawn there. What makes that pixel a LINE is the RUN. The disc's top and bottom ` +
+		`CAPS are flat, so five neighbouring columns put their sliver on the same device row: seventy pixels ` +
+		`straight across the sun. A split cell whose neighbour's edge falls in the same cell on the same side ` +
+		`cannot buy any roundness, so the caps now take a whole cell and the shoulders keep their split, which is ` +
+		`where the curve actually lives. Longest rule run 5 cells &rarr; 1 (notes/rulecount).</p><div class="row">`)
 	for _, v := range []variant{
-		{"as it ships (hue rim)", nil},
+		{"as it ships (flat caps)", nil},
+		{"caps split, as before", func(s *scape.Shore) { s.FlatCaps = false }},
 		{"no rim", func(s *scape.Shore) { s.MoonRim = "" }},
 		{"quad edge", func(s *scape.Shore) { s.MoonEdge = "quad" }},
 	} {

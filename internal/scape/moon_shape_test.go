@@ -19,7 +19,26 @@ import (
 //
 // Read from the rendered frame: a cell counts as moon if it is brighter than
 // the sky beside it, and a split cell (U+2580) counts by the half that is.
+//
+// ⚠ Both flag states, and that is not decoration. This suite's zero values are
+// Ghostty's, and PRODUCTION on his machine is Terminal.app: NoSplitCells true,
+// which is the switch the flat-cap collapse is gated on. Running only the zero
+// values would clear a disc nobody ships. That is the s13 lesson -- a harness
+// pinned to a non-production mode exonerates falsely -- and it cost four wrong
+// answers the first time.
 func TestTheMoonIsRoundAtEveryHeight(t *testing.T) {
+	for _, flat := range []bool{false, true} {
+		t.Run(map[bool]string{false: "ghostty", true: "terminal.app"}[flat], func(t *testing.T) {
+			prev, prevHalf := term.NoSplitCells, term.LowerHalf
+			term.NoSplitCells, term.LowerHalf = flat, flat
+			defer func() { term.NoSplitCells, term.LowerHalf = prev, prevHalf }()
+			moonRoundAtEveryHeight(t)
+		})
+	}
+}
+
+func moonRoundAtEveryHeight(t *testing.T) {
+	t.Helper()
 	for h := 18; h <= 30; h++ {
 		c := canvas.New(124, h, canvas.AlphaFar, canvas.AlphaMid, canvas.AlphaNear)
 		sh := NewShore(7, false)

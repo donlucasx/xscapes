@@ -109,6 +109,30 @@ type Shore struct {
 	// can carry.
 	MoonHalo bool
 
+	// FlatCaps collapses the disc's edge cells to whole cells where the edge
+	// is locally HORIZONTAL, and it is the answer to the last of his hairline
+	// reports. Every split cell on Terminal.app leaks about one device pixel
+	// of its background at the cell's bottom edge -- U+2584's ink stops at
+	// 29.4 of a 30px row -- and no glyph avoids it: the full block's ink runs
+	// 4.6..29.4, so whatever is drawn there the last row is the background.
+	// Measured in his 8.27.52 PM crop of 2026-09-07, at the disc's centre
+	// column: 17px of sky, 12px of rim, then ONE pixel of (100,113,134), which
+	// is 0.43*rim + 0.57*sky to within two counts on every channel.
+	//
+	// What makes that pixel a LINE rather than a speck is the RUN. Counted
+	// over 6 widths x 7 heights x 48 half-hours (notes/rulecount): the whole
+	// frame carries four rules and all four are on the disc -- two of them
+	// FIVE cells wide, at the top and bottom caps, and two one cell wide at
+	// the shoulders. The caps are where the silhouette is flat, and a split
+	// cell whose neighbours split at the same height buys no roundness at all;
+	// it only draws seventy pixels of rule. So the caps take a whole cell and
+	// the shoulders keep their split, which is where the curve actually lives.
+	//
+	// Gated on term.NoSplitCells, so only the terminal with the defect pays
+	// for it: Ghostty draws the blocks pixel-exact and keeps the full half-row
+	// edge everywhere. Set false to study the shipped-until-now edge.
+	FlatCaps bool
+
 	// writeTop is the first row of the writing band, or c.H when there is none.
 	writeTop int
 
@@ -188,7 +212,7 @@ func (s *Shore) MoonPos() (x, y int) { return s.moonX, s.moonY }
 func (s *Shore) MoonExtent() (rx, ry int) { return s.moonRX, s.moonRY }
 
 func NewShore(seed int64, asciiOnly bool) *Shore {
-	return &Shore{Seed: seed, ASCII: asciiOnly, SandFade: DefaultSandFade, WriteRows: DefaultWriteRows, MoonRim: "hue"}
+	return &Shore{Seed: seed, ASCII: asciiOnly, SandFade: DefaultSandFade, WriteRows: DefaultWriteRows, MoonRim: "hue", FlatCaps: true}
 }
 
 func (s *Shore) Name() string { return "shore" }
@@ -785,12 +809,64 @@ func (s *Shore) moon(c *canvas.Canvas, hy int, scale, lit, vis float64) {
 				// and takes every rule off the face.
 				c.SetBG(x, y, term.Lerp(half[0], half[1], 0.5))
 			case in[0]:
-				c.SetBGHalves(x, y, half[0], c.BGAt(x, y))
+				// The disc's LOWER edge: only the upper half is inside.
+				if s.flatEdge(dx, dy, 0, rr, shadow, noShadow) {
+					c.SetBG(x, y, half[0])
+				} else {
+					c.SetBGHalves(x, y, half[0], c.BGAt(x, y))
+				}
 			case in[1]:
-				c.SetBGHalves(x, y, c.BGAt(x, y), half[1])
+				// The disc's UPPER edge: only the lower half is inside.
+				if s.flatEdge(dx, dy, 1, rr, shadow, noShadow) {
+					c.SetBG(x, y, half[1])
+				} else {
+					c.SetBGHalves(x, y, c.BGAt(x, y), half[1])
+				}
 			}
 		}
 	}
+}
+
+// discHalf says whether one half-row of one cell is painted as disc. It is
+// moon()'s own test, lifted out so a cell can ask about its NEIGHBOURS without
+// doing their colour work. off is -0.25 for the upper half, +0.25 for the
+// lower, matching the sampling moon() paints by.
+func (s *Shore) discHalf(dx, dy int, off, rr, shadow float64, noShadow bool) bool {
+	fx, fy := float64(dx)/2.0, float64(dy)+off
+	if math.Hypot(fx, fy) >= rr {
+		return false
+	}
+	// By day the sun wanes as a crescent and the unlit half is not painted at
+	// all, so a half-row inside the circle can still be outside the disc.
+	if noShadow && math.Hypot(fx-shadow, fy) <= rr {
+		return false
+	}
+	return true
+}
+
+// flatEdge says an edge cell's split buys no roundness: a neighbouring column
+// has its edge in the SAME cell and on the same side, so the silhouette runs
+// horizontally through both and the two of them draw one straight rule.
+// in is the half that is inside -- 0 upper, 1 lower.
+//
+// Only the neighbours are asked, and only for the same half. A cell whose
+// neighbours split at a different height is on the curve, and there the split
+// is the whole reason the disc is round rather than a rectangle; those keep it.
+func (s *Shore) flatEdge(dx, dy, in int, rr, shadow float64, noShadow bool) bool {
+	if !s.FlatCaps || !term.NoSplitCells {
+		return false
+	}
+	for _, n := range [2]int{dx - 1, dx + 1} {
+		up := s.discHalf(n, dy, -0.25, rr, shadow, noShadow)
+		down := s.discHalf(n, dy, 0.25, rr, shadow, noShadow)
+		if up == down {
+			continue // that column is not an edge cell at this row
+		}
+		if (in == 0 && up) || (in == 1 && down) {
+			return true
+		}
+	}
+	return false
 }
 
 // moonQuad samples the disc at four quarters per cell (a quarter of a
