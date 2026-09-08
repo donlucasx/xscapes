@@ -7,6 +7,7 @@ import (
 	"os"
 	"os/exec"
 	"os/signal"
+	"path/filepath"
 	"strings"
 	"sync"
 	"sync/atomic"
@@ -14,6 +15,7 @@ import (
 	"time"
 
 	"github.com/donlucasx/xscapes/internal/envx"
+	"github.com/donlucasx/xscapes/internal/event"
 )
 
 // Host runs an agent inside the top rows of this terminal and paints the scape
@@ -151,11 +153,43 @@ func (h *Host) openTrace() {
 	if path == "" {
 		return
 	}
+	// XSCAPES_TRACE=1 picks the path so there is none to get wrong.
+	//
+	// The path WAS the whole failure mode. On 2026-09-07 he started a session
+	// to trace the scrollback defect, the scape came up, the defect
+	// reproduced on screen -- and nothing was captured, because the open had
+	// failed and this function returned in silence. A debugging tool you point
+	// at a file deliberately has to say when it cannot write there.
+	if path == "1" || strings.EqualFold(path, "true") || strings.EqualFold(path, "yes") {
+		home, err := event.Home()
+		if err != nil {
+			traceOff(path, err)
+			return
+		}
+		path = filepath.Join(home, "traces", time.Now().Format("20060102-150405")+".bin")
+	}
+	// Make the parent, so a directory that does not exist yet cannot quietly
+	// turn tracing off.
+	if err := os.MkdirAll(filepath.Dir(path), 0o700); err != nil {
+		traceOff(path, err)
+		return
+	}
 	f, err := os.OpenFile(path, os.O_CREATE|os.O_WRONLY|os.O_TRUNC, 0o600)
 	if err != nil {
+		traceOff(path, err)
 		return
 	}
 	h.trace = f
+	// Said out loud, and before the band takes the screen, because the only
+	// way to know a trace is running was to go looking for the file.
+	fmt.Fprintf(os.Stderr, "xscapes: tracing to %s\n", path)
+}
+
+// traceOff reports that a trace was ASKED FOR and is not happening. It never
+// stops the session: he asks for a trace mid-work and losing the agent over a
+// bad path would be worse than losing the trace. But it is never silent again.
+func traceOff(path string, err error) {
+	fmt.Fprintf(os.Stderr, "xscapes: XSCAPES_TRACE is set but TRACING IS OFF -- %s: %v\n", path, err)
 }
 
 func (h *Host) Run() error {
@@ -354,7 +388,7 @@ func (h *Host) Run() error {
 		case <-tick.C:
 			nc, nr := h.Size()
 			if nc != cols || nr != rows {
-				oldAgent, oldRows := agentRows, rows
+				oldAgent, oldRows, oldCols := agentRows, rows, cols
 				cols, rows = nc, nr
 				agentRows, scapeRows = BandWith(rows, h.ScapeRows)
 
@@ -386,6 +420,14 @@ func (h *Host) Run() error {
 				}
 				h.traceSize(cols, rows, agentRows)
 				h.write(resizeSequence(h.AltScreen, h.Rules, oldRows, rows, oldAgent, agentRows))
+				// A WIDTH change leaves Terminal.app holding each row's old
+				// cells past the new width, and erase cannot reach them -- the
+				// strip he has photographed at the frame's right edge. DL can:
+				// see reallocBand. Rows only, and nothing happens on a
+				// height-only resize.
+				if cols != oldCols && h.Rules.RetainsWidth {
+					h.write(reallocBand(agentRows+1, rows))
+				}
 				// The screen was just touched behind the tracker's back.
 				dmg.reset()
 				p.SetSize(cols, agentRows)
