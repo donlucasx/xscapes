@@ -445,7 +445,22 @@ func (c *Canvas) resolve(x, y int, p term.Profile) resolved {
 		}
 		return resolved{ch: ch, fg: fg, bg: mid, glyph: true}
 	}
-	if p == term.Profile256 && !set && term.Shading {
+	// NoSplitCells gates this too, and that is the whole of his hairline report.
+	//
+	// This branch takes a cell with NO half state and no ramp -- a plain
+	// background -- and splits it anyway, to place a band edge implied by its
+	// neighbours. That is why the hairlines survived every fix aimed at them:
+	// the ramp path above was gated, and the disc was made to paint one tone,
+	// and then this put the split back from the outside. Measured on his own
+	// screen 2026-09-07, at the disc's centre column: twelve pixels of
+	// (209,166,124), one pixel of (185,142,101), sixty more of (209,166,124) --
+	// a one-pixel rule across the sun's face, from a cell nothing had asked to
+	// split.
+	//
+	// His rulings that the disc and the shoreline STAY split are untouched:
+	// those split explicitly through SetBGHalves, which is the hf.set branch at
+	// the top and is not gated here.
+	if p == term.Profile256 && !set && term.Shading && !term.NoSplitCells {
 		if up, down, ok := c.halves(x, y); ok {
 			ui, di := up.Index256Keeping(), down.Index256Keeping()
 			if ui != di {

@@ -764,7 +764,26 @@ func (s *Shore) moon(c *canvas.Canvas, hy int, scale, lit, vis float64) {
 			case in[0] && in[1] && half[0] == half[1]:
 				c.SetBG(x, y, half[0])
 			case in[0] && in[1]:
-				c.SetBGHalves(x, y, half[0], half[1])
+				// BOTH halves inside the disc: paint ONE tone.
+				//
+				// A half block on Terminal.app leaves a one-pixel rule at the
+				// cell's bottom edge -- its ink runs to 29.4 of a 30px row, and
+				// the last device pixel row falls back to the cell's
+				// background, which is the OTHER half's colour. Measured on his
+				// own screen 2026-09-07: at the disc's centre column, twelve
+				// pixels of (209,166,124), then a single pixel of (185,142,101),
+				// then sixty more of (209,166,124). Inside the disc that rule
+				// runs clean across the face, which is what he has reported
+				// three times as "thin hairlines breaking up the art", most
+				// visibly on the sun and the moon.
+				//
+				// The SILHOUETTE is what makes the disc round, and the
+				// silhouette is drawn by the two edge cases below -- they still
+				// split, so nothing about the roundness measured over 184
+				// (width, rows) pairs changes. Collapsing only the INTERIOR
+				// costs the internal shading half a cell of vertical resolution
+				// and takes every rule off the face.
+				c.SetBG(x, y, term.Lerp(half[0], half[1], 0.5))
 			case in[0]:
 				c.SetBGHalves(x, y, half[0], c.BGAt(x, y))
 			case in[1]:
