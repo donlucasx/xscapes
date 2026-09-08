@@ -23,9 +23,9 @@ import (
 // (anchored bottom, cursor unmoved -- notes/contentprobe and shrinkprobe), or
 // as "keep what fits" for the main screen.
 func TestReplayTrace(t *testing.T) {
-	path := os.Getenv("XSCAPES_TRACE")
+	path := tracePath(t)
 	if path == "" {
-		t.Skip("set XSCAPES_TRACE to a trace file to replay it")
+		t.Skip("set XSCAPES_TRACE to a trace FILE to replay it")
 	}
 	b, err := os.ReadFile(path)
 	if err != nil {
@@ -134,9 +134,9 @@ func readTraceMarks(t *testing.T, path string) []traceMark {
 // `cols` mean the RENDERER is wrong; rows full to `cols` mean the host's idea
 // of `cols` was behind the window.
 func TestTraceRightEdge(t *testing.T) {
-	path := os.Getenv("XSCAPES_TRACE")
+	path := tracePath(t)
 	if path == "" {
-		t.Skip("set XSCAPES_TRACE to a trace file")
+		t.Skip("set XSCAPES_TRACE to a trace FILE to replay it")
 	}
 	b, err := os.ReadFile(path)
 	if err != nil {

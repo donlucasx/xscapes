@@ -24,9 +24,9 @@ import (
 // either a long-session divergence of the model or the mirror's own bytes
 // being fed back through it; a trace of a session that shows it decides.
 func TestReplayTraceKept(t *testing.T) {
-	path := os.Getenv("XSCAPES_TRACE")
+	path := tracePath(t)
 	if path == "" {
-		t.Skip("set XSCAPES_TRACE")
+		t.Skip("set XSCAPES_TRACE to a trace FILE to replay it")
 	}
 	b, err := os.ReadFile(path)
 	if err != nil {

@@ -97,7 +97,7 @@ var gifScenes = []gifScene{
 	{name: "window", tod: 0.30, todEnd: 1.30, secs: 16, cols: 108, agentRows: 16,
 		speed: loopSecs / 16.0, beats: windowLoop(),
 		note: "one whole session in one loop, the day turning under it"},
-	{name: "hero", at: 14, tod: 0.52, secs: 6, note: "the fan-out at noon: busy sea, five kittens, the sand carrying the tool calls"},
+	{name: "hero", at: 14, tod: 0.52, secs: 6, note: "the fan-out at noon: busy sea, five crablets, the sand carrying the tool calls"},
 	{name: "worried", at: 22, tod: 0.62, secs: 4, note: "a command exited 1: the companion carries it"},
 	{name: "ask", at: 30, tod: 0.80, secs: 4, note: "dusk: the agent needs permission, solid balloon, alert pose"},
 	{name: "done", at: 44, tod: 0.96, secs: 5, note: "night: done, dotted balloon, the constellation, the moon with its readout"},
@@ -181,7 +181,12 @@ func gifFrames(seed int64, sc gifScene) ([]string, error) {
 	base := time.Now()
 	red := reduce.New("site")
 	sh := scape.NewShore(seed, false)
-	cat := companion.NewCat()
+	// The SHIPPED default, not this machine's saved preference: the page has to
+	// render the same on any checkout, and it has to show what a fresh install
+	// actually gets. companionPref() would make the entry depend on whatever is
+	// in ~/.config/xscapes/companion, which is the one thing a submission must
+	// not do.
+	cat := companion.New(companion.DefaultName)
 	cat.FaceLeft(true)
 	ccw, chh := cat.Size()
 	speed := sc.speed
