@@ -13,7 +13,6 @@ import (
 // each written down after a defect he reported, and a new animal does not get
 // to rediscover them.
 
-
 // laneAlloc places sprites into lanes so that no two ever overlap.
 //
 // The first version bucketed columns as x/kw and called that "never share a
@@ -123,7 +122,6 @@ func (c *Cat) drawCrabKittens(l *canvas.Layer, px, py, n, w, seaTop, seaBot int,
 	}
 	return drawn
 }
-
 
 // crabSpan is one placed swimmer: which subagent, which lane, and the columns
 // it occupies including the two ripple cells.

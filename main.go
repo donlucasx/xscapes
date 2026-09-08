@@ -5,9 +5,9 @@
 package main
 
 import (
-	"io"
 	"flag"
 	"fmt"
+	"io"
 	"os"
 	"path/filepath"
 

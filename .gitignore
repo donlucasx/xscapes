@@ -26,3 +26,8 @@ site/anim/*.html
 site/anim/*.png
 # except the scape stills, which the page serves and publish.sh uploads
 !site/anim/scape-*.png
+
+# generated character-study pages — 15 MB of them, regenerable with
+# `go run ./notes/charstudy/crab`. Same rule as /assets/frames/*.html above:
+# the GENERATOR is the record, the render is not.
+/notes/charstudy/*.html

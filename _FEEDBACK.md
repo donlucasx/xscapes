@@ -1887,3 +1887,180 @@ and `strip.go`, both studies. That last one was on my blocker list until I check
     pose work keyed on Worried is working against a much rarer, and differently-meant, signal.
   ⇒ Also visible in his screenshot, and it is the parallel session's thread, not this one's:
     *"they could be pacing a bit. Should be tied up to an actual agent action so its not random"*.
+
+### 2026-09-07, session 21 (parallel) — THE SCROLLBACK FORK IS SETTLED: **BAD BYTES**
+
+His report: *"sometimes scrolling back through the session history some lines will be striked through"*,
+with a screenshot of the hackathon-submission window (115x60, Terminal.app).
+
+**Captured live, read-only, from the window still open** (`osascript ... get contents of selected tab of
+window id 3418`, his OK "run them"; no keystrokes, no `front window`). Saved OUTSIDE `/tmp` at
+`~/Documents/Screenshots/sb-visible.txt` (60 rows) and `sb-history.txt` (300 rows).
+
+⇒ **`sb-visible.txt` line 9, verbatim:**
+```
+──The─entry─picker─takes─only a published Commons build.─An─external─URL─or─a─repo─can't─be─submitted─on─its─own.──
+```
+Those are real **U+2500 BOX DRAWINGS LIGHT HORIZONTAL** characters, returned as PLAIN TEXT by
+AppleScript, which carries no attributes at all. **So it is not a strikethrough SGR and not a
+Terminal.app rendering artifact: the cells genuinely hold a separator row's glyphs merged into a prose
+row.** The fork that survived s14, s19 and s20 — *bad bytes or bad drawing* — is closed. **BAD BYTES.**
+
+⇒ **The dash/space positions name the mechanism.** Dashes at 0,1,5,11,18,24 — every word gap — then
+**spaces SURVIVE at 29,31,41,49**, which is exactly the bold run `only a published Commons build.`,
+and dashes resume at 56. That is **Ink's differential redraw**: Claude Code drew a full-width rule,
+then redrew the row and repainted only what it believed had changed — the bold segment in full (so its
+spaces landed), the regular text's gaps not at all (so the rule's glyphs stayed). The letterforms are
+clean because nothing overwrote them. This is the s14 partial diagnosis with an artifact behind it.
+
+⇒ **RULED OUT, so nobody re-raises it: it is not a write race.** Every writer to the terminal goes
+through `h.write`, which holds `h.mu` across the WHOLE string — the agent's forwarded output at
+host.go:302 included. A `MirrorBatch` cannot be interleaved with agent bytes, so the window between its
+`regionReset` and its closing `EnterBand` never opens.
+
+⇒ **NEXT, and it is the decisive step.** Claude Code emits NO absolute row addressing within a turn, so
+anything that moves rows or the cursor under it makes its next partial repaint land wrong. WE move
+things: `resizeSequence` clears rows that change hands, `Rebind` scrolls content up on a grow,
+`RebindShrinkAlt` moves the cursor on a shrink — and he resizes constantly. **Do not name a culprit
+without the bytes**; this defect has produced three confident wrong answers already. `h.write` already
+feeds `h.trace` and `traceSize` records sizes against byte offsets, so a trace replays through the
+screen model and shows the exact divergence point:
+```
+XSCAPES_TRACE=~/Documents/Screenshots/apple3.bin xscapes claude -- --continue
+```
+⚠ the `--` is REQUIRED (verified with `-print`), and ⚠ NOT `/tmp` — nine traces died in the 09-06 reboot.
+
+### 2026-09-07 evening — HIS FOUR RULINGS on shipping the crab, and three fixes
+
+**His four rulings** (put to him as one question set once the study was done):
+1. **Switching: the subcommand + a slash command.** `xscapes companion [cat|crab]` writes
+   `~/.config/xscapes/companion`; a running scape picks it up on its next frame.
+   `XSCAPES_COMPANION=` overrides for one run without persisting. `.claude/commands/companion.md`
+   shells out to it.
+2. **The crab is the DEFAULT.** ⚠ Taken knowingly against the flag that the live entry page, its five
+   clips and the deck all show the CAT, and Commons closes 09-17 — that is now a job.
+3. **Coat LOCKED at salmon, index 210.** An exact cube entry, so it survives the glyph path's 2.6x
+   saturate unchanged; every coat the cat ships is a near-neutral the boost ignores, and this is the
+   first companion colour with enough chroma that it had to be checked.
+4. **Pacing lands AFTER**, once Hero is standing. Build 1 = states, crablets, water, exits.
+
+⇒ **The cost estimate collapsed once looked at properly.** "Join" was costed at threading an interface
+through 25 production call sites. It needed none: the sprite data became a FIELD on the existing type,
+so `NewCrab()` returns what `NewCat()` returns and **every call site is untouched**. The refactor never
+left `internal/companion`.
+
+⇒ **Two defects the crab's own tests found before he did**, and both were ones the cat already had
+fixed: a crablet losing an eye to a neighbour's body at 16 subagents, and two swimmers overlapping in a
+lane. One cause — column de-duplication bucketed as `x/width`, which does not prevent overlap. Replaced
+with a real interval allocator that reserves the sprite AND its two ripple cells. ⚠ **My first test for
+it measured RUN LENGTHS in the painted row and kept failing on two swimmers in NEIGHBOURING lanes whose
+rims legally touch** — a proxy catching something that was never the defect. Split out `crabSwimSpans`
+and asserted the placement, which is why the cat has `swimmerSpans`.
+
+**His report: *"1. the issue is showing up on the sun/moon mostly 2. fix it"*** (the thin hairlines and
+the right-edge strip).
+
+⇒ **THE HAIRLINES HAD A THIRD PATH NOBODY HAD FOUND, and it is why two previous fixes survived.**
+`canvas.resolve` has a branch that takes a cell with **no half state and no ramp** — a plain, single
+colour background — and **splits it anyway** to place a band edge implied by its neighbours. It was
+never gated by `NoSplitCells`. So the ramp path got gated, the disc was made to paint one tone, and
+then this put the split back FROM THE OUTSIDE, on cells nothing had asked to split. Now gated.
+Measured off his own screen: at the disc's centre column, twelve pixels of (209,166,124), **one pixel
+of (185,142,101)**, sixty more of (209,166,124). Also collapsed the disc's INTERIOR to one tone where
+both halves are inside it; the silhouette still splits, so roundness is unchanged and the shape tests
+pass untouched. **Interior rules on the disc across 7 heights x 48 half-hours: 156 → 0.**
+⚠ **STILL OPEN: the disc's OUTLINE.** Its top and bottom edge cells still carry a 1px rule, because
+they must split to stay round. Proposed, NOT built: choose the half-block ORIENTATION per cell — `▀`
+where the lower colour continues below, `▄` where the upper continues above — so every gap is painted
+in the colour it sits against and becomes invisible. Same shape, no rule.
+
+⇒ **The right-edge strip: the fix was measured on 09-07 and never built.** `297dd7a` is the
+measurement, not the fix — there was no DL anywhere in `internal/host`. Confirmed from his screenshot:
+content ends at x=391 and a **19px strip at x=372-390** carries the wrong colour, which is Terminal's
+20px side inset holding cells from when the window was wider. `reallocBand` now runs on a WIDTH change
+only (height-only would be a band-wide flicker for nothing): a scroll region over the band, then DL.
+
+⇒ **Tracing failed SILENTLY and cost a whole occurrence of the scrollback defect.** He started a
+session to trace it, the scape came up, the defect reproduced on screen, and nothing was captured:
+`openTrace` returned in silence when the open failed. Now: **`XSCAPES_TRACE=1`** picks the path
+(`~/.config/xscapes/traces/<timestamp>.bin`) so there is none to get wrong · the parent directory is
+created · a failure prints `TRACING IS OFF -- <path>: <err>` and never stops the session.
+⚠ **A trace grows ~7 MB/minute** (the scape redraws 12x/s and every byte goes through `h.write`) —
+179 MB in 24 minutes, measured. Do not leave one running.
+
+⚠ **MY MISTAKES, both of which cost him time and both of which he was right about:**
+- **I told him to run shell commands with a leading `!`.** That prefix is a Claude Code convention for
+  Claude's OWN prompt; at a zsh prompt it is wrong. His scrollback shows
+  `lucasgarzoli@... xscapes % ! mkdir -p ~/Documents/Screenshots`. Every `!`-prefixed command I gave
+  him was mis-instructed for where he was typing it.
+- **I claimed the trace env var "was not set" on the strength of `ps eww`.** ⚠ **`ps eww` cannot read
+  another process's environment on this machine — a positive control with a known variable also read
+  empty. The probe was VOID** and the claim had no evidence behind it. He pushed back and was right.
+  This is the project's own rule, walked straight past.
+
+⇒ **THE RICHEST CORRUPTION SAMPLE YET, captured before anything could destroy it.**
+`~/Documents/Screenshots/corrupt-hist-515.txt` — **210 corrupted rows** from the 22-hour-old window,
+and it is TWO distinct failures: **122 rows end in a run of `─`** (a rule bleeding off the right of a
+shorter row) and **157 are interleaved mid-text**, e.g.
+`1.─Whiskers, coats, toesr—wthe─fouriwhisker─variants─(tuckedi·,double─·tdouble─longl·ncurrent,d...`
+— two rows occupying one row, alternating cells, not a rule overlay.
+⚠ **The trace was on the WRONG WINDOW.** Mapped by tty: window 515 = ttys001 = the 22-hour session
+with all 210 corrupted rows, **untraced**; window 3495 = ttys006 = the freshly started traced session,
+**zero corruption**. The corruption earns itself through long life and repeated resizes, so a fresh
+window will not show it quickly. **Next attempt must trace the LONG-LIVED window.**
+
+## Session 23 — 2026-09-07 evening, the disc's outline
+
+- *"Hairlines on the sun still an issue"* (2026-09-07 ~20:28, one heavy magnification of the disc,
+  `~/Documents/Screenshots/Screenshot 2026-09-07 at 8.27.52 PM.png`), plus *"i tried running the command
+  but no luck so ended up booting a new session"* and, mid-session, *"i am running a parallel
+  (unrelated) session now, running xscapes"* — the first sighting of the crab live in a window that
+  is not this one.
+
+⇒ **THE PROPOSED FIX WAS WRONG, AND IT WAS A RETURN TO WHAT 09-05 ALREADY REJECTED.** Session 22 left
+  a fix "proposed, not built": choose the half-block ORIENTATION per cell, `▀` where the lower colour
+  continues below and `▄` where the upper continues above, "so every gap is painted in the colour it
+  sits against". Worked through against the measured glyph boxes it collapses. Menlo's block ink runs
+  **4.6 → 29.4 of the 30px row**, so a cell has exactly two achievable partitions and both leave the
+  BACKGROUND at the bottom:
+  - `▄` (bg=up, fg=down) — up[0,17] · down[17,29.4] · **up[29.4,30]**, a 0.6px error at the bottom.
+  - `▀` (bg=down, fg=up) — **down[0,4.6]** · up[4.6,17] · down[17,30], a 4.6px error at the top.
+  Making the sliver match what is below means bg=down, which means `▀` everywhere — **U+2580, the
+  glyph `term.LowerHalf` exists to avoid**, and it trades a 0.6px line for a 4.6px one. There is no
+  third glyph: every block element in the font shares that ink box, so the bottom 0.6px of ANY cell
+  that draws a glyph is its background. **The leak is the terminal, not the renderer.**
+
+⇒ **WHAT IS ACTUALLY WRONG IS THE RUN, NOT THE PIXEL, and that is a new measurement.**
+  `notes/rulecount` rasterises a frame at Terminal.app's geometry and counts rules and their WIDTHS.
+  His own crop calibrates it: at the disc's centre column, **17px sky (50,95,131) · 12px rim
+  (165,137,136) · ONE px (100,113,134) · then the body** — and 0.43·rim + 0.57·sky = (96,112,133),
+  within two counts on every channel. So `inkBot` 29.4 and a 0.43 alpha are confirmed off his screen.
+  At his own 128x27 the whole frame carries **four rules and all four are on the disc**: two **five
+  cells wide** at the top and bottom caps, two **one cell wide** at the shoulders. Nothing else in the
+  scape rules at all — the three s22 fixes hold.
+  ⇒ **The caps are flat.** A split cell whose left or right neighbour has its edge in the SAME cell on
+  the same side is on a horizontal stretch of the silhouette: it buys **no roundness**, and the only
+  thing it draws is seventy pixels of rule. The shoulders, where neighbours split at different
+  heights, are the whole of the curve.
+
+⇒ **SHIPPED: `Shore.FlatCaps`** (`shore.go`, `discHalf` + `flatEdge`, default on, gated on
+  `term.NoSplitCells` so only Terminal.app pays). Flat-run edge cells take a whole cell; sloped ones
+  keep their split. Measured over 6 widths x 7 heights x 48 half-hours: **longest rule run 5 cells → 1,
+  rule cells 12920 → 4922**; at his 128x27, **4 rules → 2, both one cell wide**. The silhouette's
+  width profile is IDENTICAL — only the cap's fill goes from half a row to a whole one (h=24: 3 → 6
+  half-cells, h=27: 5 → 10, same columns, same row count).
+
+⇒ **The roundness test was clearing a disc nobody ships.** `TestTheMoonIsRoundAtEveryHeight` ran at
+  this suite's zero values, which are **Ghostty's** — `NoSplitCells` false, the switch the new
+  collapse is gated on. It now runs BOTH flag states as subtests and passes in both. That is the s13
+  lesson walked past again: a harness pinned to a non-production mode exonerates falsely.
+  New: `TestNoRuleRunsAcrossTheDiscsCap`, which **fails with `FlatCaps: false`** (60x16, two cells of
+  rule side by side) and passes with it — checked, because a test that passes either way proves nothing.
+
+⇒ **The trace did not run.** `~/.config/xscapes/traces/` holds only the two files from 19:29 (1.5 MB
+  and **171 MB**, last written 19:53, so the runaway stopped when that window closed). His 20:27
+  attempts left nothing, and the session he is in now was started with a bare `xscapes claude`.
+  ⚠ It would not have caught anything anyway: **a fresh window does not corrupt** — the 22-hour one had
+  210 rows, the fresh one none. The trace has to be started on a window that has already lived and been
+  resized, which is a contradiction with `XSCAPES_TRACE` being read at launch. **That is the real
+  blocker on the scrollback defect, and it is unsolved.**

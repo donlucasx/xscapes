@@ -2,6 +2,69 @@
 
 *(Renamed end to end on 2026-09-03: directory, env vars, state path and hook marker. Two names are kept on purpose and are not leftovers -- `internal/envx` still reads `ASCIISCAPES_*` and warns, and `install.go` still RECOGNISES the `# asciiscapes:v1` marker so the hooks it wrote before the rename can be found and removed.)*
 
+> **Session 22 (2026-09-07 evening), WRAPPED. THE CRAB IS ON THE BEACH, and the hairlines had a third
+> cause nobody had found.** ⚠ **NOTHING IS COMMITTED.** Five stories sit in the working tree, all green
+> (`go test ./...`, `go vet`) and installed at `~/.local/bin/xscapes`. Land them as five commits, not
+> one. `internal/companion` is OURS now — the parallel session released it.
+>
+> **HERO SHIPPED AND IS THE DEFAULT.** His pick from four silhouettes over two rounds; salmon LOCKED at
+> **cube index 210** (an exact cube entry, so it survives the glyph path's 2.6x saturate unchanged).
+> Five states, crablets on the sand, crablets in the water (**a crab does not swim — it walks in and the
+> eyestalks carry on above the surface**, same 10x8 box as `KittenSwim` so the lane arithmetic needed no
+> new numbers), and an exit queue that goes UNDER rather than swimming off. `xscapes companion
+> [cat|crab]` switches it, `XSCAPES_COMPANION=` overrides for one run, `/companion` shells out to it.
+> ⇒ **Join cost nothing**: the sprite data became a FIELD on the existing type, so `NewCrab()` returns
+> what `NewCat()` returns and **all 25 call sites are untouched**. No interface anywhere.
+> ⇒ Measured, so nobody re-derives it: the crab's ink is **12x7 cells to the cat's 9x7**, at 64-66 of 84
+> cells against the cat's 60 — same weight, arranged sideways. **The three extra columns were always
+> free**: `cat.Size()` returns the BOX, not the ink, and the cat has never used its last three.
+>
+> **Session 23 (2026-09-07, later evening). THE DISC'S OUTLINE IS CLOSED, and the fix session 22
+> proposed was wrong.** Per-cell half-block ORIENTATION cannot work: Menlo's block ink runs **4.6 →
+> 29.4 of a 30px row**, so a cell has two achievable partitions and BOTH leave the background at the
+> bottom — `▄` errs 0.6px there, `▀` errs 4.6px at the top. Making the sliver match what is below
+> means `▀` everywhere, which is U+2580, which is the glyph `LowerHalf` exists to avoid. **No glyph
+> avoids the leak; it is the terminal.**
+> ⇒ **What is wrong is the RUN, not the pixel.** `notes/rulecount` counts rules and their widths at
+> Terminal.app's geometry, calibrated against his own crop (17px sky · 12px rim · ONE px of
+> 0.43·rim+0.57·sky · body). At his 128x27 the frame carries **4 rules, all on the disc**: two **five
+> cells wide** at the flat top and bottom CAPS, two one cell wide at the shoulders. A split cell whose
+> neighbour's edge is in the same cell on the same side buys **no roundness** — it only draws 70px of
+> line. ⇒ **`Shore.FlatCaps`** (default on, gated on `NoSplitCells`) gives those cells a whole cell and
+> leaves the shoulders split. **Longest run 5 → 1 cell, rule cells 12920 → 4922**, silhouette width
+> profile IDENTICAL. ⚠ `TestTheMoonIsRoundAtEveryHeight` had been running at GHOSTTY's flags; it now
+> runs both, and `TestNoRuleRunsAcrossTheDiscsCap` was checked to FAIL without the fix.
+> ⚠ **The scrollback trace is blocked on a contradiction**: `XSCAPES_TRACE` is read at launch, but only
+> a window that has already lived for hours and been resized corrupts. His 20:27 attempts wrote nothing.
+
+> **⭐ THE HAIRLINES: a THIRD path, and it is why two previous fixes survived.** `canvas.resolve` has a
+> branch that takes a cell with **no half state and no ramp** — a plain single-colour background — and
+> **splits it anyway** to place a band edge implied by its neighbours. It was never gated by
+> `NoSplitCells`. The ramp path got gated, the disc was made to paint one tone, and then this put the
+> split back FROM THE OUTSIDE. Now gated. The disc's INTERIOR also collapses to one tone where both
+> halves are inside it; the silhouette still splits, so roundness is untouched. **Interior rules on the
+> disc: 156 → 0** over 7 heights x 48 half-hours. ~~⚠ **STILL OPEN: the disc's OUTLINE**~~ — **CLOSED
+> in session 23, but NOT by the fix proposed here, which was wrong. See the session 23 block above.**
+>
+> **The right-edge strip is FIXED.** `297dd7a` was the measurement, not the fix; there was no DL
+> anywhere in `internal/host`. `reallocBand` now runs on a WIDTH change only.
+>
+> **⭐ THE SCROLLBACK FORK IS SETTLED: BAD BYTES.** AppleScript returns plain text with no attributes,
+> and the captured row holds real **U+2500** characters — so it is not a strikethrough SGR and not a
+> Terminal.app rendering artifact. The **210-row sample** is at
+> `~/Documents/Screenshots/corrupt-hist-515.txt`. ⚠ It reproduces on LONG-LIVED, REPEATEDLY RESIZED
+> windows: the 22-hour window had 210 corrupted rows, a fresh one had none. **Trace that window next.**
+> Tracing is now `XSCAPES_TRACE=1` (picks its own path, makes the directory, and **never fails
+> silently** — it did, and it cost a whole occurrence). ⚠ A trace grows **~7 MB/min**.
+>
+> ⚠ **THE ENTRY SHOWS THE WRONG COMPANION.** He made the crab default knowing the live page, its five
+> clips and the deck all show the CAT. **Commons closes 09-17.**
+>
+> ⚠ **Two lessons paid for tonight**: the `!` prefix is a CLAUDE-PROMPT convention and is wrong at a
+> shell prompt — every `!` command given to him was mis-instructed · and **`ps eww` cannot read another
+> process's environment on this machine**; a positive control read empty too, so a claim built on it
+> had no evidence. He pushed back and was right.
+
 > **Session 21 (2026-09-07), WRAPPED. The entry stopped being the thing that could kill this.**
 > ⚠ **`internal/companion` BELONGS TO THE PARALLEL SESSION** — he is implementing the crab ("Hero")
 > there and will open a fresh session here when it lands. Do not touch it. Brief and pick in

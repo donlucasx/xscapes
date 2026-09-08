@@ -4,8 +4,11 @@
 
 ```
 cd ~/Documents/claude/xscapes/ and read CLAUDE.md (the brief, authoritative)
-and RESUME.md before responding. ⚠ Check first whether the CRAB has landed:
-internal/companion belongs to a parallel session until he says otherwise. notes/claude-hooks-verified.md is the Claude Code hook schema — trust it, do not
+and RESUME.md before responding. ⚠ FIRST: `git status` — sessions 22 and 23 left
+~6 stories UNCOMMITTED (the crab, THREE rendering fixes, the companion switcher,
+the trace fixes, 15 new tests). All green and installed; land them as separate
+commits before new work. internal/companion is OURS now, the parallel session
+released it. notes/claude-hooks-verified.md is the Claude Code hook schema — trust it, do not
 re-derive it. Skim origin-chat.md only if you need the why; ignore ideas.md — it
 is parked. Tell me where we left off, then pick up from ▶ NEXT — item 0 is a
 question for me, not work for you.
@@ -1027,6 +1030,44 @@ Demo flags: `-wired -mockup -anim -compare -layout -context -day -busy -kittens 
 ⚠ `-plain` is blind to the moon and the shoreline — both live in the background colour.
 
 ## ▶ NEXT
+
+**⚠ 0. COMMIT SESSION 22.** Everything below shipped and is installed at `~/.local/bin/xscapes`, and
+NONE of it is committed. Full suite green, vet clean. Five separate stories, and they should land as
+five commits, not one blob:
+   - the crab companion (`internal/companion/crab.go`, `crab_kittens.go`, + `kind` field on `Cat`)
+   - the companion switcher (`companion_pref.go`, `cmd.go`, `frames.go`, `.claude/commands/companion.md`)
+   - the disc-hairline fix (`internal/canvas/canvas.go` resolver gate + `internal/scape/shore.go`)
+   - the right-edge DL fix (`internal/host/band_control.go`, `host.go`, `RetainsWidth` rule)
+   - the trace fixes (`internal/host/host.go` openTrace)
+   `notes/charstudy/` is 15 MB of study pages and generators — decide whether it is committed or
+   gitignored; it is the record of how the crab was designed.
+
+**1. ⭐ THE SCROLLBACK DEFECT, and it is closer than it has ever been.** The fork is SETTLED (bad
+bytes, not bad drawing — see `_FEEDBACK.md`). The richest sample yet is on disk:
+`~/Documents/Screenshots/corrupt-hist-515.txt`, **210 corrupted rows**, two distinct failures (122
+rows ending in a run of `─`; 157 interleaved mid-text, two rows sharing one row cell by cell).
+⚠ **What is still missing is a trace of the SAME window.** Traces are now easy
+(`XSCAPES_TRACE=1 xscapes claude -- --resume <id>`, prints its path, never fails silently), but the
+corruption earns itself through LONG LIFE AND REPEATED RESIZES — the 22-hour window had 210 rows, the
+fresh one had none. **Trace the long-lived window, and resize it.** A trace grows ~7 MB/min; do not
+leave one running.
+
+**2. The disc's OUTLINE still carries a 1px rule** at its top and bottom edge cells — they must split
+to stay round. Proposed, not built: pick the half-block ORIENTATION per cell (`▀` where the lower
+colour continues below, `▄` where the upper continues above) so every gap is painted in the colour it
+sits against. Same shape, no rule. Build it behind a switch so he can compare.
+
+**3. ⚠ THE ENTRY SHOWS THE WRONG COMPANION.** He ruled the crab is the DEFAULT, knowing the live page,
+its five clips and the deck all show the cat. Commons closes **09-17**. Rebuild them or the entry's
+own pictures do not match the binary a judge installs.
+
+**4. Pacing** — his design, built and studied but NOT shipped (`notes/charstudy/13-hero-paces.html`):
+one step per MAIN-THREAD tool event, so it is a count and a position, never a rate. Needs
+`reduce.State.Steps` (~3 lines beside the existing `Events`) and costs the activity tail ~6 columns.
+
+**5. Crab gaps before it is finished**: `DrawKittens` still has ONE crablet size (the cat's ladder with
+its 6/10-up, 4/8-down hysteresis is not ported) · the balloon pointer aims where the cat's shoulder is
+· `SetEyeFill`'s three options mean something different on stalked eyes.
 
 **Order for a fresh session, 14 days to the deadline (closes 2026-09-17):**
 
