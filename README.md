@@ -10,7 +10,7 @@ while it works, and knocks when it wants you.
 It is two things. Underneath there is an **event protocol** with pluggable
 adapters, which is the part that generalises to any agent. On top there is a
 **reference scape**, which is what that protocol looks like when you give it a
-sea and a cat.
+sea and a crab.
 
 ```
 xscapes claude
@@ -100,11 +100,11 @@ Everything on screen means one thing, and no two things share a channel.
 |---|---|
 | how hard the agent is working | **the sea**: how many swells are travelling, how tall, whitecaps above half |
 | what it is doing right now | **writing in the sand**, newest brightest, older lines taken by the tide |
-| something is broken | **the companion**: ears back, tail flat, amber eyes, and it stays until you come back |
+| something is broken | **the companion**: claws down, stalks short, amber eyes, and it stays until you come back |
 | it needs you | **a solid balloon** in a warm colour, plus a bright chime |
 | it finished | **a dotted balloon** in a cool colour, plus a low sonar note |
-| subagents | **kittens**, one per agent, some of them swimming |
-| context left | **the sun by day, the moon by night** -- one body, phase and height, with a readout that stays quiet until 65% |
+| subagents | **crablets**, one per agent, some of them already in the water |
+| context left | **the sun by day, the moon by night** -- one body, phase and height, with a readout that stays quiet until 40% used |
 | time of day | **the sky**, from your actual clock |
 
 The rule underneath is that **the water is the work and the sky is the world**.
@@ -153,6 +153,7 @@ Claude Code is.
 ## Everything else
 
 ```sh
+xscapes companion crab     # choose the animal: crab (default) or cat
 xscapes inside <command>   # host any command inside the scape, not just claude
 xscapes claude -beside     # the older side by side layout, in tmux
 xscapes claude -scape 24   # give the shoreline more rows (default: two fifths)
@@ -163,6 +164,7 @@ xscapes -live              # the scape in this terminal, Ctrl-C to quit
 xscapes -info              # colour profile, size, which sound player
 xscapes notify             # hear both knocks
 xscapes replay session.jsonl   # feed a recorded session back through the engine
+XSCAPES_COMPANION=cat …    # override the companion for one run, without saving it
 XSCAPES_SILENT=1 …         # mute
 ```
 
@@ -186,7 +188,7 @@ live:
   glance is the whole budget and a screenshot has no motion at all. The first
   version mapped activity to wave speed and idle looked identical to flat out.
 - **The renderer is a real three layer alpha compositor**, so occlusion between
-  the companion, the kittens and the sea is decided once instead of per sprite.
+  the companion, the crablets and the sea is decided once instead of per sprite.
 - **The host keeps its own copy of the screen.** It is not an emulator for the
   agent's benefit, the agent's bytes still reach the terminal untouched, but
   every byte the host sends is also fed through a small terminal model, so the
@@ -197,7 +199,7 @@ live:
 Run the tests with `go test ./...`. The interesting ones assert things that
 looked fine on screen and were not: that whiskers touch fur on their own row,
 that a sixty second permission nag rings once rather than once a minute, and
-that a killed agent eventually settles instead of leaving the cat working
+that a killed agent eventually settles instead of leaving the companion working
 forever.
 
 ## Status
