@@ -56,8 +56,11 @@
 > unrecorded.
 > ⏸ **HIS, and both are held at his word:** the Commons kit regeneration (*"wait on the commons kit"*)
 > and *"lets focus on open engineering before we do anything hackathon related"*. ⏰ **8 days.**
-> ⚠ **3 commits UNPUSHED**: `gh auth`'s active account is `eclipsevalidators`, `donlucasx` is logged in
-> but inactive, and switching is host-global while his Validators session runs. His call.
+> ⇒ **PUSHED 2026-09-09 at his word** ("lets switch the login to donlucasx"): `origin/main` is
+> `2f4ce38`, verified with `git ls-remote`, nothing unpushed.
+> ⚠ **`gh auth`'s active account is now `donlucasx`, and it is HOST-GLOBAL.** His Validators work runs
+> as `eclipsevalidators`; git operations there will be refused until someone flips it back with
+> `gh auth switch --user eclipsevalidators`. Three accounts on this machine, same rule as Vercel.
 > ⚠ He has NOT restarted, so none of this is on his screen yet. Traces at **12 GB**.
 
 > **Session 25 (2026-09-08 morning), WRAPPED. THE KIMI AUDIT KILLED MY SCROLLBACK MECHANISM.**
