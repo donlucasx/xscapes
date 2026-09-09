@@ -2,9 +2,11 @@
 
 *(Renamed end to end on 2026-09-03: directory, env vars, state path and hook marker. Two names are kept on purpose and are not leftovers -- `internal/envx` still reads `ASCIISCAPES_*` and warns, and `install.go` still RECOGNISES the `# asciiscapes:v1` marker so the hooks it wrote before the rename can be found and removed.)*
 
-> **Session 27 (2026-09-09 afternoon), IN PROGRESS. Two stories landed, HEAD `745c47e`, tree clean,
-> green, installed (inode 84169114). ⚠ NOT PUSHED.** He is live-testing the s26 scrollback fixes in
-> this window and reports *"so far so good ... no strikethrough"*.
+> **Session 27 (2026-09-09 afternoon). Six stories landed and PUSHED, tree clean, green, installed
+> (inode 84212629).** ⭐⭐ **THE STRIKETHROUGH IS CONFIRMED FIXED THREE TIMES**, the third a FRESH
+> session in a different project (tyastie, 111x61) — *"seems the strikethrough issue has been fixed"*.
+> ⚠ Verified rather than assumed: that scape's PID held inode **84189069 == installed**, so it was
+> running the fixes and not a stale build.
 > ⇒ ⭐ **THE ASK BALLOON WAS POINTING AT BARE SAND, at every width, in both facings, for both
 > animals.** Measured on the RENDERED frame at 124 columns: the `v` on column 101, the companion's box
 > beginning at 107, its nearest eye at 112 — eleven cells of empty beach. The balloon was anchored to
@@ -25,9 +27,33 @@
 > instrument) and `TestTheMirrorDropsTheCellsTheTerminalRetains` (unit-scale). **The instrument FAILS
 > on a window with no width change** — a clean result there looks exactly like a pass, the trap that
 > voided the first strikethrough comparison.
-> ⏭ **Still open, measured today:** crablets have ONE size (the cat's 6/10-up 4/8-down ladder is not
-> ported; past ~14 sitters at 124 columns they silently stop being drawn) · traces at **13 GB**,
-> `20260908-102733.bin` (10.2 GB) closed at 14:21 today and spent · **HIS:** Andale Mono in Terminal.
+> ⇒ ⭐ **HERO'S LITTER NOW SHRINKS AS IT GROWS**, on the CAT's ladder (`TierFor` shared, so the
+> thresholds cannot drift). Measured against his 341h: the litter peaks at **38 subagents**, p90 14; at
+> one size 80 columns held EIGHT sitters, so the crab silently dropped them **12.6% of the time the
+> litter existed** at the design target, up to 18 at once. Smallest rung takes 80 columns to eleven.
+> ⇒ ⭐⭐ **THE GREY BLOCKS ON HIS SHORELINE ARE FIXED, and the cause was the CUBE, not our code.**
+> He photographed flat neutral blocks along the waterline. The palette asked for a warm brown
+> **(93,76,66)** and the terminal drew **(78,78,78)**. ⚠ **The quantiser is INNOCENT** — the cube's
+> levels are 0/95/135/175/215/255, so under 95 in green and blue there is only ZERO: the darkest warm
+> entry is **135/95/0 at luma 96** and the grey ramp steps by ten all the way down, so any darker warm
+> colour loses to a grey. `Palette.WetSand` ran luma 52–108, mostly under that floor — warm at 09:00,
+> GREY at 10:00, warm 11:00–14:00, grey from 15:00. **The strip changed hue back and forth through a
+> working morning.** ⚠ **A RAMP MAKES IT WORSE and that was measured, not argued** (1.42% → 3.12%):
+> a tan→blue path crosses the same dead zone. **Do not try it again.**
+> ⇒ **His ruling: floor it in daylight, let night stay neutral.** SHIPPED as `wetBandColor` — the dry
+> beach's own three cube-exact tones, one rung down, always darker than the sand, warm at **33 of 48
+> half-hours**. Rendered-frame count, same 34,632 cells both ways: **neutral waterline cells 2982 →
+> 1895, −36%.** Residual that CANNOT be fixed: the true middle of a tan→blue mix is neutral.
+> ⚠ **My first version of that metric said the fix made it WORSE and I nearly shipped on it** — it
+> filtered out cells whose RAW colour was near-neutral, which is exactly what the old code produced
+> most of, so the before-number excluded its own worst failures. **A filter that correlates with the
+> defect is not a measurement.** Instrument: `go run ./notes/wetsand`.
+> ⏭ **Still open, and MEASURED — his call:** the sea's picture **plateaus at level 0.60**, not the
+> 0.95 `tune` reports; foam and coverage are pinned flat from there to 1.0, and his real level is above
+> 0.60 for **42.2% of working time**. ⚠ NOT proven: the waterline's own swing is painted in the
+> BACKGROUND, which a glyph-reading instrument cannot see. **`TauFall`/`Impulse` cannot fix a plateau
+> in the render** — they only change how often it is visited; the change would be to the MAPPING.
+> ⏭ Traces at **13 GB**, `20260908-102733.bin` (10.2 GB) closed 14:21 and spent · **HIS:** Andale Mono.
 > ⏰ **8 days.** ⏸ Commons kit HELD at his word.
 
 > **Session 22 (2026-09-07 evening), WRAPPED. THE CRAB IS ON THE BEACH, and the hairlines had a third
