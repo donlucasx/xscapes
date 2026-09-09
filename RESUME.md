@@ -249,6 +249,18 @@ URLs, `message.md` = both), regenerated whenever the page is. **Use Default · Q
 0. ~~HIS CALL: the scrollback repro or the entry?~~ **ANSWERED 2026-09-08: the entry first, trace in
    the background. DONE — the entry is on the crab and LIVE**, page + 15 clips + deck + README,
    verified with real fetches. `7f68db6`.
+0-TEST. ⏭ **THIS IS THE JOB THIS SESSION: he is testing the two scrollback fixes in a FRESH session.**
+   Both shipped and installed 2026-09-09 (`da4ea99` strikethrough, `731768c` duplication); his first
+   live look was clean. Start traced so anything that shows has bytes behind it — **a NEW session, so
+   no `--resume`**:
+   `XSCAPES_TRACE=1 xscapes claude`
+   Work normally, **resize a few times**, then scroll back and look for struck-through rows or
+   repeated paragraphs. If either shows: **STOP** — do not scroll further, resize or exit — and search
+   the MIRROR blocks (`ESC[?47l` .. `ESC[?47h`, that order; `?47h` ENTERS the alt screen) for rows
+   holding both `─` and words, or for U+FFFD. ⚠ Restrict any trace search to bytes written BEFORE the
+   pattern was ever printed to this terminal, and dump a block before trusting a count over it.
+   ⚠ If it stays clean, say so plainly and do not claim more than the evidence carries.
+
 0-now. ⏸ **HIS, in this order:**
    (0) ⚠⚠ **DO NOT CLOSE HIS OTHER WINDOWS. An earlier version of this line said to, and it was
    WRONG and would have killed live work.** Checked by cwd 2026-09-08: ttys002 (pid 49460) is

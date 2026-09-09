@@ -2339,3 +2339,29 @@ r := []rune(s.pending + in)
   needs-you, done and worried hold their ground. ⚠ **I claimed his "pace the other way" note was
   nowhere in the record; it is in `notes/charstudy/crab/pace.go`, verbatim.** Wrong twice about the
   record in two days.
+
+### 2026-09-09 14:21 — FIRST LIVE LOOK AT BOTH FIXES
+
+- *"I did just restart before commiting"*, then, after working in it: *"i dont see anything
+  strikedthrough so far. Gonna /wrap this session entirely and start a fresh one to keep testing,
+  sounds good?"*
+- *"lets proceed w pushing the commits, lets switch the login to donlucasx"* — the `gh auth` switch is
+  his explicit word, not an assumption.
+
+⇒ **Verified he is actually running the fixes rather than taking his word or mine**: scape PID 87332
+  up 14:21:52, resumed BY ID into this conversation, and **running inode 84141583 == installed
+  84141583**. All four land in that build: the mirror fix, the strikethrough fix, the panic guard and
+  Hero's pace.
+⇒ **First live evidence, and it is honestly thin.** 559 mirrored rows in the new trace, seven
+  containing U+FFFD and **all seven my own text** — the `zz_split_test.go` output and my messages that
+  literally quote `���` as examples. Against three windows of the OLD trace: 174 rows / 0 corrupt,
+  63 rows / **2 corrupt** (including `──and─sand─at─row 33.───`), 67 rows / 0. **Consistent with the
+  fix working; not proof.** The unit test is the strong evidence — every split point of a string,
+  every PAIR of split points with escapes between the runes, checked to FAIL without the fix.
+  ⚠ **My first attempt at that comparison was VOID**: three 40 MB windows of the old trace that
+  happened to contain ZERO complete `?47l..?47h` blocks, reporting clean. **A clean result from a
+  window with nothing in it looks exactly like a pass** — the same shape as the s13 lesson, third
+  variant this week.
+⇒ **PUSHED** at his word: `origin/main` = `2f4ce38` then `e15163e`, verified with `git ls-remote`
+  rather than the local ref. ⚠ `gh auth`'s active account is HOST-GLOBAL and is now **donlucasx**;
+  Validators git operations are refused until `gh auth switch --user eclipsevalidators`.

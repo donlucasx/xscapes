@@ -61,7 +61,17 @@
 > ⚠ **`gh auth`'s active account is now `donlucasx`, and it is HOST-GLOBAL.** His Validators work runs
 > as `eclipsevalidators`; git operations there will be refused until someone flips it back with
 > `gh auth switch --user eclipsevalidators`. Three accounts on this machine, same rule as Vercel.
-> ⚠ He has NOT restarted, so none of this is on his screen yet. Traces at **12 GB**.
+> ⇒ **HE RESTARTED 14:21:52 AND IS RUNNING ALL OF IT** — scape PID 87332, resumed BY ID, running
+> inode **84141583 == installed**. First live look: *"i dont see anything strikedthrough so far."*
+> ⚠ **Thin, and say so.** 559 mirrored rows in the new trace, 7 with U+FFFD and **all 7 his own quoted
+> examples**; the old trace gave 174/0, 63/**2**, 67/0 across three windows. Consistent with the fix,
+> NOT proof — the unit test is the strong evidence. ⚠ My first version of that comparison was VOID:
+> three 40 MB windows containing ZERO complete mirror blocks, reporting clean. **A clean result from a
+> window with nothing in it looks exactly like a pass.**
+> ⏭ **He is starting a FRESH session to keep testing.** Work in it, resize, scroll back, and look.
+> ⚠ Traces at **13 GB**, 102 GiB free. `20260908-102733.bin` (9.5 GB) is CLOSED and spent — safe to
+> delete. **KEEP `20260908-005450.bin`**: it holds the 07:11 occurrence, the only full recording of
+> one, and it is what any future re-check compares against.
 
 > **Session 25 (2026-09-08 morning), WRAPPED. THE KIMI AUDIT KILLED MY SCROLLBACK MECHANISM.**
 > HEAD `957f9f0`, pushed, tree clean but for `notes/kimi-audit-brief.md`. Page still LIVE (HTTP 200).
