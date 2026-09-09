@@ -289,7 +289,14 @@ URLs, `message.md` = both), regenerated whenever the page is. **Use Default · Q
    lever left: the FONT. Menlo's block glyphs fill **85.4%** of the line box, Andale Mono **97.8%** —
    if that holds live it removes the hairline AND gives the gradient back, better than the trade he
    took. `Terminal → Settings → Profiles → Text → Font`.
-0b. **The scrollback** — the one open product defect. ⚠ **The s24 mechanism is REFUTED (see the
+0b. ~~**The scrollback**~~ ⭐⭐ **CLOSED 2026-09-09, BOTH HALVES, BOTH OURS.** The STRIKETHROUGH was
+   `r := []rune(s.pending + in)` in `screen.feed` -- pending held a partial ESCAPE and never a partial
+   RUNE, so a multi-byte glyph split across a pty read became U+FFFD and one cell became three
+   (`da4ea99`). The DUPLICATION was `resizeScrolling` feeding the mirror on every shrink (`731768c`).
+   ⚠ **The terminal never had either one** -- only the model, and `Host.mirror` writes the model into
+   scrollback, which is the only place he ever saw it. **NEXT SESSION: he tests both.** Restart with
+   `XSCAPES_TRACE=1 xscapes claude -- --resume <id>`, work, resize, and scroll back.
+   The old notes, kept only as the record of what was tried: ⚠ **The s24 mechanism is REFUTED (see the
    session 25 banner): the agent blanks all 33 of its rows before repainting, and the 300 KB
    "occurrence" cut is ~2.6 seconds.** ⭐ **Next move is `retainWidth`**: `Rules.RetainsWidth` is
    measured and honoured by `reallocBand`, but `host.go:272` builds the screen model with

@@ -19,6 +19,47 @@
 > cells against the cat's 60 — same weight, arranged sideways. **The three extra columns were always
 > free**: `cat.Size()` returns the BOX, not the ink, and the cat has never used its last three.
 >
+> **Session 26 (2026-09-09), WRAPPED. ⭐⭐ BOTH SCROLLBACK DEFECTS ARE CLOSED, AND BOTH WERE OURS.**
+> HEAD `da4ea99`, tree clean, suite + vet green, installed. Page still LIVE (HTTP 200).
+> ⭐⭐ **THE STRIKETHROUGH WAS THE FIRST LINE OF `screen.feed`:** `r := []rune(s.pending + in)`.
+> `pending` held a trailing partial ESCAPE and never a trailing partial RUNE. The agent's output comes
+> off a pty read that splits wherever it likes, and Claude Code's rule is **U+2500, three bytes at a
+> time** -- split one and `[]rune` makes U+FFFD, **one cell becomes THREE**, every cell after it shifts
+> two columns and the overflow wraps onto the row below. `"──── done ────"` fed with a cut after one
+> byte becomes `"���─── done ────"`.
+> ⇒ **Why seven sessions missed it: the TERMINAL never saw any of it.** It gets the exact bytes and
+> draws them right, which is why his no-xscapes session is clean and the LIVE screen is clean. Only the
+> MODEL was wrong, and `Host.mirror` writes the model's rows into SCROLLBACK -- the one place he ever
+> saw it. Every screenshot in seven sessions was scrolled-back content and nobody asked why.
+> ⚠ **When a defect only ever appears in one view, suspect the thing that renders that view.**
+> ⇒ **HIS TEST closed it**: bare Claude at the same window height stayed clean, which eliminated the
+> agent AND the height in one move and left only something we do to bytes nobody else touches.
+> ⚠ **FOUR HYPOTHESES DIED FIRST — do not raise them again.** `Rebind`'s `ESC[NS` (a bare SU keeps
+> ZERO rows) · an off-by-one between region and pty (34↔34, 21↔21, 29↔29, 33↔33) · a shared cursor-save
+> slot (**1,054,053 of 1,054,059** `ESC7`s are ours; the agent never uses DECSC) · our band paint
+> disturbing the agent (**966 paints** replayed, every one left its rows and cursor byte-identical).
+> **What found it was feeding the same bytes in different CHUNK SIZES and getting different screens.**
+> ⇒ **THE DUPLICATION IS ALSO CLOSED** (`731768c`): `resizeScrolling` fed the mirror on every shrink and
+> the agent repaints after a resize, so the rows came back and were kept again. **A scroll means
+> content moved on; a resize means only the viewport changed.** Reverses
+> `TestAShrinkKeepsTheRowsTheTerminalDestroys` deliberately; the guarantee survives because content
+> that really leaves is SCROLLED and `scrollUp` still keeps it. ⚠ Residue: an agent that does NOT
+> repaint after a resize loses those rows from scrollback.
+> ⇒ **A latent PANIC guarded** (`719572e`): `ESC[?47l` swapped buffers with no nil check, so a model
+> seeing a LEAVE before an ENTER nils `cells` and the next newline panics in `scrollUp`.
+> ⇒ ⭐ **HERO PACES** (`b92a9cf`), built from his own study. One step per MAIN-THREAD tool event -- a
+> COUNT and a POSITION, both of which survive a screenshot. Subagent events do NOT move him (one event,
+> two channels, is what the encoding rule forbids). Inward on a triangle: **107 → 101 → 107** at 124
+> columns, sand pulled back to 100. needs-you/done/worried hold still.
+> ⚠ **I said his "pace the other way" note was nowhere; it is in `notes/charstudy/crab/pace.go`
+> verbatim.** Wrong about the record twice in two days -- SEARCH `notes/` before saying something is
+> unrecorded.
+> ⏸ **HIS, and both are held at his word:** the Commons kit regeneration (*"wait on the commons kit"*)
+> and *"lets focus on open engineering before we do anything hackathon related"*. ⏰ **8 days.**
+> ⚠ **3 commits UNPUSHED**: `gh auth`'s active account is `eclipsevalidators`, `donlucasx` is logged in
+> but inactive, and switching is host-global while his Validators session runs. His call.
+> ⚠ He has NOT restarted, so none of this is on his screen yet. Traces at **12 GB**.
+
 > **Session 25 (2026-09-08 morning), WRAPPED. THE KIMI AUDIT KILLED MY SCROLLBACK MECHANISM.**
 > HEAD `957f9f0`, pushed, tree clean but for `notes/kimi-audit-brief.md`. Page still LIVE (HTTP 200).
 > ⭐ **THE MECHANISM I REPORTED IN S24 IS REFUTED.** I claimed the agent's post-resize repaint writes

@@ -2268,3 +2268,74 @@ ESC[?47l ESC[61;1H \n ESC[61;1H ESC[2K ESC[0m    xscapes claude -- --resume 2c24
   composition is MIRRORED, companion on the RIGHT with a margin that grows with width (5 columns at
   124), so "pace toward the right" would indeed run out of room: **pacing must run leftward, into the
   frame.** That is his ruling, now written down before it is built.
+
+### 2026-09-09 — ⭐⭐ THE STRIKETHROUGH IS CLOSED, AND HIS TEST IS WHAT CLOSED IT
+
+- *"ok so Ive been working on a parallel session w no xscapes, no issues whatsoever"*, then, after
+  being asked to try the same thing in a SHORT window: *"issue ONLY happens on xscapes sessions.
+  Tested what you said above, stayed clean"*.
+- *"wait on the commons kit"* — the regeneration is HELD at his word, not forgotten.
+- *"lets focus on open engineering before we do anything hackathon related. Lets fix the
+  strikethrough"* — his priority ruling with 8 days on the clock.
+- *"idk if its two orphan windows or these two other sessions im actually running- ok to leave them
+  open before I run the resume command above?"* — he asked instead of acting, and it is the only
+  reason live work survived; see the retraction above.
+- *"this may b the 4th time we d do this, are you sure?"* on being told to restart AGAIN. Checked
+  rather than repeated: nothing in the plan needed it. **Ask for a restart only when something
+  depends on it.**
+
+⇒ ⭐⭐ **IT WAS THE FIRST LINE OF `screen.feed`, and it was ours all along.**
+```go
+r := []rune(s.pending + in)
+```
+  `pending` held a trailing partial ESCAPE and never a trailing partial RUNE, and `[]rune` turns the
+  orphaned bytes of a split multi-byte character into U+FFFD with no way back. The agent's output
+  arrives from a pty read, which splits wherever it likes, and Claude Code's interface is full of
+  multi-byte glyphs -- its full-width rule is **U+2500, three bytes at a time**. Split one and a
+  single cell becomes **THREE**: every cell after it on the row shifts two columns and the overflow
+  wraps onto the row below. Measured:
+```
+  unsplit             "──── done ────"
+  split after 1 byte  "���─── done ────"
+  split after 4 bytes "─���── done ────"
+```
+⇒ **Why seven sessions missed it.** The TERMINAL never saw any of this -- it gets the exact bytes and
+  draws them correctly, which is why his no-xscapes session is clean and why the LIVE screen is clean.
+  Only the MODEL was wrong, and `Host.mirror` writes the model's rows into the terminal's scrollback,
+  which is **the one place he has ever seen it**. Every screenshot across seven sessions was of
+  scrolled-back content and nobody asked why it was always scrollback. ⚠ **When a defect only ever
+  appears in one view, suspect the thing that renders that view.**
+⇒ **His test is what found it**, and it is worth saying plainly: bare Claude at the same window height
+  staying clean eliminated the agent AND the height in one move, leaving only something we do to bytes
+  nobody else touches.
+
+⚠ **FOUR HYPOTHESES DIED FIRST. Recorded as dead so none of them is raised again:**
+  1. **`Rebind`'s `ESC[NS`** -- the obvious suspect, our own compensation scroll fed through our own
+     model. A bare `ESC[3S` keeps **zero** rows. Refuted by test, not argument.
+  2. **An off-by-one between the scroll region and the pty** -- counted across the whole trace, they
+     match exactly: 34↔34, 21↔21, 29↔29, 33↔33, 38, 31, 37, 32.
+  3. **A shared cursor-save slot** -- **1,054,053 of 1,054,059** `ESC7`s are ours; the agent never
+     uses DECSC at all, so we are not clobbering it.
+  4. **Our band paint disturbing the agent** -- **966 paints** replayed from the real trace, and every
+     one left the agent's 34 rows and its cursor byte-identical.
+  ⇒ What actually found it: **feeding the same bytes in different chunk sizes and getting different
+  screens.** That is the whole method, and it should have been the first thing tried.
+
+⇒ **Also closed this session: the DUPLICATION.** `resizeScrolling` handed its lost top rows to the
+  mirror on every shrink, and the agent repaints the whole page after a resize, so they came straight
+  back and the next shrink kept them again. **A scroll means content moved on; a resize means only the
+  viewport changed** -- the mirror follows the first and ignores the second. It reverses
+  `TestAShrinkKeepsTheRowsTheTerminalDestroys`, which asserted the opposite deliberately; the
+  guarantee survives because content that really leaves is SCROLLED, and `scrollUp` still keeps it.
+⇒ **And a latent panic guarded**: `ESC[?47l` swapped buffers with no nil check, so a model that sees a
+  LEAVE before an ENTER sets `cells` to nil and the next newline panics inside `scrollUp`. That would
+  take a live session down.
+
+⇒ **HERO PACES** (`b92a9cf`), built from his own study rather than re-derived. One step per
+  MAIN-THREAD tool event -- a COUNT and a POSITION, both of which survive a screenshot, where a drift
+  is decoration. Subagent events deliberately do not move him: that would spend one event on two
+  channels. Inward on a triangle that returns home, measured on the rendered frame at 124 columns:
+  **CatX 107, span 6, sand stopping at 100, walking 107 → 101 → 107** with a column to spare.
+  needs-you, done and worried hold their ground. ⚠ **I claimed his "pace the other way" note was
+  nowhere in the record; it is in `notes/charstudy/crab/pace.go`, verbatim.** Wrong twice about the
+  record in two days.
