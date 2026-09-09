@@ -190,11 +190,25 @@ func (s *screen) takeScrolled() [][]cell {
 // resizeScrolling is what Terminal.app does when a MAIN-screen window
 // SHRINKS: it keeps the BOTTOM of the screen and lets the top go, so every
 // remaining row moves up by the difference, and the cursor with it.
+// ⚠ It does NOT feed the mirror, and that is the fix for the duplicated
+// scrollback rows he reported through six sessions.
+//
+// A SCROLL means content moved on and the row at the top is gone; a RESIZE
+// means only that the viewport changed. The mirror is a record of content, so
+// it follows scrolls and ignores resizes. It used to keep the rows a shrink
+// pushed off the top, and the agent repaints the whole page after every resize
+// -- 33 ESC[2K ESC[1B pairs then a full repaint, measured in his own trace --
+// so the same rows came straight back on screen and were kept again on the next
+// shrink. Counted in the mirror's own writes across thirteen resizes on
+// 2026-09-08: "landed in THIS conversation" x5, "the live-refresh build" x4,
+// "right on the expected rate" x4, for lines written exactly once.
+//
+// ⚠ The trade: an agent that does NOT repaint after a resize loses those rows
+// from the mirrored scrollback. They were leaving the visible screen either way
+// and the terminal would not have kept them, so this is the smaller harm -- but
+// it is a real one, and it is the reason scrollUp() still keeps.
 func (s *screen) resizeScrolling(w, h int) {
 	if delta := s.h - h; delta > 0 {
-		for _, row := range s.cells[:delta] {
-			s.keep(row)
-		}
 		kept := s.cells[delta:]
 		s.cells = append([][]cell{}, kept...)
 		s.h = h

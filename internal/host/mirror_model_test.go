@@ -63,21 +63,45 @@ func TestHostInsertedBlankRowsAreNotKeptButAgentBlankLinesAre(t *testing.T) {
 	}
 }
 
-func TestAShrinkKeepsTheRowsTheTerminalDestroys(t *testing.T) {
+// ⚠ REVERSED 2026-09-09, on evidence that did not exist when this was written.
+// It used to be TestAShrinkKeepsTheRowsTheTerminalDestroys and asserted the
+// opposite: that a shrink hands its lost top rows to the mirror, because the
+// terminal destroys them.
+//
+// The terminal does destroy them. The AGENT does not: it repaints the whole
+// page after every resize -- 33 ESC[2K ESC[1B pairs then a full repaint,
+// measured in his own trace on 2026-09-08 -- so the rows come straight back on
+// screen and the next shrink keeps them again. Counted in the mirror's own
+// writes across thirteen resizes: "landed in THIS conversation" x5, "the
+// live-refresh build" x4, for lines written exactly once. That is the
+// duplicated scrollback he reported through six sessions.
+//
+// And the old guarantee is not lost, which is what makes the reversal safe: if
+// content genuinely leaves, the agent SCROLLS it, and scrollUp() still keeps
+// every row that goes. The resize path was redundant with it for any agent that
+// repaints, and harmful for all of them.
+//
+// ⚠ The residue: an agent that does NOT repaint after a resize loses those rows
+// from the mirrored scrollback. `xscapes inside <cmd>` can host such a thing.
+func TestAShrinkIsNotMirrored(t *testing.T) {
 	sc := newScreen(20, 8)
 	sc.capture = true
 	sc.feed(Open(true, 5, 8))
 	for i := 1; i <= 4; i++ {
 		sc.feed("\x1b[" + string(rune('0'+i)) + ";1Hrow" + string(rune('0'+i)))
 	}
-	sc.resizeAlt(20, 6) // two rows lost off the top
-	lines := rowTexts(sc.takeScrolled())
-	want := []string{"row1", "row2"}
-	if strings.Join(lines, "|") != strings.Join(want, "|") {
-		t.Errorf("kept %q, want %q", lines, want)
+	sc.resizeAlt(20, 6) // two rows off the top: a viewport change, not a scroll
+	if lines := rowTexts(sc.takeScrolled()); len(lines) != 0 {
+		t.Errorf("a shrink handed %q to the mirror; a resize moves the viewport, not the content", lines)
 	}
+	// The geometry itself is unchanged and still asserted.
 	if sc.rowAt(0) != "row3" {
 		t.Errorf("row 1 after the shrink is %q, want row3", sc.rowAt(0))
+	}
+	// And the guarantee that replaces it: content that really leaves is kept.
+	sc.feed("\x1b[6;1H\r\n")
+	if lines := rowTexts(sc.takeScrolled()); len(lines) == 0 {
+		t.Error("an agent scroll kept nothing -- the mirror would lose the transcript")
 	}
 }
 
