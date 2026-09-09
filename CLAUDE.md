@@ -2,6 +2,34 @@
 
 *(Renamed end to end on 2026-09-03: directory, env vars, state path and hook marker. Two names are kept on purpose and are not leftovers -- `internal/envx` still reads `ASCIISCAPES_*` and warns, and `install.go` still RECOGNISES the `# asciiscapes:v1` marker so the hooks it wrote before the rename can be found and removed.)*
 
+> **Session 27 (2026-09-09 afternoon), IN PROGRESS. Two stories landed, HEAD `745c47e`, tree clean,
+> green, installed (inode 84169114). ⚠ NOT PUSHED.** He is live-testing the s26 scrollback fixes in
+> this window and reports *"so far so good ... no strikethrough"*.
+> ⇒ ⭐ **THE ASK BALLOON WAS POINTING AT BARE SAND, at every width, in both facings, for both
+> animals.** Measured on the RENDERED frame at 124 columns: the `v` on column 101, the companion's box
+> beginning at 107, its nearest eye at 112 — eleven cells of empty beach. The balloon was anchored to
+> its own corner and cleared the companion by two columns; **the unmirrored layout it was mirrored from
+> OVERLAPS the animal by design, and that overlap is what makes a speech balloon read as speech.**
+> Now anchored to the companion's own `HeadCol()` (cat's eyes 2/6, mirrored 9/5; crab's 4/7 and the
+> crab does not flip), with the pointer column READ OFF the balloon's rows so `MirrorTail` cannot
+> desync it. `layout.BubbleX` is GONE — it was the wrong anchor, not a wrong number.
+> ⇒ ⭐⭐ **THE `retainWidth` WIRING GAP IS CLOSED AS REFUTED — DO NOT WIRE IT.** S25 called it "the
+> strongest lead yet" and said *wire it and replay*. Replayed: **31 of 975 mirrored rows merge, and 17
+> of 1472 on a second independent window** — the current row with a fragment of the pre-resize row
+> stitched on (`don't scroll, don't resize, don't exit.files while you`), **which is the corruption's
+> own signature.** Faithful to the terminal and wrong for the mirror: the retained cells are stale, and
+> a mirrored line longer than the window WRAPS in the main buffer and takes the row under it.
+> ⚠ **`reallocBand` does NOT settle it, though it looks like it should**: it deletes rows
+> `agentRows+1..rows`, which is the SCAPE's band — the AGENT's rows keep their tails.
+> ⇒ The reason now lives at `host.go`'s `newScreen` call, plus `TestReplayTraceRetainDiff` (the
+> instrument) and `TestTheMirrorDropsTheCellsTheTerminalRetains` (unit-scale). **The instrument FAILS
+> on a window with no width change** — a clean result there looks exactly like a pass, the trap that
+> voided the first strikethrough comparison.
+> ⏭ **Still open, measured today:** crablets have ONE size (the cat's 6/10-up 4/8-down ladder is not
+> ported; past ~14 sitters at 124 columns they silently stop being drawn) · traces at **13 GB**,
+> `20260908-102733.bin` (10.2 GB) closed at 14:21 today and spent · **HIS:** Andale Mono in Terminal.
+> ⏰ **8 days.** ⏸ Commons kit HELD at his word.
+
 > **Session 22 (2026-09-07 evening), WRAPPED. THE CRAB IS ON THE BEACH, and the hairlines had a third
 > cause nobody had found.** ⚠ **NOTHING IS COMMITTED.** Five stories sit in the working tree, all green
 > (`go test ./...`, `go vet`) and installed at `~/.local/bin/xscapes`. Land them as five commits, not
