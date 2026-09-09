@@ -556,6 +556,17 @@ func (s *screen) csi(params string, final rune) {
 		}
 	case priv && arg(0, 0) == 47 && final == 'l':
 		if s.alt {
+			// The nil guard is not paranoia: the swap in the 'h' case above
+			// creates `other` on the way in, so a model that sees a LEAVE
+			// before it ever saw an ENTER would swap nil into cells, and the
+			// next newline at the bottom margin panics inside scrollUp with
+			// "index out of range [0] with length 0". Found 2026-09-09 when a
+			// replay was started mid-trace; a host whose model is built or
+			// rebuilt while the agent is already on the alternate screen is
+			// the same shape, and it would take the session down.
+			if s.other == nil {
+				s.other = blankRows(s.w, s.h)
+			}
 			s.cells, s.other = s.other, s.cells
 			s.alt = false
 		}
