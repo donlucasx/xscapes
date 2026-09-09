@@ -2216,3 +2216,55 @@ unchanged afterwards. **Every finding below I re-verified myself before acceptin
   is that no Menlo size gives 14x30 with row == line box, and Menlo's ink already overshoots and is
   clipped at 29.4 where the mapping predicts 30.4. ⇒ **Andale Mono should SHRINK the gap ~3.5x, not
   close it.** Still his 30-second test; go in expecting improvement, not a clean kill.
+
+### 2026-09-08 10:48 — ⭐⭐ THE DUPLICATED ROWS ARE OURS, AND THE MIRROR IS WRITING THEM
+
+- *"on a first impression upon reload there was a strikedthrough line, but after resizing the window a
+  couple times seems to have fixed itself?"* (two screenshots, 10:48:11 at 124x59 and 10:48:25 at
+  153x61), and separately: *"what happened with the companion pacing around a bit when it works alone?
+  i have not see the crab pace around at all. My last note on this (on a previous session) was that the
+  companion was pacing towards the right side of the frame, where it had little to no margin to do so,
+  so I prompted u to have it pace the other way- have not seen it happen yet"*.
+
+⇒ **CAUGHT IN A TRACED SESSION, WITH THE BYTES.** Trace `20260908-102733.bin`, sidecar carries
+  **thirteen resizes** in one burst, offsets 118754259 -> 119189858 (124x59 down to 84x55 and back up
+  to 153x61). His second screenshot shows heavy DUPLICATION where the first showed a strikethrough:
+  the same paragraph three to six times over.
+
+⇒ ⭐ **The duplicates are in OUR MIRROR's own writes.** `Host.History` leaves the alt screen, writes
+  one row to the main buffer, and returns — so a mirror write is `ESC[?47l` ... `ESC[?47h`, and unlike
+  the agent's column-addressed repaint it writes a row as **contiguous text**, which makes it
+  searchable. Counted inside the mirror blocks of the resize burst, for lines I wrote exactly ONCE at
+  10:29:
+  `landed in THIS conversation` **x5** · `the live-refresh build` **x4** · `right on the expected
+  rate` **x4** · `trace open and writing` **x3**.
+  Two of them, byte for byte, at different rows:
+```
+ESC[?47l ESC[66;1H \n ESC[66;1H ESC[2K ESC[0m    xscapes claude -- --resume 2c247007-...   ← landed in THIS conversation
+ESC[?47l ESC[61;1H \n ESC[61;1H ESC[2K ESC[0m    xscapes claude -- --resume 2c247007-...   ← landed in THIS conversation
+```
+  **Same row, mirrored again on a later resize.** A resize moves content back across the "leaving the
+  band" boundary and the mirror has no memory of having already written it.
+  ⚠ **This overturns session 19's explicit ruling.** s19 recorded the duplicated prose blocks as s14
+  #6 and said they were NOT ours — *"Claude Code re-renders; a plain terminal keeps both"*. They are
+  ours, and the trace says so in our own emissions.
+  ⚠ Scope: this explains **duplication**. It does not yet explain the **strikethrough/merge** rows,
+  which are a different symptom and still open.
+
+⚠ **TWO METHOD ERRORS OF MINE IN THIS ONE SEARCH, both caught by a positive control:**
+  1. I delimited mirror blocks as `?47h` ... `?47l`. **Backwards** — `?47h` ENTERS the alt screen, so
+     I was searching the scape-painting periods and every count came back zero. A zero from the wrong
+     window looks exactly like a clean bill of health.
+  2. Before believing the zeros I dumped a block, saw sky and sand at rows 33+, and knew immediately
+     the delimiters were wrong. **Dump the region before trusting a count over it.**
+
+⇒ **PACING: NOT BUILT, and his note was never logged.** `Walk()` has **zero callers** outside
+  `internal/companion`; the cat has a walk bitmap and the crab's `crabWalk` says in its own comment
+  "Unused until pacing lands". Nothing drives lateral movement for either animal, so there is nothing
+  on screen to see and nothing to reverse. The study exists (`notes/charstudy/crab/pace.go`,
+  `13-hero-paces.html`) and his s21 note *"they could be pacing a bit. Should be tied up to an actual
+  agent action so its not random"* is logged — but **his instruction to pace the OTHER WAY, away from
+  the right edge, appears nowhere in this file.** It was not recorded when he gave it. ⚠ The
+  composition is MIRRORED, companion on the RIGHT with a margin that grows with width (5 columns at
+  124), so "pace toward the right" would indeed run out of room: **pacing must run leftward, into the
+  frame.** That is his ruling, now written down before it is built.
