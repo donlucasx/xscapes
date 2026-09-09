@@ -73,6 +73,42 @@ func (a *laneAlloc) place(prefLane, prefX int) (lane, x int, ok bool) {
 	return 0, 0, false
 }
 
+// crabTiers is the litter's size ladder, and it is the CAT's ladder ported
+// rather than a second one invented.
+//
+// It was the last "partial" on Hero's API table, and the cost was measured
+// rather than assumed: folded through his own 341 hours of recordings, the
+// litter runs to 38 subagents at its peak and a p90 of 14. One size fits 18
+// sitters at 153 columns and only EIGHT at 80, the design target -- so at 80
+// columns the crab dropped subagents 12.6% of the time the litter existed, up
+// to 18 at once, while the cat shrank them and kept going.
+//
+// Same rungs, same thresholds, same hysteresis: TierFor is shared, so the two
+// animals cannot drift apart.
+var crabTiers = []struct {
+	rows []string
+	eyes [2]int
+}{
+	{Crablet, crabletEyeCells},
+	{CrabletSmall, [2]int{1, 3}},
+	{CrabletTiny, [2]int{1, 2}},
+}
+
+func (c *Cat) crabBitmap(t int) *Bitmap {
+	if c.kitCache == nil {
+		c.kitCache = map[int]*Bitmap{}
+	}
+	// Offset so the crab's rungs cannot collide with the cat's in the cache of
+	// a companion that has been swapped mid-run.
+	key := 100 + t
+	if b, ok := c.kitCache[key]; ok {
+		return b
+	}
+	b := ParseBitmap(crabTiers[t].rows)
+	c.kitCache[key] = b
+	return b
+}
+
 // drawCrabKittens is DrawKittens for Hero.
 func (c *Cat) drawCrabKittens(l *canvas.Layer, px, py, n, w, seaTop, seaBot int, t float64, seed int64) int {
 	if n <= 0 {
@@ -88,7 +124,13 @@ func (c *Cat) drawCrabKittens(l *canvas.Layer, px, py, n, w, seaTop, seaBot int,
 	}
 	drawn := c.drawCrabSwimmers(l, swimmers, w, seaTop, seaBot, t, seed)
 
-	body := ParseBitmap(Crablet)
+	// One size for the whole litter, chosen by how many are on the SAND --
+	// the same split the cat makes, and for the same reason: mixing sizes
+	// reads as a jumble.
+	ti := TierFor(len(sitters), c.kitTier)
+	c.kitTier = ti
+	body := c.crabBitmap(ti)
+	eyeCells := crabTiers[ti].eyes
 	cw, ch := body.W/2, body.H/4
 	ky := py + 7 - ch
 	var pend []pendingEyes
@@ -113,7 +155,7 @@ func (c *Cat) drawCrabKittens(l *canvas.Layer, px, py, n, w, seaTop, seaBot int,
 		if math.Mod(t+HashF(i, 12, seed)*6.283, 4.2+HashF(i, 16, seed)*3) < 0.17 {
 			glyph = '-'
 		}
-		pend = append(pend, pendingEyes{x + crabletEyeCells[0], x + crabletEyeCells[1], ky, glyph, 1, l})
+		pend = append(pend, pendingEyes{x + eyeCells[0], x + eyeCells[1], ky, glyph, 1, l})
 		drawn++
 	}
 	// Bodies first, faces after: a neighbour's seam must not take an eye.

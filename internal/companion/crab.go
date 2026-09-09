@@ -190,6 +190,43 @@ var Crablet = []string{
 	"............",
 }
 
+// The smaller rungs of the litter's size ladder, at the kittens' dimensions so
+// the lane arithmetic and the step between neighbours need no new numbers:
+// 10x12 and 8x12 source pixels, which is 5 cells by 3 and 4 by 3.
+//
+// The claws come in to one cell each and the middle pair of cells is left empty
+// for the eyes, exactly as the full-size crablet does -- the eyes are plotted
+// as characters on TOP of the body, so the bitmap has to leave them a hole.
+var CrabletSmall = []string{
+	"#........#",
+	"##......##",
+	".#..#...#.",
+	".#.####.#.",
+	"..######..",
+	".########.",
+	"##########",
+	".########.",
+	"#..####..#",
+	"#..####..#",
+	"#........#",
+	"..........",
+}
+
+var CrabletTiny = []string{
+	"#......#",
+	"##....##",
+	".#....#.",
+	".#.##.#.",
+	"..####..",
+	".######.",
+	"########",
+	".######.",
+	"#.####.#",
+	"#.####.#",
+	"#......#",
+	"........",
+}
+
 // A crab does not swim. It walks in until the water closes over the shell and
 // the eyestalks carry on above the surface -- what the animal actually does,
 // and the only thing that reads at five cells by two. Same 10x8 box as
