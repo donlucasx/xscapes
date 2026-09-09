@@ -58,9 +58,13 @@
 > and *"lets focus on open engineering before we do anything hackathon related"*. ⏰ **8 days.**
 > ⇒ **PUSHED 2026-09-09 at his word** ("lets switch the login to donlucasx"): `origin/main` is
 > `2f4ce38`, verified with `git ls-remote`, nothing unpushed.
-> ⚠ **`gh auth`'s active account is now `donlucasx`, and it is HOST-GLOBAL.** His Validators work runs
-> as `eclipsevalidators`; git operations there will be refused until someone flips it back with
-> `gh auth switch --user eclipsevalidators`. Three accounts on this machine, same rule as Vercel.
+> ⚠ **`gh auth`'s active account is HOST-GLOBAL and it does NOT STAY PUT.** It flipped back to
+> `eclipsevalidators` between two of this session's own commands, because his Validators session
+> reclaims it. ⇒ **Switch immediately before every push, do not assume a previous switch held:**
+> `gh auth switch --user donlucasx && git push origin main`. The failure is a misleading 403 —
+> *"Permission to donlucasx/xscapes.git denied to eclipsevalidators"* — which reads like a repo
+> permission problem and is an identity problem. Three GitHub accounts here, same rule as the three
+> Vercel ones.
 > ⇒ **HE RESTARTED 14:21:52 AND IS RUNNING ALL OF IT** — scape PID 87332, resumed BY ID, running
 > inode **84141583 == installed**. First live look: *"i dont see anything strikedthrough so far."*
 > ⚠ **Thin, and say so.** 559 mirrored rows in the new trace, 7 with U+FFFD and **all 7 his own quoted
