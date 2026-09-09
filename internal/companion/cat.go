@@ -74,7 +74,16 @@ type Cat struct {
 	coat term.RGB
 	// eyeFill is one of the EyeFill constants; see SetEyeFill.
 	eyeFill string
+
+	// stepping is set for the frames a pace step is in flight, so the legs
+	// swap phase mid-stride. It is a per-frame flag rather than an argument
+	// because Draw already carries five and the litter's draws would each
+	// need it too.
+	stepping bool
 }
+
+// SetStepping says a pace step is in flight this frame. See pace.go.
+func (c *Cat) SetStepping(v bool) { c.stepping = v }
 
 // SetFace chooses how much detail the companion's face carries.
 func (c *Cat) SetFace(f Face) { c.face = f }
@@ -135,6 +144,8 @@ func (c *Cat) Draw(l *canvas.Layer, x, y int, t float64, st State) {
 	src := c.body
 	if st == Worried {
 		src = c.worried
+	} else if c.stepping {
+		src = c.walkBitmap()
 	}
 	f := src.Blank()
 

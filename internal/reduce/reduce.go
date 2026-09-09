@@ -123,6 +123,15 @@ type State struct {
 	// Events counts everything applied, which is the cheapest possible
 	// answer to "is this thing actually wired up?".
 	Events int
+
+	// Steps is how many MAIN-THREAD tool events this session has seen, and
+	// StepAge how long ago the last one was. One step of the companion's pace
+	// each. An agent working alone makes all its calls on the main thread and
+	// paces constantly; one orchestrating six subagents makes few itself and
+	// settles down, which is his earlier ask falling out rather than being
+	// special-cased.
+	Steps   int
+	StepAge float64
 }
 
 type inflight struct {
@@ -139,6 +148,11 @@ type Reducer struct {
 	heatAt  time.Time
 	turnOpn bool
 	turnAt  time.Time
+
+	// steps counts main-thread tool events; stepAt is when the last one landed.
+	// The companion takes one step of its pace per step.
+	steps  int
+	stepAt time.Time
 
 	flight map[string]inflight
 	subs   map[string]time.Time
@@ -215,6 +229,16 @@ func (r *Reducer) Apply(e event.Event, now time.Time) {
 	case event.ToolStart:
 		if e.ID != "" {
 			r.flight[e.ID] = inflight{started: now, op: e.Op, tool: e.Tool, target: e.Target}
+		}
+		// One step of the companion's pace, and ONLY for the main thread.
+		// Subagent work belongs to the litter; if it moved the parent too, the
+		// same event would be spending two channels. His correction is what
+		// this encodes: "should be tied up to an actual agent action so its not
+		// random" -- a step is a COUNT and where it ends up is a POSITION, both
+		// of which survive a screenshot, where a drift is decoration.
+		if e.Agent == "" {
+			r.steps++
+			r.stepAt = now
 		}
 		// A scape attached partway through a session never saw the prompt, so
 		// tool traffic has to be able to open a turn by itself -- otherwise it
@@ -451,6 +475,8 @@ func (r *Reducer) State(now time.Time) State {
 	working := r.turnOpn || len(r.flight) > 0
 
 	st := State{
+		Steps:   r.steps,
+		StepAge: sinceOr(now, r.stepAt),
 		Act: scape.Activity{
 			Working:     working,
 			Level:       clamp01(lvl),
@@ -532,4 +558,13 @@ func clamp01(v float64) float64 {
 		return 1
 	}
 	return v
+}
+
+// sinceOr is seconds since t, or a large number when t is the zero time, so a
+// session that has not stepped yet reads as "long ago" rather than "just now".
+func sinceOr(now, t time.Time) float64 {
+	if t.IsZero() {
+		return 1e9
+	}
+	return now.Sub(t).Seconds()
 }

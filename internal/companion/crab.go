@@ -262,7 +262,13 @@ func crabUpper(st State, t float64) []string {
 // drawCrab is the crab's whole Draw. Compose the upper half for the state onto
 // the fixed lower half, breathe, then plot the two eyes on top.
 func (c *Cat) drawCrab(l *canvas.Layer, x, y int, t float64, st State) {
-	rows := append(append([]string{}, crabUpper(st, t)...), crabLower...)
+	lower := crabLower
+	if c.stepping && st != Worried {
+		// Mid-stride: the legs swap phase and the body drops a pixel. Only the
+		// LOWER half changes, so a step costs one extra bitmap and nothing else.
+		lower = crabLowerStep
+	}
+	rows := append(append([]string{}, crabUpper(st, t)...), lower...)
 	src := ParseBitmap(rows)
 
 	// Breathing, exactly as the cat does it: one quadrant subpixel is two

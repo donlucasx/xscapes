@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"math"
 	"os"
 	"os/signal"
 	"syscall"
@@ -219,7 +220,11 @@ func runLive(seed int64, fps float64, wIn, hIn int, ctxUsed, tod float64, ascii 
 // what that implies for everything anchored to it. One function, so the mockup
 // and the live loop cannot disagree about it.
 type layout struct {
-	CatX     int // left cell of the companion sprite
+	CatX int // left cell of the companion sprite
+	// PaceSpan is how far inward the companion paces. The strip is RESERVED
+	// from the sand and the litter, both of which otherwise run right up to
+	// CatX; see paceSpan in pace.go for why it goes inward and not outward.
+	PaceSpan int
 	BubbleX  int
 	SandFrom int
 	SandTo   int
@@ -247,6 +252,7 @@ func compose(w int, catW int, mirror bool) layout {
 			MoonX: 0.72, Mirror: false,
 		}
 	}
+	span := paceSpan(w)
 	catX := w - catW - right
 	if catX < 0 {
 		// Narrower than the sprite. Pin it to the left edge rather than let it
@@ -259,8 +265,8 @@ func compose(w int, catW int, mirror bool) layout {
 		bx = margin
 	}
 	return layout{
-		CatX: catX, BubbleX: bx,
-		SandFrom: margin, SandTo: catX - 1,
+		CatX: catX, BubbleX: bx, PaceSpan: span,
+		SandFrom: margin, SandTo: catX - 1 - span,
 		MoonX: 0.28, Mirror: true,
 	}
 }
@@ -365,17 +371,25 @@ func drawReadout(c *canvas.Canvas, sh *scape.Shore, used float64) {
 func drawScene(c *canvas.Canvas, sh *scape.Shore, cat *companion.Cat, lay layout,
 	st reduce.State, t float64, seed int64, top int) {
 	drawReadout(c, sh, st.Act.ContextUsed)
-	cat.Draw(c.Near(), lay.CatX, top, t, st.Pose)
+
+	// The pace. dx is negative -- inward, toward the centre -- and the litter
+	// keeps to the far side of the reserved strip so the companion never walks
+	// through it. See pace.go.
+	dx, moving := pace(st, c.W)
+	catX := lay.CatX + int(math.Round(dx))
+	litterX := lay.CatX - lay.PaceSpan
+	cat.SetStepping(moving)
+	cat.Draw(c.Near(), catX, top, t, st.Pose)
 	if st.Kittens > 0 {
 		// Swimmers stay above the shore's mean waterline with a row to spare
 		// for the swell's crests; the waterline moves with activity, so this
 		// is read off the shore every frame rather than derived from height.
-		cat.DrawKittens(c.Near(), c.Mid(), lay.CatX, top, st.Kittens, c.W-1,
+		cat.DrawKittens(c.Near(), c.Mid(), litterX, top, st.Kittens, c.W-1,
 			int(float64(c.H)*0.42)+1, sh.SandTop()-2, t, seed)
 	}
 	if len(st.KittenExits) > 0 {
 		// Finished subagents swim off along the top lane; same water bounds.
-		cat.DrawKittenExits(c.Near(), st.KittenExits, lay.CatX, top, c.W-1,
+		cat.DrawKittenExits(c.Near(), st.KittenExits, litterX, top, c.W-1,
 			int(float64(c.H)*0.42)+1, sh.SandTop()-2, t, seed)
 	}
 	if st.Bubble != "" {
