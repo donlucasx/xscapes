@@ -114,6 +114,12 @@ type screen struct {
 // the retained cells again. No reflow, no wrap, no blanking. With it off, a
 // row is cut to the new width and padded with blanks, which is what the model
 // assumed before and what Ghostty's source does.
+//
+// ⚠ OFF in production ON PURPOSE, and only the resize instruments turn it on.
+// It is faithful to the terminal and wrong for the mirror -- measured on his
+// own traces, it makes the mirror write merged rows. The reason is at the
+// declaration site in host.go and the evidence is in
+// TestTheMirrorDropsTheCellsTheTerminalRetains.
 func (s *screen) retain(w int, row []cell) []cell {
 	if !s.retainWidth || len(row) <= w {
 		r := blankRow(max(w, len(row)))

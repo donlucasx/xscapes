@@ -269,6 +269,19 @@ func (h *Host) Run() error {
 	waitDone := make(chan struct{})
 	if h.History {
 		h.mu.Lock()
+		// ⚠ This model deliberately does NOT take Rules.RetainsWidth, and it is
+		// the one line in the host that looks like an oversight and is not.
+		// Session 25 called it "a wiring gap and it is in the mirror path --
+		// the strongest lead yet" on the scrollback corruption. Wired and
+		// replayed against two independent windows of his own traces, it is
+		// the opposite of a fix: the mirror starts writing rows with a
+		// pre-resize fragment stitched onto the end, which is the corruption's
+		// own signature, and rows wider than the window, which wrap in the
+		// main buffer and take the row underneath. Terminal.app really does
+		// retain those cells; they are stale, and the mirror is a record of
+		// content, not a photograph of the glass. See
+		// TestTheMirrorDropsTheCellsTheTerminalRetains, and
+		// TestReplayTraceRetainDiff for the measurement.
 		h.model = newScreen(cols, rows)
 		h.model.capture = true
 		h.mu.Unlock()
