@@ -3,6 +3,7 @@ package host
 import (
 	"strconv"
 	"strings"
+	"unicode/utf8"
 )
 
 // screen is the smallest terminal that can answer "what would this look like",
@@ -246,6 +247,37 @@ func (s *screen) resizeAnchoredBottom(w, h int) {
 	s.resize(w, h)
 }
 
+// tailPartialRune is the length of an incomplete utf-8 sequence at the end of
+// s, or 0. A byte that is not a rune start is a continuation, so walk back at
+// most UTFMax-1 of them to the start byte and compare the length it promises
+// against the bytes actually present.
+func tailPartialRune(s string) int {
+	for i := 1; i <= utf8.UTFMax && i <= len(s); i++ {
+		b := s[len(s)-i]
+		if !utf8.RuneStart(b) {
+			continue
+		}
+		var n int
+		switch {
+		case b < 0x80:
+			n = 1
+		case b&0xE0 == 0xC0:
+			n = 2
+		case b&0xF0 == 0xE0:
+			n = 3
+		case b&0xF8 == 0xF0:
+			n = 4
+		default:
+			return 0 // not a legal start byte; let []rune deal with it
+		}
+		if n > i {
+			return i
+		}
+		return 0
+	}
+	return 0
+}
+
 // resizeAlt is what Terminal.app's ALTERNATE screen does, measured by eye with
 // notes/contentprobe on 2026-09-03: content is anchored to the BOTTOM edge in
 // both directions. A grow pushes it down by the delta and inserts blank rows
@@ -417,8 +449,34 @@ func clamp(v, lo, hi int) int {
 }
 
 func (s *screen) feed(in string) {
-	r := []rune(s.pending + in)
+	in = s.pending + in
 	s.pending = ""
+	// ⚠ Hold back a trailing INCOMPLETE utf-8 rune, or []rune below turns its
+	// orphaned bytes into U+FFFD and there is no getting them back.
+	//
+	// This is the strikethrough, and it was ours the whole time. The agent's
+	// output arrives from a pty read, which splits wherever it likes, and
+	// Claude Code's interface is full of multi-byte glyphs -- the full-width
+	// rule alone is U+2500 three bytes at a time. Split one and a single cell
+	// becomes THREE, so every cell after it on the row shifts two columns and
+	// the overflow wraps onto the row below. The terminal itself never sees
+	// any of this: it gets the exact bytes and draws them correctly, which is
+	// why a bare agent is clean and why the live screen is clean. Only the
+	// MODEL is wrong -- and Host.mirror writes the model's rows into the
+	// terminal's scrollback, which is the one place he has ever seen it.
+	//
+	// pending already existed for a trailing partial ESCAPE. Runes need the
+	// same treatment and never got it. The two cannot both be pending at once
+	// -- an escape's final byte is ASCII, so a partial rune is never inside
+	// one -- but they are appended rather than assigned so that stays true by
+	// construction rather than by argument.
+	var partial string
+	if n := tailPartialRune(in); n > 0 {
+		partial, in = in[len(in)-n:], in[:len(in)-n]
+	}
+	defer func() { s.pending += partial }()
+
+	r := []rune(in)
 
 	for i := 0; i < len(r); i++ {
 		c := r[i]
