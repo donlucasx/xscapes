@@ -81,6 +81,21 @@ func MirrorTail(rows []string) []string {
 	return out
 }
 
+// TailCol is which cell of a balloon carries the pointer, so a caller can put
+// that cell over the creature the balloon comes from. Read off the rows rather
+// than computed from the text width, because MirrorTail moves it.
+func TailCol(rows []string) int {
+	if len(rows) == 0 {
+		return 0
+	}
+	for i, r := range []rune(rows[len(rows)-1]) {
+		if r == 'v' {
+			return i
+		}
+	}
+	return 0
+}
+
 // bubbleInner pads the text into the balloon's middle row. Sized in runes,
 // because a wide rune would make the drawn box narrower than the border it is
 // measured against.

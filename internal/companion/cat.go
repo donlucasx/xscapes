@@ -124,6 +124,28 @@ func NewCat() *Cat {
 // Size is the character footprint, not the pixel size.
 func (c *Cat) Size() (w, h int) { return c.body.W / 2, c.body.H / 4 }
 
+// catEyeCells are the cat's eye cells in the authored, unmirrored box. Shared
+// with HeadCol so the balloon and the face cannot drift apart.
+var catEyeCells = [2]int{2, 6}
+
+// HeadCol is the head's column within the sprite's own box, and it is where a
+// balloon's pointer belongs.
+//
+// Measured, not guessed: the cat's eyes sit at cells 2 and 6 of twelve, at 9
+// and 5 once mirrored; the crab's at 4 and 7, and the crab does not flip. The
+// midpoint is the cell between them either way.
+func (c *Cat) HeadCol() int {
+	if c.kind == KindCrab {
+		return (crabEyeCells[0] + crabEyeCells[1] + 1) / 2
+	}
+	a, b := catEyeCells[0], catEyeCells[1]
+	if c.mirror {
+		w, _ := c.Size()
+		a, b = w-1-a, w-1-b
+	}
+	return (a + b) / 2
+}
+
 // FaceLeft mirrors the whole companion.
 //
 // The sprite is not symmetric: the body sits in the left nine of its twelve
@@ -222,7 +244,7 @@ func (c *Cat) eyes(l *canvas.Layer, x, y int, t float64, st State) {
 	}
 	// The eyes are plotted as characters on top of the quadrant body, so they
 	// have to be mirrored by hand: the flip happens to the bitmap, not here.
-	a, b := 2, 6
+	a, b := catEyeCells[0], catEyeCells[1]
 	if c.mirror {
 		w, _ := c.Size()
 		a, b = w-1-a, w-1-b

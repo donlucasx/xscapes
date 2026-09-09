@@ -225,7 +225,6 @@ type layout struct {
 	// from the sand and the litter, both of which otherwise run right up to
 	// CatX; see paceSpan in pace.go for why it goes inward and not outward.
 	PaceSpan int
-	BubbleX  int
 	SandFrom int
 	SandTo   int
 	MoonX    float64
@@ -247,7 +246,7 @@ func compose(w int, catW int, mirror bool) layout {
 	right := margin + w/32
 	if !mirror {
 		return layout{
-			CatX: 5, BubbleX: 12,
+			CatX:     5,
 			SandFrom: 5 + catW + 2, SandTo: w - margin,
 			MoonX: 0.72, Mirror: false,
 		}
@@ -260,12 +259,8 @@ func compose(w int, catW int, mirror bool) layout {
 		// side would start eating the face, and the face is the whole point.
 		catX = 0
 	}
-	bx := catX - 2
-	if bx < margin {
-		bx = margin
-	}
 	return layout{
-		CatX: catX, BubbleX: bx, PaceSpan: span,
+		CatX: catX, PaceSpan: span,
 		SandFrom: margin, SandTo: catX - 1 - span,
 		MoonX: 0.28, Mirror: true,
 	}
@@ -397,20 +392,39 @@ func drawScene(c *canvas.Canvas, sh *scape.Shore, cat *companion.Cat, lay layout
 		if st.BubbleAsk {
 			rows, col = companion.Bubble(st.Bubble), bubbleAskCol
 		}
-		x := lay.BubbleX
 		if lay.Mirror {
 			rows = companion.MirrorTail(rows)
-			if w := bubbleWidth(rows); x-w >= 0 {
-				x -= w
-			} else {
-				x = 0
-			}
 		}
+		x := bubbleX(rows, lay.CatX+cat.HeadCol(), c.W)
 		// Opaque: a balloon is TEXT, and a transparent space lets the sea
 		// write glyphs into the middle of the words.
 		(&companion.Sprite{Rows: rows, Body: col, Opaque: true}).Draw(c.Near(), x, top-len(rows))
 	}
 	drawSand(c, st.Tail, sh.SandColor(), sh.SandTop(), lay.SandFrom, lay.SandTo)
+}
+
+// bubbleX puts the balloon's POINTER over the companion's head, and lets the
+// rest of the box fall where it falls.
+//
+// It used to be anchored to the balloon's own corner instead, two columns clear
+// of the companion's box. Measured at 124 columns before it was changed: the
+// pointer landed on column 101, the box began at 107 and the nearest ink at
+// 110, so the `v` came out of nine cells of bare sand. The unmirrored layout
+// this was mirrored from overlaps the companion by design, and that overlap is
+// what makes a speech balloon read as speech. Nothing collides -- the balloon's
+// rows are ABOVE the companion's, never beside them.
+//
+// Clamped to the frame, in which case the pointer no longer aims: a balloon cut
+// off at the edge is worse than one that misses.
+func bubbleX(rows []string, head, w int) int {
+	x := head - companion.TailCol(rows)
+	if bw := bubbleWidth(rows); x+bw > w {
+		x = w - bw
+	}
+	if x < 0 {
+		x = 0
+	}
+	return x
 }
 
 func bubbleWidth(rows []string) int {
