@@ -430,6 +430,46 @@ func writeBandColor(p Palette) term.RGB {
 	}
 }
 
+// wetBandColor is the wet strip at the water's edge: the beach's own staircase,
+// one tone DOWN.
+//
+// It used to be the interpolated palette value, and that is what he
+// photographed on 2026-09-09 -- flat grey blocks along the shore, five cells
+// wide, under the litter. The cube's channel levels are 0, 95, 135, 175, 215,
+// 255, so below 95 in green and blue there is only zero: the darkest entry
+// keeping a warm ordering is sandNight at luma 96, and under that the cube has
+// only the pure reds, while the grey ramp steps by ten the whole way down.
+// Palette.WetSand runs luma 52 to 108 across the day, so it spends most of it
+// under that floor and the nearest colour the terminal owns is a grey.
+// Measured hour by hour in notes/wetsand: warm at 09:00, GREY at 10:00, warm
+// 11:00 to 14:00, grey from 15:00 on -- the strip changed hue back and forth
+// through a working morning.
+//
+// The dry beach never had this problem because writeBandColor never leaves
+// three cube-exact tones. This is the same three tones, shifted one step, so
+// the wet strip is exactly as stable as the sand it sits on and is always one
+// rung darker.
+//
+// At night the beach is already on the last warm tone the cube has, so there is
+// nothing warm below it and the strip falls off the end into a grey. That is
+// deliberate, and it is consistent there: by then the whole scene is dark, and
+// the locked rule is that the darkness lives in the backgrounds while the
+// colour lives in the glyphs.
+func wetBandColor(p Palette) term.RGB {
+	switch l := bandLuma(p.SandNear); {
+	case l >= 160:
+		return sandLow
+	case l >= 100:
+		return sandNight
+	default:
+		return wetNight
+	}
+}
+
+// wetNight is a grey-ramp entry, chosen for its distance below sandNight
+// rather than for a hue it cannot have.
+var wetNight = term.RGB{R: 68, G: 68, B: 68}
+
 func bandLuma(c term.RGB) float64 {
 	return 0.299*float64(c.R) + 0.587*float64(c.G) + 0.114*float64(c.B)
 }
@@ -488,7 +528,7 @@ func (s *Shore) paintBG(c *canvas.Canvas, hy int, edge []float64) {
 			case fy < ex+0.5:
 				// The waterline cell straddles sea and sand. Mix by how much of
 				// the cell the water actually covers.
-				col = term.Lerp(s.pal.WetSand, s.pal.SeaNear, ex-fy+0.5)
+				col = term.Lerp(wetBandColor(s.pal), s.pal.SeaNear, ex-fy+0.5)
 			case s.writeTop > 0 && y >= s.writeTop:
 				// One flat tone, all the way across and all the way down. This
 				// is the page, not the picture.

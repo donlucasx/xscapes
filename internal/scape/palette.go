@@ -254,3 +254,8 @@ func PaletteAt(t float64) Palette {
 	}
 	return dayKeys[0].p
 }
+
+// DryBandExport and WetBandExport let notes/wetsand print the beach's two tones
+// without exporting the pickers themselves.
+func DryBandExport(p Palette) term.RGB { return writeBandColor(p) }
+func WetBandExport(p Palette) term.RGB { return wetBandColor(p) }

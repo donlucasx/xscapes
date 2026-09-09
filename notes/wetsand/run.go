@@ -53,23 +53,20 @@ func run() {
 	fmt.Printf("  below it the cube offers only the pure reds, so any darker warm colour\n")
 	fmt.Printf("  is nearer a grey-ramp entry than anything with hue.\n\n")
 
-	fmt.Println("hour   dry sand         wet sand asked     drawn as        verdict")
+	fmt.Println("hour   dry beach        wet strip        verdict")
 	for h := 0; h < 24; h++ {
 		p := scape.PaletteAt(float64(h) / 24)
-		q := term.FromIndex256(p.WetSand.Index256Keeping())
-		verdict := "warm"
-		switch {
-		case chroma(q) > 0:
-		case chroma(p.WetSand) > 20:
-			verdict = "NEUTRAL -- real hue thrown away"
-		default:
-			verdict = "neutral, and the palette asked for one"
+		dry := scape.DryBandExport(p)
+		wet := scape.WetBandExport(p)
+		verdict := "warm, one rung under the sand"
+		if chroma(wet) == 0 {
+			verdict = "neutral -- the cube has no warm tone under the sand here"
 		}
-		fmt.Printf("%02d:00  %3d/%3d/%3d L%3.0f  %3d/%3d/%3d L%3.0f  %3d/%3d/%3d L%3.0f  %s\n",
-			h,
-			p.SandNear.R, p.SandNear.G, p.SandNear.B, luma(p.SandNear),
-			p.WetSand.R, p.WetSand.G, p.WetSand.B, luma(p.WetSand),
-			q.R, q.G, q.B, luma(q), verdict)
+		if luma(wet) >= luma(dry) {
+			verdict += "   <-- NOT DARKER THAN THE SAND"
+		}
+		fmt.Printf("%02d:00  %3d/%3d/%3d L%3.0f  %3d/%3d/%3d L%3.0f  %s\n",
+			h, dry.R, dry.G, dry.B, luma(dry), wet.R, wet.G, wet.B, luma(wet), verdict)
 	}
 
 	fmt.Println("\nthe shoreline gradient, sand -> sea, at the hours that matter:")
@@ -77,7 +74,7 @@ func run() {
 		p := scape.PaletteAt(h / 24)
 		fmt.Printf("  %5.2fh  ", h)
 		for _, t := range []float64{0, 0.25, 0.5, 0.75, 1} {
-			q := term.FromIndex256(term.Lerp(p.WetSand, p.SeaNear, t).Index256Keeping())
+			q := term.FromIndex256(term.Lerp(scape.WetBandExport(p), p.SeaNear, t).Index256Keeping())
 			mark := " "
 			if chroma(q) == 0 {
 				mark = "*"
@@ -87,4 +84,36 @@ func run() {
 		fmt.Println()
 	}
 	fmt.Println("  (* = neutral grey. At 16:42 three of the five steps are grey.)")
+}
+
+// proposed is option 2 from the 2026-09-09 menu, for the table only: hold the
+// wet band on a warm cube entry while the DRY beach still draws warm, and let
+// it go neutral once the whole beach has, which is the locked rule that
+// darkness lives in the backgrounds.
+func proposed(sand, wet term.RGB) term.RGB {
+	if chroma(term.FromIndex256(sand.Index256Keeping())) == 0 {
+		return wet
+	}
+	if chroma(term.FromIndex256(wet.Index256Keeping())) > 0 {
+		return wet
+	}
+	best, bestD := wet, 1<<62
+	for _, r := range levels {
+		for _, g := range levels {
+			for _, b := range levels {
+				if !(r > g && g >= b) || g == 0 {
+					continue
+				}
+				cand := term.RGB{R: uint8(r), G: uint8(g), B: uint8(b)}
+				if luma(cand) >= luma(sand) {
+					continue
+				}
+				dr, dg, db := r-int(wet.R), g-int(wet.G), b-int(wet.B)
+				if d := dr*dr + dg*dg + db*db; d < bestD {
+					bestD, best = d, cand
+				}
+			}
+		}
+	}
+	return best
 }
