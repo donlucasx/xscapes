@@ -3,7 +3,7 @@
 *(Renamed end to end on 2026-09-03: directory, env vars, state path and hook marker. Two names are kept on purpose and are not leftovers -- `internal/envx` still reads `ASCIISCAPES_*` and warns, and `install.go` still RECOGNISES the `# asciiscapes:v1` marker so the hooks it wrote before the rename can be found and removed.)*
 
 > **Session 27 (2026-09-09 into 09-10), WRAPPED. Fifteen commits, PUSHED, tree clean, suite + vet
-> green BOTH ways (default and `XSCAPES_TIDE=1`), installed.**
+> green BOTH ways (the tide, now the DEFAULT, and `XSCAPES_TIDE=0`), installed.**
 > ⭐⭐ **THE STRIKETHROUGH IS CONFIRMED FIXED THREE TIMES**, the third a FRESH session in another
 > project — *"seems the strikethrough issue has been fixed"*. ⚠ Verified, not trusted: that scape's
 > PID held inode **84189069 == installed**.
@@ -25,7 +25,7 @@
 > cube-exact tones one rung down. Neutral waterline cells **2982 → 1895, −36%**.
 >
 > ⭐⭐⭐ **HIS IDEA, THE TIDE** — *"moving in and out of the land, instead of moving towards the left
-> ... Like a real tide"* — behind **`XSCAPES_TIDE=1`, default OFF**, and he likes it live. He was
+> ... Like a real tide"* — **SHIPPED ON by default 2026-09-10** at his word *"turn XSCAPES_TIDE=1 ON by default"*, after he ran it for an evening and kept it. `XSCAPES_TIDE=0` restores the old fixed waterline. He was
 > right twice: the sea's texture slides sideways, AND **the sea never came up the beach at all** —
 > mean waterline row **18.75 at level 0.00 and 18.75 at 1.00**. With the tide it runs **13.30 →
 > 18.71, 5.4 rows**, which is also the fix the sea's plateau needs.

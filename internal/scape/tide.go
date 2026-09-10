@@ -6,9 +6,11 @@ import (
 	"github.com/donlucasx/xscapes/internal/envx"
 )
 
-// Tide is HIS idea, 2026-09-09, built behind a switch to be looked at rather
-// than shipped: "the tide could be moving in and out of the land, instead of
-// moving towards the left of the screen. Like a real tide."
+// Tide is HIS idea, 2026-09-09, and SHIPPED ON at his word the next day: "turn
+// XSCAPES_TIDE=1 ON by default." He asked for it as "the tide could be moving
+// in and out of the land, instead of moving towards the left of the screen.
+// Like a real tide", ran it for an evening and kept it -- "new tide seems to
+// work well ... I like it".
 //
 // He is right about both halves, and both are measured.
 //
@@ -37,8 +39,17 @@ import (
 // already sits, and REST pulls it back up the frame toward the horizon. Idle
 // reads as low tide with a wide beach, and that is the honest way round.
 //
-//	XSCAPES_TIDE=1 xscapes claude
-var Tide = envx.Lookup("TIDE") == "1"
+// XSCAPES_TIDE=0 puts the old waterline back -- a fixed row with a sine sliding
+// across it -- which is the picture every frame before 2026-09-10 was reviewed
+// against, and what the A/B in notes/searange and notes/drift compares to.
+var Tide = true
+
+func init() {
+	switch envx.Lookup("TIDE") {
+	case "0", "off", "no":
+		Tide = false
+	}
+}
 
 // TideRange is how many rows, at scale 1, the water withdraws when the agent
 // goes quiet. Clamped afterwards by the same guards that keep the waterline

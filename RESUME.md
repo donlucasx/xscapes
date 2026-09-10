@@ -5,7 +5,8 @@
 ```
 cd ~/Documents/claude/xscapes/ and read CLAUDE.md (the brief, authoritative)
 and RESUME.md before responding. Session 27 is WRAPPED: HEAD is pushed, tree
-clean, suite + vet green BOTH ways (default and XSCAPES_TIDE=1), installed.
+clean, suite + vet green BOTH ways (the tide, now the DEFAULT, and XSCAPES_TIDE=0),
+installed.
 The scrollback strikethrough is CONFIRMED FIXED three times over, the third in
 a fresh session in another project. Skim origin-chat.md only if you need the
 why; ignore ideas.md -- it is parked. Tell me where we left off, then pick up
@@ -31,8 +32,8 @@ next session and reporting back. Four things are new since he last looked proper
 - the balloon points at the companion
 
 ```
-xscapes claude                    # shipped default
-XSCAPES_TIDE=1 xscapes claude     # with his tide
+xscapes claude                    # the tide, now the default
+XSCAPES_TIDE=0 xscapes claude     # the old fixed waterline, for comparison
 ```
 
 **1. ⏸ HIS, still open:** Andale Mono in Terminal (⚠ now worth only the four dashes at the disc's

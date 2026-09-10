@@ -25,8 +25,8 @@
 // the wave itself is going. Flipping the wave's own sign moved the y peak from
 // -1 to -2, which is noise. X is the axis his report is about and X is clean.
 //
-//	go run ./notes/drift
-//	XSCAPES_TIDE=1 go run ./notes/drift
+//	go run ./notes/drift              (the tide, now the default)
+//	XSCAPES_TIDE=0 go run ./notes/drift   (the old fixed waterline)
 package main
 
 import (

@@ -292,8 +292,9 @@ func (s *Shore) Update(c *canvas.Canvas, t float64, act Activity) {
 	scale = math.Max(0.45, math.Min(1.35, scale))
 
 	sy := c.H - beach
-	// HIS idea, behind XSCAPES_TIDE: the water withdraws up the frame when the
-	// agent goes quiet and comes back as it works. See tide.go.
+	// HIS idea, shipped on by default 2026-09-10: the water withdraws up the
+	// frame when the agent goes quiet and comes back as it works. XSCAPES_TIDE=0
+	// restores the old fixed waterline. See tide.go.
 	if sy <= hy+1 {
 		sy = hy + 2
 	}
