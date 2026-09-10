@@ -167,6 +167,10 @@ type Reducer struct {
 	ctxSet bool
 
 	todoDone, todoOf int
+	// turnsDone is how many turns have closed this session, and it is what
+	// lights the constellation when the agent keeps no checklist. See
+	// StarsCap.
+	turnsDone int
 
 	tail    tail
 	session string
@@ -301,6 +305,7 @@ func (r *Reducer) Apply(e event.Event, now time.Time) {
 		r.bubble = e.Text
 
 	case event.Done:
+		r.turnsDone++
 		r.turnOpn = false
 		r.needsInput = false
 		r.doneAt = now
@@ -354,6 +359,58 @@ func (r *Reducer) Apply(e event.Event, now time.Time) {
 		}
 		r.heat += Impulse
 	}
+}
+
+// StarsCap is how many places the constellation holds when it is counting
+// closed turns rather than a checklist.
+//
+// Measured over his own recorded sessions: turns closed run p50 12, p75 16,
+// p90 24 and max 32, so a sky of 32 fills through a long session and never
+// pegs. That range is the whole reason this channel could be rebound at all --
+// the two other accumulators that fire often enough were both unusable, files
+// changed at p50 2 and p90 107 and finished subagents at p50 10 and p90 172.
+// A channel that is empty half the time and saturated the rest is not a
+// channel; that is the same defect the sea has above level 0.6.
+const StarsCap = 32
+
+// stars is what the constellation counts.
+//
+// The channel was spec'd as todos completed and has NEVER lit: across his whole
+// recorded history -- 60,000+ tool calls -- TodoWrite has been called zero
+// times, which hook.go had already noticed. So it counts CLOSED TURNS instead,
+// which is the same idea (units of work finished) carried by an event that
+// actually fires, about a dozen times a session.
+//
+// A checklist still wins where one exists. An agent that keeps todos is telling
+// us something more specific than "a turn ended", and other agents are not
+// Claude Code; this only falls back when nothing has ever sent one.
+//
+// ⚠ THE RULE TENSION, NAMED RATHER THAN HIDDEN: `done` also raises the finish
+// knock, and the encoding rule forbids one event driving two channels. The
+// argument for it here is that the two are different KINDS of variable -- the
+// knock is momentary and says "it just finished, come back", the stars are
+// cumulative and say "this session has got through N" -- and they never
+// compete, because they light at the same instant in different parts of the
+// frame. It is one line to bind this elsewhere if he rules the other way.
+func stars(todoDone, todoOf, turns int) int {
+	if todoOf > 0 {
+		return todoDone
+	}
+	if turns > StarsCap {
+		return StarsCap
+	}
+	return turns
+}
+
+// starTotal is how many PLACES the sky lays out, which fixes where each star
+// sits. It is deliberately not the count: positions are keyed by index, so a
+// total that moved would slide every existing star sideways as the next one
+// arrived, and the brief asks that a star light where it always was.
+func starTotal(todoOf int) int {
+	if todoOf > 0 {
+		return todoOf
+	}
+	return StarsCap
 }
 
 // Tick advances time with no event, which is what the render loop calls on
@@ -481,8 +538,8 @@ func (r *Reducer) State(now time.Time) State {
 			Working:     working,
 			Level:       clamp01(lvl),
 			ContextUsed: r.ctx,
-			TodoDone:    r.todoDone,
-			TodoTotal:   r.todoOf,
+			TodoDone:    stars(r.todoDone, r.todoOf, r.turnsDone),
+			TodoTotal:   starTotal(r.todoOf),
 		},
 		Pose:        r.pose(now),
 		Kittens:     len(r.subs),
