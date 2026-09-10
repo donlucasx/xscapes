@@ -697,9 +697,21 @@ func (s *Shore) todoStars(c *canvas.Canvas, hy, done, total int) {
 	}
 	near := c.Near()
 	for i := 0; i < total; i++ {
-		// Spread across the width by index so the constellation grows outward
-		// rather than piling up, then jittered so it is not a ruled line.
-		frac := (float64(i) + 0.5) / float64(total)
+		// Spread across the width by index -- but NOT in index ORDER, which is
+		// what kept this channel from ever being noticed.
+		//
+		// It used to be frac = (i+0.5)/total, so the sky filled strictly left
+		// to right: measured at 153 columns, one star landed on column 6, two
+		// on 6 and 9, and sixteen still had not passed the halfway mark. His
+		// first-ever lit constellation was two specks in the far-left corner
+		// and he read it as not shining at all.
+		//
+		// The golden ratio fixes it without giving up the thing that matters:
+		// each index still maps to ONE column forever, so a star lights where
+		// it always was, and the first few are spread right across the sky
+		// because every new one falls in the largest remaining gap. That is
+		// what a low-discrepancy sequence is for.
+		frac := math.Mod((float64(i)+0.5)*0.6180339887, 1)
 		x := int(frac*float64(c.W-6)) + 3
 		x += int(HashF(i, 11, s.Seed+31)*3) - 1
 		y := top + int(HashF(i, 23, s.Seed+37)*float64(bot-top))
