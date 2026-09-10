@@ -2,59 +2,62 @@
 
 *(Renamed end to end on 2026-09-03: directory, env vars, state path and hook marker. Two names are kept on purpose and are not leftovers -- `internal/envx` still reads `ASCIISCAPES_*` and warns, and `install.go` still RECOGNISES the `# asciiscapes:v1` marker so the hooks it wrote before the rename can be found and removed.)*
 
-> **Session 27 (2026-09-09 afternoon). Six stories landed and PUSHED, tree clean, green, installed
-> (inode 84212629).** ⭐⭐ **THE STRIKETHROUGH IS CONFIRMED FIXED THREE TIMES**, the third a FRESH
-> session in a different project (tyastie, 111x61) — *"seems the strikethrough issue has been fixed"*.
-> ⚠ Verified rather than assumed: that scape's PID held inode **84189069 == installed**, so it was
-> running the fixes and not a stale build.
-> ⇒ ⭐ **THE ASK BALLOON WAS POINTING AT BARE SAND, at every width, in both facings, for both
-> animals.** Measured on the RENDERED frame at 124 columns: the `v` on column 101, the companion's box
-> beginning at 107, its nearest eye at 112 — eleven cells of empty beach. The balloon was anchored to
-> its own corner and cleared the companion by two columns; **the unmirrored layout it was mirrored from
-> OVERLAPS the animal by design, and that overlap is what makes a speech balloon read as speech.**
-> Now anchored to the companion's own `HeadCol()` (cat's eyes 2/6, mirrored 9/5; crab's 4/7 and the
-> crab does not flip), with the pointer column READ OFF the balloon's rows so `MirrorTail` cannot
-> desync it. `layout.BubbleX` is GONE — it was the wrong anchor, not a wrong number.
-> ⇒ ⭐⭐ **THE `retainWidth` WIRING GAP IS CLOSED AS REFUTED — DO NOT WIRE IT.** S25 called it "the
-> strongest lead yet" and said *wire it and replay*. Replayed: **31 of 975 mirrored rows merge, and 17
-> of 1472 on a second independent window** — the current row with a fragment of the pre-resize row
-> stitched on (`don't scroll, don't resize, don't exit.files while you`), **which is the corruption's
-> own signature.** Faithful to the terminal and wrong for the mirror: the retained cells are stale, and
-> a mirrored line longer than the window WRAPS in the main buffer and takes the row under it.
-> ⚠ **`reallocBand` does NOT settle it, though it looks like it should**: it deletes rows
-> `agentRows+1..rows`, which is the SCAPE's band — the AGENT's rows keep their tails.
-> ⇒ The reason now lives at `host.go`'s `newScreen` call, plus `TestReplayTraceRetainDiff` (the
-> instrument) and `TestTheMirrorDropsTheCellsTheTerminalRetains` (unit-scale). **The instrument FAILS
-> on a window with no width change** — a clean result there looks exactly like a pass, the trap that
-> voided the first strikethrough comparison.
-> ⇒ ⭐ **HERO'S LITTER NOW SHRINKS AS IT GROWS**, on the CAT's ladder (`TierFor` shared, so the
-> thresholds cannot drift). Measured against his 341h: the litter peaks at **38 subagents**, p90 14; at
-> one size 80 columns held EIGHT sitters, so the crab silently dropped them **12.6% of the time the
-> litter existed** at the design target, up to 18 at once. Smallest rung takes 80 columns to eleven.
-> ⇒ ⭐⭐ **THE GREY BLOCKS ON HIS SHORELINE ARE FIXED, and the cause was the CUBE, not our code.**
-> He photographed flat neutral blocks along the waterline. The palette asked for a warm brown
-> **(93,76,66)** and the terminal drew **(78,78,78)**. ⚠ **The quantiser is INNOCENT** — the cube's
-> levels are 0/95/135/175/215/255, so under 95 in green and blue there is only ZERO: the darkest warm
-> entry is **135/95/0 at luma 96** and the grey ramp steps by ten all the way down, so any darker warm
-> colour loses to a grey. `Palette.WetSand` ran luma 52–108, mostly under that floor — warm at 09:00,
-> GREY at 10:00, warm 11:00–14:00, grey from 15:00. **The strip changed hue back and forth through a
-> working morning.** ⚠ **A RAMP MAKES IT WORSE and that was measured, not argued** (1.42% → 3.12%):
-> a tan→blue path crosses the same dead zone. **Do not try it again.**
-> ⇒ **His ruling: floor it in daylight, let night stay neutral.** SHIPPED as `wetBandColor` — the dry
-> beach's own three cube-exact tones, one rung down, always darker than the sand, warm at **33 of 48
-> half-hours**. Rendered-frame count, same 34,632 cells both ways: **neutral waterline cells 2982 →
-> 1895, −36%.** Residual that CANNOT be fixed: the true middle of a tan→blue mix is neutral.
-> ⚠ **My first version of that metric said the fix made it WORSE and I nearly shipped on it** — it
-> filtered out cells whose RAW colour was near-neutral, which is exactly what the old code produced
-> most of, so the before-number excluded its own worst failures. **A filter that correlates with the
-> defect is not a measurement.** Instrument: `go run ./notes/wetsand`.
-> ⏭ **Still open, and MEASURED — his call:** the sea's picture **plateaus at level 0.60**, not the
-> 0.95 `tune` reports; foam and coverage are pinned flat from there to 1.0, and his real level is above
-> 0.60 for **42.2% of working time**. ⚠ NOT proven: the waterline's own swing is painted in the
-> BACKGROUND, which a glyph-reading instrument cannot see. **`TauFall`/`Impulse` cannot fix a plateau
-> in the render** — they only change how often it is visited; the change would be to the MAPPING.
-> ⏭ Traces at **13 GB**, `20260908-102733.bin` (10.2 GB) closed 14:21 and spent · **HIS:** Andale Mono.
-> ⏰ **8 days.** ⏸ Commons kit HELD at his word.
+> **Session 27 (2026-09-09 into 09-10), WRAPPED. Fifteen commits, PUSHED, tree clean, suite + vet
+> green BOTH ways (default and `XSCAPES_TIDE=1`), installed.**
+> ⭐⭐ **THE STRIKETHROUGH IS CONFIRMED FIXED THREE TIMES**, the third a FRESH session in another
+> project — *"seems the strikethrough issue has been fixed"*. ⚠ Verified, not trusted: that scape's
+> PID held inode **84189069 == installed**.
+>
+> ⭐ **THE ASK BALLOON POINTED AT BARE SAND** at every width, both facings, both animals — the `v` on
+> column 101 with the nearest eye at 112. The mirrored layout turned an overlap into a gap. Anchored
+> to the companion's own `HeadCol()` now; `layout.BubbleX` is GONE, it was the wrong anchor.
+> ⭐⭐ **THE `retainWidth` WIRING GAP IS CLOSED AS REFUTED — DO NOT WIRE IT.** S25 called it "the
+> strongest lead yet". Replayed on two independent windows of his traces: **31 of 975 mirrored rows
+> merge, and 17 of 1472** — the corruption's own signature. ⚠ `reallocBand` does NOT settle it: it
+> deletes the SCAPE's band, so the AGENT's rows keep their tails.
+> ⭐ **HERO'S LITTER SHRINKS**, on the cat's shared ladder. At 80 columns one size held EIGHT sitters
+> and the crab dropped subagents **12.6% of the time the litter existed**; the smallest rung holds 11.
+> ⭐⭐ **THE GREY BLOCKS ON HIS SHORELINE ARE FIXED, and the cause was the CUBE.** The palette asked
+> for a warm brown **(93,76,66)** and the terminal drew **(78,78,78)**. ⚠ **The quantiser is
+> INNOCENT** — under 95 in green and blue the cube holds only ZERO, so its warm floor is luma 96 and
+> any darker warm colour loses to the grey ramp. ⚠ **A RAMP MAKES IT WORSE, measured** (1.42% →
+> 3.12%) — **do not try it again.** His ruling *"2"*: `wetBandColor` takes the dry beach's own three
+> cube-exact tones one rung down. Neutral waterline cells **2982 → 1895, −36%**.
+>
+> ⭐⭐⭐ **HIS IDEA, THE TIDE** — *"moving in and out of the land, instead of moving towards the left
+> ... Like a real tide"* — behind **`XSCAPES_TIDE=1`, default OFF**, and he likes it live. He was
+> right twice: the sea's texture slides sideways, AND **the sea never came up the beach at all** —
+> mean waterline row **18.75 at level 0.00 and 18.75 at 1.00**. With the tide it runs **13.30 →
+> 18.71, 5.4 rows**, which is also the fix the sea's plateau needs.
+> ⚠ **Three of HIS OWN locked guarantees caught the first build**: the backdrop churned **59.13%** of
+> open-sea cells a frame against 8% · the waterline was **56 distinct tones** on one row against 40 ·
+> a level step **teleported** it 1.03 rows against a 0.02 normal frame. All fixed. ⚠ And the fix for
+> the third SILENTLY ATE THE FEATURE — the swell rescale measured from `sy`, counted the tide as
+> swell and squashed it 5.1 rows → 1.7. ⚠ **Sideways is HALVED, NOT GONE** (26% → 5%); a weak pull
+> at ~3 cells remains, uncharted. ⚠ Swimmers follow the tide; **sitters do not** (pinned to the
+> companion), so at full activity crablets stand in the water.
+>
+> ⭐⭐ **THE CONSTELLATION IS ALIVE FOR THE FIRST TIME, and he was right against me twice.**
+> TodoWrite has fired **ZERO times in 60,000+ tool calls**, so the channel had never lit. His ruling
+> *"rebind it"*. ⚠ **I then got it wrong twice and he caught both** — I said it had never lit (it
+> had, he had seen it), then that the layout was the problem and the rate was fine (the numbers said
+> otherwise). **Both times the answer was to go and count his real event log.**
+> ⇒ **The layout was half of it**: positions ran in index ORDER over 32 places, so one star landed on
+> column 6 of 153 and sixteen had not passed halfway. A golden-ratio sequence spreads the first few
+> across the sky and keeps each index's column fixed forever.
+> ⇒ **HIS TASK HYPOTHESIS WAS THE OTHER HALF AND IT WAS RIGHT**: during a fan-out a subagent finishes
+> every **31 s** against **14 min** between turns. ⚠ But tasks INSTEAD of turns fails — counts are
+> bimodal, 20 of 30 sessions have 0-26 and 10 have 64-734, so tasks alone leaves 19 of 30 nearly
+> empty. **Eight tasks to a star**: gaps p50 14.5 → **5.4 min**, p90 130.8 → **58.8**.
+>
+> ⚠ **AND I REPEATED TWO OVERSTATEMENTS OF OUR OWN, both now corrected in place.** The s24 banner's
+> "Andale Mono gives back the split-cell gradient, better than the trade he took" is **REFUTED**:
+> split cells change the distinct-tone count at 1 of 6 hours by ONE and the max luma step at none —
+> `canvas.go` had measured it already. And RESUME's "only 4 needs_input events exist" is **STALE**:
+> recounted, **52 asks and 347 finishes** over ~75,600 events. The notification cue is alive.
+> ⇒ Traces **13 GB → 3.1 GB** at his word (*"get rid of it"*), 111 GiB free.
+> ⏭ **NEXT is his look**, then the sea's mapping. ⏸ Commons HELD: *"once we are ready, I will let
+> you know when"*. ⏰ **7 days.**
 
 > **Session 22 (2026-09-07 evening), WRAPPED. THE CRAB IS ON THE BEACH, and the hairlines had a third
 > cause nobody had found.** ⚠ **NOTHING IS COMMITTED.** Five stories sit in the working tree, all green

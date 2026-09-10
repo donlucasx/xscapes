@@ -4,19 +4,72 @@
 
 ```
 cd ~/Documents/claude/xscapes/ and read CLAUDE.md (the brief, authoritative)
-and RESUME.md before responding. Sessions 22 and 23 are LANDED as eight commits,
-HEAD `62f2664`, tree clean, all green and installed. ⚠ FIRST: `git log
-origin/main..HEAD` — those eight are **UNPUSHED** and need his go-ahead. internal/companion is OURS now, the parallel session
-released it. notes/claude-hooks-verified.md is the Claude Code hook schema — trust it, do not
-re-derive it. Skim origin-chat.md only if you need the why; ignore ideas.md — it
-is parked. Tell me where we left off, then pick up from ▶ NEXT — item 0 is a
-question for me, not work for you.
+and RESUME.md before responding. Session 27 is WRAPPED: HEAD is pushed, tree
+clean, suite + vet green BOTH ways (default and XSCAPES_TIDE=1), installed.
+The scrollback strikethrough is CONFIRMED FIXED three times over, the third in
+a fresh session in another project. Skim origin-chat.md only if you need the
+why; ignore ideas.md -- it is parked. Tell me where we left off, then pick up
+from ▶ NEXT -- items 0 and 1 are mine to look at, not work for you.
 
-Two things about how to work on this, learned the hard way in session 11:
-build the instrument before trusting the picture, and check what the RENDERED
-frame does rather than what the source says it should. And one from session 14:
-do NOT drive Terminal.app (osascript, System Events) without asking me first.
+Three things about how to work on this, and they were all paid for:
+build the instrument before trusting the picture; measure the RENDERED frame
+rather than what the source says it should do; and when a question is about
+what my sessions actually DO, go and count the event log in
+~/.config/xscapes/run/*.jsonl instead of reasoning about it -- that is what
+settled every argument in session 27, twice against my own confident answer.
+Do NOT drive Terminal.app (osascript, System Events) without asking me first.
 ```
+
+## ▶ NEXT (session 27 left it here)
+
+**0. ⏳ HIS LOOK, and it is the whole reason the last two hours happened.** He is testing on his
+next session and reporting back. Four things are new since he last looked properly:
+
+- the shoreline's grey blocks are gone (`wetBandColor`)
+- the constellation is spread across the sky and lights ~3x more often
+- the crab's litter shrinks when there are many subagents
+- the balloon points at the companion
+
+```
+xscapes claude                    # shipped default
+XSCAPES_TIDE=1 xscapes claude     # with his tide
+```
+
+**1. ⏸ HIS, still open:** Andale Mono in Terminal (⚠ now worth only the four dashes at the disc's
+shoulders -- the split-cell half of that promise is REFUTED) · **Commons publish + submit**, held at
+his word *"once we are ready, I will let you know when"*.
+
+**2. The tide's residue, if he keeps it.** ⚠ The sideways drift is HALVED, not gone: a weak pull at
+about three cells remains and I did not find what carries it (`go run ./notes/drift`, x-profile
+spread 26% → 5%). ⚠ And the litter is anchored to the COMPANION, not the waterline, so at full
+activity the water reaches the sitters and crablets stand in it. Both are his call to chase.
+
+**3. The sea's mapping, MEASURED and unruled.** Three glyph channels plateau at level 0.60 and the
+fourth (the waterline's swing) at 0.70; his real level is above 0.70 for **28.2% of working time**.
+`TauFall`/`Impulse` CANNOT fix a plateau -- they only change how often it is visited. The tide is the
+fix if it ships: it takes the waterline from 0.09 rows of movement to 5.4. `go run ./notes/searange`.
+
+**4. Small and unruled:** `SetEyeFill`'s three options mean something different on stalked eyes
+(study-only, the product never calls it -- probably just close it) · a long sand line can be written
+across the litter (measured: 1.8% of samples) · the mirror loses rows for an agent that does not
+repaint after a resize (known, accepted trade).
+
+**5. Parked:** the brand workstream (deck rebuild, Commons page restyle, README `<picture>` header,
+CLI help mark, GitHub avatar -- the header and the mark are confirmed NOT done) · Milestone 2.
+
+## Instruments built in session 27 (do not re-derive these)
+
+- `go run ./notes/wetsand` -- the 256 cube's warm floor is luma 96, and what that does to the beach
+  hour by hour. **A ramp makes it WORSE** (1.42% → 3.12%); measured, do not try it again.
+- `go run ./notes/searange` -- what the RENDERED sea does across the activity range, four channels.
+- `go run ./notes/drift` -- which way the sea travels, by cross-correlating two frames.
+- `TestReplayTraceRetainDiff` -- replays a real trace through the mirror's model both ways.
+  ⚠ It FAILS on a window with no width change, because a clean result there would mean nothing.
+
+⚠ **Two traps these instruments taught, and both voided a measurement before they were fixed:**
+a FRESH `scape.Shore` per frame has no history, so anything that integrates (the wave clock, the
+tide's easing) reads as if the session just started -- warm ONE shore up. And `go test` CACHES, so
+the same command with a different environment variable can hand back the previous run's output.
 
 ## Brand workstream — where we left off (2026-09-05, session 17, a PARALLEL session; HEAD `9ba068e`, pushed)
 

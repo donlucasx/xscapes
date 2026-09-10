@@ -2365,3 +2365,77 @@ r := []rune(s.pending + in)
 ⇒ **PUSHED** at his word: `origin/main` = `2f4ce38` then `e15163e`, verified with `git ls-remote`
   rather than the local ref. ⚠ `gh auth`'s active account is HOST-GLOBAL and is now **donlucasx**;
   Validators git operations are refused until `gh auth switch --user eclipsevalidators`.
+
+## Session 27 — 2026-09-09 into 09-10, fine tuning before the entry
+
+His opener: *"resume work on xscapes, lets continue working on fine tuning before submitting"*.
+
+### The strikethrough, confirmed closed three times
+
+- *"so far so good on this session, no strikethrough."*
+- *"ok, still no strikethrough issue"*
+- *"running another session from scratch and seems the strikethrough issue has been fixed."*
+
+⇒ The third was a FRESH session in a different project (tyastie, 111x61). Verified rather than
+  taken on trust: that scape's PID held inode **84189069 == installed**, so it was running the fix
+  and not a stale build. Three independent confirmations; the s26 fix stands.
+
+### His rulings
+
+- **The wet sand, from a menu of four:** *"2"* — floor it in daylight, let the night stay neutral.
+- **The spent trace:** *"get rid of it"* — 10.2 GB deleted, traces 13 GB → 3.1 GB.
+- **Commons:** *"once we are ready, I will let you know when"* — still held.
+- **Push:** *"push"* — and again at the end of the session.
+- **The constellation:** *"rebind it"*, then *"can they be tasks instead of turns?"*
+
+### ⭐ HIS IDEA: the tide
+
+> *"I was thinking, and I dont want to act on this yet, but that the tide could be moving in and out
+> of the land, instead of moving towards the left of the screen. Like a real tide. Does that make
+> sense? can we test this?"*
+
+⇒ **He was right on both halves and both are measured.** The waterline's base row is a function of
+  the canvas height and NOTHING else: rendered and averaged, the mean sat at row 18.75 at level 0.00
+  and 18.75 at level 1.00. The sea never came up the beach. Built behind `XSCAPES_TIDE=1`.
+
+Then, live: *"new tide seems to work well, tho it still moves to the sides. I like it, and sub agents
+seem to adapt to where the water is, correct? I did notice the sub agents remained on the scene for
+a while after they were stopped"*
+
+⇒ The sideways motion was the SEA'S SURFACE, not the waterline — x sat inside the travelling phase,
+  and a plane wave travels perpendicular to its crests. Halved, **not eliminated**; a weak pull at
+  ~3 cells remains and I have not found what carries it. ⇒ Subagents: swimmers follow the tide,
+  sitters do not (they are pinned to the companion). ⇒ The dwell is HIS OWN ruling of 2026-09-05,
+  60 s from a subagent's START.
+
+### ⭐⭐ THE CONSTELLATION, and he was right twice against me
+
+- *"ive only seen the constellation when working hard past safe context levels."*
+- *"the constellation is still not shinning. We need to find its best use case so its actually
+  perceived by the users"*
+- ⭐ *"wait, are you sure about that? what is the actual mechanic that lights up stars currently?
+  tasks done? So the problem is not that I cant see them, but what is 'tasks done' and wether we get
+  enough of those per session to populate the sky- am I correct, or missing something?"*
+- ⭐ *"can we find a different event that the stars can signify? can they be tasks instead of turns?
+  I feel like the agents complete a lot more tasks than they would actual turns (specially on long
+  sprints)"*
+
+⚠ **I WAS WRONG TWICE AND HE CAUGHT BOTH.** First I reported the channel had never lit — it had, and
+he had seen it. Then I said the layout was the problem and the rate was probably fine — the numbers
+did not support that, and he pushed back. **Both times the fix was to go and count his real event
+log rather than reason about it.**
+
+⇒ **His task hypothesis was right and the measurement is decisive**: during a fan-out a subagent
+  finishes every **31 seconds** against **14 minutes** between closed turns. ⚠ But tasks INSTEAD of
+  turns fails — subagent counts are bimodal, 20 of 30 sessions have 0-26 and 10 have 64-734, so
+  counting them alone leaves 19 of 30 sessions nearly empty while one workflow session pegs the sky
+  in minutes. **Eight tasks to a star** survives both ends.
+
+### Smaller, his
+
+- *"sure we are missing split cells? do we want them? session looking good rn"* ⇒ **No, and I had
+  overstated it twice.** Measured: turning split cells back on changes the distinct-tone count down
+  a sky column at one hour of six, by one, and the max luma step at none of them. `canvas.go` had
+  already measured this. All Andale Mono is worth is the four dashes at the disc's shoulders.
+- *"whats the problem? explain in simple terms"* and *"explain both two me in simpler terms"* ⇒ he
+  asks for plain explanations of measured findings and gets them; keep the numbers, drop the jargon.
