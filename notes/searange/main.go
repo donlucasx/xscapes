@@ -28,9 +28,10 @@ import (
 func main() {
 	const w, h = 111, 25
 	hy := h*42/100 + 2
-	fmt.Printf("%-6s %8s %10s %8s %8s\n", "level", "foam", "wavecells", "swing", "crests")
+	fmt.Printf("TIDE=%v\n", scape.Tide)
+	fmt.Printf("%-6s %8s %10s %8s %8s %8s\n", "level", "foam", "wavecells", "swing", "crests", "meanrow")
 	for _, lv := range []float64{0.0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 0.95, 1.0} {
-		var foam, wave, swing, crests float64
+		var foam, wave, swing, crests, mean float64
 		const n = 80
 		for k := 0; k < n; k++ {
 			c := canvas.New(w, h, canvas.AlphaFar, canvas.AlphaMid, canvas.AlphaNear)
@@ -64,6 +65,11 @@ func main() {
 				}
 			}
 			swing += float64(hi - lo)
+			sum := 0
+			for _, v := range prof {
+				sum += v
+			}
+			mean += float64(sum) / float64(w)
 			pk := 0
 			for x := 2; x < w-2; x++ {
 				if prof[x] < prof[x-2] && prof[x] <= prof[x+2] {
@@ -72,7 +78,7 @@ func main() {
 			}
 			crests += float64(pk)
 		}
-		fmt.Printf("%-6.2f %8.0f %10.0f %8.2f %8.2f\n", lv, foam/n, wave/n, swing/n, crests/n)
+		fmt.Printf("%-6.2f %8.0f %10.0f %8.2f %8.2f %8.2f\n", lv, foam/n, wave/n, swing/n, crests/n, mean/n)
 	}
 	fmt.Println()
 	fmt.Println("His real level while working, folded from 341h of recordings:")

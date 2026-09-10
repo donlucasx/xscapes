@@ -278,18 +278,21 @@ func (s *Shore) Update(c *canvas.Canvas, t float64, act Activity) {
 	if s.SandRows > 0 {
 		beach = s.SandRows
 	}
+	// Everything sized in rows has to scale, or the scene that is composed at
+	// 80x24 turns into a giant moon and a wall of foam at 40x12.
+	scale := math.Min(float64(c.W)/80.0, float64(c.H)/24.0)
+	scale = math.Max(0.45, math.Min(1.35, scale))
+
 	sy := c.H - beach
+	// HIS idea, behind XSCAPES_TIDE: the water withdraws up the frame when the
+	// agent goes quiet and comes back as it works. See tide.go.
+	sy -= tideOffset(act.Level, scale)
 	if sy <= hy+1 {
 		sy = hy + 2
 	}
 	if sy > writeTop-1 {
 		sy = writeTop - 1
 	}
-
-	// Everything sized in rows has to scale, or the scene that is composed at
-	// 80x24 turns into a giant moon and a wall of foam at 40x12.
-	scale := math.Min(float64(c.W)/80.0, float64(c.H)/24.0)
-	scale = math.Max(0.45, math.Min(1.35, scale))
 
 	// Working raises the sea; resting lets it settle. Integrate, do not scale:
 	// see the note on Shore.phase.
@@ -346,6 +349,9 @@ func (s *Shore) Update(c *canvas.Canvas, t float64, act Activity) {
 // colour at sub-cell precision, so a two-row swing reads as one smooth curve
 // instead of the staircase you get from rounding to a row.
 func (s *Shore) waterline(w, sy int, tt float64, act Activity, scale float64) []float64 {
+	if Tide {
+		return tideEdge(w, sy, tt, act, scale)
+	}
 	reach := (0.8 + act.Level*2.1) * scale
 	e := make([]float64, w)
 	for x := 0; x < w; x++ {
