@@ -1175,11 +1175,18 @@ its 6/10-up, 4/8-down hysteresis is not ported) · the balloon pointer aims wher
 5. **Dial `TauFall`.** `xscapes tune -sweep` answers it in a second now. 12s
    gives median 0.54 / p90 0.80 / 3.5% saturated; 20s gives 0.64 / 0.90 / 6.0%.
    40s pins the sea and should not ship.
-6. **The 45-60s demo video**, Terminal.app. ⚠ Before recording: **only 4
-   `needs_input` events exist in the entire 18,919-event record.** The cue the
+6. **The 45-60s demo video**, Terminal.app. ~~⚠ Before recording: only 4
+   `needs_input` events exist in the entire 18,919-event record. The cue the
    30%-weighted Waiting Experience is built on essentially never fires on its
    own, so the video either drives it deliberately or leads with `done` (119)
-   and the worried pose (91 errors).
+   and the worried pose (91 errors).~~ ⚠ **STALE, RECOUNTED 2026-09-09 and the
+   conclusion is REVERSED.** Over ~75,600 events and 115 sessions the record now
+   holds **52 `needs_input` and 347 `done`** -- roughly one ask and three
+   finishes per session. **The notification cue is alive and fires on its own**;
+   nothing needs to be driven deliberately. (His ruling of 2026-09-07 was no
+   demo video, so this only matters if that reopens.) ⚠ Counted the same way in
+   the same place, so the change is real events and not a different denominator:
+   `grep -ho '"kind":"[a-z_]*"' ~/.config/xscapes/run/*.jsonl | sort | uniq -c`
 4. **Waves in the sea** -- his idea, and there is no encoding conflict: the
    swells already ARE the activity channel, so making them look like waves is a
    rendering upgrade, not a new variable. Two constraints: keep the SPEED

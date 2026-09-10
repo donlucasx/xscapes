@@ -196,8 +196,12 @@
 > ⏳ **A trace is RUNNING** (`~/.config/xscapes/traces/20260908-005450.bin`, scape up 00:54:50, window
 > 119x51). ~6.6 MB/min. **When the strikethrough appears: STOP** — no scroll, no resize, no exit.
 > ⏸ **HIS, open:** test **Andale Mono** in Terminal (its block glyph fills **100.0%** of the line box
-> against Menlo's **87.6%**, read from the font files) — if it holds live it kills every remaining
-> hairline AND gives back the split-cell gradient, better than the trade he took · Commons publish +
+> against Menlo's **87.6%**, read from the font files) — ⚠ **the "gives back the split-cell gradient,
+> better than the trade he took" half of this is REFUTED, measured 2026-09-09**: turning split cells
+> back on down a sky column changes the distinct-tone count at 1 of 6 hours (by ONE) and the max luma
+> step between rows at NONE of them — 35.4/56.4/56.4/28.4/56.4/19.0 either way, because only 2-5 cells
+> a column split at all and their halves are adjacent entries on the same path. `canvas.go` said so
+> already. **All Andale Mono is worth is the four dashes at the disc's shoulders · Commons publish +
 > submit, **closes 09-17**.
 
 > **Session 23 (2026-09-07 night), WRAPPED. SESSIONS 22 AND 23 ARE LANDED — eight commits, HEAD
