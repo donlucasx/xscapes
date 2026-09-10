@@ -167,10 +167,10 @@ type Reducer struct {
 	ctxSet bool
 
 	todoDone, todoOf int
-	// turnsDone is how many turns have closed this session, and it is what
-	// lights the constellation when the agent keeps no checklist. See
-	// StarsCap.
-	turnsDone int
+	// turnsDone is how many turns have closed this session, and tasksDone how
+	// many subagents have finished. Together they light the constellation when
+	// the agent keeps no checklist. See StarsCap and TasksPerStar.
+	turnsDone, tasksDone int
 
 	tail    tail
 	session string
@@ -323,6 +323,7 @@ func (r *Reducer) Apply(e event.Event, now time.Time) {
 
 	case event.SubEnd:
 		if e.Agent != "" {
+			r.tasksDone++
 			if started, ok := r.subs[e.Agent]; ok {
 				// The kitten leaves at the end, or at the end of its dwell,
 				// whichever is later. Until then it stays in the litter.
@@ -373,6 +374,33 @@ func (r *Reducer) Apply(e event.Event, now time.Time) {
 // channel; that is the same defect the sea has above level 0.6.
 const StarsCap = 32
 
+// TasksPerStar is how many finished subagents make one star.
+//
+// HIS observation, and the measurements back it: "I feel like the agents
+// complete a lot more tasks than they would actual turns (specially on long
+// sprints)." During a fan-out a subagent finishes every 31 seconds at the
+// median, against fourteen minutes between closed turns.
+//
+// Tasks INSTEAD of turns does not work, and that is why this is a ratio rather
+// than a swap: subagent counts are bimodal across his sessions -- twenty of
+// thirty have between zero and twenty-six, ten have between sixty-four and
+// seven hundred and thirty-four -- so counting them alone leaves nineteen of
+// thirty sessions with almost no stars at all while a workflow session pegs the
+// sky in minutes.
+//
+// Eight is the grain that survives both. Measured over the real event stream,
+// gaps between stars in minutes:
+//
+//	turns only        p50 14.5   p90 130.8
+//	+ tasks/32        p50 12.6   p90 109.8
+//	+ tasks/16        p50  9.9   p90  92.8
+//	+ tasks/8         p50  5.4   p90  58.8   <- this
+//
+// and per session it moves the median from 12 stars to 16, pegging the sky in
+// three sessions of thirty rather than one. A finer grain buys less than it
+// costs: tasks/4 pegs nine of thirty.
+const TasksPerStar = 8
+
 // stars is what the constellation counts.
 //
 // The channel was spec'd as todos completed and has NEVER lit: across his whole
@@ -392,14 +420,15 @@ const StarsCap = 32
 // cumulative and say "this session has got through N" -- and they never
 // compete, because they light at the same instant in different parts of the
 // frame. It is one line to bind this elsewhere if he rules the other way.
-func stars(todoDone, todoOf, turns int) int {
+func stars(todoDone, todoOf, turns, tasks int) int {
 	if todoOf > 0 {
 		return todoDone
 	}
-	if turns > StarsCap {
+	n := turns + tasks/TasksPerStar
+	if n > StarsCap {
 		return StarsCap
 	}
-	return turns
+	return n
 }
 
 // starTotal is how many PLACES the sky lays out, which fixes where each star
@@ -538,7 +567,7 @@ func (r *Reducer) State(now time.Time) State {
 			Working:     working,
 			Level:       clamp01(lvl),
 			ContextUsed: r.ctx,
-			TodoDone:    stars(r.todoDone, r.todoOf, r.turnsDone),
+			TodoDone:    stars(r.todoDone, r.todoOf, r.turnsDone, r.tasksDone),
 			TodoTotal:   starTotal(r.todoOf),
 		},
 		Pose:        r.pose(now),

@@ -1,6 +1,7 @@
 package reduce
 
 import (
+	"fmt"
 	"testing"
 	"time"
 
@@ -31,6 +32,23 @@ func TestTheConstellationCountsClosedTurns(t *testing.T) {
 	if got := r.State(now).Act.TodoTotal; got != StarsCap {
 		t.Errorf("the sky lays out %d places, want the fixed %d", got, StarsCap)
 	}
+	// Finished subagents count too, at TasksPerStar to one: during a fan-out
+	// one arrives every 31 seconds against fourteen minutes between turns, and
+	// that is the case he asked about -- "specially on long sprints".
+	before := r.State(now).Act.TodoDone
+	for i := 0; i < TasksPerStar-1; i++ {
+		r.Apply(event.Event{Kind: event.SubStart, Agent: fmt.Sprint("a", i)}, now)
+		r.Apply(event.Event{Kind: event.SubEnd, Agent: fmt.Sprint("a", i)}, now)
+	}
+	if got := r.State(now).Act.TodoDone; got != before {
+		t.Errorf("%d finished tasks lit a star early: %d, want %d", TasksPerStar-1, got, before)
+	}
+	r.Apply(event.Event{Kind: event.SubStart, Agent: "last"}, now)
+	r.Apply(event.Event{Kind: event.SubEnd, Agent: "last"}, now)
+	if got := r.State(now).Act.TodoDone; got != before+1 {
+		t.Errorf("%d finished tasks lit %d stars, want %d", TasksPerStar, got, before+1)
+	}
+
 	// It fills a long session without pegging, and then holds.
 	for i := 0; i < StarsCap*2; i++ {
 		r.Apply(event.Event{Kind: event.Done}, now)
