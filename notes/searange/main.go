@@ -33,11 +33,22 @@ func main() {
 	for _, lv := range []float64{0.0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 0.95, 1.0} {
 		var foam, wave, swing, crests, mean float64
 		const n = 80
+		// ONE shore, WARMED UP. A fresh one per frame has no history, so
+		// anything that integrates -- the wave clock, and under Tide the
+		// tide's own easing -- reads as if the session had just started. That
+		// trap voided this instrument once and the drift instrument once, both
+		// on 2026-09-09.
+		sh := scape.NewShore(7, false)
+		act := scape.Activity{Level: lv, Working: true, ContextUsed: 0.3, TimeOfDay: 13.0 / 24}
+		tm := 0.0
+		for k := 0; k < 400; k++ {
+			tm += 0.08
+			sh.Update(canvas.New(w, h, canvas.AlphaFar, canvas.AlphaMid, canvas.AlphaNear), tm, act)
+		}
 		for k := 0; k < n; k++ {
 			c := canvas.New(w, h, canvas.AlphaFar, canvas.AlphaMid, canvas.AlphaNear)
-			sh := scape.NewShore(7, false)
-			sh.Update(c, 1+float64(k)*0.8, scape.Activity{
-				Level: lv, Working: true, ContextUsed: 0.3, TimeOfDay: 13.0 / 24})
+			tm += 0.08
+			sh.Update(c, tm, act)
 			prof := make([]int, w)
 			for x := 0; x < w; x++ {
 				prof[x] = h

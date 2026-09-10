@@ -45,26 +45,42 @@ var Tide = envx.Lookup("TIDE") == "1"
 // off the horizon and out of the writing.
 var TideRange = 5.0
 
-// tideOffset is how far the waterline pulls back from its busy position.
-func tideOffset(level, scale float64) int {
+// TideEase is the time constant the water takes to reach where the activity
+// puts it. Seconds.
+var TideEase = 3.0
+
+// tideTarget is how far the waterline should have withdrawn at this level.
+func tideTarget(level, scale float64) float64 {
 	if !Tide {
 		return 0
 	}
-	return int(math.Round((1 - clamp01(level)) * TideRange * scale))
+	return (1 - clamp01(level)) * TideRange * scale
 }
+
+// hyFloor is the highest row the water may withdraw to, so a long quiet stretch
+// cannot pull the shoreline up into the sky.
+func hyFloor(sy int) float64 { return float64(sy) - TideRange - 1 }
 
 // tideEdge is the waterline under Tide: one phase for every column, so the
 // whole sheet advances and retreats together, over a coast whose own shape
 // drifts thirteen times slower than the shipped one and so reads as a place
 // rather than as a pattern going past.
-func tideEdge(w, sy int, tt float64, act Activity, scale float64) []float64 {
+func tideEdge(w, sy int, floor, at, tt float64, act Activity, scale float64) []float64 {
 	wash := (0.7 + act.Level*0.9) * scale * math.Sin(tt*0.5)
+	base := float64(sy) - at
+	if base < floor {
+		base = floor
+	}
 	e := make([]float64, w)
 	for x := 0; x < w; x++ {
 		fx := float64(x)
-		e[x] = float64(sy) + wash +
-			0.60*scale*math.Sin(fx*0.11+tt*0.06) +
-			0.35*scale*math.Sin(fx*0.047-tt*0.03)
+		// No time in the x terms at all. Any of it, however slow, is the coast
+		// itself sliding across the frame -- which is the thing he asked to be
+		// rid of, and 0.06 was still several radians a minute. The shoreline is
+		// a PLACE; all the motion belongs to the wash.
+		e[x] = base + wash +
+			0.60*scale*math.Sin(fx*0.11) +
+			0.35*scale*math.Sin(fx*0.047)
 	}
 	return e
 }

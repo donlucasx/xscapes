@@ -12,6 +12,14 @@ type Shore struct {
 	Seed  int64
 	ASCII bool
 
+	// tideRow is the waterline's row BEFORE the wash, which is what the open
+	// sea's ramp is anchored to under Tide. Taking it from the washed edge
+	// re-ramps the whole sea every frame; see paintBG.
+	tideRow int
+	// tideAt is how far the water has withdrawn right now, in rows and as a
+	// FLOAT: the waterline glides rather than stepping whole cells.
+	tideAt float64
+
 	// Where the moon landed this frame, so callers can anchor a label to it
 	// without recomputing the position and drifting out of sync.
 	moonX, moonY int
@@ -286,7 +294,6 @@ func (s *Shore) Update(c *canvas.Canvas, t float64, act Activity) {
 	sy := c.H - beach
 	// HIS idea, behind XSCAPES_TIDE: the water withdraws up the frame when the
 	// agent goes quiet and comes back as it works. See tide.go.
-	sy -= tideOffset(act.Level, scale)
 	if sy <= hy+1 {
 		sy = hy + 2
 	}
@@ -304,6 +311,12 @@ func (s *Shore) Update(c *canvas.Canvas, t float64, act Activity) {
 		dt = 0.05
 	}
 	s.lastT = t
+	// The tide EASES toward where the activity puts it. Snapping was caught by
+	// his own TestActivityChangeDoesNotTeleportTheSea: a level step jumped the
+	// waterline 1.03 rows against 0.02 in a normal frame, 47x, where the guard
+	// allows 8x. A tide that arrives in one frame is not a tide.
+	s.tideAt += (tideTarget(act.Level, scale) - s.tideAt) * math.Min(1, dt/TideEase)
+	s.tideRow = sy - int(math.Round(s.tideAt))
 	s.phase += dt * (0.55 + act.Level*1.45)
 	tt := s.phase
 	edge := s.waterline(c.W, sy, tt, act, scale)
@@ -314,20 +327,30 @@ func (s *Shore) Update(c *canvas.Canvas, t float64, act Activity) {
 	// crests and hollows stay where they are, just shallower -- so the water
 	// still runs up the sand and back, and never touches the writing.
 	if writeTop < c.H {
-		room := float64(writeTop-1) - float64(sy)
+		// Measured from where the water actually IS, not from where it would
+		// be with no tide. This guard exists to stop the SWELL reaching the
+		// writing band; under Tide the whole edge is displaced from sy by up
+		// to five rows, so measuring against sy counted the tide itself as
+		// swell and squashed it flat -- the tide's range collapsed from 5.1
+		// rows to 1.7 and every quiet level pinned to the same row.
+		ref := float64(sy)
+		if Tide {
+			ref = float64(s.tideRow)
+		}
+		room := float64(writeTop-1) - ref
 		if room < 0.5 {
 			room = 0.5
 		}
 		dev := 0.0
 		for _, e := range edge {
-			if d := math.Abs(e - float64(sy)); d > dev {
+			if d := math.Abs(e - ref); d > dev {
 				dev = d
 			}
 		}
 		if dev > room {
 			k := room / dev
 			for i := range edge {
-				edge[i] = float64(sy) + (edge[i]-float64(sy))*k
+				edge[i] = ref + (edge[i]-ref)*k
 			}
 		}
 	}
@@ -350,7 +373,7 @@ func (s *Shore) Update(c *canvas.Canvas, t float64, act Activity) {
 // instead of the staircase you get from rounding to a row.
 func (s *Shore) waterline(w, sy int, tt float64, act Activity, scale float64) []float64 {
 	if Tide {
-		return tideEdge(w, sy, tt, act, scale)
+		return tideEdge(w, sy, hyFloor(sy), s.tideAt, tt, act, scale)
 	}
 	reach := (0.8 + act.Level*2.1) * scale
 	e := make([]float64, w)
@@ -509,6 +532,18 @@ func (s *Shore) paintBG(c *canvas.Canvas, hy int, edge []float64) {
 	sky := term.NewRamp(s.pal.SkyTop, s.pal.SkyHorizon)
 	sea := term.NewRamp(s.pal.SeaFar, s.pal.SeaNear)
 	depth := math.Max(1, mean-float64(hy))
+	if Tide {
+		// The open sea's ramp is anchored to the TIDE's row, not to the mean of
+		// the washed edge, and this is not a detail: the wash moves the edge
+		// every single frame, so a depth taken from it re-ramps the whole sea
+		// twelve times a second. Caught by his own guarantee --
+		// TestTheBackdropHoldsStillBetweenFrames allows 8% of open-sea cells to
+		// change between frames and the first tide build churned 59.13%, which
+		// is the exact defect the per-column anchor caused and the note above
+		// this describes. sy moves only when the ACTIVITY moves it, so the
+		// backdrop holds still and steps when the tide does.
+		depth = math.Max(1, float64(s.tideRow)-float64(hy))
+	}
 	for x := 0; x < c.W; x++ {
 		ex := edge[x]
 		for y := 0; y < c.H; y++ {
@@ -534,7 +569,19 @@ func (s *Shore) paintBG(c *canvas.Canvas, hy int, edge []float64) {
 			case fy < ex+0.5:
 				// The waterline cell straddles sea and sand. Mix by how much of
 				// the cell the water actually covers.
-				col = term.Lerp(wetBandColor(s.pal), s.pal.SeaNear, ex-fy+0.5)
+				mix := ex - fy + 0.5
+				if Tide {
+					// Snapped to five steps. The tide's coast is FLAT -- under
+					// a row of amplitude -- so the whole waterline lands in one
+					// row and every column gets its own slightly different mix:
+					// 56 distinct tones on one row, against the 40 his
+					// TestNoRowIsAConfettiOfNearIdenticalTones allows, which is
+					// the blotchy-sand defect coming back by another door.
+					// Five steps is enough to read as a wet edge and few enough
+					// that the row is a band rather than a gradient.
+					mix = math.Round(mix*4) / 4
+				}
+				col = term.Lerp(wetBandColor(s.pal), s.pal.SeaNear, mix)
 			case s.writeTop > 0 && y >= s.writeTop:
 				// One flat tone, all the way across and all the way down. This
 				// is the page, not the picture.
@@ -1119,6 +1166,22 @@ func (s *Shore) sea(c *canvas.Canvas, hy int, edge []float64, tt float64, act Ac
 			// the same x and the depth-ramped threshold carves vertical wedges
 			// instead of swell lines.
 			ph := float64(x)*0.30 + float64(y)*0.9 + tt*(0.5+depth*1.5)
+			if Tide {
+				// Toward the shore, not across the frame -- his report on the
+				// tide build, "it still moves to the sides".
+				//
+				// A plane wave travels PERPENDICULAR to its crests, so as long
+				// as x sits inside the travelling phase the pattern must slide
+				// sideways: with x at 0.30 and y at 0.9 the old locus moved
+				// (-0.32, -0.95) per step, up the frame and to the left, which
+				// is backwards twice over. Flipping the sign would only send it
+				// down and to the RIGHT.
+				//
+				// So x comes out of the travelling term and becomes a spatial
+				// DISTORTION of a wave that travels in y alone: the crests
+				// wiggle, and they come in.
+				ph = (float64(y)+tt*(0.55+depth*1.65))*0.9 + 1.5*math.Sin(float64(x)*0.16)
+			}
 			wv := (math.Sin(ph) + 0.5*math.Sin(ph*0.47+tt*0.5)) * amp
 			// Coverage carries the load, not speed. Speed is invisible in a
 			// glance -- and a glance is the only budget this has -- so a busier
