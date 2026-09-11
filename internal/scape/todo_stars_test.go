@@ -75,23 +75,26 @@ func TestTheChecklistIsLegibleAtEveryHour(t *testing.T) {
 			t.Fatalf("tod %.3f: %d stars lit, want 4", tod, lit)
 		}
 		// Contrast is measured on what is PAINTED, through the same 256 path
-		// the terminal uses, against the sky in the same row.
+		// the terminal uses -- and INSIDE the star's own cell. It used to be
+		// read against column 1 of the same row, which is a different cell and
+		// can be a whole ramp step out; on a small scape, thirty luma out. What
+		// the eye compares is the glyph and the ground it is drawn on, and
+		// ResolveAt hands back both.
 		worst := 999.0
 		for y := 0; y < hy; y++ {
 			for x := 0; x < c.W; x++ {
 				if cell := c.Near().Cells[y*c.W+x]; !cell.Set || cell.R != '*' {
 					continue
 				}
-				_, fg, _ := c.ResolveAt(x, y, term.Profile256)
-				_, _, sky := c.ResolveAt(1, y, term.Profile256)
-				if d := lumaOf(fg) - lumaOf(sky); d < worst {
+				_, fg, bg := c.ResolveAt(x, y, term.Profile256)
+				if d := lumaOf(fg) - lumaOf(bg); d < worst {
 					worst = d
 				}
 			}
 		}
-		t.Logf("tod %.3f: the dimmest lit star reads %+.1f luma above its sky", tod, worst)
+		t.Logf("tod %.3f: the dimmest lit star reads %+.1f luma above its own ground", tod, worst)
 		if worst < 40 {
-			t.Errorf("tod %.3f: a lit todo star is only %+.1f luma above its sky -- the checklist is invisible at that hour",
+			t.Errorf("tod %.3f: a lit todo star is only %+.1f luma above its ground -- the checklist is invisible at that hour",
 				tod, worst)
 		}
 	}

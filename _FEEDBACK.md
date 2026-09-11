@@ -2661,3 +2661,44 @@ separate them (0 of 144).
 same side of the lift's `sin > 0.35` boolean at all six sample times, so the golden could not fail.
 Rebuilt to sixteen times straddling the lift's edges, the blink's 0.16 s window and the resting
 claw's 7.2 s alternation — 96 frames per state became 256 — and it went RED.
+
+### ⭐ Session 28 — HIS RULING: the shooting star IS the star arriving
+
+- *"i like the idea of the occational shooting star, ideally w a meaning behind it."*
+- *"any ideas around different characters? ... looking at this current session as it gets darker, I
+  see more characters varying in sizes and shapes appearing. Thats what I was talking about."*
+- *"this felt too bare, how can we dial it for daytime?"*
+- ⭐ **"ok let the shooting star be the star arriving."**
+
+⇒ ⭐ **EVERY OTHER MEANING IS DEAD, and the log says so rather than an argument.** Counted across all
+123 spools / 76,495 events: **`compact` 0 · `test_pass` 0 · `test_fail` 0 · `todo` 0**. A streak bound
+to any of those would never once have appeared. What does fire is all spoken for — `error` 769 (the
+sea and the companion), `sub_end` 1892 (the litter), `done` 356 (the knock), `prompt` 413,
+`needs_input` 54.
+⇒ **So the streak carries the channel's OWN meaning**: it flies in and lands where the new star will
+sit. No second variable, nothing bent in the encoding rule, and it is a MOMENT rather than a rate.
+Naturally paced at p50 5.4 min between stars, and it answers the thing he has raised twice — that
+the constellation never announces itself.
+⚠ Junk in the log worth noting: **`ask` appears 3 times as a KIND**. Those are my own wrong `emit ask`
+commands from this session — `emit` builds the kind from the word typed and accepts anything, so a
+typo becomes a permanent event nobody handles. It should reject a kind the protocol does not define.
+
+⇒ ⭐⭐ **"TOO BARE" IS NOT FEWER STARS — IT IS STARS DRAWN INVISIBLE.** The ambient field encodes the
+clock in ALPHA (`far.Plot(x, y, g, Star, twinkle)`), and at low `StarVis` the quantised foreground
+lands on the same cube index as the sky behind it. **Both of his screenshots plot the same 39
+specks**; the difference is how many survive quantisation:
+
+    hour   StarVis   plotted   legible   lost
+    16.0     0.233      39        18      53%
+    18.0     0.350      39        19      51%
+    20.4     0.610      39        19      51%   <- his 20:22 shot, "too bare"
+    20.9     0.664      39        39       0%   <- his 20:55 shot, "thats what I was talking about"
+
+⇒ **The fix follows from HIS OWN RULE: encode in COUNT, not alpha.** Draw fewer specks at full
+contrast instead of all of them fading toward nothing — *"encode in coverage, count or position,
+never in rate"*, and alpha-to-invisible is that mistake in a different costume. It also kills the
+blink found this morning (specks crossing the `twinkle <= 0.02` cut-off ~4x a second at his hour) and
+still gives ZERO at noon, which is correct.
+⇒ **Characters:** the ambient field has four glyphs (`.` `.` `·` `+`) and the constellation owns `*`
+alone — *"a channel that shares a glyph with the scenery is not a channel."* Room for more sizes and
+shapes, and with count-not-alpha each one is crisp rather than half-faded.

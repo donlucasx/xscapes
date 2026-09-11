@@ -40,6 +40,12 @@ type Shore struct {
 	// dark tone by coincidence, so the frame alone cannot say).
 	quadDark map[[2]int]bool
 
+	// The constellation's layout, and the geometry it was laid out for. It
+	// depends on nothing that changes between frames -- see starPlaces -- so it
+	// is computed once per window size and kept.
+	starKey starKey
+	starPts [][2]int
+
 	pal     Palette // this frame's colours, from the time of day
 	ctxUsed float64 // this frame's context reading, for the moon and its shine
 
@@ -362,7 +368,7 @@ func (s *Shore) Update(c *canvas.Canvas, t float64, act Activity) {
 	s.discGeom(c, hy, scale, 1-clamp01(act.ContextUsed))
 	s.stars(c, hy, t)
 	s.moon(c, hy, scale, 1-clamp01(act.ContextUsed), moonVis(s.pal))
-	s.todoStars(c, hy, act.TodoDone, act.TodoTotal)
+	s.todoStars(c, hy, foamCeiling(sy, scale), act.TodoDone, act.TodoTotal)
 	s.sea(c, hy, edge, tt, act)
 	s.sand(c, edge)
 	s.foam(c, edge, scale)
@@ -663,68 +669,558 @@ func clamp01(v float64) float64 {
 // a fresh session is a full moon, and the light goes out as the window fills.
 // The unlit face is still painted, faintly, so the moon never disappears --
 // a missing moon reads as a bug, a dark moon reads as a warning.
-// todoStarFloor keeps the checklist legible at every hour.
+// ⚠ THE CHECKLIST'S OLD LEGIBILITY FLOOR WAS A FIXED ALPHA, todoStarFloor =
+// 0.85, and it is gone. The reasoning behind it is not, and it is why this
+// channel does not use StarVis: a completed todo is a fact about the AGENT and
+// the ambient field's visibility is a fact about the WORLD, StarVis is 0 at
+// noon, so hanging the checklist on the clock would switch it off for the whole
+// working day -- the exact bug moonVisFloor exists to fix, arriving a second
+// time through a different door.
 //
-// The same rule as the moon and needed for the same reason: a completed todo is
-// a fact about the AGENT, and the ambient star field's visibility is a fact
-// about the WORLD. StarVis is 0 at noon. Hanging the checklist on it would
-// switch the readout off for the whole working day -- which is exactly the bug
-// moonVisFloor exists to fix, arriving a second time through a different door.
-const todoStarFloor = 0.85
+// What changed is that a fixed alpha was standing in for a measurement. At 0.85
+// with the palette's star tone, measured at the 40-luma bar the tests enforce,
+// the checklist stops reading at 0.36 of the sky at the worst hour of the day
+// -- SHALLOWER than the band that shipped. Legibility is bought by measuring
+// against the painted ground instead, which is what lets the band go deep
+// enough to answer his note.
+//
+// todoStarContrast is the contrast a lit star is held to, in luma, against the
+// ground it is actually painted on. It is 55 rather than the 40 the tests
+// enforce because the quantiser gets a vote: the ink is chosen in true colour
+// and the eye reads the cube entry nearest it, and a cube step is worth up to
+// about ten luma. The margin is the quantiser's, not decoration.
+const todoStarContrast = 55.0
 
-// todoStars lights one star per finished todo and leaves a faint mark where one
-// is still outstanding, so the sky carries "n of N" rather than just n.
+// A star's MAGNITUDE is its alpha, and it runs from starDimmest up to fully
+// opaque. It is fixed by the slot's index and the seed, so it is a fact about
+// that star forever, and starInk raises it from there wherever the sky needs
+// it -- so it only ever runs UPWARD from the floor and nothing is dimmer for
+// carrying it.
+//
+// Every star used to be the same tone, which is a thing skies do not do and
+// dashboards do: a row of identical asterisks reads as UI.
+//
+// starDimmest is 0.70 and it is measured, not picked. At 0.85, where the alpha
+// used to sit, thirty-two stars carry THREE distinct tones at night; at 0.70
+// they carry six, and the faintest still reads +133 luma above its own ground
+// against a bar of 40. Lower buys more tones and starts to cost the count,
+// which is the one thing this channel may not spend.
+const starDimmest = 0.70
+
+func starMagnitude(i int, seed int64) float64 {
+	return starDimmest + HashF(i, 53, seed+43)*(1-starDimmest)
+}
+
+// constellationSlots is how many places the sky lays out at a minimum, and it
+// mirrors reduce.StarsCap. It does NOT decide how many are drawn: a longer
+// checklist simply gets more places, and because each place depends only on the
+// places below it, the first thirty-two are the same either way.
+const constellationSlots = 32
+
+// starKey is the geometry a cached constellation layout belongs to. moonR is
+// the disc's radius in sixty-fourths of a row, because the corridor the layout
+// keeps clear is measured from it.
+type starKey struct {
+	w, hy, top, bot, n int
+	moonX, moonR       int
+	rx, ry             int
+}
+
+// starBand is the slice of sky the constellation is allowed to use: rows
+// top..bot inclusive.
+//
+// HIS NOTE, 2026-09-10: "can we spread them more vertically? currently sitting
+// in a narrow band pretty high up". It was rows 1..hy*3/5 -- at his 125x28 that
+// is six rows of eleven, all of them the top half of the sky.
+//
+// The bottom is MEASURED rather than chosen, and the thing that measures it is
+// legibility. A star's ink is lifted against the background it sits on (see
+// starInk), and the deepest row that still clears the 40-luma bar at the worst
+// hour of the day -- 17:45, when the horizon is pale and warm -- is 0.82 of hy
+// at his geometry, 0.80 at the smallest scape the design targets and 0.86 at
+// the tallest.
+//
+// Three quarters rather than the four fifths that sweep allows, because four
+// fifths meets the bar EXACTLY: over 8192 rendered stars, 8 geometries x 32
+// hours, the dimmest reads +40.0 at 4/5 and +47.0 at 3/4. It costs nothing
+// where he actually works -- at 125x28 and 143x27, hy is 11 and both fractions
+// give row 8 -- and buys seven luma everywhere else.
+//
+// Below that the sky is simply brighter than white ink can beat: at midday the
+// horizon row is luma 208 and the brightest ink there is 255, which after the
+// glyph alpha is worth 40 exactly. There is no clever tone that reaches lower,
+// which is why this is a measurement and not a preference.
+func starBand(hy, foamTop int) (top, bot int) {
+	// And never in the water. foamTop is the highest row the foam can ever
+	// reach at this geometry (foamCeiling), so hard is the last row a star may
+	// have at all and easy leaves a clear row under the deepest one.
+	//
+	// This bites at the short end and it bit the band that shipped too: at
+	// 40x12 the sky is five rows and the tide pulls the water up to row four,
+	// which was inside the old band as well. The foam ate a star there -- it
+	// plots into the same near layer, after the constellation, and it wins the
+	// cell, so the star is simply deleted.
+	hard, easy := foamTop-1, foamTop-2
+	top, bot = 1, hy*3/4
+	if bot > easy {
+		bot = easy
+	}
+	// The top row is a margin, and a margin is a luxury a thin sky cannot
+	// afford. At 40x12 the band would be two rows of about thirty usable
+	// columns for a cap of thirty-two stars -- the last few forced into
+	// neighbouring cells, and a pair in neighbouring cells reads as one, which
+	// is the count error this channel exists to avoid. Giving the row back
+	// takes the closest pair at that size from 1.0 screen units to 2.0.
+	if bot-top < 2 {
+		top = 0
+	}
+	// And then, only if the water leaves it, one more row -- the spare one
+	// rather than a wet one.
+	if bot-top < 2 && bot+1 <= hard {
+		bot++
+	}
+	if bot > hard {
+		bot = hard
+	}
+	// bot < top means the water is in the sky and there is no band at all. The
+	// caller draws nothing; at those heights -- eight and nine rows, where the
+	// tide reaches row one of a three-row sky -- there is no sky to draw in.
+	return top, bot
+}
+
+// foamCeiling is the highest row foam() can ever speckle at this geometry: one
+// row above the waterline's own ceiling, and rounded the way foam() rounds --
+// int(e+0.5)-1, not floor(e)-1. The difference is one row and it put a star in
+// the foam at 30x8 with XSCAPES_TIDE=0, which is the geometry and the switch
+// that a floor() version passed.
+func foamCeiling(sy int, scale float64) int {
+	return int(math.Floor(seaCeiling(sy, scale)+0.5)) - 1
+}
+
+// seaCeiling is the highest row the waterline can ever reach at this geometry,
+// as a float. It is a static property -- the tide's range, the wash and the
+// coast's own shape are all scaled by `scale` and bounded by their own
+// amplitudes -- so nothing that depends on it moves with the activity or the
+// frame, which is what lets the constellation be laid out against it.
+//
+// The swell rescale in Update only ever SHRINKS the deviation from the base
+// row, so a real frame's edge is never higher than this.
+func seaCeiling(sy int, scale float64) float64 {
+	if !Tide {
+		// reach (0.8 + 2.1*level), worst at full activity, and the second sine.
+		return float64(sy) - 3.45*scale
+	}
+	// The tide's two terms pull in OPPOSITE directions with the activity: the
+	// withdrawal is (1-level)*TideRange and the wash is (0.7 + 0.9*level), so
+	// taking the worst of each independently is a row too pessimistic -- at
+	// 80x24 it costs the band a whole row for a level that cannot happen.
+	// Sweep the level instead and take the highest the edge actually gets.
+	best := math.MaxFloat64
+	for step := 0; step <= 32; step++ {
+		level := float64(step) / 32
+		base := float64(sy) - (1-level)*TideRange*scale
+		if f := hyFloor(sy); base < f {
+			base = f
+		}
+		// The wash, and the coast's own two sines (0.60 + 0.35).
+		if e := base - (0.7+0.9*level)*scale - 0.95*scale; e < best {
+			best = e
+		}
+	}
+	return best
+}
+
+// starCellAspect is how much taller a terminal cell is than it is wide, and it
+// is why the layout below measures in "screen units" rather than cells.
+//
+// Two stars one ROW apart are about as far apart on glass as two stars two
+// COLUMNS apart. Spreading by cell distance therefore packs rows twice as
+// tightly as columns, which is exactly the thing that makes a pair read as one
+// mark -- a miscount, in a channel whose entire job is a count.
+const starCellAspect = 2.0
+
+// starMinSep is how far apart two stars must be, in screen units, before the
+// layout stops looking for somewhere better -- about three columns on a row, or
+// a row and a half straight up. Below that a pair starts to read as one mark,
+// and the count is the channel.
+//
+// starDarts is the budget. It is spent only on collisions, so a sparse sky uses
+// one dart per star; the whole layout is computed once per window size anyway
+// (see the cache) rather than per frame.
+// starHardSep is the floor under which a dart is not accepted at all: below it
+// a pair starts to merge, so the layout stops sampling and takes the roomiest
+// cell in the band instead of the roomiest dart.
+// starSpreadN is how many stars are placed as far apart as the band allows
+// before the layout relaxes into dart-throwing. Four, because four is what the
+// two guarantees leave: the first few must be spread (s27, his two specks in
+// the corner) and the rest must not be (2026-09-10, his "instead of from left
+// to right"). Measured, three of the four corners of the band are taken by star
+// four, and by twelve stars the column-gap spread is back at 1.0.
+const (
+	starMinSep  = 3.0
+	starHardSep = 2.0
+	starSpreadN = 4
+	starDarts   = 64
+)
+
+// starPlaces lays the constellation out as blue noise: random-LOOKING, with a
+// separation nothing random gives you.
+//
+// The problem this solves is HIS, 2026-09-10: "can we have the stars appear
+// randomly across the sky, instead of from left to right?"
+//
+// The history, so nobody reverts into it. The first layout was
+// frac = (i+0.5)/total: strictly left to right, and at 153 columns his
+// first-ever lit constellation was two specks in the far-left corner with
+// sixteen slots still short of halfway. The fix for that was a golden-ratio
+// sequence, which is LOW-DISCREPANCY -- deliberately as even as a set of points
+// can be. It spread them, and it made a ruler: gap sd/mean 0.31 at nineteen
+// stars where a real random sky measures about 1.00.
+//
+// A pure hash is not the answer either, and the numbers say so: same counts,
+// hashed positions, sd/mean 1.00 -- and five pairs closer than two cells at
+// nineteen stars. Two stars in adjacent cells read as ONE. That is a count
+// error, and the count is the whole channel.
+//
+// So: dart-throwing, which is Poisson-disk sampling done the simple way. For
+// slot i, draw positions from the hash and take the FIRST that is at least
+// starMinSep from everything already placed; if the whole budget of darts is
+// spent without one, take the roomiest dart thrown. The distribution is as
+// random as a sky, because every accepted dart IS a uniform draw -- it is only
+// the collisions that are thrown away.
+//
+// Mitchell's best-candidate was built and measured first and is REJECTED, with
+// the render to show why. Best-candidate maximises the nearest-neighbour
+// distance, and this band is 119 columns wide by 16 screen units tall, so the
+// arrangement that maximises it is ROWS: at twelve stars it put ten of them on
+// two lines at the top and bottom of the band, which is a tidier version of the
+// ruler the golden ratio drew. Optimal spacing is not what a sky looks like.
+//
+// Both share the property that is locked in CLAUDE.md: slot i depends only on
+// slots below it, so a star still lights where it always was and never moves as
+// later ones arrive.
+//
+// Two dimensions, not one: the old layout spread x and hashed y independently,
+// which is what pinned the sky into a band. Distance is measured in screen
+// units (see starCellAspect), so a pair a row apart is not mistaken for a pair
+// that is genuinely far apart.
+//
+// The result is cached: the layout depends only on the geometry, the band, the
+// seed and the moon's column, none of which change between frames.
+func (s *Shore) starPlaces(w, hy, top, bot, n int) [][2]int {
+	if n < constellationSlots {
+		n = constellationSlots
+	}
+	if n > 256 {
+		n = 256
+	}
+	key := starKey{w: w, hy: hy, top: top, bot: bot, n: n, moonX: s.moonX, moonR: int(math.Round(s.moonRR * 64)), rx: s.moonRX, ry: s.moonRY}
+	if s.starKey == key && s.starPts != nil {
+		return s.starPts
+	}
+
+	cells := s.starCells(w, hy, top, bot)
+	if len(cells) == 0 {
+		s.starKey, s.starPts = key, nil
+		return nil
+	}
+
+	pts := make([][2]int, 0, n)
+	// The room there is, across: one column is one screen unit.
+	width := float64(w)
+	for i := 0; i < n; i++ {
+		// How far this star has to be from everything already placed. The first
+		// few have to be as far apart as the band allows, so they ask for more
+		// than any sky can give and end up taking the roomiest dart thrown --
+		// which is the farthest corner. After that the ask drops to starMinSep
+		// and the first dart that clears it wins, which is a uniform draw.
+		//
+		// The opening is not a flourish, it is the s27 guarantee kept:
+		// TestTheFirstStarsAreSpreadAcrossTheSky exists because his first-ever
+		// lit constellation was two specks in the far-left corner, and a layout
+		// that is random from the very first star will sometimes put the second
+		// one beside it. Two stars ARE the picture at that moment. Thirty are a
+		// scatter and can afford to be a scatter -- and measured, they have to
+		// be: holding the spread rule past the first few drags the column-gap
+		// spread from 1.26 back down to 0.31, which is the ruler again.
+		want := starMinSep
+		if i < starSpreadN {
+			want = width + 1 // unreachable on purpose: take the roomiest dart
+		}
+		want *= want
+		bestX, bestY, bestD := 0, 0, -1.0
+		for j := 0; j < starDarts; j++ {
+			cell := cells[int(HashF(i*1021+j, 101, s.Seed+31)*float64(len(cells)))%len(cells)]
+			x, y := cell[0], cell[1]
+			d := math.MaxFloat64
+			for _, p := range pts {
+				dx := float64(x - p[0])
+				dy := float64(y-p[1]) * starCellAspect
+				if v := dx*dx + dy*dy; v < d {
+					d = v
+				}
+			}
+			if d > bestD {
+				bestX, bestY, bestD = x, y, d
+			}
+			if d >= want {
+				break
+			}
+		}
+		if bestD < starHardSep*starHardSep {
+			// The darts all landed on top of something. That happens when the
+			// sky is genuinely too small for the cap -- at 40x12 the band is
+			// three rows of about thirty usable columns and thirty-two stars
+			// will not fit three apart however they are arranged -- so stop
+			// sampling and take the best cell there IS. Deterministic, and it
+			// depends on the same thing every other branch depends on: the
+			// stars already placed.
+			bestX, bestY, bestD = s.roomiestCell(cells, pts)
+		}
+		pts = append(pts, [2]int{bestX, bestY})
+	}
+	s.starKey, s.starPts = key, pts
+	return pts
+}
+
+// roomiestCell is the exhaustive answer to "where is there most room": the cell
+// in the band whose nearest placed star is furthest away. It is the fallback
+// for a sky too small to hold the whole cap at arm's length, and it runs only
+// when the darts have all failed -- and then only once per window size, since
+// the layout is cached.
+func (s *Shore) roomiestCell(cells, pts [][2]int) (int, int, float64) {
+	bestX, bestY, bestD := cells[0][0], cells[0][1], -1.0
+	for _, cell := range cells {
+		d := math.MaxFloat64
+		for _, p := range pts {
+			dx := float64(cell[0] - p[0])
+			dy := float64(cell[1]-p[1]) * starCellAspect
+			if v := dx*dx + dy*dy; v < d {
+				d = v
+			}
+		}
+		if d > bestD {
+			bestX, bestY, bestD = cell[0], cell[1], d
+		}
+	}
+	return bestX, bestY, bestD
+}
+
+// starCells is every cell of the band the constellation may use: the band less
+// a margin, less the moon's own corridor, less the ground the context readout
+// can land on.
+//
+// THE MOON'S CORRIDOR is the fix for a defect he reported on 2026-09-10 -- "I
+// can see some of the constellation stars appearing and disappearing - once
+// they appear, they should not disappear IMO". The disc sinks as the context
+// fills (discGeom: 0.22*hy to 0.84*hy) and todoStars has always skipped any
+// cell it covers, so a star the moon drifted over went OUT. Measured before
+// this change, over a full context sweep: one star at 124x22 and one at
+// 153x51. Opening the band to three quarters of the sky would have made that
+// worse, since the disc's whole descent is now inside it.
+//
+// Keeping off the moon's COLUMNS instead of its current cells fixes it for
+// good, and it costs nine columns of a hundred and twenty-five. The exclusion
+// depends only on the geometry -- moonX and moonRR are fixed by the width, the
+// height and MoonX, never by the context -- so the positions stay put as the
+// disc moves through them, which is the whole point.
+//
+// ⚠ THE READOUT'S GROUND is the same defect by another door, and it is one the
+// deeper band CREATED: measured, the layout that shipped never collided with it
+// (0 of 6072 readout cells over the sweep) and the first deep one did, at 50 --
+// four of twenty-four window-and-seed pairs lost a star for a stretch of the
+// context range. drawReadout plots into the same near layer AFTER the scape, so
+// a star under the number is simply deleted, and unlike the moon it does not
+// move on: from 40% used it is there for the rest of the session.
+//
+// ⚠ The arithmetic below MIRRORS drawReadout in live.go, which is a coupling
+// and will rot if that moves. TestTheReadoutNeverCoversAStar holds the two ends
+// together: it reproduces drawReadout's own placement and goes red if this
+// stops covering it.
+func (s *Shore) starCells(w, hy, top, bot int) [][2]int {
+	lo, hi := 3, w-3
+	if hi <= lo || bot < top {
+		return nil
+	}
+	// The widest column offset DiscCovers can return true for, at any row:
+	// it tests hypot((x-moonX)/2, dy) < moonRR, so |dx| < 2*moonRR.
+	colR := int(math.Ceil(2*s.moonRR)) - 1
+	if colR < 0 {
+		colR = 0
+	}
+	blocked := s.readoutGround(w, hy, top, bot)
+	cells := make([][2]int, 0, (hi-lo)*(bot-top+1))
+	for y := top; y <= bot; y++ {
+		for x := lo; x < hi; x++ {
+			if s.moonRR > 0 && x >= s.moonX-colR && x <= s.moonX+colR {
+				continue
+			}
+			if blocked[[2]int{x, y}] {
+				continue
+			}
+			cells = append(cells, [2]int{x, y})
+		}
+	}
+	if len(cells) == 0 {
+		// A scape too narrow to have a sky beside the moon. Give the stars the
+		// width back rather than drawing nothing; the draw-time guard in
+		// todoStars still keeps them off the disc itself.
+		for y := top; y <= bot; y++ {
+			for x := lo; x < hi; x++ {
+				cells = append(cells, [2]int{x, y})
+			}
+		}
+	}
+	return cells
+}
+
+// readoutLabel is the longest the context readout can be: "100% left". It is
+// never actually that long -- the readout shows what is LEFT and only appears
+// from 40% used -- but the layout is cheaper to reason about at the maximum
+// than at every string the number can make.
+const readoutLabel = 9
+
+// readoutGround is every cell the context readout can ever be painted on at
+// this geometry, over the whole descent of the disc. See starCells for why it
+// is excluded and for the warning about the coupling.
+func (s *Shore) readoutGround(w, hy, top, bot int) map[[2]int]bool {
+	out := map[[2]int]bool{}
+	rx, ry := s.moonRX, s.moonRY
+	if rx == 0 && ry == 0 {
+		return out
+	}
+	mark := func(x0, y int) {
+		if y < top || y > bot {
+			return
+		}
+		for i := 0; i <= readoutLabel; i++ {
+			out[[2]int{x0 + i, y}] = true
+		}
+	}
+	for step := 0; step <= 128; step++ {
+		// discGeom's own altitude, swept over every context the session can
+		// reach. int() rather than rounding, because that is what it does.
+		my := int(float64(hy) * (0.22 + 0.62*float64(step)/128))
+		if my < 1 {
+			my = 1
+		}
+		if y := my + ry + 1; y <= hy {
+			// Under the disc, centred on it. The label is at most
+			// readoutLabel wide and drawReadout centres it, so it reaches
+			// half that either side.
+			mark(s.moonX-readoutLabel/2, y)
+			continue
+		}
+		// Beside it, on the disc's own row. drawReadout prefers the right and
+		// falls back to the left; which one it takes depends on the label's
+		// real length, so both are held.
+		mark(s.moonX+rx+2, my)
+		mark(s.moonX-rx-1-readoutLabel, my)
+	}
+	return out
+}
+
+// starInk is the tone and the alpha for one lit star, chosen against the
+// ground it is ACTUALLY painted on rather than against the palette's idea of a
+// night sky.
+//
+// This is the sand's rule, applied to the sky: "Ink is sampled from the PAINTED
+// background per row, never the palette's nominal sand." The reason is the same
+// and it is what buys the deeper band. Measured at the 40-luma bar the tests
+// hold: the palette's star tone at alpha 0.85 stops reading at 0.36 of the sky
+// at the worst hour of the day, which is SHALLOWER than the band that shipped;
+// lifted toward white it reaches 0.64; lifted and fully opaque, 0.82.
+//
+// Two things it must not do, both of which the first version did and both of
+// which the rendered frame caught:
+//
+//   - Reason about c.BGAt. That is the NOMINAL background, and on 256 a sky
+//     cell takes its tone from the ramp's own path instead. At 40x12 the
+//     nominal ground is luma 159 and the ground the eye sees is 188, so an ink
+//     chosen for 55 points of contrast delivered 19.
+//   - Reason about the ink it passes in. The glyph path saturates chroma by
+//     GlyphBoost before quantising, which moves the luma as well -- the
+//     palette's star tone comes out twelve luma DARKER than it went in.
+//
+// So it walks the lift from the palette tone to white, and reads the contrast
+// the same way the terminal will: quantised, glyph path, against the ground
+// ResolveAt reports. The first rung that clears the bar wins, so at night
+// nothing changes at all.
+//
+// mag is the star's own magnitude, 0 to 1, fixed by its slot. It is added to
+// the floor, so a faint star is exactly as legible as the tests require and a
+// bright one has more.
+func (s *Shore) starInk(c *canvas.Canvas, x, y int, mag float64) (term.RGB, float64) {
+	nominal := c.BGAt(x, y)
+	// The cell has no glyph yet, so on 256 this reports it as its two halves:
+	// the LOWER one, which in a sky that brightens downward is the brighter of
+	// the two and so the harder to beat. Being wrong in that direction costs a
+	// shade of white and nothing else.
+	_, _, ground := c.ResolveAt(x, y, term.Profile256)
+	white := term.RGB{R: 255, G: 255, B: 255}
+	bestInk, bestA, best := s.pal.Star, mag, -math.MaxFloat64
+	// The star's own magnitude first, then fully opaque: a bright night star
+	// keeps the tone its magnitude gives it, and only a sky that beats it makes
+	// it give that up.
+	for _, a := range [2]float64{mag, 1.0} {
+		for step := 0; step <= starInkSteps; step++ {
+			ink := term.Lerp(s.pal.Star, white, float64(step)/starInkSteps)
+			seen := term.Profile256.Quantise(nominal.Blend(ink, a), true)
+			if d := bandLuma(seen) - bandLuma(ground); d >= todoStarContrast {
+				return ink, a
+			} else if d > best {
+				bestInk, bestA, best = ink, a, d
+			}
+		}
+	}
+	// Nothing reaches: the sky there is brighter than white ink can beat. Take
+	// the best there is rather than the dimmest, and let the band's own floor
+	// (starBand) keep the layout out of rows where this happens.
+	return bestInk, bestA
+}
+
+// starInkSteps is how finely the lift from the palette's star tone to white is
+// walked. Nine rungs, because the cube has six levels a channel and a finer
+// walk returns the same colours.
+const starInkSteps = 8
+
+// todoStars lights one star per finished todo, so the sky carries n.
 //
 // Position, not rate: each slot's place is fixed by its index and the scene
 // seed, so a star lights where it always was rather than appearing somewhere
 // new. A star that moved would encode nothing and read as noise, and a glance
-// is the whole budget.
+// is the whole budget. See starPlaces for how the places are chosen and why
+// they are neither a ruler nor a pure hash.
 //
 // Deliberately NOT a row across the top. A progress bar in the sky is a piece
 // of UI and the brief cuts anything that makes this feel like a dashboard; a
 // constellation filling in does the same work and belongs to the picture.
-func (s *Shore) todoStars(c *canvas.Canvas, hy, done, total int) {
+func (s *Shore) todoStars(c *canvas.Canvas, hy, foamTop, done, total int) {
 	if total <= 0 || hy < 3 {
 		return
 	}
 	if done > total {
 		done = total
 	}
-	// The upper sky is the darkest part of it at every hour, and so the only
-	// part where a white mark reads by day as well as by night.
-	top, bot := 1, hy*3/5
-	if bot <= top {
-		bot = top + 1
+	top, bot := starBand(hy, foamTop)
+	if bot < top {
+		return // the water is up in the sky: no band to put a constellation in
 	}
+	pts := s.starPlaces(c.W, hy, top, bot, total)
 	near := c.Near()
-	for i := 0; i < total; i++ {
-		// Spread across the width by index -- but NOT in index ORDER, which is
-		// what kept this channel from ever being noticed.
-		//
-		// It used to be frac = (i+0.5)/total, so the sky filled strictly left
-		// to right: measured at 153 columns, one star landed on column 6, two
-		// on 6 and 9, and sixteen still had not passed the halfway mark. His
-		// first-ever lit constellation was two specks in the far-left corner
-		// and he read it as not shining at all.
-		//
-		// The golden ratio fixes it without giving up the thing that matters:
-		// each index still maps to ONE column forever, so a star lights where
-		// it always was, and the first few are spread right across the sky
-		// because every new one falls in the largest remaining gap. That is
-		// what a low-discrepancy sequence is for.
-		frac := math.Mod((float64(i)+0.5)*0.6180339887, 1)
-		x := int(frac*float64(c.W-6)) + 3
-		x += int(HashF(i, 11, s.Seed+31)*3) - 1
-		y := top + int(HashF(i, 23, s.Seed+37)*float64(bot-top))
+	for i := 0; i < done && i < len(pts); i++ {
+		x, y := pts[i][0], pts[i][1]
 		if x < 0 || x >= c.W || y < 0 || y >= c.H {
 			continue
 		}
 		// Never on the moon: it carries context remaining, and a star inside
-		// the disc would be read as part of it. This was a hand-fitted ellipse
-		// (dx*dx+4*dy*dy <= 16) measured against a disc of one particular size,
-		// and it drifted: at the cap it excluded only the centre column while
-		// the disc reached two either side. DiscCovers is moon()'s own
-		// sampling, so the guard cannot fall out of step with the shape again.
+		// the disc would be read as part of it. starCells already keeps the
+		// whole layout out of the disc's columns; this is the guard that was
+		// here before it and it stays, because DiscCovers is moon()'s own
+		// sampling and a layout that ever drifts back into the disc's reach
+		// should be caught by the shape itself rather than by arithmetic about
+		// it. (It was a hand-fitted ellipse once, measured against a disc of
+		// one particular size, and it drifted.)
 		if s.DiscCovers(x, y) {
 			continue
 		}
@@ -732,9 +1228,8 @@ func (s *Shore) todoStars(c *canvas.Canvas, hy, done, total int) {
 		// ring, so the sky read "n of N"; his ruling of 2026-09-05 -- "discard
 		// the ring altogether, it's not clear what it means" -- so the sky
 		// says n, and the size of the list is not on screen.
-		if i < done {
-			near.Plot(x, y, '*', s.pal.Star, todoStarFloor)
-		}
+		ink, a := s.starInk(c, x, y, starMagnitude(i, s.Seed))
+		near.Plot(x, y, '*', ink, a)
 	}
 }
 
