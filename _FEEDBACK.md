@@ -2439,3 +2439,225 @@ log rather than reason about it.**
   already measured this. All Andale Mono is worth is the four dashes at the disc's shoulders.
 - *"whats the problem? explain in simple terms"* and *"explain both two me in simpler terms"* ⇒ he
   asks for plain explanations of measured findings and gets them; keep the numbers, drop the jargon.
+
+## Session 28 (2026-09-10) — his live look at the shipped build, and a new idea
+
+He resumed inside the installed build. ⚠ **Verified by inode before answering anything, and it
+mattered**: the scape for this session is PID 4549, started 11:03:07, holding inode **84361125 ==
+`~/.local/bin/xscapes` == HEAD `31264bc`**. His other two scapes — `tyastie` (09:31) and
+`Validators` (10:04) — hold inode **84245880**, which predates `54ebd26` (the constellation spread,
+10:43), `5e365ff` (tasks/8, 10:51) and `31264bc` (the tide as default, 11:02). Anything reported
+from those two windows is the old picture.
+
+### ⭐ Report 1 — the stars blink
+
+- *"running this session to test out latest changes. On a first impression, I can see some of the
+  constellation stars appearing and dissapearing- once they appear, they should not dissapear IMO"*
+
+⇒ **The constellation is not what he saw, and it is measured three ways.** (i) The count cannot
+  drop: `stars()` is `turns + tasks/8`, both monotonic; the one path that could drop it is a todo
+  list taking over from the fallback (`reduce.go:424`) and there are **0 `todo` events in all 122
+  spools**. Mid-session resets: **0** — no `session_end` in the whole log has an event after it.
+  Context going backwards, which is what moves the disc: **6 steps down out of 11,015**. (ii) The
+  render is steady: `TestAStarNeverGoesOut` renders the COMPOSED frame — `drawScene`, so the readout
+  and companion are in it — across a whole session, count 1→24 and context 0→1, at five geometries
+  and both animals: **zero stars go out**. (iii) Clock only, thirteen hours at 143x27: **15/15 at
+  every hour**.
+⇒ ⭐ **What does blink is the OTHER star field**, and it is a gate rather than a fade.
+  `shore.go:634` reads `twinkle := (0.55 + 0.45*sin(...)) * StarVis; if twinkle <= 0.02 { continue }`.
+  That range bottoms out at `0.10*StarVis`, so below StarVis 0.2 every speck crosses the cut-off once
+  a cycle and switches **off** instead of dimming. At his hour (11:00, StarVis 0.042) the field is
+  **24.4 specks drawn, 15.9 visibly different from their own background, 0.35 blink-outs per frame**
+  — at `inside.go:51`'s 12 fps that is **~4 disappearances a second**. At midnight the same field
+  measures 0.13. The blinking hours are **08:00–13:00**, where StarVis is small but not zero.
+  ⚠ The glyphs differ and that is the discriminator: constellation is `*`, ambient is `.` `·` `+`.
+⇒ **Separately, a resize slides the constellation**: 143→142 columns moves **8 of 15** stars a cell;
+  143x27→143x21 moves **14 of 15**. Proportional, not scattered, but it does break the brief's own
+  "a star lights where it always was" the moment the window is dragged.
+⏸ **His ruling pending**, three options on the table: gate the FIELD on `StarVis` rather than each
+  speck's twinkled value (recommended, one line) · narrow the twinkle to `(0.775 + 0.225*sin)` so its
+  minimum clears the cut-off · leave it.
+⚠ **A void measurement, caught and fixed**: the first ambient count filtered on "not a space", which
+  swept in several hundred half-block gradient cells and reported ~300 sky cells **at noon, when
+  StarVis is 0 and there are no ambient stars at all**. Filter on the field's own glyphs.
+
+### ⭐⭐ Report 2 — HIS IDEA: the companion comes closer before it asks
+
+- *"Heres a separate idea I had I would love to test. When the companion prompts the user because it
+  needs input, it comes up with a dialoge bubble (works well). Can we animate the main
+  Agent/companion to come CLOSER to the user before it prompts it? So the companion (crab, in this
+  case) would walk up closer to the screen and get bigger. Can we sketch this? is it even possible,
+  considering the eyes are made with characters? can we size those up? dont test it if you dont
+  think its doable/will look good"*
+
+⇒ **His question about the eyes is the right one and the answer is no.** The body is a bitmap
+  (`crab.go:35`) drawn through `ToQuadrant` — 2 source px per cell column, 4 per cell row — so it
+  scales by authoring a bigger bitmap, which this repo already does four times for the litter. But
+  the eyes are literal **glyphs**: `'o'`, `'O'` and amber at NeedsYou, `'-'` blinking, `'^'` done,
+  one cell each at `crab.go:342-366`. **A cell is a cell; a character cannot be scaled.** On a bigger
+  body they read as pinpricks. The fix is to stop using a glyph and draw the eye as its own small
+  quadrant bitmap in the eye colour — which yields a rounder eye than `o`, so it is an upgrade.
+⇒ ⭐ **The room is the real constraint, and it runs the opposite way to intuition.** Folded from his
+  real log — **30 sessions, 54 `needs_input` events** — the activity level AT THE ASK is p10 0.54,
+  **p50 0.59**, p90 0.65, max 0.83. The ask does not fire when things are quiet; it fires mid-turn,
+  so the **tide is IN and the beach is at its narrowest exactly when the crab wants room**. Beach
+  rows at the median ask: 80x24 **7**, 111x25 **8**, 124x22 **7**, 143x27 **8**, 153x51 **12** —
+  against a crab that is **7 rows tall**. Two rows sit under its feet (`live.go:173`), so **9 rows is
+  reachable everywhere and a dramatic zoom is not.**
+⇒ ⭐ **A finding that stands on its own, whatever he rules on the crab: the sea says "hard at work"
+  while the agent is blocked on him.** `needs_input` does not clear `turnOpn`, so `TurnFloor` (0.30)
+  / `FlightFloor` (0.45) hold the level at 0.59 with nothing running (`reduce.go:554`). By his own
+  encoding rule — the water is the work — a blocked agent is not working. Dropping the level at the
+  ask would withdraw the tide and hand the crab 3–4 rows for free at exactly the right moment. **One
+  line, and it moves a locked channel, so it is his call.**
+⏳ Four directions drafting for his pick, the same way Hero was chosen: the minimal step (14x9) ·
+  the real push-in (16x11, needs the tide to pull back) · no scale change at all, the upper half
+  leans in · the exact 2x (24x14) as the reference point.
+
+Instruments: `go run ./notes/s28-starflicker` · `go run ./notes/s28-closer` ·
+`go run ./notes/s28-askroom` · `go test -run TestAStarNeverGoesOut -count=1 .`
+
+### ⚠ Session 28 — THE SCROLLBACK MERGE IS BACK, IN THE FIXED BUILD (parked at his word)
+
+Not a report of his — spotted in his 14:22 screenshot while he was reporting something else. **Parked
+immediately at his instruction, *"focus on the draft"*.** Written down so the measurement is not lost.
+
+⚠ **The build is the FIXED one, settled by inode:** scape PID 4549, up since 11:03:07, holds
+**84361125 == `~/.local/bin/xscapes` == HEAD `31264bc`**.
+
+⇒ **The signature, diffed against the exact text that was emitted** (it was my own output, so the
+original is known rather than reconstructed): row 1 had **22 spaces, 18 filled with a character**;
+row 2 had **29 spaces, 27 filled**. **NON-SPACE CELLS ALTERED: 0, in both rows.** The paragraph also
+appears **twice**, once clean and once corrupt, and one glyph went the other way — "the whole open
+sea" came back as "the wh le open sea".
+
+⇒ ⭐ **"Zero non-space cells altered" is the whole clue, and it says this is NOT the s26
+strikethrough.** That one was a split UTF-8 rune making U+FFFD: one cell becomes three and every cell
+after it SHIFTS, so it damages non-space cells by construction. This damages only cells that were
+BLANK. **The s26 fix is not regressed; this is a different mechanism in the same window.** A row whose
+blank cells hold another row's glyphs is a row that was never CLEARED before being drawn — our model
+kept what was there and the agent wrote only the cells it addressed (`screen.put` writes one cell and
+leaves the rest untouched).
+⏭ **The leading hypothesis, untested:** `feed()` holds back a trailing partial UTF-8 rune (the s26
+fix) — does it hold back a trailing partial **CSI escape**? A split, dropped `ESC[2K` would leave the
+row uncleared and produce exactly this. s26's own decisive method applies: feed the same bytes in
+different chunk sizes and compare the screens.
+⚠ **Do not raise s26's four dead hypotheses again** (`Rebind`'s `ESC[NS` · a region/pty off-by-one ·
+a shared cursor-save slot · our band paint disturbing the agent).
+⚠ **The evidence is in his LIVE window and a restart destroys it** (`1049l` discards most mirrored
+rows). Reading it back needs AppleScript, which is **his call and must be asked for** — the standing
+rule in RESUME.md. Not asked yet; he was mid-task.
+
+### ⭐ Session 28 — HIS SECOND IDEA: the turn, and colour as perspective
+
+- *"also, I just noticed this animation on the claude app, when you scroll down to refresh the code
+  sessions- I like how the claude mascot moves from one side to another and uses colors to give the
+  illusion of a 3d perspective when it turns. Is there a possibility to do this with any of our
+  companion moments?"*
+
+⇒ **Yes, and BOTH halves are already in the code — neither needs inventing.** Two-pass colour on one
+body is proven by `plotRim` (`kittens.go:403`), which already draws a second pass in its own colour
+around the same sprite; and `Sprite` carries `Accent` + `AccentOf` (`sprite.go:30`) for runes that
+paint in a second tone. A sprite's spaces are transparent, so two bitmaps — a lit region and a shaded
+region — composite into one animal.
+⇒ ⭐ **The cube holds the ramp, measured** (`go run ./notes/s28-turn`). Every tone below is
+**cube-exact AND survives the glyph path's 2.6x saturate on the same index**, which is the property
+`CrabCoat` was locked for on 2026-09-07 and which any shade paired with it must also have:
+
+    idx 167  rgb(215, 95, 95)   -40 luma
+    idx 174  rgb(215,135,135)   -12 luma
+    idx 210  rgb(255,135,135)     0      <- the coat
+    idx 217  rgb(255,175,175)   +28 luma
+
+  ⚠ Three near neighbours are traps — **138, 181 and 95 all MOVE under the boost** (to 174, 217 and
+  131), so a shade authored from them is not the shade that reaches the screen.
+⇒ ⭐ **Where it belongs is the PACE, not the ask.** `pace.go` already walks the companion on a
+triangle inward and back, one step per main-thread tool event — **his own ruling**, *"should be tied
+up to an actual agent action so its not random."* Today a step only TRANSLATES, which is why it can
+read as sliding. A creature that turns as it reverses reads as walking, and a turn is an
+ORIENTATION — a position, not a rate — so it passes the encoding rule the same way the step does.
+⚠ **The honest caveat, and it is about the crab specifically:** the mascot is a blob that can face
+either way, while a crab is drawn FACE-ON already and walks sideways, so it has less to turn than the
+mascot does. The natural crab version is face-on → three-quarter → profile as it comes down the
+beach, which is the same motion as the "come closer" idea and not a second one.
+⚠ **And the two ideas need each other:** shading resolution is ONE CELL = 2x4 source pixels, so at
+12x7 there are very few cells to carry a three-tone turn. **This is an argument for the bigger crab.**
+
+### ⭐⭐ Session 28 — THE PACE SNAP IS CONFIRMED, and fixing it naively re-breaks the balloon
+
+His instruction: *"yes, lets test the bigger crab- it should walk up closer to prompt, without
+overlapping sub agents. OK if a part of its body is cut on the bottom of the screen, feel free to
+draft it first or simply test it live"*
+
+⇒ ⭐ **His bottom-clipping permission VOIDS the constraint that killed two of yesterday's four
+directions.** The ceiling was never the sprite's HEIGHT, it is its **TOP ROW** staying out of the sea;
+everything below may run off the frame. `canvas.Plot`/`PlotOn` both bounds-check and return silently
+(`canvas.go:49`, `:59`), so drawing past the bottom is safe and needs no clipping logic.
+
+⇒ ⭐⭐ **THE PACE SNAP IS CONFIRMED ON THE RENDERED FRAME** (`go run ./notes/s28-pace`). The
+instrument SYMLINKS `pace.go` rather than copying its arithmetic, so it cannot go stale, and it
+drives a real `reduce.Reducer` with real events. **Non-empty control printed first**: the companion
+really is away from home before the ask at 6 of 6 widths, and its 124-column home of 107 with ink at
+101..112 **reproduces the s26 banner's independently measured 107 → 101 → 107**.
+  - **The jump: 6 cells OUTWARD at 111/124/143/153, 5 at 80, 2 at 40, in ONE frame**, with `Steps`
+    and `StepAge` unchanged either side — the pose is the only thing that moved.
+  - ⭐ **It is TWO teleports per ask, and the second was never written down**: answering starts a
+    tool, `ToolStart` both clears `needsInput` and takes a step, so it snaps straight back inward.
+  - Over 68 (width, step-count) transitions, **56 move the companion, every one outward**, mean 2.54
+    cells.
+
+⇒ ⚠⚠ **THE TRAP, and it would have shipped the s27 defect a second time.** `live.go:398` anchors the
+balloon with `bubbleX(rows, lay.CatX+cat.HeadCol(), c.W)` — **HOME, not the drawn `catX`**. That is
+correct today ONLY BECAUSE OF THE DEFECT: every pose that raises a balloon is a held pose, so `dx`
+was always 0 and `catX == lay.CatX`. **Fix the pace alone and the pointer misses the head by up to 6
+cells — bare sand again.** Proved, not predicted: with the pace fixed and `live.go` untouched,
+`TestTheBalloonPointsAtTheCompanion` fails **9 of 20** combinations. **The two must land together.**
+⚠ **And that test could never have caught it**: it builds its state from `demoState()`, which leaves
+`Steps` at 0, so `dx` is 0 whatever `pace()` does. It needs `st.Steps = paceSpan(w)` to become a guard.
+⚠ `TestTheHeldPosesDoNotPace` (`pace_test.go:58`) asserts `dx == 0` for the held poses — **that
+assertion IS the defect written down** and has to be re-stated as "holds the offset it had".
+
+⇒ ⚠ **A SEPARATE PRE-EXISTING DEFECT, confirmed on a pristine copy and NOT fixed by this work:**
+`pace()` calls `paceSpan(w)` unconditionally, but `compose()` sets `lay.PaceSpan = 0` in the
+UNMIRRORED layout (`-mirror=false`), where `CatX` is 5 and "inward" is the wrong direction. At w=124
+that gives `dx=-6` and a drawn `catX` of **-1** — the companion is clipped by the LEFT frame edge
+while it works.
+
+### ⭐⭐ Session 28 — THE NEAR CRAB IS BUILT, behind `XSCAPES_NEAR`, awaiting his ruling
+
+Two rungs, OFF by default, nothing installed, nothing committed.
+`XSCAPES_NEAR=1` the authored 16x9 · `=2` the exact 2x at 24x14, which CLIPS at the bottom.
+
+⇒ ⭐ **His bottom-clipping permission is what shapes it.** The sprite is anchored by its **TOP ROW**
+at exactly the y the shipped crab draws at, and grows DOWNWARD: 12x7 → 16x9 → 24x14. That makes
+"the top row never enters the sea" **structural rather than arithmetic — it does not move at all** —
+keeps the eyes within a row of where they have always been, and is what an approach looks like from
+a camera near the ground: the head holds its line, the feet come toward you and off the frame.
+⇒ **Rung 2 is generated, not typed** — every source pixel doubled at init — so it cannot drift from
+the shipped art and every state, claw frame and mid-stride leg comes free. ⚠ Its measured cost, in
+the comment: the glyph vocabulary collapses **11 → 3** and every diagonal becomes a one-cell
+staircase. Ink at the ask: **61 → 106 → 188 cells**. Rung 2 clips **5 of its 14 rows** — lower legs
+gone, claws, eyes, shell and upper legs kept.
+⇒ **The eye is a bitmap pass now, 2x2 cells, every cell through `PlotOn` with the coat as ground so
+the ring's hole is salmon and not sea.** A glyph on a 24-wide body would be **0.30%** of the sprite
+against today's 1.19%; four cells of 336 is **1.19% exactly**. ⭐ And it buys something nobody asked
+for: ask-vs-working becomes a **SHAPE** difference (ring `▛▜▙▟` against bead `▗▖▝▘`), which at one
+cell it never was — `'O'` against `'o'`.
+⇒ **Approach eases one rung per `stepDur` (0.28 s), pace.go's own constant**, and the retreat is the
+same call running back, so Worried arriving mid-ask walks the animal home instead of cutting.
+
+⇒ ⚠⚠ **THE BALLOON TRAP WAS CAUGHT AND FIXED IN THE SAME CHANGE.** `live.go:491` now reads
+`bubbleX(rows, catX+cat.HeadCol(), c.W)` — the **DRAWN** column, not `lay.CatX`. **I verified this
+myself on the painted frame rather than trusting the report**: the eyes' midpoint is IDENTICAL at
+all three rungs at all six widths (65 / 94 / 98 / 107 / 125 / 135) and the pointer lands between them
+every time; the eyes spread symmetrically outward as the crab grows. Eye cells 2 → 8.
+⇒ ⭐ **OFF-BY-DEFAULT PROVED END TO END ON THE REAL BINARY, not on a model of it**: `git archive HEAD`
+into the scratchpad, built, and **126 frames compared across 7 widths x 6 heights x 3 hours —
+0 differing**. Suite, build and vet green at unset, 1 and 2.
+⇒ **A bonus, measured:** at rung 2 the doubling makes the vertical halving lossless, so `crabWork`
+and `crabDone` — **byte-identical today, 0 of 84 cells** — differ in **12 of 336**. Rung 1 does not
+separate them (0 of 144).
+⚠ **A mutation PASSED first and had to be rebuilt**: the working breath at 2.2 and 2.3 lands on the
+same side of the lift's `sin > 0.35` boolean at all six sample times, so the golden could not fail.
+Rebuilt to sixteen times straddling the lift's edges, the blink's 0.16 s window and the resting
+claw's 7.2 s alternation — 96 frames per state became 256 — and it went RED.
