@@ -67,13 +67,26 @@ func init() { Near = nearFromEnv(envx.Lookup("NEAR")) }
 // in the middle of his work. Pure so the mapping can be tested; init cannot.
 func nearFromEnv(v string) int {
 	switch v {
+	case "0", "off", "no":
+		return 0
 	case "1":
 		return 1
 	case "2":
 		return 2
 	}
-	return 0
+	// Unset is the FULL approach, his ruling of 2026-09-11. He tried it behind
+	// the switch -- "looks great" -- and then asked of his own live session
+	// "The main companion does not come closer to the screen when prompting the
+	// user- did you push that feature live?", which it was not. It is now.
+	// Rung 2 rather than rung 1 because the one he approved is the CROPPED one:
+	// "I was referring to the cropped version, which I liked- the horizontal
+	// crop." XSCAPES_NEAR=0 puts the shipped crab back.
+	return nearDefault
 }
+
+// nearDefault is the rung an unset XSCAPES_NEAR gets. The same shape the tide
+// took: behind a switch, lived in, then turned on at his word.
+const nearDefault = 2
 
 // nearStep is how long ONE rung of the walk is held, in seconds.
 //

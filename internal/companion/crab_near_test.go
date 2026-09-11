@@ -105,11 +105,26 @@ func TestAnArmedFlagAloneStillDrawsTheShippedCrab(t *testing.T) {
 
 // OFF unless the environment asks. Both halves: the flag's own parse, and the
 // package variable that init() left behind in this very process.
-func TestTheNearPoseIsOffUnlessTheEnvironmentAsksForIt(t *testing.T) {
+// ⚠ THIS TEST'S GUARANTEE WAS DELIBERATELY INVERTED ON 2026-09-11. It used to
+// assert the near pose was OFF unless asked for, which was right while he was
+// judging it behind a switch. He judged it -- "looks great" -- and then asked of
+// his own live session "The main companion does not come closer to the screen
+// when prompting the user- did you push that feature live?" So an unset
+// XSCAPES_NEAR is now the full approach, and what needs a guarantee is the
+// other direction: that he can still get the shipped crab back, and that a typo
+// gives him the DEFAULT rather than an error or a half-armed ladder.
+func TestTheNearPoseIsOnByDefaultAndCanStillBeTurnedOff(t *testing.T) {
 	for _, c := range []struct {
 		v    string
 		want int
-	}{{"", 0}, {"0", 0}, {"off", 0}, {"no", 0}, {"true", 0}, {"3", 0}, {"", 0}, {"1", 1}, {"2", 2}} {
+	}{
+		{"", nearDefault}, {"1", 1}, {"2", 2},
+		{"0", 0}, {"off", 0}, {"no", 0},
+		// A typo is not an error and not OFF: he types this by hand mid-session
+		// while judging a frame, and the least surprising answer is the picture
+		// everyone else is looking at.
+		{"true", nearDefault}, {"3", nearDefault}, {"yes", nearDefault},
+	} {
 		if got := nearFromEnv(c.v); got != c.want {
 			t.Errorf("XSCAPES_NEAR=%q arms rung %d, want %d", c.v, got, c.want)
 		}
@@ -117,8 +132,8 @@ func TestTheNearPoseIsOffUnlessTheEnvironmentAsksForIt(t *testing.T) {
 	if v := envx.Lookup("NEAR"); v != "" {
 		t.Skipf("XSCAPES_NEAR is %q in this shell, so the default cannot be read here", v)
 	}
-	if Near != 0 {
-		t.Fatalf("XSCAPES_NEAR is unset and the ladder is armed at rung %d", Near)
+	if Near != nearDefault {
+		t.Fatalf("XSCAPES_NEAR is unset and the ladder is at rung %d, want the default %d", Near, nearDefault)
 	}
 }
 
