@@ -2702,3 +2702,35 @@ still gives ZERO at noon, which is correct.
 ⇒ **Characters:** the ambient field has four glyphs (`.` `.` `·` `+`) and the constellation owns `*`
 alone — *"a channel that shares a glyph with the scenery is not a channel."* Room for more sizes and
 shapes, and with count-not-alpha each one is crisp rather than half-faded.
+
+### Session 28 (2026-09-11) — his live look at the constellation, and four notes
+
+- *"scatter and spread is working well."* ⇒ the dart-throwing placement lands.
+- ⭐ *"push it live"* (the near crab) ⇒ **SHIPPED ON by default at rung 2**, `e6f3bb5`. It had been
+  behind `XSCAPES_NEAR` and off, so his own session never saw it — he had judged it through `go run`
+  the day before (*"looks great"*) and I read that as approval of the LOOK rather than of the
+  default. ⚠ Rung 2 because the one he approved is the CROPPED one: *"I was referring to the cropped
+  version, which I liked- the horizontal crop."*
+- ⭐ *"when the main agent is working, alone, it should have its eyes open"* ⇒ **HE IS RIGHT AND HIS
+  OWN LOG SAYS BY HOW MUCH.** `TurnSilence = 5 min` force-closes an open turn when no busy event has
+  landed, `pose()` then finds no turn and no flight and returns Resting, and Resting draws the eye as
+  `-`. Counted over 411 turns and **16,276 gaps inside open turns**: gaps longer than five minutes
+  are **13 of 16,276 (0.08%)** — but they are the LONG ones (p50 10 min, **max 81.6 min**), so the
+  companion spent **3.37 HOURS asleep while a turn was open**, against 31.69 hours inside closed
+  turns. **About a tenth of his working time, asleep while working.** The case he screenshotted is a
+  fan-out at 13/14 agents where the main thread is idle for an hour and nothing fires.
+  ⚠ The timeout is not junk — its own comment says it "force-closes a turn nothing ever ended", so
+  deleting it leaves a companion working forever after a crashed session. The fix has to be measured
+  BOTH ways. ⚠ And `turnOpn` also drives `TurnFloor`, so a turn that stays open longer holds the
+  WATER up — a change to the sea he did not ask for.
+- ⭐ *"Magnitude. Do they seem right in the first screenshot? i dont see a big difference in
+  brightness between stars."* ⇒ **It renders, and his eye is still right.** 4–8 distinct tones at
+  every hour; luma spread **49.4 at midnight, 32.6 at his 12:34 screenshot** against a sky gap of
+  92.5. Midday is the worst case — smallest spread, brightest sky — and with 19 stars over 114
+  columns two different magnitudes are almost never adjacent, so there is nothing to compare
+  against. **Magnitude reads when marks sit near each other, and this sky is deliberately sparse.**
+- ⭐ *"make sure we can still see some during daytime, even if fainter than at nighttime"* ⇒ **HIS
+  RULING, and it OVERRIDES the design note that the sky is empty at noon.** `StarVis` is 0 at midday
+  by design (*"the moon and the constellation are washed out at midday by design"*), and he is asking
+  for a floor instead: fewer and fainter by day, never nothing. ⚠ This contradicts a constraint I had
+  already briefed ("NOON MUST STILL BE EMPTY, assert it") — correct it before that lands.

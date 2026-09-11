@@ -63,7 +63,33 @@ var (
 	// TurnSilence force-closes a turn nothing ever ended. Stop is the only
 	// event that closes one, so a crashed agent or a killed pane would
 	// otherwise leave the cat working forever.
-	TurnSilence = 5 * time.Minute
+	//
+	// It measures how QUIET a turn has gone, and quiet is measured in events.
+	// That is why a turn with live subagents is exempt from it (see decay):
+	// during a fan-out the main thread reports nothing for long stretches while
+	// the machine is flat out, so the one case with the most work happening was
+	// the case most likely to be called silent. His report, 2026-09-11:
+	// "when the main agent is working, alone, it should have its eyes open."
+	// ⚠ FIVE MINUTES WAS TOO SHORT AND HIS OWN LOG SAYS SO. Folded through this
+	// reducer a second at a time -- notes/s28-asleep, 30 sessions, 361 hours of
+	// wall clock -- the companion was Resting for 4.43 hours BETWEEN A PROMPT
+	// AND ITS DONE, with a single stretch of 126 minutes. That is his report of
+	// 2026-09-11: "when the main agent is working, alone, it should have its
+	// eyes open." A long main-thread tool fires tool_start, runs for an hour,
+	// and fires tool_end; nothing lands in between, so a five-minute bar reads
+	// the quietest kind of hard work as an abandoned session.
+	//
+	// THIRTY COSTS NOTHING MEASURABLE. Swept over the same corpus against the
+	// thing the timeout exists to prevent -- still Working an hour after the
+	// session's last event -- every setting from 5 minutes to 3 hours, and
+	// every FlightStale from 20 minutes to 3 hours, measures 0.00 hours of
+	// false work. The guard has never once had to fire on his real usage, while
+	// its short bar was costing about an eighth of every open turn.
+	//
+	// ⚠ FlightStale is NOT the lever, which is the answer I expected and the
+	// measurement refused: raising it from 20 minutes to 3 hours moves the sleep
+	// 4.43 -> 4.33 hours. Turn silence is what shuts the eye.
+	TurnSilence = 30 * time.Minute
 
 	// KittenExit is how long a finished subagent's kitten takes to swim off.
 	// The litter count drops the moment the end arrives (the count is live);
@@ -80,7 +106,19 @@ var (
 
 	// SubStale drops a subagent whose end event never arrived, so one lost
 	// event does not strand a kitten on the beach for the rest of the day.
-	SubStale = 30 * time.Minute
+	// ⚠ SIXTY, NOT THIRTY, AND THE ORDERING AGAINST TurnSilence IS LOAD-BEARING.
+	// A turn with live subagents is exempt from TurnSilence (see decay), so if
+	// SubStale is not comfortably LONGER than TurnSilence the exemption can
+	// never fire -- the litter is swept at the same moment the turn would have
+	// closed, and the rule is dead code. At 30 and 30 it was exactly that, which
+	// is what TestTheCompanionStaysAwakeWhileItsKittensAreOnTheBeach caught by
+	// refusing to measure nothing.
+	//
+	// Sixty is measured off his own log rather than picked to clear the other
+	// constant: 639 completed subagents, p50 7.4 min, p90 20.8, p99 39.8, max
+	// 57.3. Thirty was sweeping 26 of them -- 4.07% -- while they were still
+	// running. Sixty sweeps none, and still bounds a lost sub_end.
+	SubStale = 60 * time.Minute
 
 	// FlightStale drops a tool whose end never arrived. Without it, one lost
 	// tool_end pins the sea and the companion at "working" forever -- and the
@@ -468,12 +506,6 @@ func (r *Reducer) decay(now time.Time) {
 			delete(r.flight, id)
 		}
 	}
-	// TurnSilence is not conditioned on the flight map being empty. It used to
-	// be, which meant the one case the timeout was written for -- an agent
-	// killed mid-tool -- was the exact case that could not fire it.
-	if r.turnOpn && now.Sub(r.turnAt) > TurnSilence {
-		r.turnOpn = false
-	}
 	for id, t := range r.subs {
 		if now.Sub(t) > SubStale {
 			delete(r.subs, id)
@@ -487,6 +519,39 @@ func (r *Reducer) decay(now time.Time) {
 		if now.Sub(t) >= KittenExit {
 			delete(r.gone, id)
 		}
+	}
+
+	// The turn check runs LAST, after the sweeps, so it reads a litter that is
+	// already current rather than one frame stale.
+	//
+	// TurnSilence is not conditioned on the flight map being empty. It used to
+	// be, which meant the one case the timeout was written for -- an agent
+	// killed mid-tool -- was the exact case that could not fire it.
+	//
+	// A LIVE LITTER IS NOT SILENCE. A turn whose work has moved into subagents
+	// reports nothing on the main thread, so the timeout used to fire in the
+	// middle of the busiest thing the agent ever does; his screenshot was a
+	// workflow at "13/14 agents done, 1h 0m 37s" with the companion asleep.
+	//
+	// Folded through his own run log -- 124 files, 76,496 events, replayed
+	// second by second and scored against stretches the log itself proves were
+	// work -- this takes false sleep from 1.02 h to 0.23 h of 80.76 working
+	// hours, and costs NO false work at all, because len(subs) is already
+	// bounded by SubStale. Raising TurnSilence instead is a near one-for-one
+	// trade: 30 min reaches zero false sleep but leaves a killed pane claiming
+	// to work for half an hour, 0.08 h -> 0.50 h. Do not reach for it first.
+	//
+	// It is also the only reading that keeps the frame coherent: len(subs) IS
+	// State.Kittens, so without this the scene draws kittens on the sand beside
+	// a companion with its eyes shut.
+	//
+	// ⚠ The first instrument reported 3.53 h and was WRONG: it counted a
+	// silence as work whenever the next event was a `context` reading, and the
+	// scape polls context on its own schedule, so 125 minutes of a claude.ai
+	// usage-limit wall landed in the working column. A passive event is not
+	// evidence of work.
+	if r.turnOpn && len(r.subs) == 0 && now.Sub(r.turnAt) > TurnSilence {
+		r.turnOpn = false
 	}
 }
 

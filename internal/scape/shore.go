@@ -366,7 +366,7 @@ func (s *Shore) Update(c *canvas.Canvas, t float64, act Activity) {
 
 	s.paintBG(c, hy, edge)
 	s.discGeom(c, hy, scale, 1-clamp01(act.ContextUsed))
-	s.stars(c, hy, t)
+	s.stars(c, hy, t, foamCeiling(sy, scale), act.TodoDone, act.TodoTotal)
 	s.moon(c, hy, scale, 1-clamp01(act.ContextUsed), moonVis(s.pal))
 	s.todoStars(c, hy, foamCeiling(sy, scale), act.TodoDone, act.TodoTotal)
 	s.sea(c, hy, edge, tt, act)
@@ -613,18 +613,145 @@ func (s *Shore) paintBG(c *canvas.Canvas, hy int, edge []float64) {
 	}
 }
 
-func (s *Shore) stars(c *canvas.Canvas, hy int, t float64) {
+// ambientGlyphs is the dust's vocabulary, and it is wider than it was on his
+// note of 2026-09-11: "any ideas around different characters? ... I see more
+// characters varying in sizes and shapes appearing."
+//
+// No '*'. It belongs to the checklist, and a channel that shares a glyph with
+// the scenery is not a channel: at midnight the ambient field drew stars
+// indistinguishable from finished todos and the count could not be read off the
+// sky at all. Nothing here reads as an asterisk either, which is the same rule
+// one step further out -- a four-pointed sparkle would have cost the count just
+// as surely as the asterisk itself.
+//
+// The variety is in SHAPE and in where the ink sits inside the cell, which is
+// what "different sizes" looks like at terminal type sizes: the period and the
+// comma sit on the baseline, the grave, the apostrophe and the double quote
+// hang at the cap line, the middle dot and the colon are centred, and '+' and
+// '°' are the two that fill a cell.
+//
+// Repeats are weights, and the slice is read by index so a repeat is simply a
+// second slot: plain round dots take six of the thirteen, which is what keeps
+// the sky reading as dust with punctuation in it rather than as typography.
+//
+// ⚠ Every one of these was measured in Menlo Regular before it was picked, not
+// assumed from its codepoint: all thirteen are present and all thirteen have
+// the same advance as 'M' (1233/2048 em). Half of them are East Asian
+// Ambiguous, which is the same class as U+2580 and U+2584 -- the blocks the
+// whole scape is drawn with -- so they carry no width risk this project has not
+// already taken everywhere.
+var ambientGlyphs = []rune{
+	'.', '.', '.',
+	'\u00b7', '\u00b7',
+	',', '`', '\'',
+	':', '"',
+	'+', '\u00b0',
+	'.',
+}
+
+// ambientPeak is the field's density at the top of the sky at the darkest hour.
+// It is a fraction of cells, so at his 125x28 -- eleven rows of sky -- the
+// midnight field is about forty-five specks.
+const ambientPeak = 0.052
+
+// ambientClockGamma bends StarVis into a share of that density.
+//
+// A straight multiply is too steep: mid-afternoon is StarVis 0.175, which would
+// leave eight specks in a sky that already reads bare. The exponent keeps the
+// day and the night ordered while giving the daylight hours a field that is
+// actually there -- 0.175 becomes a share of 0.46, and 1.0 stays 1.0.
+const ambientClockGamma = 0.45
+
+// ambientContrast is the luma a speck must clear against the ground it is
+// actually painted on, measured on the RENDERED cell. Half the constellation's
+// bar: dust that competes with a finished todo would be reporting something.
+const ambientContrast = 24.0
+
+// ambientDimmest is the faintest a speck may start. The search only ever runs
+// UPWARD from a speck's own magnitude, so this is a floor and not a ceiling.
+// ambientDayFloor is HIS RULING, 2026-09-11: "make sure we can still see some
+// during daytime, even if fainter than at nighttime."
+//
+// ⚠ IT OVERRIDES A DESIGN DECISION AND THAT IS WORTH SAYING. StarVis reaches
+// exactly 0 at noon, and CLAUDE.md records the intent -- "the moon and the
+// constellation are washed out at midday by design" -- because the sky is the
+// WORLD and a real midday sky has no stars in it. He has ruled the other way,
+// for the thing that matters more here: a sky with nothing in it reads as a
+// scene that has stopped working, and he said so twice before this ("this felt
+// too bare").
+//
+// So the clock keeps its whole range and gains a floor under it: at midnight
+// the field is at full density, at noon it is at this fraction of it. Measured
+// at his 125x28, that is 26 specks at midnight and 3 at noon -- present, sparse,
+// and every one of them legible, which is the half of his note that matters
+// ("even if fainter"). Before the count-not-alpha change, noon drew zero and
+// dusk drew 39 of which 20 could not be told from the sky behind them.
+const ambientDayFloor = 0.25
+
+const ambientDimmest = 0.45
+
+// ambientTwinkle is how much the shimmer may LIFT a speck above the rung that
+// was measured. It only ever adds.
+const ambientTwinkle = 0.30
+
+// ambientInkSteps is how finely the lift from the palette's star tone to white
+// is walked, the same eight rungs the constellation uses.
+const ambientInkSteps = 8
+
+// stars is the ambient dust field -- the sky's texture, not the checklist.
+//
+// ⭐ HIS REPORT, 2026-09-11: "during the daytime I dont see any other characters
+// tho like I saw before during nightime giving depth to the constellation." He
+// had reported the same sky twice the day before, an hour apart: 20:22 read
+// bare and 20:55 read rich.
+//
+// BOTH OF THOSE FRAMES PLOTTED THE SAME THIRTY-NINE SPECKS. What differed was
+// how many survived the cube. The field used to encode the clock in ALPHA --
+// far.Plot(x, y, g, Star, (0.55+0.45*sin) * StarVis) -- and at a low StarVis the
+// quantised foreground lands on the SAME cube index as the sky behind it. The
+// specks were drawn and could not be seen: 53% of them lost at 16:00, 51% at
+// 20:22, 0% at 20:55.
+//
+// ⭐ SO THE CLOCK MOVED TO COUNT, which is the house rule and not a preference:
+// encode in coverage, count or position, never in rate -- and an alpha that
+// fades a thing to invisible is a rate wearing a different coat. StarVis now
+// decides how many cells are ELIGIBLE, through the same hash threshold the row
+// falloff already used, and every speck that qualifies is drawn at an opacity
+// MEASURED to clear its own background. Because the threshold moves and the
+// hash does not, a daylight field is a strict SUBSET of the midnight one: the
+// specks thin out, none of them moves.
+//
+// ⚠ AND THE GATE IS GONE. `if twinkle <= 0.02 { continue }` did not dim a
+// speck, it deleted it, so below StarVis 0.2 every speck crossed the gate once
+// a cycle and switched off -- 0.47 blink-outs a frame at 08:00, which at
+// inside.go's 12 fps is about six disappearances a second. That is his "stars
+// appearing and dissapearing" of 2026-09-10. Eligibility is now a fact about
+// the CELL and the hour; the shimmer can only lift a speck above the rung that
+// was measured, never below it, so it cannot take one away.
+//
+// ⚠ NOON STAYS EMPTY. StarVis is 0 at noon and the sky is the WORLD: stars are
+// not visible at midday and this may not make them so. The threshold is zero
+// there and the compare is >=, so no hash value can pass it.
+//
+// ⚠ AND IT KEEPS OFF THE CONSTELLATION'S OWN CELLS, which the old field did
+// not. compositeBG BLENDS the layers rather than letting the top glyph own the
+// cell, and a lit star's alpha is its magnitude -- 0.70 at the dimmest -- so
+// whatever the far layer left underneath tints its ink. Measured before and
+// after this change over 399 star cells at four geometries and seven hours: the
+// two fields share no cell at his 125x28, but they share one at 143x27 and two
+// at 80x24, and raising the dust's opacity moved FIVE of those stars by one
+// cube step. One step is nothing to look at and the channel is still exact --
+// which is the point. The checklist is a count of finished work and its pixels
+// are not the dust's to move.
+func (s *Shore) stars(c *canvas.Canvas, hy int, t float64, foamTop, done, total int) {
 	far := c.Far()
-	// No '*' here. It belongs to the checklist, and a channel that shares a
-	// glyph with the scenery is not a channel: at midnight the ambient field
-	// drew stars indistinguishable from finished todos and the count could not
-	// be read off the sky at all.
-	glyphs := []rune{'.', '.', '\u00b7', '+'}
+	taken := s.constellationCells(c.W, hy, foamTop, done, total)
+	share := ambientDayFloor + (1-ambientDayFloor)*math.Pow(s.pal.StarVis, ambientClockGamma)
 	for y := 0; y < hy; y++ {
 		// Thin out toward the horizon, where haze would eat them.
-		density := 0.045 * (1 - float64(y)/math.Max(1, float64(hy))*0.75)
+		density := ambientPeak * (1 - float64(y)/math.Max(1, float64(hy))*0.75) * share
 		for x := 0; x < c.W; x++ {
-			if HashF(x, y, s.Seed) > density {
+			if HashF(x, y, s.Seed) >= density {
 				continue
 			}
 			// Never on the disc. moon() paints backgrounds, so a glyph left
@@ -635,15 +762,89 @@ func (s *Shore) stars(c *canvas.Canvas, hy int, t float64) {
 			if s.DiscCovers(x, y) {
 				continue
 			}
-			ph := HashF(x, y, s.Seed+7) * 2 * math.Pi
-			twinkle := (0.55 + 0.45*math.Sin(t*0.9+ph)) * s.pal.StarVis
-			if twinkle <= 0.02 {
+			if taken[y*c.W+x] {
 				continue
 			}
-			g := glyphs[int(HashF(x, y, s.Seed+3)*float64(len(glyphs)))%len(glyphs)]
-			far.Plot(x, y, g, s.pal.Star, twinkle)
+			ph := HashF(x, y, s.Seed+7) * 2 * math.Pi
+			// The shimmer is a LIFT, never a fade: 1.0 at the bottom of the
+			// cycle, so the rung the search clears is also the floor.
+			lift := 1 + ambientTwinkle*(0.5+0.5*math.Sin(t*0.9+ph))
+			mag := ambientDimmest + HashF(x, y, s.Seed+11)*(1-ambientDimmest)
+			g := ambientGlyphs[int(HashF(x, y, s.Seed+3)*float64(len(ambientGlyphs)))%len(ambientGlyphs)]
+			s.speck(c, far, x, y, g, mag*lift)
 		}
 	}
+}
+
+// constellationCells is where todoStars is about to put its lit stars, so the
+// dust can stay out of them. It asks the same question with the same arguments,
+// so it gets the same memoised layout (starPlaces is keyed on the geometry and
+// the disc, both of which discGeom has already fixed for this frame) and the
+// checklist recomputes nothing. Reading only: nothing here decides anything
+// about the constellation, it just declines to paint underneath it.
+func (s *Shore) constellationCells(w, hy, foamTop, done, total int) map[int]bool {
+	if done <= 0 || total <= 0 || hy < 3 {
+		return nil
+	}
+	if done > total {
+		done = total
+	}
+	top, bot := starBand(hy, foamTop)
+	if bot < top {
+		return nil
+	}
+	pts := s.starPlaces(w, hy, top, bot, total)
+	out := make(map[int]bool, done)
+	for i := 0; i < done && i < len(pts); i++ {
+		x, y := pts[i][0], pts[i][1]
+		if x < 0 || x >= w || y < 0 || y >= hy {
+			continue
+		}
+		out[y*w+x] = true
+	}
+	return out
+}
+
+// speck draws one mote at the faintest ink and opacity that can actually be
+// SEEN in that cell, and draws nothing where none can.
+//
+// This is starInk's method applied to the dust, and it is here for the same
+// reason: a fixed alpha is a guess about a background, and the background is a
+// gradient that moves all day. The difference is the bar and what happens when
+// it cannot be met -- the constellation must appear, so it takes the best tone
+// there is; the dust is texture, so a cell that cannot carry a visible mote
+// simply does not get one. That is what keeps the count honest: everything this
+// function plots is on screen.
+//
+// The opacity rungs run from the speck's own magnitude up through the far
+// layer's full alpha to opaque. The far layer is 0.30, so 1/far.Alpha is the
+// cell alpha at which Blend clamps to the ink itself -- the only way a mote on
+// a bright midday sky reaches the bar at all. At night the first rung clears on
+// its own and nothing is spent.
+func (s *Shore) speck(c *canvas.Canvas, far *canvas.Layer, x, y int, g rune, a0 float64) {
+	i := y*far.W + x
+	was := far.Cells[i]
+	opaque := a0
+	if far.Alpha > 0 {
+		if o := 1 / far.Alpha; o > opaque {
+			opaque = o
+		}
+	}
+	white := term.RGB{R: 255, G: 255, B: 255}
+	for _, a := range [3]float64{a0, math.Max(a0, 1), opaque} {
+		for step := 0; step <= ambientInkSteps; step++ {
+			ink := term.Lerp(s.pal.Star, white, float64(step)/ambientInkSteps)
+			far.Plot(x, y, g, ink, a)
+			// Read the cell back rather than predicting it. A glyph collapses
+			// a split background to the ramp's mid tone, so the ground a speck
+			// really sits on is not the ground the empty cell reported.
+			_, fg, bg := c.ResolveAt(x, y, term.Profile256)
+			if d := bandLuma(fg) - bandLuma(bg); d >= ambientContrast || -d >= ambientContrast {
+				return
+			}
+		}
+	}
+	far.Cells[i] = was
 }
 
 // moon is painted into the BACKGROUND rather than drawn as a block glyph.
