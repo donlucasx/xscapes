@@ -43,9 +43,16 @@ func (s State) String() string {
 }
 
 var (
-	furCol   = term.RGB{R: 236, G: 228, B: 210}
-	eyeCol   = term.RGB{R: 168, G: 236, B: 176} // moonlit shine, not a highlight
-	eyeAlert = term.RGB{R: 232, G: 252, B: 226}
+	furCol = term.RGB{R: 236, G: 228, B: 210}
+	eyeCol = term.RGB{R: 168, G: 236, B: 176} // moonlit shine, not a highlight
+	// EyeAlert is the open eye of the NeedsYou pose, and it is EXPORTED so that
+	// a test outside this package can find the companion's FACE on a rendered
+	// frame. That guarantee -- the ask balloon's pointer comes out of the face,
+	// which s27 shipped after the `v` sat nine cells into bare sand -- was
+	// checked by reading back the literal rune 'O', and the near pose's eye is
+	// a bitmap with no 'O' in it. A glyph is the one property of the eye that
+	// the come-closer walk is allowed to change; the colour is not.
+	EyeAlert = term.RGB{R: 232, G: 252, B: 226}
 	// Amber, against the moonlit green of every other state. Colour does the
 	// work that a five-cell face cannot.
 	eyeWorried = term.RGB{R: 244, G: 176, B: 96}
@@ -80,6 +87,13 @@ type Cat struct {
 	// because Draw already carries five and the litter's draws would each
 	// need it too.
 	stepping bool
+
+	// approach is how far along the come-closer walk the companion is: 0 at
+	// home, 1 at the near pose. The one piece of state the companion carries
+	// BETWEEN frames -- everything else here is recomputed every draw -- and
+	// it has to be, because a walk is a thing that takes time. Driven by
+	// Approach and read by nearRung; see crab_near.go.
+	approach float64
 }
 
 // SetStepping says a pace step is in flight this frame. See pace.go.
@@ -233,7 +247,7 @@ func (c *Cat) eyes(l *canvas.Layer, x, y int, t float64, st State) {
 	case Resting:
 		glyph = '-' // dozing between turns
 	case NeedsYou:
-		glyph, col = 'O', eyeAlert
+		glyph, col = 'O', EyeAlert
 	case Worried:
 		glyph, col = 'o', eyeWorried
 	case Done:

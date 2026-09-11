@@ -40,6 +40,14 @@ type frames struct {
 	// nextCompanionCheck paces refreshCompanion; see it for why this is not
 	// read every frame.
 	nextCompanionCheck time.Time
+
+	// lastFrame is when the previous frame was painted, and it exists only to
+	// give Approach a real dt. It cannot be derived from the frame rate: -fps
+	// is a flag, the two launchers disagree about it already (12 in inside.go,
+	// 20 in main.go), and a frame that arrives late after a resize or a
+	// compaction would otherwise advance the walk by the wrong amount. Zero on
+	// the first frame, which yields dt = 0 and no movement.
+	lastFrame time.Time
 }
 
 // companionPoll is how often a running scape re-reads the saved companion.
@@ -169,6 +177,28 @@ func (f *frames) frame(now time.Time) string {
 			f.player.Play(k)
 		}
 	}
+
+	// The approach. His idea, 2026-09-10: when the agent needs him, the
+	// companion should "walk up closer to the screen and get bigger" before it
+	// prompts -- so it is driven by the POSE, eased over real seconds, and it
+	// retreats through the same call the moment the ask is answered.
+	//
+	// It is NOT a delay in front of the notification. The knock above has
+	// already rung and the balloon goes up this same frame; the walk happens
+	// underneath it. His asks stay open a median 130 s (28 closed ask windows
+	// over 30 recordings), so there is no shortage of time to cross the sand.
+	//
+	// Only NeedsYou brings it forward. Done is a knock he can answer whenever
+	// he likes, and Worried persists for a median 795 s -- a companion parked
+	// at full size for thirteen minutes is not an approach, it is a new
+	// default size.
+	dt := 0.0
+	if !f.lastFrame.IsZero() {
+		dt = now.Sub(f.lastFrame).Seconds()
+	}
+	f.lastFrame = now
+	f.cat.Approach(dt, st.Pose == companion.NeedsYou)
+
 	f.sh.Update(f.c, t, st.Act)
 	top := f.c.H - 2 - f.chh
 	drawScene(f.c, f.sh, f.cat, f.lay, st, t, f.seed, top)

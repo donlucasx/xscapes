@@ -296,9 +296,33 @@ func crabUpper(st State, t float64) []string {
 	return crabWork2
 }
 
+// crabBreathPeriod is how long one breath takes in each state. Pulled out of
+// drawCrab so the near pose (crab_near.go) breathes on the same clock rather
+// than on a copy of it that can drift.
+func crabBreathPeriod(st State) float64 {
+	switch st {
+	case Working:
+		return 2.2
+	case NeedsYou:
+		return 1.6
+	case Worried:
+		return 1.9
+	}
+	return 3.6
+}
+
 // drawCrab is the crab's whole Draw. Compose the upper half for the state onto
 // the fixed lower half, breathe, then plot the two eyes on top.
 func (c *Cat) drawCrab(l *canvas.Layer, x, y int, t float64, st State) {
+	// The come-closer walk, his idea of 2026-09-10. OFF unless XSCAPES_NEAR is
+	// set AND the approach has actually climbed a rung, so an armed flag on its
+	// own still renders today's frame. See crab_near.go.
+	// l.W is the frame's own width, so the draw path and DrawnBox cannot
+	// disagree about which rung the picture can pay for.
+	if rung := c.nearRung(l.W); rung > 0 {
+		c.drawCrabNear(l, x, y, t, st, rung)
+		return
+	}
 	lower := crabLower
 	if c.stepping && st != Worried {
 		// Mid-stride: the legs swap phase and the body drops a pixel. Only the
@@ -311,15 +335,7 @@ func (c *Cat) drawCrab(l *canvas.Layer, x, y int, t float64, st State) {
 	// Breathing, exactly as the cat does it: one quadrant subpixel is two
 	// source rows, so a two-row shift moves the body by half a character cell
 	// -- the smallest vertical step this medium has.
-	period := 3.6
-	switch st {
-	case Working:
-		period = 2.2
-	case NeedsYou:
-		period = 1.6
-	case Worried:
-		period = 1.9
-	}
+	period := crabBreathPeriod(st)
 	lift := 0
 	if math.Sin(t*2*math.Pi/period) > 0.35 {
 		lift = 2
@@ -344,7 +360,7 @@ func (c *Cat) drawCrab(l *canvas.Layer, x, y int, t float64, st State) {
 	case Resting:
 		glyph = '-'
 	case NeedsYou:
-		glyph, col = 'O', eyeAlert
+		glyph, col = 'O', EyeAlert
 	case Worried:
 		col = eyeWorried
 	case Done:
