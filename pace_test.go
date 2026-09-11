@@ -53,16 +53,36 @@ func TestNothingIsDrawnInThePacingStrip(t *testing.T) {
 	}
 }
 
-// A pose that holds its ground does not pace. A raised claw that is also
-// walking is noise, and "done" is held still so it cannot read as another ask.
-func TestTheHeldPosesDoNotPace(t *testing.T) {
+// A pose that holds its ground HOLDS ITS GROUND: it keeps the column it is
+// standing on and drops the stride pose, because a raised claw that is also
+// walking is noise.
+//
+// ⚠ THIS TEST USED TO ASSERT THE DEFECT. It read `dx != 0 || moving` and
+// called that "it should hold its ground" -- but dx = 0 is HOME, the column
+// nearest the frame edge, so what it was really pinning down was a teleport of
+// up to paceSpan(w) cells OUTWARD at the frame the agent asks for something.
+// See the comment on pace(). The guarantee below is the one the old name
+// always meant, and near_test.go states it again on the RENDERED frame.
+func TestTheHeldPosesHoldTheirGround(t *testing.T) {
 	for _, st := range []reduce.State{
 		{Pose: companion.NeedsYou, Steps: 9, StepAge: 0.1},
 		{Pose: companion.Done, Steps: 9, StepAge: 0.1},
 		{Pose: companion.Worried, Steps: 9, StepAge: 0.1},
 	} {
-		if dx, moving := pace(st, 124); dx != 0 || moving {
-			t.Errorf("pose %v paced to %.2f (moving=%v); it should hold its ground", st.Pose, dx, moving)
+		dx, moving := pace(st, 124)
+		if moving {
+			t.Errorf("pose %v took the stride pose; a held pose does not walk", st.Pose)
+		}
+		// Where a WORKING companion with the same numbers would be standing.
+		want, _ := paceAt(st.Steps, st.StepAge, paceSpan(124))
+		if dx != want {
+			t.Errorf("pose %v is at %.2f but it was standing at %.2f -- it moved %.2f cells "+
+				"for no reason but the pose changing", st.Pose, dx, want, dx-want)
+		}
+		if dx == 0 {
+			t.Errorf("pose %v is at home (0); with Steps=%d it should be mid-strip, "+
+				"and a test that passes at 0 cannot tell holding from teleporting",
+				st.Pose, st.Steps)
 		}
 	}
 	// And a working companion with the same numbers does move, so the test

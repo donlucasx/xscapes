@@ -372,8 +372,93 @@ func drawScene(c *canvas.Canvas, sh *scape.Shore, cat *companion.Cat, lay layout
 	// through it. See pace.go.
 	dx, moving := pace(st, c.W)
 	catX := lay.CatX + int(math.Round(dx))
-	litterX := lay.CatX - lay.PaceSpan
 	cat.SetStepping(moving)
+
+	// WHERE THE COMPANION ACTUALLY IS, which stopped being the same thing as
+	// its box the moment it could walk up closer to ask.
+	//
+	// His instruction, 2026-09-10: "it should walk up closer to prompt,
+	// without overlapping sub agents." Size() still returns the shipped 12x7
+	// box forever -- compose() derives the companion's margin, the litter's
+	// room, SandTo and the moon's column from it -- so the near pose is drawn
+	// CENTRED on the same head column and hangs off the box to the LEFT,
+	// which is into the scene rather than into the frame edge. DrawnBox says
+	// by how much, for this frame, part-way through the approach included.
+	//
+	// With XSCAPES_NEAR unset it is (0, 12, 7) and every line below collapses
+	// to the expression it replaced, which is what near_test.go proves.
+	// The width is passed rather than stored: the near ladder refuses a rung
+	// the frame cannot pay for, so the drawn box DEPENDS on the frame, and an
+	// argument cannot be forgotten the way a setter can.
+	boxDX, boxW, _ := cat.DrawnBox(c.W)
+	nearLeft := catX + boxDX
+	nearRight := nearLeft + boxW - 1
+
+	// ⚠ AND BOTH CLAMPS BELOW HAVE TO KNOW WHICH WAY THE SCENE FACES, which is
+	// the one thing the first version of this got wrong and it cost the whole
+	// activity tail.
+	//
+	// The mirrored composition -- the shipped one, locked 2026-08-31 -- puts the
+	// companion against the RIGHT edge with the sand and the litter growing
+	// leftward away from it, so "clear of the companion" means "left of its left
+	// edge" and both clamps are a minimum. `-mirror=false` is the superseded
+	// left-anchored layout, and it is the mirror image in every term: CatX is 5,
+	// PaceSpan is not set at all (so it is zero), SandFrom is just right of the
+	// companion and SandTo is the far frame edge, and DrawKittens starts the
+	// sitters at px + Size().w + 1 rather than at px - 1. A minimum there does
+	// not clear the companion, it walks straight into it -- `min(SandTo, ...)`
+	// drove SandTo below SandFrom and the sand drew NOTHING AT ALL.
+	//
+	// Measured, pristine HEAD against this tree over 7,560 frames with the near
+	// pose off: every one of the 3,780 unmirrored frames differed, 2,088 of them
+	// with the companion standing at home where even the pace fix changes
+	// nothing. Written this way, mirrored and unmirrored are both byte-identical
+	// to HEAD wherever the companion is drawn at its shipped size.
+	litterX := lay.CatX - lay.PaceSpan
+	sandFrom, sandTo := lay.SandFrom, lay.SandTo
+	if lay.Mirror {
+		// The litter keeps the far side of BOTH: the reserved pacing strip,
+		// which is fixed so the sitters do not shuffle on every step, and
+		// whatever the companion is actually covering this frame, which is what
+		// moves when it comes forward. The minimum of the two, not a bigger
+		// permanent reserve: reserving the near pose's whole extra width at
+		// every width and every moment would cost the litter six columns it
+		// almost never needs, and the litter is the subagent count.
+		//
+		// ⚠ The sitters DO slide left while the companion comes forward -- up
+		// to six cells at the biggest rung, and back when he answers. That is
+		// the price of not overlapping them, and it is his instruction that
+		// overlap is the thing to avoid.
+		if nearLeft < litterX {
+			litterX = nearLeft
+		}
+		// And the sand keeps clear of it too. drawSand runs LAST and Plot
+		// REPLACES a cell, so a line of the activity tail long enough to reach
+		// under the companion would punch its own letters straight through the
+		// body. It could not happen before: SandTo is CatX-1-PaceSpan, which is
+		// one column clear of the furthest the companion could pace.
+		//
+		// Measured cost at 80 columns, the narrowest width he runs: the tail's
+		// budget goes 56 columns -> 50 in the worst case (paced fully in,
+		// biggest rung), and is untouched whenever the companion is at home.
+		// The option s28 rejected -- reserving the litter's whole span from the
+		// sand -- left 8 of those 56 with fourteen subagents.
+		if nearLeft-1 < sandTo {
+			sandTo = nearLeft - 1
+		}
+	} else {
+		// Left-anchored: everything grows RIGHTWARD, so both clamps push the
+		// far edge out instead of pulling it in. The litter's anchor is the
+		// companion's box ORIGIN and DrawKittens adds Size().w + 1 to it, so
+		// what has to clear nearRight is that sum, not the anchor itself.
+		ccw, _ := cat.Size()
+		if v := nearRight - ccw; v > litterX {
+			litterX = v
+		}
+		if nearRight+1 > sandFrom {
+			sandFrom = nearRight + 1
+		}
+	}
 	cat.Draw(c.Near(), catX, top, t, st.Pose)
 	if st.Kittens > 0 {
 		// Swimmers stay above the shore's mean waterline with a row to spare
@@ -395,12 +480,23 @@ func drawScene(c *canvas.Canvas, sh *scape.Shore, cat *companion.Cat, lay layout
 		if lay.Mirror {
 			rows = companion.MirrorTail(rows)
 		}
-		x := bubbleX(rows, lay.CatX+cat.HeadCol(), c.W)
+		// Anchored to where the companion IS this frame, not to where its box
+		// sits at home.
+		//
+		// lay.CatX was right only because of the teleport: every pose that
+		// raises a balloon is a held pose, and a held pose used to return
+		// dx = 0, so the companion was always at home whenever a balloon was
+		// up. pace() now holds the companion where it stands, so home can be
+		// up to paceSpan(w) cells away -- 6 at his usual widths -- and that is
+		// exactly the miss s27 fixed: "THE ASK BALLOON POINTED AT BARE SAND
+		// ... the `v` on column 101 with the nearest eye at 112." Same anchor,
+		// same distance, a different cause.
+		x := bubbleX(rows, catX+cat.DrawnHeadCol(c.W), c.W)
 		// Opaque: a balloon is TEXT, and a transparent space lets the sea
 		// write glyphs into the middle of the words.
 		(&companion.Sprite{Rows: rows, Body: col, Opaque: true}).Draw(c.Near(), x, top-len(rows))
 	}
-	drawSand(c, st.Tail, sh.SandColor(), sh.SandTop(), lay.SandFrom, lay.SandTo)
+	drawSand(c, st.Tail, sh.SandColor(), sh.SandTop(), sandFrom, sandTo)
 }
 
 // bubbleX puts the balloon's POINTER over the companion's head, and lets the

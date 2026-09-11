@@ -92,9 +92,54 @@ func stillFor(st reduce.State) bool {
 }
 
 // pace is the companion's offset and stride for this frame.
+//
+// ⭐ THE TELEPORT, and it ran against the whole point of the ask.
+//
+// This used to answer a held pose with `return 0, false`. The intent above is
+// "hold where you are" -- but 0 is not where you are, 0 is HOME, the column
+// nearest the frame EDGE. So at the exact frame the agent asked him for
+// something, the companion did not stop walking: it jumped OUTWARD, away from
+// the reader, by however far it happened to have paced. Measured through this
+// same function on a real reducer (notes/s28-pace): 6 cells at 111, 124, 143
+// and 153 columns, 5 at 80, 2 at 40, in ONE frame -- and the same jump
+// backwards the moment he answered. 56 of 68 (width, step-count) pairs move;
+// mean 2.54 cells, every non-zero one outward.
+//
+// It is a defect rather than a look, which is why it ships ON with no switch:
+// the stated intent and the implementation disagreed, and his own idea for the
+// near pose -- "walk up closer to the screen" before it prompts -- is the exact
+// opposite of what the code did first.
+//
+// The fix is to return the offset the companion is ALREADY at. dx is then a
+// function of Steps and StepAge alone, and a pose change on its own moves it by
+// exactly zero cells at every width and every step count -- which is the
+// guarantee near_test.go states and checks.
+//
+// WHY NOT SNAP TO THE END OF THE STRIDE instead of holding mid-cell: because
+// 23 of his 24 real asks arrive with a stride in flight (notes/s28-pacehold, 30
+// sessions, 76,373 events). Snapping would move the companion up to a cell on
+// the ask frame in 96% of asks, which is a smaller version of the same bug.
+//
+// WHAT STILL MOVES, and he should know it: a held pose keeps reading Steps, so
+// if a main-thread tool event lands during one the companion takes that step.
+// Measured over 381 real held windows: NeedsYou carries a step in 0 of 24 and
+// Done in 0 of 296 -- the agent is blocked on him, so it runs no tools and both
+// are planted by the data rather than by a special case. Worried carries steps
+// in 59 of 61, up to 109 of them over a median 795 s, because an error does not
+// stop the agent working. So a worried companion now paces where it used to sit
+// pinned at home. That is the pace channel telling the truth (the agent IS
+// working), and "planted" was never what shipped anyway -- what shipped was
+// "teleported home and then pinned there".
+//
+// moving stays false for a held pose, exactly as before: the stride POSE is
+// suppressed even while the last stride finishes. Residual, and it is small: a
+// hold that arrives mid-stride slides up to one cell over stepDur with the legs
+// still. On the crab -- the default -- this is invisible for Worried, which
+// already ignores c.stepping (internal/companion/crab.go:303).
 func pace(st reduce.State, w int) (dx float64, moving bool) {
+	dx, moving = paceAt(st.Steps, st.StepAge, paceSpan(w))
 	if stillFor(st) {
-		return 0, false
+		return dx, false
 	}
-	return paceAt(st.Steps, st.StepAge, paceSpan(w))
+	return dx, moving
 }
