@@ -9,14 +9,20 @@
 // Two sounds, because the brief locks done and needs_input as distinct cues and
 // a distinction that exists only on screen is no distinction to someone looking
 // elsewhere. They are picked from the same family so the pair still reads as
-// one scape's voice: a bright chime when the agent is BLOCKED on you, a deep
-// sonar note when it has finished and you can come back whenever.
+// one scape's voice: a rising drop when the agent is BLOCKED on you, a falling
+// one when it has finished and you can come back whenever.
+//
+// The cues SHIP WITH XSCAPES (his ask, 2026-09-11: "a fun sound that users can
+// identify w xscapes"). They used to be Glass.aiff and Submarine.aiff, which
+// work perfectly well and are the reason this changed: a sound every Mac has
+// played for twenty years belongs to the OS and cannot belong to a product.
+// See sounds.go for the embedding, and notes/s28-sound for where they came
+// from.
 package notify
 
 import (
 	"os"
 	"os/exec"
-	"runtime"
 
 	"github.com/donlucasx/xscapes/internal/envx"
 )
@@ -43,6 +49,10 @@ func (k Kind) String() string {
 type Player struct {
 	cmd  string
 	args map[Kind][]string
+	// source names which rung of the fallback ladder this player is standing
+	// on. It is carried only so Describe can say it: the three rungs sound
+	// completely different and nothing else on screen distinguishes them.
+	source string
 	// bell falls back to the terminal's own BEL when no player exists. It is
 	// the thing the brief says to beat, so it is the floor, not the plan.
 	bell bool
@@ -52,47 +62,50 @@ type Player struct {
 // The pre-rename XSCAPES_SILENT still works; see internal/envx.
 const SilentEnv = "XSCAPES_SILENT"
 
+// ourCue is what Describe calls the shipped droplet pair.
+const ourCue = "xscapes droplet"
+
 // New picks a player for this machine. Sound is on by default -- ambient audio
 // is the thing the brief keeps off, not the notification.
+//
+// Three rungs, in this order, and each exists for a reason the one below it
+// cannot cover:
+//
+//  1. the EMBEDDED DROPLET, when it can be written to disk and something can
+//     play it. This is the cue that is xscapes', and the only rung that makes
+//     the sound identifiable.
+//  2. the SYSTEM SOUNDS it played until 2026-09-11. Reached when the droplet
+//     cannot be materialised -- a read-only home, a full disk, no HOME at all.
+//     Borrowed and anonymous, but it is a real sound at the right moment.
+//  3. the TERMINAL BELL. Reached when there is no player binary to run at all.
+//     It is the thing the brief says to beat, so it is the floor, not the plan.
+//
+// The ladder is walked once, here, rather than per knock: every rung does file
+// I/O, and Play is called from the render loop.
 func New() *Player {
 	if envx.Lookup("SILENT") != "" {
 		return &Player{}
 	}
-	switch runtime.GOOS {
-	case "darwin":
-		// Verified present rather than assumed: a missing file makes afplay
-		// exit non-zero and the knock is silently lost.
-		ask, okA := firstFile(
-			"/System/Library/Sounds/Glass.aiff",
-			"/System/Library/Sounds/Tink.aiff",
-		)
-		done, okD := firstFile(
-			"/System/Library/Sounds/Submarine.aiff",
-			"/System/Library/Sounds/Purr.aiff",
-		)
-		if okA && okD && have("afplay") {
-			return &Player{cmd: "afplay", args: map[Kind][]string{
-				Ask:  {ask},
-				Done: {done},
-			}}
-		}
-	case "linux":
-		ask, okA := firstFile(
-			"/usr/share/sounds/freedesktop/stereo/message.oga",
-			"/usr/share/sounds/freedesktop/stereo/bell.oga",
-		)
-		done, okD := firstFile(
-			"/usr/share/sounds/freedesktop/stereo/complete.oga",
-			"/usr/share/sounds/freedesktop/stereo/message.oga",
-		)
-		if okA && okD && have("paplay") {
-			return &Player{cmd: "paplay", args: map[Kind][]string{
-				Ask:  {ask},
-				Done: {done},
-			}}
-		}
+	// Checked before either file rung, because both of them need it: a cue
+	// with nothing to play it is not a cue.
+	cmd := playerBin()
+	if cmd == "" {
+		return &Player{bell: true}
+	}
+	if ask, done, ok := materialiseCues(); ok {
+		return filePlayer(cmd, ourCue, ask, done)
+	}
+	if ask, done, ok := systemCue(); ok {
+		return filePlayer(cmd, systemCueName(), ask, done)
 	}
 	return &Player{bell: true}
+}
+
+func filePlayer(cmd, source, ask, done string) *Player {
+	return &Player{cmd: cmd, source: source, args: map[Kind][]string{
+		Ask:  {ask},
+		Done: {done},
+	}}
 }
 
 // Play sounds one knock. It never blocks the render loop and never fails
@@ -127,13 +140,21 @@ func (p *Player) Play(k Kind) {
 // can say so rather than leaving the user wondering.
 func (p *Player) Silent() bool { return p != nil && p.cmd == "" && !p.bell }
 
-// Describe names what the player will do, for `-info`.
+// Describe names what the player will actually play, for `-info` and for
+// `xscapes notify`.
+//
+// It names the CUE and not just the command, because the command is the one
+// thing all three sounding rungs have in common: "afplay" is true of the
+// droplet and of Glass alike, and the user hearing a twenty-year-old system
+// chime has no other way to find out that the shipped cue never got written.
 func (p *Player) Describe() string {
 	switch {
 	case p == nil || p.Silent():
 		return "silent"
 	case p.bell:
 		return "terminal bell"
+	case p.source != "":
+		return p.cmd + " (" + p.source + ")"
 	default:
 		return p.cmd
 	}
