@@ -2734,3 +2734,36 @@ shapes, and with count-not-alpha each one is crisp rather than half-faded.
   by design (*"the moon and the constellation are washed out at midday by design"*), and he is asking
   for a floor instead: fewer and fainter by day, never nothing. ⚠ This contradicts a constraint I had
   already briefed ("NOON MUST STILL BE EMPTY, assert it") — correct it before that lands.
+
+### ⭐ Session 28 (2026-09-11) — the sound cues
+
+- *"The sound cues when claude needs me are off. Im getting multiple offbeat sound cues. I would like
+  to a) polish existing sound notifications on claude settings b) polish how the xscapes companion
+  notifies you when it needs your help. does it override claudes? or build on it? would love to find
+  a more on-theme sound cue for xscapes, but that its not annoying. Looking for a fun sound that
+  users can identify w xscapes"*
+- ⭐ *"a) proceed, let xscapes do the sound b) try the dropplet"* · *"push it live so we can test it
+  w the rest"*
+
+⇒ **It never overrode Claude — they STACK, and that is the whole bug.** Three of his hooks
+(`Notification`, `PermissionRequest`, `Stop`) fired TWO commands each: his own `afplay Funk.aiff`
+AND the xscapes hook, which makes the scape play its own cue from a different process milliseconds
+later. One prompt, two timbres, unsynchronised.
+⇒ ⭐ **And his own hooks doubled up before xscapes touched anything.** Counted in
+`~/.claude/hook-debug.log`, **14,792 firings since May**: **324 bursts of 2+ sounds inside three
+seconds (2.3%), worst burst TWENTY-ONE.** Commonest pairs: `PermissionRequest` twice (83) and
+`Notification + PermissionRequest` (56).
+⇒ **His settings.json is edited** — the three `afplay` clauses removed, xscapes owns the sound alone.
+⚠ The `echo >> hook-debug.log` line was KEPT on purpose: it is his measurement log and it is what
+proved this. Backup at `<scratchpad>/settings.backup.json`. ⚠ The guards were verified surviving the
+edit (the `VERCEL_TOKEN` PreToolUse guard and `secret-output-guard`), which is the trap
+`reference_claude_code_hook_event_semantics` records.
+⚠ **The xscapes side was the well-behaved one all along** — `Knocker` edge-detects on the bubble
+text, so a 60 s nag rings once. Nothing changed there.
+⇒ ⭐ **THE CUE IS OURS NOW.** It played `Glass.aiff` / `Submarine.aiff`, which are macOS's — fine,
+and **not identifiable**: every Mac user has heard Glass for twenty years, and a sound that belongs
+to the OS cannot belong to the product. Four families were synthesised (`notes/s28-sound/make.py`,
+stdlib only) and auditioned; **he picked the DROPLET**. 260 ms ask, 340 ms done, embedded with
+`go:embed`, materialised once under `Home()` (**not `/tmp`** — a reboot destroyed nine traces there).
+Three fallback rungs: droplet → the old system sounds → the bell. `XSCAPES_SILENT` still wins.
+**Measured cost: +50,304 bytes, +0.76% of the binary.** Verified by running it.

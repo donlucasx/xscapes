@@ -4,61 +4,113 @@
 
 ```
 cd ~/Documents/claude/xscapes/ and read CLAUDE.md (the brief, authoritative)
-and RESUME.md before responding. Session 27 is WRAPPED: HEAD is pushed, tree
-clean, suite + vet green BOTH ways (the tide, now the DEFAULT, and XSCAPES_TIDE=0),
-installed.
-The scrollback strikethrough is CONFIRMED FIXED three times over, the third in
-a fresh session in another project. Skim origin-chat.md only if you need the
-why; ignore ideas.md -- it is parked. Tell me where we left off, then pick up
-from ▶ NEXT -- items 0 and 1 are mine to look at, not work for you.
+and RESUME.md before responding. Session 28 is WRAPPED: HEAD 8a65298, pushed,
+tree clean, suite + vet + fmt green, installed.
+Seven things shipped yesterday and I have only seen some of them live -- the
+crab that walks up when it asks, a constellation scattered across the sky, a
+daytime sky that keeps its dust, a companion that stops sleeping while it
+works, and xscapes' own droplet sound. Skim origin-chat.md only if you need
+the why; ignore ideas.md -- it is parked.
+Tell me where we left off, then pick up from the NEXT queue -- items 0 and 2
+are mine, not work for you.
 
-Three things about how to work on this, and they were all paid for:
+Four things about how to work on this, and they were ALL paid for:
 build the instrument before trusting the picture; measure the RENDERED frame
-rather than what the source says it should do; and when a question is about
-what my sessions actually DO, go and count the event log in
-~/.config/xscapes/run/*.jsonl instead of reasoning about it -- that is what
-settled every argument in session 27, twice against my own confident answer.
+rather than what the source says it should do; when a question is about what my
+sessions actually DO, go and count the event log in ~/.config/xscapes/run/*.jsonl
+instead of reasoning about it; and A MEASUREMENT AT ONE SEED, ONE GEOMETRY OR
+ONE HOUR IS NOT A MEASUREMENT -- that is what made you confidently wrong to my
+face twice in two sessions.
 Do NOT drive Terminal.app (osascript, System Events) without asking me first.
 ```
 
-## ▶ NEXT (session 27 left it here)
+## ▶ NEXT (session 28 left it here)
 
-**0. ⏳ HIS LOOK, and it is the whole reason the last two hours happened.** He is testing on his
-next session and reporting back. Four things are new since he last looked properly:
-
-- the shoreline's grey blocks are gone (`wetBandColor`)
-- the constellation is spread across the sky and lights ~3x more often
-- the crab's litter shrinks when there are many subagents
-- the balloon points at the companion
+**0. ⏳ HIS LOOK, and almost everything below is waiting on it.** Seven things shipped today and he
+has seen only some of them live. ⚠ **His running scapes hold OLD binaries until restarted** — check
+by inode, never by assumption:
 
 ```
-xscapes claude                    # the tide, now the default
-XSCAPES_TIDE=0 xscapes claude     # the old fixed waterline, for comparison
+lsof -p <pid> -a -d txt | grep xscapes      # against: stat -f %i ~/.local/bin/xscapes
+xscapes claude                              # restart to pick it up
 ```
 
-**1. ⏸ HIS, still open:** Andale Mono in Terminal (⚠ now worth only the four dashes at the disc's
-shoulders -- the split-cell half of that promise is REFUTED) · **Commons publish + submit**, held at
-his word *"once we are ready, I will let you know when"*.
+New since he last looked properly: **the droplet sound** (and only ONE sound per event now, his
+settings are edited) · **the daytime sky keeps 3 specks at noon and loses none to the cube** · **the
+companion stops sleeping while it works** · the crab comes closer **by default**.
 
-**2. The tide's residue, if he keeps it.** ⚠ The sideways drift is HALVED, not gone: a weak pull at
-about three cells remains and I did not find what carries it (`go run ./notes/drift`, x-profile
-spread 26% → 5%). ⚠ And the litter is anchored to the COMPANION, not the waterline, so at full
-activity the water reaches the sitters and crablets stand in it. Both are his call to chase.
+**1. HIS, OPEN, both small:**
+- **Magnitude: widen or drop?** Measured: 4–8 distinct tones, luma spread 49.4 at midnight and
+  **32.6 at midday** against a sky gap of 92.5. It renders; it is just the weakest case at his hour,
+  and with 19 stars over 114 columns two magnitudes are almost never adjacent to compare.
+- **The shooting star.** ⭐ **HIS RULING IS ALREADY MADE** — *"ok let the shooting star be the star
+  arriving"* — and it is DESIGNED but NOT BUILT. It flies in and lands where the new star will sit,
+  so the meaning is the channel's own. ⚠ One open design question: the trail glyphs a streak needs
+  (`.`, `·`, `+`) are **the ambient field's**, so a tail is indistinguishable from the dust it flies
+  through. Either no tail, or a glyph the dust never uses.
 
-**3. The sea's mapping, MEASURED and unruled.** Three glyph channels plateau at level 0.60 and the
-fourth (the waterline's swing) at 0.70; his real level is above 0.70 for **28.2% of working time**.
-`TauFall`/`Impulse` CANNOT fix a plateau -- they only change how often it is visited. The tide is the
-fix if it ships: it takes the waterline from 0.09 rows of movement to 5.4. `go run ./notes/searange`.
+**2. Andale Mono and the Commons publish** — both still his, both untouched since s27. ⏰ Commons
+closes **09-17**, six days.
 
-**4. Small and unruled:** `SetEyeFill`'s three options mean something different on stalked eyes
-(study-only, the product never calls it -- probably just close it) · a long sand line can be written
-across the litter (measured: 1.8% of samples) · the mirror loses rows for an agent that does not
-repaint after a resize (known, accepted trade).
+**3. Open defects, measured and NOT fixed, in the order I would take them:**
+- ⚠ **The scrollback merge is BACK in the fixed build** and it is a DIFFERENT mechanism from the s26
+  strikethrough. Signature, diffed against the exact emitted text: **zero non-space cells altered**,
+  18 of 22 spaces filled in one row and 27 of 29 in another, and the paragraph appears twice. A row
+  whose blank cells hold another row's glyphs was never CLEARED before being drawn. **Leading
+  hypothesis, untested: `feed()` holds back a trailing partial UTF-8 rune (the s26 fix) — does it
+  hold back a trailing partial CSI?** A split, dropped `ESC[2K` produces exactly this. Parked at his
+  word (*"focus on the draft"*); the evidence is in a live window and a restart destroys it.
+- ⚠ **The tide's churn ceiling breaks while the tide MOVES** — 139 of 216 cells, settling to 0.00%
+  against the 8% bar. Cause isolated: **`s.tideRow` is an INTEGER**, so every row boundary the easing
+  tide crosses re-ramps the whole open sea in one frame.
+- ⚠ **`hyFloor` cannot do its job at 12-row heights** — it is a function of `sy` alone and never
+  references the horizon, so at 40x12 it permits the water four rows ABOVE it.
+- ⚠ **`-mirror=false` draws the companion at column −1** at 124 columns. `pace()` calls `paceSpan(w)`
+  unconditionally but `compose()` sets `PaceSpan = 0` in the unmirrored layout. Pre-existing.
+- ⚠ **At 40x12 two stars can touch** (8 pairs at 19 stars, 97 at 32): the separation bar is 2.0
+  screen units and two stars one row apart in the same column measure exactly 2.00. Below the design
+  floor, but two touching stars read as one, which is a count error.
+- ⚠ **30x8 draws 21 of 32 stars.** Below the floor; the old layout drew 16.
+- ⚠ **`emit` accepts any word as a kind and confirms delivery of nothing.** `emit ask` is not a kind;
+  it went to the socket, was dropped by the reducer, and printed "sent ask to session…". **Three
+  `ask` events are in his log as junk** because of it. It should reject an undefined kind.
 
-**5. Parked:** the brand workstream (deck rebuild, Commons page restyle, README `<picture>` header,
-CLI help mark, GitHub avatar -- the header and the mark are confirmed NOT done) · Milestone 2.
+**4. Residues, his call, none blocking:** the sea's sideways motion is the DOMINANT motion on screen
+(~9 cells/s against ~2 rows/s inward) and is GEOMETRY, not a term — the crests lie 4.78 cells of x
+per row of y, and `sea()` and `swells()` each produce it independently · 2.76 h of the "asleep while
+working" figure remains, some of it my measure counting sessions abandoned mid-turn.
 
-## Instruments built in session 27 (do not re-derive these)
+**5. Parked:** the brand workstream · Milestone 2 · `SetEyeFill` (confirmed product-dead, 3 call
+sites, all study/test).
+
+## Instruments built in session 28 (do not re-derive these)
+
+- `go run ./notes/s28-asleep` — folds his REAL log through the REAL reducer a second at a time and
+  reports how long the companion is Resting between a prompt and its done. ⚠ **It exists because two
+  earlier answers were PROXIES**: counting gaps over `TurnSilence` assumes a closed turn means a
+  sleeping companion (it does not — flight holds the eyes open), and sampling at EVENT times misses
+  a defect that happens BETWEEN events.
+- `go run ./notes/s28-skyday` — plotted vs LEGIBLE specks by hour. The gap is the whole defect.
+- `go run ./notes/s28-magday` — star tones and luma spread across the day.
+- `go run ./notes/s28-starroom` / `s28-stargrab` — the constellation's band and spacing.
+- `go run ./notes/s28-asleep` sweep — what `TurnSilence` and `FlightStale` actually buy and cost.
+- `go run ./notes/s28-pace` — ⭐ SYMLINKS `pace.go` rather than copying its arithmetic, so it cannot
+  go stale. Every prior pace study had to copy it.
+- `bash notes/s28-sound/audition.sh` — the four candidate cue families, ask then done.
+- `go run ./notes/s28-closer` / `s28-askroom` — the room for a bigger companion, and the activity
+  level at the ask (p50 **0.59** — the tide is IN when it asks, so the beach is at its narrowest).
+
+⚠ **Three traps this session paid for, all of them mine:**
+**A measurement at ONE SEED is not a measurement.** I told him the constellation could not be what he
+saw — "steady, measured three ways" — and it was seed 7 only. Swept over seeds 1/7/42, the old layout
+had **891 of 1818 frames with the wrong count**. He was right and I was confidently wrong.
+**`git add -A` sweeps an agent's scratch files into a pushed commit.** It did (`zzambientprobe_test.go`,
+174 lines, in `e6f3bb5`). The repo already had a memory about this.
+**A fix that costs nothing can also buy nothing.** "A turn with live subagents is not silent" was
+correct, free, and recovered 0.37 of 4.43 hours, because 10 of his 13 long gaps have zero subagents.
+
+
+### Session 27's, still current
 
 - `go run ./notes/wetsand` -- the 256 cube's warm floor is luma 96, and what that does to the beach
   hour by hour. **A ramp makes it WORSE** (1.42% → 3.12%); measured, do not try it again.

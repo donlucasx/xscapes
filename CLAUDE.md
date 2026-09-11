@@ -2,6 +2,83 @@
 
 *(Renamed end to end on 2026-09-03: directory, env vars, state path and hook marker. Two names are kept on purpose and are not leftovers -- `internal/envx` still reads `ASCIISCAPES_*` and warns, and `install.go` still RECOGNISES the `# asciiscapes:v1` marker so the hooks it wrote before the rename can be found and removed.)*
 
+> **Session 28 (2026-09-10 into 09-11), WRAPPED. Six commits, PUSHED, HEAD `8a65298`, tree clean,
+> suite + vet + fmt green, installed. HIS SESSION, start to finish: he reported, I measured, he ruled.**
+>
+> ⭐⭐ **HIS IDEA, THE CRAB COMES CLOSER** — *"can we animate the main Agent/companion to come CLOSER
+> to the user before it prompts it?"* — **SHIPPED ON by default** at his word *"push it live"*, at
+> rung 2, the one he approved (*"I was referring to the cropped version, which I liked"*).
+> ⭐ **His bottom-clipping permission is what made it possible and it VOIDED the constraint that
+> killed two of four drafted directions**: the ceiling was never the sprite's HEIGHT, it is its **TOP
+> ROW** staying out of the sea. So it is anchored by the top row and grows DOWN, 12x7 → 16x9 → 24x14,
+> which makes "the head never enters the sea" structural rather than arithmetic.
+> ⚠ **The eyes had to stop being GLYPHS.** A cell is a cell; one `'O'` on a 24-wide body is 0.30% of
+> the sprite against 1.19% today. They are 2x2 BITMAPS now, a RING for alert, every cell through
+> `PlotOn` with the coat as ground so the hole is salmon and not sea. ⭐ It bought something nobody
+> asked for: **ask-vs-working is now a SHAPE difference**, which at one cell it never was.
+> ⚠ **His margin note caught a regression I would not have**: centring each rung on the head column
+> was cheap but spent half of every new column into the RIGHT margin, so the air ran 9/7/3 as the
+> animal approached — **less room the closer it got**. It hangs into the scene now and the air OPENS:
+> 9/10/12. The cost is that the head MOVES, so `DrawnHeadCol` exists and the balloon follows it.
+> ⚠ `XSCAPES_NEAR=0` puts the shipped crab back. `nearFits` refuses a rung wider than half the frame.
+>
+> ⭐⭐ **THE PACE WAS TELEPORTING HIM AWAY AT THE EXACT MOMENT IT ASKED.** `stillFor` is right that a
+> held pose stands still; "still" was implemented as `dx = 0`, and **0 is HOME, the column nearest the
+> frame edge**. Measured on the rendered frame: **6 cells OUTWARD at 111/124/143/153**, in one frame,
+> with `Steps` unchanged — and **TWO teleports per ask**, because answering starts a tool which both
+> clears `needsInput` and steps. ⚠ **Fixing it alone re-breaks the balloon**: `live.go` anchored the
+> pointer to `lay.CatX`, which was correct ONLY BECAUSE of the defect. 9 of 20 combinations failed.
+> They land together.
+>
+> ⭐⭐ **THE CONSTELLATION IS A SKY NOW**, his two asks in one change — *"appear randomly across the
+> sky, instead of from left to right"* and *"spread them more vertically"*. Dart-throwing in TWO
+> dimensions: column-gap sd/mean **0.29–0.47 → 0.63–0.80** (a random sky is ~1.00 and COLLIDES), band
+> `hy*3/5 → hy*3/4` with the bottom MEASURED at the worst hour, zero collisions.
+> ⚠ **Mitchell's best-candidate — the method I suggested — was built and REJECTED with the render**:
+> maximising nearest-neighbour distance produces ROWS. Optimal spacing is not what a sky looks like.
+> ⭐⭐ **AND IT CLOSED HIS "stars appearing and dissapearing" REPORT, WHICH I HAD ANSWERED WRONG.** I
+> said the constellation was steady, "measured three ways" — **at seed 7 only**. Over seeds 1/7/42 x
+> 6 geometries x 101 context steps the old layout had **891 of 1818 frames with the wrong count**;
+> at 125x28 seed 1 with one star lit it drew **ZERO**. The disc ate them as it sank. Now 0 of 1818.
+> ⇒ Two holes closed on the way, neither reported: the readout was landing ON stars (50 hits), and no
+> star was ever guaranteed out of the WATER.
+>
+> ⭐ **THE DAYTIME SKY WAS NEVER BARE — IT DREW ITS DUST INVISIBLE.** Both his screenshots plot the
+> SAME 39 specks; at 20:22 **twenty of them quantise into the sky behind them** (51% lost). The clock
+> was encoded in ALPHA, which is *"encode in rate"* wearing a different coat. Moved to COUNT: **0%
+> lost at every hour**. ⭐ **His ruling OVERRODE a design decision** — *"make sure we can still see
+> some during daytime"* — so noon keeps 3 specks where `StarVis` is exactly 0 and CLAUDE.md said
+> "washed out at midday by design". ⚠ A test asserting noon was empty is deliberately inverted.
+>
+> ⭐ **THE COMPANION WAS ASLEEP FOR HOURS WHILE WORKING** — *"when the main agent is working, alone,
+> it should have its eyes open"*. ⚠⚠ **MY FIRST NUMBER WAS A PROXY AND WAS WRONG** (3.37 h): a closed
+> turn does NOT mean a sleeping companion, because flight holds the eyes open. Folded through the
+> REAL reducer a second at a time: **4.43 h Resting between a prompt and its done, 12.4%, worst
+> stretch 126 min.** ⚠ **And the first fix was the wrong lever** — "live subagents keep the turn
+> open" is free and recovered **0.37 of 4.43 h**, because **10 of his 13 long gaps have ZERO
+> subagents**. `TurnSilence` 5 → 30 min is what shuts the eye; every setting from 5 min to 3 h
+> measures **0.00 h of false work**, so the guard has never once had to fire.
+> ⭐ That exposed DEAD CODE the tests caught by refusing to measure nothing: with `TurnSilence` and
+> `SubStale` both 30, the litter is swept the moment the turn closes. `SubStale` → 60, measured off
+> 639 subagents (max 57.3 min); thirty was sweeping **4% of them while still running**. **4.43 → 2.76 h.**
+>
+> ⭐ **XSCAPES HAS ITS OWN SOUND, AND STOPS BEING THE SECOND ONE YOU HEAR.** It never overrode
+> Claude — **they stack**: three hooks fired his `afplay Funk.aiff` AND the xscapes hook. ⭐ And his
+> own hooks doubled before xscapes touched anything: **14,792 firings logged, 324 bursts of 2+ inside
+> three seconds, worst burst TWENTY-ONE.** His `settings.json` is edited (guards verified surviving);
+> the `hook-debug.log` echo was KEPT because it is what proved this. **The cue is the DROPLET**, his
+> pick from four synthesised families — Glass and Submarine are macOS's and *"a sound that belongs to
+> the OS cannot belong to the product"*. Embedded, materialised under `Home()` not `/tmp`, three
+> fallback rungs, **+0.76% binary**.
+>
+> ⚠ **THREE TRAPS PAID FOR, ALL MINE:** a measurement at ONE SEED is not a measurement · `git add -A`
+> swept an agent's scratch file into a pushed commit (the repo already had a memory about it) · a fix
+> that costs nothing can also BUY nothing.
+> ⏭ **NEXT is his look**, then the shooting star (**his ruling is already made**: *"let the shooting
+> star be the star arriving"*, designed, not built) and the magnitude call.
+> ⚠ **The scrollback merge is BACK in the fixed build and it is a DIFFERENT mechanism** — zero
+> non-space cells altered, only blanks filled. Parked at his word. ⏰ **Commons closes 09-17, 6 days.**
+
 > **Session 27 (2026-09-09 into 09-10), WRAPPED. Fifteen commits, PUSHED, tree clean, suite + vet
 > green BOTH ways (the tide, now the DEFAULT, and `XSCAPES_TIDE=0`), installed.**
 > ⭐⭐ **THE STRIKETHROUGH IS CONFIRMED FIXED THREE TIMES**, the third a FRESH session in another
