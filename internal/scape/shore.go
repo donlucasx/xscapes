@@ -51,6 +51,12 @@ type Shore struct {
 	starKey starKey
 	starPts [][2]int
 
+	// The arriving star's flight path, and what it was built for. Held for the
+	// whole fall so the path cannot shift under the star mid-flight; see
+	// arrival.go.
+	arrKey   arrKey
+	arrTrack [][2]int
+
 	pal     Palette // this frame's colours, from the time of day
 	ctxUsed float64 // this frame's context reading, for the moon and its shine
 
@@ -373,7 +379,7 @@ func (s *Shore) Update(c *canvas.Canvas, t float64, act Activity) {
 	s.discGeom(c, hy, scale, 1-clamp01(act.ContextUsed))
 	s.stars(c, hy, t, foamCeiling(sy, hy, scale), act.TodoDone, act.TodoTotal)
 	s.moon(c, hy, scale, 1-clamp01(act.ContextUsed), moonVis(s.pal))
-	s.todoStars(c, hy, foamCeiling(sy, hy, scale), act.TodoDone, act.TodoTotal)
+	s.todoStars(c, hy, foamCeiling(sy, hy, scale), act)
 	s.sea(c, hy, edge, tt, act)
 	s.sand(c, edge)
 	s.foam(c, edge, scale)
@@ -1443,7 +1449,8 @@ const starInkSteps = 8
 // Deliberately NOT a row across the top. A progress bar in the sky is a piece
 // of UI and the brief cuts anything that makes this feel like a dashboard; a
 // constellation filling in does the same work and belongs to the picture.
-func (s *Shore) todoStars(c *canvas.Canvas, hy, foamTop, done, total int) {
+func (s *Shore) todoStars(c *canvas.Canvas, hy, foamTop int, act Activity) {
+	done, total := act.TodoDone, act.TodoTotal
 	if total <= 0 || hy < 3 {
 		return
 	}
@@ -1456,6 +1463,25 @@ func (s *Shore) todoStars(c *canvas.Canvas, hy, foamTop, done, total int) {
 	}
 	pts := s.starPlaces(c.W, hy, top, bot, total)
 	near := c.Near()
+
+	// THE NEWEST STAR MAY STILL BE IN THE AIR -- his ruling of 2026-09-12, "the
+	// fall". While it is, the sky lights one FEWER settled star and the missing
+	// one is drawn wherever the fall has got to. It is the same star with the
+	// same magnitude through the same ink search, so what lands is exactly what
+	// would have appeared without the fall.
+	//
+	// A track the sky refuses changes nothing: done stands, the star arrives in
+	// its place, and the frame is byte-identical to the one that shipped before
+	// this existed.
+	var flight [2]int
+	flying := false
+	if act.Arriving && done > 0 {
+		if track := s.arrivalTrack(c.W, hy, top, bot, done-1, pts); len(track) >= arrivalMin {
+			flight, flying = track[arrivalHead(len(track), act.ArrivalPhase)], true
+			done--
+		}
+	}
+
 	for i := 0; i < done && i < len(pts); i++ {
 		x, y := pts[i][0], pts[i][1]
 		if x < 0 || x >= c.W || y < 0 || y >= c.H {
@@ -1478,6 +1504,15 @@ func (s *Shore) todoStars(c *canvas.Canvas, hy, foamTop, done, total int) {
 		// says n, and the size of the list is not on screen.
 		ink, a := s.starInk(c, x, y, starMagnitude(i, s.Seed))
 		near.Plot(x, y, '*', ink, a)
+	}
+
+	// And the one in the air, LAST, so a path cell that happens to sit beside a
+	// settled star composites over the same ground the settled ones left rather
+	// than under it. `done` was decremented above, so it is now the arriving
+	// star's own index and it keeps its own magnitude the whole way down.
+	if flying {
+		ink, a := s.starInk(c, flight[0], flight[1], starMagnitude(done, s.Seed))
+		near.Plot(flight[0], flight[1], '*', ink, a)
 	}
 }
 

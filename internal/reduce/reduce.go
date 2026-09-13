@@ -209,6 +209,16 @@ type Reducer struct {
 	// many subagents have finished. Together they light the constellation when
 	// the agent keeps no checklist. See StarsCap and TasksPerStar.
 	turnsDone, tasksDone int
+	// starsLit is the star count as of the last event, and starAt is when that
+	// count last went UP. Together they are the rising edge the fall hangs on.
+	//
+	// The count is DERIVED -- stars() reads a checklist if there is one and
+	// closed turns plus finished subagents if there is not -- so there is no
+	// single field whose increment means "a star arrived". Watching the derived
+	// value is what makes the edge independent of which channel is bound: the
+	// day this is rebound again, the fall follows it for free.
+	starsLit int
+	starAt   time.Time
 
 	tail    tail
 	session string
@@ -398,7 +408,30 @@ func (r *Reducer) Apply(e event.Event, now time.Time) {
 		}
 		r.heat += Impulse
 	}
+
+	// THE RISING EDGE THE FALL HANGS ON, and it is here rather than in State
+	// because it is a fact about an EVENT and not about a frame. State runs
+	// once a frame in the live loop and several times a frame in three of the
+	// study pages; stamping the clock there would restart the fall on every
+	// extra call and hold the star in the air forever.
+	//
+	// A count that jumps by more than one -- a todo list arriving 3 of 7 done
+	// -- flies only the newest star and the rest appear, which is what the
+	// sky already does and is honest: the fall is an arrival, not a tally.
+	// A count that DROPS (a fresh list with fewer done) stamps nothing.
+	if n := stars(r.todoDone, r.todoOf, r.turnsDone, r.tasksDone); n != r.starsLit {
+		if n > r.starsLit {
+			r.starAt = now
+		}
+		r.starsLit = n
+	}
 }
+
+// StarFall is how long the arriving star takes to reach its place. Half a
+// second, his pick from five rendered arms -- long enough to be seen as a fall
+// at the twenty frames a second the live loop runs, short enough that the sky
+// is never wrong about the count for as long as a glance.
+const StarFall = 500 * time.Millisecond
 
 // StarsCap is how many places the constellation holds when it is counting
 // closed turns rather than a checklist.
@@ -625,6 +658,15 @@ func (r *Reducer) State(now time.Time) State {
 	lvl = floor + (1-floor)*lvl
 	working := r.turnOpn || len(r.flight) > 0
 
+	// Never from a zero clock: an unstamped starAt is a session that has lit no
+	// star, and time.Since(zero) is fifty-seven years, not "not falling".
+	arriving, phase := false, 0.0
+	if !r.starAt.IsZero() {
+		if age := now.Sub(r.starAt); age >= 0 && age < StarFall {
+			arriving, phase = true, age.Seconds()/StarFall.Seconds()
+		}
+	}
+
 	st := State{
 		Steps:   r.steps,
 		StepAge: sinceOr(now, r.stepAt),
@@ -634,6 +676,11 @@ func (r *Reducer) State(now time.Time) State {
 			ContextUsed: r.ctx,
 			TodoDone:    stars(r.todoDone, r.todoOf, r.turnsDone, r.tasksDone),
 			TodoTotal:   starTotal(r.todoOf),
+			// The fall, from WALL-CLOCK age. Strictly less than StarFall, so
+			// the phase never reaches 1 and the landing frame is the settled
+			// frame -- one picture of the star at home, not two.
+			Arriving:     arriving,
+			ArrivalPhase: phase,
 		},
 		Pose:        r.pose(now),
 		Kittens:     len(r.subs),
@@ -690,6 +737,14 @@ func (r *Reducer) reset() {
 	r.doneAt = time.Time{}
 	r.bubble = ""
 	r.tail = tail{}
+	// A fall in flight does not survive a new conversation.
+	//
+	// ⚠ starsLit is deliberately LEFT ALONE, and that is not an oversight.
+	// reset does not clear todoDone or turnsDone, so the constellation survives
+	// a `clear` -- zeroing the remembered count here would make the very next
+	// event look like a rise of everything already in the sky and fly a star
+	// that arrived long ago.
+	r.starAt = time.Time{}
 }
 
 // FitTail re-renders the sand to a column budget, dropping whole pieces of a

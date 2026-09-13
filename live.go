@@ -304,6 +304,25 @@ func demoState(t, ctxUsed, tod float64) reduce.State {
 	if phase == 3 {
 		st.Act.TodoDone = 5
 	}
+	// And the newest star FALLS into its place, the way it does in a real
+	// session. Without this the demo is the one place the feature cannot be
+	// seen: the fall is driven by the reducer's rising edge, and the demo cycle
+	// has no reducer -- so `xscapes` with no agent attached, and every clip the
+	// site renders from this function, would show stars appearing on their own
+	// cells while the product they advertise does something else.
+	//
+	// Same rule as the reducer's, for the same reason: only a RISING count
+	// flies. The cycle drops from five stars back to one when it loops, and a
+	// fall there would animate work being undone.
+	prev := (phase + 3) % 4
+	was := prev + 1
+	if prev == 3 {
+		was = 5
+	}
+	if age := math.Mod(t, 8); st.Act.TodoDone > was && age < reduce.StarFall.Seconds() {
+		st.Act.Arriving = true
+		st.Act.ArrivalPhase = age / reduce.StarFall.Seconds()
+	}
 	return st
 }
 

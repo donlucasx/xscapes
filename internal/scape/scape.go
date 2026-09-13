@@ -25,6 +25,22 @@ type Activity struct {
 	// is no list, which is not the same as a list with nothing done -- the sky
 	// shows nothing in the first case and an unlit constellation in the second.
 	TodoDone, TodoTotal int
+
+	// Arriving says the newest finished todo's star is still in flight: it has
+	// not reached its place yet, so the sky draws one fewer settled star and
+	// the missing one is falling into it. See arrival.go.
+	//
+	// ⚠ IT IS A SEPARATE BOOL ON PURPOSE, and ArrivalPhase must never be read
+	// without it. A bare phase would make the zero value -- what every caller
+	// that has never heard of this feature passes -- mean "launching right
+	// now", so every pinned frame in the repo would fire a fall at once.
+	Arriving bool
+	// ArrivalPhase is 0 at launch and 1 the instant the star lands, and it is
+	// meaningless unless Arriving is set. The reducer drives it from WALL-CLOCK
+	// age rather than integrating dt: Shore.Update clamps a frame gap over a
+	// second, so an integrated fall would freeze mid-air on a stalled render
+	// and a suspended laptop would wake with the star still falling.
+	ArrivalPhase float64
 }
 
 type Scape interface {
