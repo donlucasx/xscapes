@@ -2,7 +2,7 @@
 
 *(Renamed end to end on 2026-09-03: directory, env vars, state path and hook marker. Two names are kept on purpose and are not leftovers -- `internal/envx` still reads `ASCIISCAPES_*` and warns, and `install.go` still RECOGNISES the `# asciiscapes:v1` marker so the hooks it wrote before the rename can be found and removed.)*
 
-> **Session 29 (2026-09-11 into 09-12), WRAPPED. HEAD `<SHA>`, tree clean, suite + vet + fmt green.
+> **Session 29 (2026-09-11 into 09-12), WRAPPED. HEAD `d02530b`, tree clean, suite + vet + fmt green.
 > ⚠ NOT PUSHED AND NOT INSTALLED — he has seen none of it running. Two days, and almost all of it
 > was HIS design round: I drew, he ruled.**
 >

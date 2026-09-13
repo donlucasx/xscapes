@@ -4,7 +4,7 @@
 
 ```
 cd ~/Documents/claude/xscapes/ and read CLAUDE.md (the brief, authoritative)
-and RESUME.md before responding. Session 29 is WRAPPED: HEAD <SHA>, tree clean,
+and RESUME.md before responding. Session 29 is WRAPPED: HEAD d02530b, tree clean,
 suite + vet + fmt green. NOT PUSHED and NOT INSTALLED -- I have seen none of it
 running.
 Two days went into the COMPANION and it is all built: the cat asks with its
