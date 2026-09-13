@@ -3,7 +3,10 @@
 *(Renamed end to end on 2026-09-03: directory, env vars, state path and hook marker. Two names are kept on purpose and are not leftovers -- `internal/envx` still reads `ASCIISCAPES_*` and warns, and `install.go` still RECOGNISES the `# asciiscapes:v1` marker so the hooks it wrote before the rename can be found and removed.)*
 
 > **Session 30 (2026-09-12). ⭐⭐ THE SHOOTING STAR IS BUILT, and it was the one feature left.**
-> HEAD `f5ebade`, tree clean, suite + vet + fmt green, **INSTALLED** (inode 85156170).
+> HEAD `417414e`, tree clean, suite + vet + fmt green, **INSTALLED** (inode 85156875).
+> ⭐ **AND THE INSTALLED BINARY NOW SAYS WHICH COMMIT IT IS**: `go build` stamps the git revision,
+> so `go version -m ~/.local/bin/xscapes | grep vcs.revision` identifies a running scape without an
+> inode table. ⚠ Build from a CLEAN tree or it stamps `vcs.modified=true` and the old SHA.
 > ⚠ **STILL NOT PUSHED** — three commits sit ahead of `origin/main` now (s29's two and this).
 > Push needs `gh auth switch --user donlucasx` FIRST, every time; it is his call.
 >
