@@ -32,8 +32,7 @@ none of it running.
 **Restart a scape and look.** Nothing else in the product is waiting on me.
 
 ```
-git push                                    # NOT done; 3 commits ahead; his call
-gh auth switch --user donlucasx && git push origin main   # the switch is host-global and does NOT stay put
+# PUSHED 2026-09-12: origin/main is 27ecb1b, nothing unpushed.
 xscapes claude                              # already installed; just restart
 go version -m ~/.local/bin/xscapes | grep vcs.revision    # the binary names its own commit
 lsof -p <pid> -a -d txt | grep xscapes                    # which binary a running scape holds
@@ -58,10 +57,9 @@ the balloon).
 ⚠ **The claim I wrote into the source before counting it was WRONG**: away-from-the-moon does NOT
 make the disc and readout guards dead. Disc fires 90 times, **all on the flip**; readout fires 108
 times **on the primary direction**. Both mutation-tested red. Numbers live in `arrival.go`.
-⏭ **The one open decision is his: "no fall below some size."** 40x12 flies only 38.0% (the sky is
-5 rows, the band 3, and 32 places leave no clear six-column corridor). A refused track degrades to
-the pre-feature behaviour, so nothing is broken — the question is whether the small end should stop
-trying at all.
+✅ **HIS RULING, 2026-09-12: "leave it as is."** 40x12 keeps its 38.0% and a refused track keeps
+falling back to the pre-feature look. **There is no size floor and this is closed** — do not
+re-open it or offer one again.
 ⏭ **And the fall has no ASSET.** `demoState` flies it now, so `go run . -site site` CAN render it —
 but the clip would need to catch a phase boundary (t = 8.0, 16.0, 24.0 in the cycle).
 

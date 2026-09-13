@@ -9,8 +9,10 @@
 > ⭐ **AND THE INSTALLED BINARY NOW SAYS WHICH COMMIT IT IS**: `go build` stamps the git revision,
 > so `go version -m ~/.local/bin/xscapes | grep vcs.revision` identifies a running scape without an
 > inode table. ⚠ Build from a CLEAN tree or it stamps `vcs.modified=true` and the old SHA.
-> ⚠ **STILL NOT PUSHED** — three commits sit ahead of `origin/main` now (s29's two and this).
-> Push needs `gh auth switch --user donlucasx` FIRST, every time; it is his call.
+> ⇒ **PUSHED 2026-09-12 at his word**: `origin/main` is `27ecb1b`, verified with `git ls-remote`,
+> nothing unpushed. Seven commits went up — s29's whole companion round and s30's star.
+> ⇒ **HIS RULING on the small end: "leave it as is."** 40x12 keeps its 38% and the refused tracks
+> keep falling back to the pre-feature look. **No size floor.** Do not re-open it.
 >
 > ⭐ **"The fall", his ruling: the star ITSELF travels** six columns and three rows into its own
 > place, 0.50 s, linear, no tail. Built exactly as the study costed it — `Arriving bool` +
