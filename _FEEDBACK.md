@@ -2985,3 +2985,23 @@ been open since s26 and was reported BACK in the fixed build in s28. ⚠ It is n
 the evidence window is long gone, so it is CLOSED-ON-HIS-WORD, to be reopened if it recurs.
 ⚠ **HE DID NOT ANSWER 4** (the rotating eye's 25% back-to-back repeat) while answering the items
 around it. Left as built — pure random — and flagged as still open rather than decided by silence.
+
+### Session 30 (2026-09-12) — the shooting star, built
+
+He opened with *"resume work on xscapes"* and left it at that, so the queue's own item 1 — the one
+feature left, already ruled — is what got built. No new report and no new defect from him.
+
+⭐ **Two answers, both verbatim:**
+
+⇒ **PUSH: "Push now."** Seven commits went up (s29's whole companion round plus the star);
+`origin/main` is `9e6da2c`, verified with `git ls-remote`.
+
+⇒ **THE SMALL END: "Leave it as is."** Asked because 40x12 can only fly 38.0% of arrivals — five
+rows of sky, a three-row band, and thirty-two places leave no clear six-column corridor — and a
+refused track degrades to exactly the look that shipped before the fall existed. **So there is no
+size floor and the question is CLOSED.** Do not offer one again. The two alternatives he turned down
+were a measured threshold on sky rows, and letting a 2–3 cell track fly (which the study had already
+judged reads as a flicker rather than an arrival at 12 fps).
+
+⚠ **STILL UNANSWERED, carried from s29 and not decided by silence:** the rotating eye's 24.3%
+back-to-back repeat. It was not put to him this session.
