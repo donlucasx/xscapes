@@ -64,10 +64,19 @@ type Cat struct {
 	// kind is which animal this is. The sprite data is a field rather than a
 	// hardcoded bitmap, so a second companion needs no interface and no change
 	// at any of the 25 construction sites outside this package.
-	kind     Kind
-	body     *Bitmap
-	walk     *Bitmap
-	worried  *Bitmap
+	kind    Kind
+	body    *Bitmap
+	walk    *Bitmap
+	worried *Bitmap
+	// ask is the body held while the agent is blocked on the user. nil is the
+	// shipped behaviour -- the ask is carried by the eye glyph alone -- and
+	// giving the cat one is what a design round is deciding. See SetAskArt.
+	ask *Bitmap
+	// done is the body held after a turn closes. Like ask, nil falls through
+	// to the shipped behaviour.
+	done *Bitmap
+	// step is the front-view mid-stride body.
+	step     *Bitmap
 	kitCache map[int]*Bitmap
 	kitTier  int // last chosen litter size, for hysteresis
 	swim     *Bitmap
@@ -81,6 +90,15 @@ type Cat struct {
 	coat term.RGB
 	// eyeFill is one of the EyeFill constants; see SetEyeFill.
 	eyeFill string
+
+	// noRim suppresses the cleared ring. Study-only; see SetNoRim.
+	noRim bool
+
+	// askN counts asks, and asking remembers whether the last frame was one,
+	// so askN moves on the RISING EDGE only. It drives the rotating near eye;
+	// see Approach.
+	askN   int
+	asking bool
 
 	// stepping is set for the frames a pace step is in flight, so the legs
 	// swap phase mid-stride. It is a per-frame flag rather than an argument
@@ -132,7 +150,18 @@ func (c *Cat) eyeGround() (term.RGB, bool) {
 }
 
 func NewCat() *Cat {
-	return &Cat{body: ParseBitmap(CatBody), worried: ParseBitmap(CatWorried), coat: furCol}
+	return &Cat{
+		body:    ParseBitmap(CatBody),
+		worried: ParseBitmap(CatWorried),
+		// His rulings of 2026-09-11: the cat asks with its ears and finishes
+		// with its chin up. Before this the ask and the finish were the WORKING
+		// body -- measured, 97% of a still of either was also a still of the
+		// cat simply working.
+		ask:  ParseBitmap(CatAsk),
+		done: ParseBitmap(CatDone),
+		step: ParseBitmap(CatBodyStep),
+		coat: furCol,
+	}
 }
 
 // Size is the character footprint, not the pixel size.
@@ -177,11 +206,27 @@ func (c *Cat) Draw(l *canvas.Layer, x, y int, t float64, st State) {
 		c.drawCrab(l, x, y, t, st)
 		return
 	}
+	// The come-closer walk. Same gate the crab uses: OFF unless XSCAPES_NEAR is
+	// set AND the approach has actually climbed a rung, so an armed flag on its
+	// own still renders the shipped frame. l.W is the frame's own width, so the
+	// draw path and DrawnBox cannot disagree about which rung is affordable.
+	if rung := c.nearRung(l.W); rung > 0 {
+		c.drawCatNear(l, x, y, t, st, rung)
+		return
+	}
 	src := c.body
-	if st == Worried {
+	switch {
+	case st == Worried:
 		src = c.worried
-	} else if c.stepping {
-		src = c.walkBitmap()
+	case st == NeedsYou && c.ask != nil:
+		src = c.ask
+	case st == Done && c.done != nil:
+		src = c.done
+	case c.stepping:
+		// The FRONT view mid-stride, not the side-view walk sprite. See
+		// CatBodyStep: reaching for CatWalk here drew a 16-cell side view
+		// inside the 12-cell box and put the eyes 6 and 10 cells off the head.
+		src = c.step
 	}
 	f := src.Blank()
 
@@ -214,28 +259,72 @@ func (c *Cat) Draw(l *canvas.Layer, x, y int, t float64, st State) {
 			}
 		}
 	}
-	c.tail(f, wag, lift, tailLen)
+	c.tailAt(f, wag, lift, tailLen, 1)
 	if c.mirror {
 		f = f.Mirrored()
 	}
 
-	(&Sprite{Rows: f.ToQuadrant(), Body: c.coat}).Draw(l, x, y)
+	// The cleared ring. His ruling, 2026-09-11. The cat's own kittens have
+	// called plotRim since they were written (kittens.go) and the PARENT was
+	// the odd one out -- which is the case the ring exists for, because a
+	// litter sits right beside its parent in the same cream at the same alpha
+	// on the same layer, and two of those read as one malformed shape.
+	q := f.ToQuadrant()
+	if !c.noRim {
+		plotRim(l, q, x, y)
+	}
+	(&Sprite{Rows: q, Body: c.coat}).Draw(l, x, y)
 	c.drawFace(l, x, y, c.face, st)
 	c.eyes(l, x, y, t, st)
 }
 
-// tail sweeps a curve up from the right hip. Two pixels thick so it survives
-// the halving that ToQuadrant does.
-func (c *Cat) tail(b *Bitmap, wag float64, lift int, length float64) {
-	n := int(13 * length)
-	for i := 0; i <= n; i++ {
-		f := float64(i) / 13
-		x := 17 + int(5*f+2.2*math.Sin(wag*1.6+f*2.6)+0.5)
-		y := 24 - int(13*f+0.5) + lift
-		b.Set(x, y)
-		b.Set(x+1, y)
-		b.Set(x, y+1)
+// tailAt sweeps a curve up from the right hip. Two pixels thick at 1x so it
+// survives the halving that ToQuadrant does.
+//
+// EVERY LENGTH HERE SCALES, including the stroke. The tail is the one part of
+// this animal that is not a bitmap, which is exactly why the come-closer work
+// has to touch it: nearDouble doubles BITMAPS, so a cat drawn at a near rung by
+// doubling CatBody arrives with no tail at all. Measured at 2x with the stroke
+// left at 2px, the curve also thins to a hairline the quadrant halving drops in
+// places, so the thickness is a function of s and not a constant.
+func (c *Cat) tailAt(b *Bitmap, wag float64, lift int, length float64, scale float64) {
+	if scale < 1 {
+		scale = 1
 	}
+	// FRACTIONAL on purpose. The near ladder's middle rung is 32 source
+	// columns against the shipped 24 -- a scale of 4/3, not 2 -- so an
+	// integer-only tail lands the curve mid-body there instead of on the hip.
+	s := scale
+	// The stroke is stamped in whole pixels, so its thickness rounds.
+	th := int(s + 0.5)
+	if th < 1 {
+		th = 1
+	}
+	n := int(13 * length * s)
+	steps := 13 * s
+	for i := 0; i <= n; i++ {
+		f := float64(i) / steps
+		x := int(17*s+0.5) + int(5*s*f+2.2*s*math.Sin(wag*1.6+f*2.6)+0.5)
+		y := int(24*s+0.5) - int(13*s*f+0.5) + lift
+		// The stamp is an L, not a square: (x,y), (x+1,y), (x,y+1) at 1x.
+		// Scaling it as a full square instead changed the shipped cat, and
+		// crab_near_test.go's golden hash caught it on the first run -- the
+		// bottom-right corner is what makes the curve taper rather than read
+		// as a chain of blocks.
+		for dy := 0; dy < 2*th; dy++ {
+			for dx := 0; dx < 2*th; dx++ {
+				if dx < th || dy < th {
+					b.Set(x+dx, y+dy)
+				}
+			}
+		}
+	}
+}
+
+// TailAt draws the tail onto an arbitrary bitmap at a given scale, so a study
+// can render a near rung without the tail simply going missing.
+func (c *Cat) TailAt(b *Bitmap, wag float64, lift int, length float64, scale float64) {
+	c.tailAt(b, wag, lift, length, scale)
 }
 
 // eyes are plotted as characters ON TOP of the quadrant body, in the gaps the

@@ -103,6 +103,9 @@ func main() {
 		mockup  = flag.String("mockup", "", "write the left-vs-mirrored composition study to an HTML file")
 		overlay = flag.String("overlay", "", "mock the agent INSIDE the scape: composite a captured pane (text file) over the scene")
 		sandfd  = flag.String("sandfade", "", "tuner: how far the lower beach falls away to black")
+		starfl  = flag.String("starfall", "", "the star-arriving study: write the mockup to an HTML file")
+		catalt  = flag.String("catalts", "", "the cat design round: write the alternatives to an HTML file")
+		decide  = flag.String("decisions", "", "every art decision still open, in one page")
 		site    = flag.String("site", "", "write the submission page: reads <dir>/template.html, writes <dir>/index.html")
 		gifsDir = flag.String("gifs", "", "write the animated clips of the demo turn as frame pages into <dir> (then site/make-gifs.py encodes them)")
 	)
@@ -164,6 +167,39 @@ func main() {
 			hl = *height
 		}
 		runLive(*seed, *fps, wl, hl, *ctxUsed, *tod, *asciiG, *session, *mirror, *await)
+		return
+	}
+
+	if *decide != "" {
+		if err := os.WriteFile(*decide, []byte(decisionsPage(*seed)), 0o644); err != nil {
+			fmt.Fprintln(os.Stderr, "xscapes:", err)
+			os.Exit(1)
+		}
+		fmt.Println(*decide)
+		return
+	}
+
+	if *catalt != "" {
+		if err := os.WriteFile(*catalt, []byte(catAltsPage(*seed)), 0o644); err != nil {
+			fmt.Fprintln(os.Stderr, "xscapes:", err)
+			os.Exit(1)
+		}
+		for _, ln := range catAltsReport() {
+			fmt.Fprintln(os.Stderr, "  ", ln)
+		}
+		fmt.Println(*catalt)
+		return
+	}
+
+	if *starfl != "" {
+		if err := os.WriteFile(*starfl, []byte(starfallPage(*seed)), 0o644); err != nil {
+			fmt.Fprintln(os.Stderr, "xscapes:", err)
+			os.Exit(1)
+		}
+		for _, ln := range starfallSweep(*seed) {
+			fmt.Fprintln(os.Stderr, "  ", ln)
+		}
+		fmt.Println(*starfl)
 		return
 	}
 

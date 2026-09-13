@@ -61,13 +61,42 @@ func TestNothingMovesWithTheNearPoseUnset(t *testing.T) {
 		{"crab/resting/256 frames", "75e6f283f7b133e5"},
 		{"crab/working/256 frames", "0913d492b66b12e5"},
 		{"crab/needs you/256 frames", "7cc91b37f3727ba5"},
-		{"crab/all done/256 frames", "87b4f7aef6d72b85"},
+		// ⚠ MOVED 2026-09-12 at his ruling that BOTH animals get a distinct
+		// finish pose. crabDone was DEAD ART: measured, all six of its
+		// half-rows were byte-identical to crabWork's, because it raised one
+		// claw by a SINGLE source row and ToQuadrant ORs rows in pairs. So the
+		// crab's whole finish cue was the eye glyph. It is now "settled on the
+		// sand" with the near pincer shutting every 7 s.
+		{"crab/all done/256 frames", "389ca759383046a5"},
 		{"crab/something is broken/256 frames", "178daff7432fda85"},
-		{"cat/resting/256 frames", "80f5d044664fe09d"},
-		{"cat/working/256 frames", "45ea37f9272f30c5"},
-		{"cat/needs you/256 frames", "b7d10105a2f0b4c1"},
-		{"cat/all done/256 frames", "f2034baf926d86b5"},
-		{"cat/something is broken/256 frames", "5844edee4034b395"},
+		// ⚠ THE CAT'S FIVE HASHES MOVED ON 2026-09-11 AND THAT WAS INTENDED.
+		// His ruling that day gave the cat's PARENT body the cleared ring its
+		// own kittens have always had (plotRim, kittens.go). The ring is the
+		// whole diff and that was PROVEN before these were rewritten, not
+		// assumed: rendered over a painted ground, with the ring and without,
+		// across five states x four phases x both facings, 1,876 cells change
+		// and every one of them is a ground cell that became blank. Zero cells
+		// changed any other way. Re-blessing a golden on "I meant to change it"
+		// is how a real regression gets waved through; the probe is what makes
+		// this honest. The crab's five are untouched and still the originals.
+		// Resting steps too -- the golden sweeps stepping on and off for every
+		// state -- so the front-view stride moves this hash for the same
+		// reason it moves cat/working. Same change, same scope.
+		{"cat/resting/256 frames", "dfa549e998455be5"},
+		// ⚠ MOVED 2026-09-12: the cat got a FRONT-VIEW mid-stride body. It had
+		// none, so Draw reached for CatWalk -- a 16-cell side view -- inside
+		// the 12-cell box and plotted the eyes 6 and 10 cells off the head.
+		// 4,037 occurrences across 31 recorded sessions, 0.28 s each. Only the
+		// PAW row differs from standing, asserted in stride_test.go, so
+		// nothing above the waist and no eye cell moved.
+		{"cat/working/256 frames", "9da53f52bca90c6d"},
+		// ⚠ MOVED 2026-09-12. The cat had no ask body and no finish body at
+		// all -- both drew the WORKING bitmap, so 97% of a still of either was
+		// also a still of the cat simply working (measured, 1,200 frames a
+		// side, bodies only). Now "Pricked ears" and "Chin up", his picks.
+		{"cat/needs you/256 frames", "2860edf8c100076d"},
+		{"cat/all done/256 frames", "7ec06554e0a9dbd5"},
+		{"cat/something is broken/256 frames", "4197960b244d2275"},
 	}
 	got := shippedFrameHashes(t)
 	if len(got) != len(golden) {
@@ -491,21 +520,67 @@ func TestOneSlowFrameCannotSkipARung(t *testing.T) {
 	}
 }
 
-// The cat never approaches. There is no cat art at this size, and the root
-// package calls Approach and DrawnBox on whichever animal is configured.
-func TestTheCatIsUntouchedByTheNearPose(t *testing.T) {
-	for _, rung := range []int{0, 1, 2} {
-		withNear(t, rung)
-		c := NewCat()
+// THE CAT CLIMBS NOW, and this test used to assert the opposite.
+//
+// It was right when it was written: the near art was Hero's, nearSteps()
+// returned 0 for the cat, and the promise being kept was that the root package
+// could call Approach and DrawnBox on whichever animal was configured without
+// knowing anything. His ruling of 2026-09-12 -- "the goal is for the cat to
+// come closer when it needs human input, right? like the crab" -- replaced that
+// promise with the opposite one, so the test is inverted rather than deleted:
+// the interesting property is still that BOTH animals answer these calls
+// sensibly, and now that both climb, both ladders get walked.
+func TestBothAnimalsClimbTheirOwnLadder(t *testing.T) {
+	for _, arm := range []struct {
+		name string
+		make func() *Cat
+	}{{"cat", NewCat}, {"crab", NewCrab}} {
+		// XSCAPES_NEAR=0 is OFF for both, and nothing may move.
+		withNear(t, 0)
+		c := arm.make()
 		for i := 0; i < 40; i++ {
 			c.Approach(0.1, true)
 		}
-		if c.approach != 0 || c.nearRung(200) != 0 {
-			t.Errorf("rung %d: the cat walked to %.2f", rung, c.approach)
+		if c.nearRung(200) != 0 {
+			t.Errorf("%s: NEAR=0 still put it on rung %d", arm.name, c.nearRung(200))
 		}
 		w, h := c.Size()
 		if dx, bw, bh := c.DrawnBox(200); dx != 0 || bw != w || bh != h {
-			t.Errorf("rung %d: the cat's box is (%d, %d, %d), want (0, %d, %d)", rung, dx, bw, bh, w, h)
+			t.Errorf("%s: NEAR=0 box is (%d, %d, %d), want (0, %d, %d)", arm.name, dx, bw, bh, w, h)
+		}
+
+		// And armed, each animal walks its OWN ladder to its OWN top box.
+		for _, rung := range []int{1, 2} {
+			withNear(t, rung)
+			c := arm.make()
+			if dx, bw, bh := c.DrawnBox(200); dx != 0 || bw != w || bh != h {
+				t.Errorf("%s: armed but not yet walked, box is (%d, %d, %d), want the shipped (0, %d, %d)",
+					arm.name, dx, bw, bh, w, h)
+			}
+			for i := 0; i < 40; i++ {
+				c.Approach(0.1, true)
+			}
+			if got := c.nearRung(200); got != rung {
+				t.Errorf("%s: NEAR=%d walked to rung %d", arm.name, rung, got)
+			}
+			_, bw, bh := c.DrawnBox(200)
+			want := c.boxes()[rung]
+			if bw != want.w || bh != want.h {
+				t.Errorf("%s rung %d: box is %dx%d, want %dx%d from its own table",
+					arm.name, rung, bw, bh, want.w, want.h)
+			}
+			if bw <= w || bh <= h {
+				t.Errorf("%s rung %d: %dx%d is not bigger than the shipped %dx%d, so "+
+					"\"closer\" means nothing", arm.name, rung, bw, bh, w, h)
+			}
+			// It has to walk BACK, too. The instant he answers is the one
+			// frame he is certainly looking at.
+			for i := 0; i < 40; i++ {
+				c.Approach(0.1, false)
+			}
+			if got := c.nearRung(200); got != 0 {
+				t.Errorf("%s: after retreating it is still on rung %d", arm.name, got)
+			}
 		}
 	}
 }

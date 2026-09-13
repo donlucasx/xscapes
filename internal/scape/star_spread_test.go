@@ -211,7 +211,7 @@ func bandFor(w, h int) (hy, top, bot int) {
 	if sy > writeTop-1 {
 		sy = writeTop - 1
 	}
-	top, bot = starBand(hy, foamCeiling(sy, scale))
+	top, bot = starBand(hy, foamCeiling(sy, hy, scale))
 	return hy, top, bot
 }
 
@@ -245,7 +245,7 @@ func seaFloorFor(w, h int) int {
 	if sy > writeTop-1 {
 		sy = writeTop - 1
 	}
-	return foamCeiling(sy, scale)
+	return foamCeiling(sy, hy, scale)
 }
 
 func lumaOfStar(c term.RGB) float64 {

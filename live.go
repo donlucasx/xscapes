@@ -245,9 +245,18 @@ func compose(w int, catW int, mirror bool) layout {
 	// every width was right for a narrow pane and cramped in a wide one.
 	right := margin + w/32
 	if !mirror {
+		// ⚠ THE UNMIRRORED LAYOUT PACES THE OTHER WAY, and it used to reserve
+		// nothing for it. paceAt returns a NEGATIVE offset -- inward, toward
+		// the centre -- which is inward only for a companion on the RIGHT.
+		// On the left, negative is toward the frame edge, and at 124 columns
+		// the animal was drawn at COLUMN -1. This layout still ships
+		// (-mirror=false, and inside.go uses it), so it gets the same span
+		// reserved and drawScene flips the sign.
+		span := paceSpan(w)
 		return layout{
 			CatX:     5,
-			SandFrom: 5 + catW + 2, SandTo: w - margin,
+			PaceSpan: span,
+			SandFrom: 5 + catW + 2 + span, SandTo: w - margin,
 			MoonX: 0.72, Mirror: false,
 		}
 	}
@@ -371,7 +380,7 @@ func drawScene(c *canvas.Canvas, sh *scape.Shore, cat *companion.Cat, lay layout
 	// keeps to the far side of the reserved strip so the companion never walks
 	// through it. See pace.go.
 	dx, moving := pace(st, c.W)
-	catX := lay.CatX + int(math.Round(dx))
+	catX := lay.CatX + int(math.Round(paceOffsetOf(dx, lay)))
 	cat.SetStepping(moving)
 
 	// WHERE THE COMPANION ACTUALLY IS, which stopped being the same thing as
@@ -620,4 +629,23 @@ func drawSand(c *canvas.Canvas, lines []reduce.Line, sand term.RGB, sandTop, xFr
 			x++
 		}
 	}
+}
+
+// paceOffsetOf turns pace()'s offset into a displacement for THIS layout.
+//
+// paceAt returns a negative number -- inward, toward the centre -- which is
+// inward only for a companion anchored on the right. On the left, inward is
+// the other way.
+func paceOffsetOf(dx float64, lay layout) float64 {
+	if lay.Mirror {
+		return dx
+	}
+	return -dx
+}
+
+// paceOffset is the whole thing for one state, so a test can ask the same
+// question the draw does instead of re-deriving it.
+func paceOffset(st reduce.State, lay layout, w int) float64 {
+	dx, _ := pace(st, w)
+	return paceOffsetOf(dx, lay)
 }

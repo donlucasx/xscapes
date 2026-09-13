@@ -15,7 +15,12 @@ type Shore struct {
 	// tideRow is the waterline's row BEFORE the wash, which is what the open
 	// sea's ramp is anchored to under Tide. Taking it from the washed edge
 	// re-ramps the whole sea every frame; see paintBG.
-	tideRow int
+	tideRow float64
+
+	// starCrowded counts placements that had to accept a touching cell because
+	// the sky is genuinely too small for the star count. Read by the tests; it
+	// is the honest signal that the band, not the placement, is out of room.
+	starCrowded int
 	// tideAt is how far the water has withdrawn right now, in rows and as a
 	// FLOAT: the waterline glides rather than stepping whole cells.
 	tideAt float64
@@ -323,10 +328,10 @@ func (s *Shore) Update(c *canvas.Canvas, t float64, act Activity) {
 	// waterline 1.03 rows against 0.02 in a normal frame, 47x, where the guard
 	// allows 8x. A tide that arrives in one frame is not a tide.
 	s.tideAt += (tideTarget(act.Level, scale) - s.tideAt) * math.Min(1, dt/TideEase)
-	s.tideRow = sy - int(math.Round(s.tideAt))
+	s.tideRow = float64(sy) - s.tideAt
 	s.phase += dt * (0.55 + act.Level*1.45)
 	tt := s.phase
-	edge := s.waterline(c.W, sy, tt, act, scale)
+	edge := s.waterline(c.W, sy, hy, tt, act, scale)
 	// Scale the swell to the room it has instead of clipping it.
 	//
 	// Clipping is what drew the ruled shoreline: every trough that reached past
@@ -342,7 +347,7 @@ func (s *Shore) Update(c *canvas.Canvas, t float64, act Activity) {
 		// rows to 1.7 and every quiet level pinned to the same row.
 		ref := float64(sy)
 		if Tide {
-			ref = float64(s.tideRow)
+			ref = s.tideRow
 		}
 		room := float64(writeTop-1) - ref
 		if room < 0.5 {
@@ -366,9 +371,9 @@ func (s *Shore) Update(c *canvas.Canvas, t float64, act Activity) {
 
 	s.paintBG(c, hy, edge)
 	s.discGeom(c, hy, scale, 1-clamp01(act.ContextUsed))
-	s.stars(c, hy, t, foamCeiling(sy, scale), act.TodoDone, act.TodoTotal)
+	s.stars(c, hy, t, foamCeiling(sy, hy, scale), act.TodoDone, act.TodoTotal)
 	s.moon(c, hy, scale, 1-clamp01(act.ContextUsed), moonVis(s.pal))
-	s.todoStars(c, hy, foamCeiling(sy, scale), act.TodoDone, act.TodoTotal)
+	s.todoStars(c, hy, foamCeiling(sy, hy, scale), act.TodoDone, act.TodoTotal)
 	s.sea(c, hy, edge, tt, act)
 	s.sand(c, edge)
 	s.foam(c, edge, scale)
@@ -378,9 +383,9 @@ func (s *Shore) Update(c *canvas.Canvas, t float64, act Activity) {
 // fractional is the whole trick: the shoreline is painted into the background
 // colour at sub-cell precision, so a two-row swing reads as one smooth curve
 // instead of the staircase you get from rounding to a row.
-func (s *Shore) waterline(w, sy int, tt float64, act Activity, scale float64) []float64 {
+func (s *Shore) waterline(w, sy, hy int, tt float64, act Activity, scale float64) []float64 {
 	if Tide {
-		return tideEdge(w, sy, hyFloor(sy), s.tideAt, tt, act, scale)
+		return tideEdge(w, sy, hyFloor(sy, hy), s.tideAt, tt, act, scale)
 	}
 	reach := (0.8 + act.Level*2.1) * scale
 	e := make([]float64, w)
@@ -545,11 +550,33 @@ func (s *Shore) paintBG(c *canvas.Canvas, hy int, edge []float64) {
 		// every single frame, so a depth taken from it re-ramps the whole sea
 		// twelve times a second. Caught by his own guarantee --
 		// TestTheBackdropHoldsStillBetweenFrames allows 8% of open-sea cells to
-		// change between frames and the first tide build churned 59.13%, which
-		// is the exact defect the per-column anchor caused and the note above
-		// this describes. sy moves only when the ACTIVITY moves it, so the
-		// backdrop holds still and steps when the tide does.
-		depth = math.Max(1, float64(s.tideRow)-float64(hy))
+		// change between frames and the first tide build churned 59.13%.
+		//
+		// ⚠ THE FIX FOR THAT WAS AN INTEGER ROW, AND THE INTEGER WAS THE NEXT
+		// DEFECT. Rounding the tide to a row does hold the backdrop still --
+		// but only between crossings. Every row boundary the easing tide
+		// passes re-ramps the WHOLE open sea in a single frame: measured, 139
+		// of 216 cells, against the same 8% bar, settling back to 0.00% once
+		// the tide stopped moving. So the guarantee held on average and broke
+		// exactly while the feature was doing its job, which is the worst
+		// place for a ceiling to fail.
+		//
+		// ⚠⚠ AND THE OBVIOUS FIX IS WORSE. Making the depth fractional so the
+		// churn is spread rather than saved up was tried on 2026-09-12 and
+		// MEASURED: the open sea then churns 53.62% EVERY FRAME, against 64%
+		// on the crossing frames alone. depth scales the whole gradient, so
+		// any change to it re-maps every row's colour -- there is no small
+		// change to make. Spreading a spike that big just makes it permanent.
+		//
+		// So the depth is rounded again, deliberately, and the spike stands as
+		// a known defect rather than being traded for a worse one. Fixing it
+		// properly means anchoring the backdrop gradient to something that is
+		// not the tide, which is a design change to the sea and not a one-line
+		// fix to this expression. Carded rather than bodged.
+		//
+		// The SWELL's reference (see ref, above) is fractional now, because it
+		// paints nothing and so costs no churn.
+		depth = math.Max(1, math.Round(s.tideRow)-float64(hy))
 	}
 	for x := 0; x < c.W; x++ {
 		ex := edge[x]
@@ -994,8 +1021,8 @@ func starBand(hy, foamTop int) (top, bot int) {
 // int(e+0.5)-1, not floor(e)-1. The difference is one row and it put a star in
 // the foam at 30x8 with XSCAPES_TIDE=0, which is the geometry and the switch
 // that a floor() version passed.
-func foamCeiling(sy int, scale float64) int {
-	return int(math.Floor(seaCeiling(sy, scale)+0.5)) - 1
+func foamCeiling(sy, hy int, scale float64) int {
+	return int(math.Floor(seaCeiling(sy, hy, scale)+0.5)) - 1
 }
 
 // seaCeiling is the highest row the waterline can ever reach at this geometry,
@@ -1006,7 +1033,7 @@ func foamCeiling(sy int, scale float64) int {
 //
 // The swell rescale in Update only ever SHRINKS the deviation from the base
 // row, so a real frame's edge is never higher than this.
-func seaCeiling(sy int, scale float64) float64 {
+func seaCeiling(sy, hy int, scale float64) float64 {
 	if !Tide {
 		// reach (0.8 + 2.1*level), worst at full activity, and the second sine.
 		return float64(sy) - 3.45*scale
@@ -1020,7 +1047,7 @@ func seaCeiling(sy int, scale float64) float64 {
 	for step := 0; step <= 32; step++ {
 		level := float64(step) / 32
 		base := float64(sy) - (1-level)*TideRange*scale
-		if f := hyFloor(sy); base < f {
+		if f := hyFloor(sy, hy); base < f {
 			base = f
 		}
 		// The wash, and the coast's own two sines (0.60 + 0.35).
@@ -1177,6 +1204,15 @@ func (s *Shore) starPlaces(w, hy, top, bot, n int) [][2]int {
 			// depends on the same thing every other branch depends on: the
 			// stars already placed.
 			bestX, bestY, bestD = s.roomiestCell(cells, pts)
+			// roomiestCell takes the best cell there IS, which at a small
+			// enough sky is still a touching one. Nothing can be done about
+			// that -- thirty-two stars do not fit in three rows of thirty
+			// columns however they are arranged -- but it must not be silent:
+			// the count is wrong at that point, and the band's own floor is
+			// what is supposed to prevent it.
+			if bestD <= starHardSep*starHardSep {
+				s.starCrowded++
+			}
 		}
 		pts = append(pts, [2]int{bestX, bestY})
 	}
@@ -1352,6 +1388,14 @@ func (s *Shore) readoutGround(w, hy, top, bot int) map[[2]int]bool {
 // the floor, so a faint star is exactly as legible as the tests require and a
 // bright one has more.
 func (s *Shore) starInk(c *canvas.Canvas, x, y int, mag float64) (term.RGB, float64) {
+	r := s.starInkReport(c, x, y, mag)
+	return r.Ink, r.Alpha
+}
+
+// starInkReport is the whole search, with what it spent to reach its answer.
+// starInk keeps the two-value signature because every call site in the scene
+// wants only the answer; see StarInk for why the rest is worth reporting.
+func (s *Shore) starInkReport(c *canvas.Canvas, x, y int, mag float64) StarInk {
 	nominal := c.BGAt(x, y)
 	// The cell has no glyph yet, so on 256 this reports it as its two halves:
 	// the LOWER one, which in a sky that brightens downward is the brighter of
@@ -1359,25 +1403,28 @@ func (s *Shore) starInk(c *canvas.Canvas, x, y int, mag float64) (term.RGB, floa
 	// shade of white and nothing else.
 	_, _, ground := c.ResolveAt(x, y, term.Profile256)
 	white := term.RGB{R: 255, G: 255, B: 255}
-	bestInk, bestA, best := s.pal.Star, mag, -math.MaxFloat64
+	best := StarInk{Ink: s.pal.Star, Alpha: mag, Contrast: -math.MaxFloat64, Exhausted: true}
 	// The star's own magnitude first, then fully opaque: a bright night star
 	// keeps the tone its magnitude gives it, and only a sky that beats it makes
 	// it give that up.
-	for _, a := range [2]float64{mag, 1.0} {
+	for ai, a := range [2]float64{mag, 1.0} {
 		for step := 0; step <= starInkSteps; step++ {
 			ink := term.Lerp(s.pal.Star, white, float64(step)/starInkSteps)
 			seen := term.Profile256.Quantise(nominal.Blend(ink, a), true)
-			if d := bandLuma(seen) - bandLuma(ground); d >= todoStarContrast {
-				return ink, a
-			} else if d > best {
-				bestInk, bestA, best = ink, a, d
+			d := bandLuma(seen) - bandLuma(ground)
+			if d >= todoStarContrast {
+				return StarInk{Ink: ink, Alpha: a, Rung: step, FullAlpha: ai == 1, Contrast: d}
+			}
+			if d > best.Contrast {
+				best = StarInk{Ink: ink, Alpha: a, Rung: step,
+					FullAlpha: ai == 1, Exhausted: true, Contrast: d}
 			}
 		}
 	}
 	// Nothing reaches: the sky there is brighter than white ink can beat. Take
 	// the best there is rather than the dimmest, and let the band's own floor
 	// (starBand) keep the layout out of rows where this happens.
-	return bestInk, bestA
+	return best
 }
 
 // starInkSteps is how finely the lift from the palette's star tone to white is

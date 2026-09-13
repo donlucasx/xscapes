@@ -2767,3 +2767,221 @@ stdlib only) and auditioned; **he picked the DROPLET**. 260 ms ask, 340 ms done,
 `go:embed`, materialised once under `Home()` (**not `/tmp`** — a reboot destroyed nine traces there).
 Three fallback rungs: droplet → the old system sounds → the bell. `XSCAPES_SILENT` still wins.
 **Measured cost: +50,304 bytes, +0.76% of the binary.** Verified by running it.
+
+### Session 29 (2026-09-11) — the shooting star, the cat, and the site
+
+- *"lets draft the shooting stars on a terminal mockup"*
+- *"while I test the current build, and once you are done with the constellation/shooting star tests,
+  lets a) update the cat companion to have all the existing behaviors, come close when prompting and
+  ensure its ready for the user to swap companions on demand b) update the hackathon site to showcase
+  updated art, scenes and features"*
+
+⇒ **A QUEUE, IN HIS ORDER, and the shooting star comes first.** He is testing the s28 build live
+while this runs, so his look at the seven shipped things is happening in parallel rather than
+blocking.
+⇒ (a) is PARITY, not invention: the crab grew four things in s27–s28 the cat may not have — the
+near/approach rungs behind `XSCAPES_NEAR`, the 2x2 bitmap eyes with the alert RING, the shrinking
+litter ladder, and `DrawnHeadCol` so the ask balloon follows the head. "ready for the user to swap
+companions on demand" is a SEPARATE ask from parity: `xscapes companion <name>` exists; the question
+is whether a swap mid-session is picked up live.
+⇒ (b) the site is `site/`, published by `site/publish.sh` to https://donlucasx.github.io/xscapes/.
+⏰ Commons closes **09-17**.
+
+- *"1. mockup some alts for the cat. later include him as an alt companion on the site. prompt me
+  for any other open questions or gaps"*
+
+⇒ **A DESIGN ROUND, the way Hero was picked from silhouettes** — alternatives rendered, he rules.
+⇒ ⭐ **"as an alt companion" SETTLES a question nobody had asked out loud: the crab STAYS the
+default.** The cat is being brought to parity as a CHOICE, not restored to primacy. His 2026-09-07
+ruling ("The crab is the DEFAULT") stands.
+⇒ "later" puts the site behind this, so the queue is now: cat alts → his ruling → build → site.
+⇒ He asked to be PROMPTED with open questions, so they are his to answer and must be collected
+rather than assumed away.
+
+#### Four rulings, 2026-09-11, taken through an AskUserQuestion set (his answers VERBATIM, with the options he did NOT take, because the road not taken is half the ruling)
+
+1. **"Yes, give the cat the rim (Recommended)"** — the cat's PARENT body gets `plotRim` the way the
+   crab's does (crab.go:355). ⚠ Not a cosmetic: two cream sprites at the same alpha on the same
+   layer is exactly the case kittens.go:396-402 says reads as one malformed shape, and the cat's own
+   kittens already call it — the parent was the odd one out. He declined *"Show me it merging first"*
+   and *"Leave it"*, so he did NOT want a picture round for this one; it is a straight fix.
+   ⚠ Verify by drawing the cat over the sand text and asserting a CLEARED RING, not by eye.
+2. **"Both animals (Recommended)"** — `Done` and `Working` render as the SAME silhouette at 12x7
+   (0 cells differ at a matched breath phase) and that gets fixed for the CAT **and the CRAB**.
+   He declined *"Cat only, this round"* and *"Neither — ask pose only"*. ⭐ This WIDENS the round he
+   asked for: the crab is the default companion and he would not leave it wrong.
+   ⚠ The brief locks done and needs_input as DISTINCT cues; today the whole difference is the eye
+   glyph and a tail held still.
+3. **"Fix it, recognise both names (Recommended)"** — `XSCAPES_COMPANION` is dead (`envx.Lookup`
+   prefixes, so the live name is `XSCAPES_XSCAPES_COMPANION`) and the README documents the dead one.
+   Read the correct name, KEEP recognising the old double-prefixed spelling for one release, and add
+   the assertion that would have caught it. He declined the clean break and declined dropping the
+   env var. ⇒ [[feedback_rename_the_key_others_hold]] applies exactly.
+4. **"Re-open it at the near sizes only (Recommended)"** — 12x7 stays EXACTLY as it ships; the nose,
+   toes and whiskers he asked for in the character study land only at the bigger rungs, where the
+   pixels can hold them. He declined wiring `Base` on at every size and declined leaving it parked.
+   ⭐ This is a careful reading: his 09-01 *"keep the characters as is for now"* is preserved at the
+   shipped size and re-opened only where more pixels exist. ⚠ `face.go:97` still CLAIMS Base is
+   "what Lucas has settled on" while nothing reads it — correct that comment in the same edit.
+
+#### His rulings on the cat round, 2026-09-11 (verbatim, with a screenshot of his own live crab attached)
+
+- *"1. Pricke ears 2. settled on the sand, but it should not be completely static. it could close a
+  claw every so often, or something similar. for the cat, chin up. 3.try the faithcul scale-up, rung
+  1, but without the nose (the original rung 0 doesnt have any nose/mouth). -- the goal is for the
+  cat to come closer when it needs human input, right? like the crab [screenshot] can we mockup an
+  alternative approach for the crab close up where the eyes read softer? maybe thiner lines or an
+  alt approach where the companion reads gentler yet ready"*
+
+⇒ **THE ASK POSE IS `Pricked ears`** — the smallest of the five that works (5 cells, and it deletes
+the skull band so the ears stand free). He took the restrained one over the four bigger changes.
+⇒ **DONE, CAT = `Chin up`.** DONE, CRAB = `Settled on the sand` — **but with a condition that is
+itself a design instruction**: *"it should not be completely static. it could close a claw every so
+often, or something similar."* ⚠ This is NOT the same as the other poses: Done is a HELD pose and
+every other held pose in this project is deliberately still (`stillFor`, pace.go). He is asking for
+an IDLE TWITCH inside a held pose, and it must not re-open the "encode in rate" question — a claw
+that closes occasionally carries NO information, which is exactly why it is allowed.
+⇒ **RUNG 1 = `The Faithful Scale-Up`, WITHOUT THE NOSE.** ⭐ His reason is the one that matters and
+I had it backwards: *"the original rung 0 doesnt have any nose/mouth"*. My own ruling-4 reading
+("re-open the detail at the near sizes only") let the drafts add a nose; he is saying the ANIMAL has
+no nose at any size, so a nose appearing as it walks toward you is a new feature, not more detail.
+⚠ Correct the `face.go` comment in the same edit — `Base = Face{Nose: true, Toes: true}` is still
+claimed as "what Lucas has settled on" and this ruling says otherwise for the near rungs.
+⇒ **"the goal is for the cat to come closer when it needs human input, right? like the crab" — YES**,
+and it is confirmation, not a question to answer with a change.
+⇒ ⭐⭐ **NEW ROUND, FROM HIS OWN SCREEN: THE CRAB'S NEAR EYES READ TOO HARD.** *"can we mockup an
+alternative approach for the crab close up where the eyes read softer? maybe thiner lines or an alt
+approach where the companion reads gentler yet ready"*. ⚠ The s28 near eye is a 2x2 bitmap RING
+whose hole is painted coat — 8 cells of `▙▛▜▟` per eye at rung 2 — and it was justified on AREA
+(2 of 84 vs 8 of 336). His screenshot is that decision landing: two hard mint rectangles with a
+salmon bar through them. **"gentler yet ready" is the brief**: it must still read as ALERT, because
+ask-vs-working being a SHAPE difference is what rung 2 bought in s28.
+
+#### 2026-09-12, on the crab's near eye, the cat picks, and the twitch
+
+- *"as far as the closeup crab eyes, Id like to keep the round off, the high pupil, the hood and the
+  hooded ring on rotation. It could be random each time, or tied to something if we can differentiate
+  types of moments. -- w regards to the cat animations I see under 'his picks', the pricked ears
+  'asking' has an odd loop/animation. The middle rung 'rung 2' is no good --- the crabs finish:
+  settled on the sand: the twitch works great."*
+
+⇒ ⭐⭐ **FOUR EYES ON ROTATION, not one.** Round Off · The high pupil · The hood · The hooded ring.
+**Sea Glass is OUT** — and it is the only one of the five that was a COLOUR change rather than a
+shape change, which is consistent with the measurement: the cube gives colour almost nowhere to go.
+⚠ **"random each time, or tied to something if we can differentiate types of moments" is an OPEN
+QUESTION HE IS ASKING ME, and the encoding rule decides it.** Random carries NO information, which
+is exactly why it is permitted (same argument as the claw twitch). Tying it to a variable puts a
+SECOND meaning on a channel that already has one, which the rule forbids — UNLESS the thing it is
+tied to is the SAME variable the channel already carries, i.e. a sub-kind of "needs you".
+⇒ **COUNT THE LOG BEFORE ANSWERING.** Whether "types of moments" exist at all is a measurement, not
+a design opinion — and this project has already been burned once by binding a cue to an event that
+fires zero times (`compact`, and TodoWrite before it).
+⇒ ⚠ **DEFECT IN MY MOCKUP: "the pricked ears 'asking' has an odd loop/animation."** Diagnose before
+touching the art — the ask pose is the FASTEST animation (breath period 1.6 s, wag sin(5t)) and the
+page loops 24 frames at 12 fps = 2.000 s, which is not a whole number of either. Suspect the LOOP,
+not the pose.
+⇒ ⚠⚠ **"The middle rung 'rung 2' is no good" is AMBIGUOUS and the two readings cost different work.**
+The picks card shows four tiles: rung 0 · rung 1 no-nose · rung 1 asking · **rung 2 doubled**. Either
+he means the tile LABELLED rung 2 (the naive 2x blow-up of CatBody, which is the crudest thing on
+the card), or he means the middle rung of the ladder, which IS rung 1 and is the one he just picked.
+**ASK. Redrawing the wrong one wastes a round.**
+⇒ ✅ **"the crabs finish: settled on the sand: the twitch works great"** — CONFIRMED, and it is the
+SINGLE-claw variant at one close every 7 s that was animated on that card, not the both-claws one.
+
+#### Two rulings, 2026-09-12, taken through an AskUserQuestion set
+
+1. **"The 24x14 doubled one (Recommended)"** — the tile labelled rung 2 is what is no good, NOT the
+   16x9 he had just picked. ⭐ It is the only tile on that card **nobody drew**: `nearDouble` turns
+   every source pixel into a 2x2 block, so the top rung is a naive blow-up of the shipped body while
+   rungs 0 and 1 are hand-authored. It is also **the size he actually sees** — rung 2 is where the
+   animal stops when it walks up to ask. He declined *"The 16x9 middle rung"* and *"Both of them"*,
+   so the 16x9 Faithful-Scale-Up-without-the-nose STANDS.
+   ⚠ This voids the line that made cat parity look cheap: "rung 2 is free for the cat, CatBody
+   doubles to exactly 24x14". It renders at that size; it does not look like anything anyone drew.
+2. **"Random, and I'll say why (Recommended)"** — the four eyes rotate at RANDOM. He declined tying
+   them to ask-types (even with a measurement offered first) and declined one-per-session.
+   ⭐ The reason is the encoding rule and it is the same argument that lets the claw twitch exist:
+   **a random eye carries NO information**, so it cannot be a second meaning on a channel that
+   already carries "the agent needs you". A tied eye would have been.
+   ⚠ Design consequence to honour: the eye must be stable WITHIN one ask and vary BETWEEN asks —
+   picked on the rising edge of NeedsYou, never per frame, or the face flickers mid-conversation.
+
+- *"i see, welll lets fix the rung 2 then, just fix the eyes and remove the mouth"* [+ screenshot of
+  the REJECTED doubled rung 2]
+
+⇒ ⭐ **REVERSAL, and it supersedes "rung 2 is no good": KEEP THE NAIVE 2x BLOW-UP.** He is not asking
+for a redraw at all — he is pointing at two specific defects in it. The three hand-drawn 24x14
+drafts stay on the page as alternatives but are NOT what he asked for.
+⇒ **"remove the mouth"** — ⭐ he has now caught the muzzle-gap trap from the OTHER side. The shipped
+cat's gap (CatBody row 11) is invisible because rows 10 and 12 are solid and ToQuadrant's OR eats it;
+DOUBLING puts that same gap on a clean cell boundary, so the mouth APPEARS at 24x14. Same root cause
+as the nose he caught on the 16x9, opposite direction.
+⇒ **"just fix the eyes"** — ⚠ SUSPECT MY OWN MOCKUP FIRST. `catRungStage(double2x(CatBody),
+[2]int{8, 14}, 4, ...)` passes the CRAB'S near-pose eye cells, copied from `nearPoseFor`. The cat's
+doubled eye holes are at cells 4-6 and 12-14, so {8,14} is not where its eyes are. Measure before
+drawing anything.
+
+- *"a"* ⇒ **RUNG 2's EYE IS ONE GLYPH CENTRED IN THE SOCKET** (cells 5 and 13, row 4) — the faithful
+  option: exactly what 12x7 does, in the right cell. He declined the edged socket with a sky pupil
+  and declined the proportional two-cell eye in a deepened socket.
+  ⇒ ⭐ **THAT CLOSES EVERY OPEN DESIGN QUESTION ON THE COMPANION.** Final set:
+  ask = `Pricked ears` · cat finish = `Chin up` · crab finish = `Settled on the sand` + the SINGLE
+  claw shutting every ~7 s · rung 1 = `Faithful Scale-Up` minus the nose · rung 2 = the 2x body with
+  the muzzle filled and one centred eye glyph · crab near eye = four on RANDOM rotation.
+  ⚠ **NOTHING IS WIRED INTO THE PRODUCT YET** — all of it still lives in study files at the root and
+  renders through the doors in `internal/companion/study_art.go`. Building it is the next job.
+
+#### 2026-09-12, answering the open-cards list item by item
+
+- *"1. lets go with 'the fall' 2. where can I see this? 3. whats the call to make here? 4. what are
+  the optons 5. 2a (the eyes) or round 4, the faithtful scaled up works. -- why dont you make a new
+  page with all the outstanding decisions on art so we can see and pick. 6. whats pending ? 7. whats
+  the question 8. whats there to decide? 9. whats there to decide 10. dont let em touch 11. what
+  does this mean"*
+
+⇒ ⭐⭐ **RULING 1: THE SHOOTING STAR IS "THE FALL"** — arm A3 on `s29-starfall.html`. That answers
+the two questions that mattered: **the thing that moves IS the star** (not a separate mark flying
+into a star already home), and the path is **6 columns, 3 rows, away from the moon, 0.50 s, linear,
+NO TAIL**. ⚠ It costs the locked position row for half a second — CLAUDE.md's *"Position is fixed by
+index and seed so a star lights where it always was"* — and he has now ruled with that cost on the
+page in front of him. Section L was the frame that decided it.
+⇒ ⭐ **RULING 10: "dont let em touch"** — at 40x12 two stars may not render adjacent. The separation
+bar is 2.0 screen units and two stars one row apart in the same column measure exactly 2.00, so the
+bar has NO headroom; 8 pairs at 19 stars, 97 at 32. It is a COUNT error, because two touching stars
+read as one. ⇒ raise the bar or re-place at that geometry; his word is that it must not happen.
+⇒ ⭐ **HE WANTS ONE PAGE OF EVERY OUTSTANDING ART DECISION** — *"why dont you make a new page with
+all the outstanding decisions on art so we can see and pick"*. Not another round: a CONSOLIDATION of
+what is still undecided, options side by side.
+⇒ On 5: *"2a (the eyes) or round 4, the faithtful scaled up works"* — he is content with EITHER the
+fixed 2x body (eye treatment a) or the hand-drawn Faithful Scale-Up at 24x14. Not yet a pick; it
+goes on the new page as the first decision.
+⇒ Items 2, 3, 4, 6, 7, 8, 9 and 11 are QUESTIONS BACK TO ME, not rulings. Answer them plainly.
+
+#### 2026-09-12, on the open-decisions page
+
+- *"2. never seen it live, but agreed its not acceptable [screenshot of the mid-stride defect]
+  5. D 6. Whats pending? The scrollback issue seems resolved 7. do it 8. address it 11. fix it -
+  build everything else that hasnt been built"*
+
+⇒ ⭐ **THE TOP RUNG IS D = "Ruffed sit"** — the one that spends the pixels: cheek fur flaring at the
+jawline, tufted ears, separated toes. NOT the 2x blow-up he had accepted as workable, and NOT the
+Faithful Scale-Up. ⚠ This SUPERSEDES "lets fix the rung 2 then" of earlier today: the fixed 2x body
+was the fallback and he has now seen a drawn one beside it and taken the drawn one.
+⇒ **MID-STRIDE: fix it.** *"never seen it live, but agreed its not acceptable"* — he has never
+noticed it in 31 sessions, which is consistent with 0.28 s a time, and it still goes. He did not
+pick between the two fixes, so: author the front-view step bitmap (option A), because the
+alternative is a companion that never changes shape while walking, and *"I dont see this one moving"*
+was his very first note on the cat.
+⇒ **7 "do it"** = the tide's churn ceiling (`s.tideRow` is an INTEGER, so every row boundary the
+easing tide crosses re-ramps the whole open sea: 139 of 216 cells against an 8% bar).
+⇒ **8 "address it"** = `hyFloor` is a function of `sy` alone and never references the horizon, so at
+40x12 it permits water four rows ABOVE it.
+⇒ **11 "fix it"** = `emit` must reject an undefined kind instead of confirming delivery of nothing.
+⇒ **"build everything else that hasnt been built"** — the shooting star ("the fall"), the star
+separation rule ("dont let em touch"), the `-mirror=false` column −1 defect, and the cleanup of the
+art now living in two places.
+⇒ ⭐ **6: "The scrollback issue seems resolved."** HIS OBSERVATION, and it closes a card that has
+been open since s26 and was reported BACK in the fixed build in s28. ⚠ It is not a measurement and
+the evidence window is long gone, so it is CLOSED-ON-HIS-WORD, to be reopened if it recurs.
+⚠ **HE DID NOT ANSWER 4** (the rotating eye's 25% back-to-back repeat) while answering the items
+around it. Left as built — pure random — and flagged as still open rather than decided by silence.

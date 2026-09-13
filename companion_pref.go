@@ -24,12 +24,39 @@ func companionPath() (string, error) {
 	return filepath.Join(h, "companion"), nil
 }
 
+// companionEnv is the environment override, and it recognises TWO spellings on
+// purpose.
+//
+// ⚠ THE DOCUMENTED NAME NEVER WORKED. envx.Lookup PREFIXES what it is given,
+// so `envx.Lookup("XSCAPES_COMPANION")` read XSCAPES_XSCAPES_COMPANION -- the
+// variable README.md has advertised since the rename did nothing at all, and
+// the only spelling that ever had an effect was the doubled one nobody would
+// type. Fixed 2026-09-11 at his ruling, "fix it, recognise both names".
+//
+// The doubled spelling is kept for one release rather than deleted because
+// something on a machine may have been set to whatever actually worked, and a
+// key that is renamed out from under installed state orphans it silently --
+// the same lesson a hook marker and a config directory both taught here. The
+// correct name wins when both are set.
+func companionEnv() string {
+	if v := strings.TrimSpace(envx.Lookup("COMPANION")); v != "" {
+		return v
+	}
+	return strings.TrimSpace(envx.Lookup("XSCAPES_COMPANION"))
+}
+
 // companionPref is which companion to draw: the environment first, so a run can
 // be overridden without changing anything on disk, then the file, then the
 // default.
+//
+// The name is NORMALISED and VALIDATED here, at the point of READING, not only
+// where it is written. A file holding "Crab" or "octopus" used to leave the
+// live loop rebuilding the companion twice a second forever, because the
+// refresh compared the raw string against the animal's own name and never
+// agreed with itself.
 func companionPref() string {
-	if v := strings.TrimSpace(envx.Lookup("XSCAPES_COMPANION")); v != "" {
-		return v
+	if v := companionEnv(); v != "" {
+		return companionName(v)
 	}
 	p, err := companionPath()
 	if err != nil {
@@ -40,7 +67,20 @@ func companionPref() string {
 		return companion.DefaultName
 	}
 	if v := strings.TrimSpace(string(b)); v != "" {
-		return v
+		return companionName(v)
+	}
+	return companion.DefaultName
+}
+
+// companionName lower-cases and validates, falling back to the default rather
+// than handing the renderer a name it will have to fall back from on every
+// frame.
+func companionName(v string) string {
+	v = strings.ToLower(strings.TrimSpace(v))
+	for _, n := range companion.Names() {
+		if n == v {
+			return v
+		}
 	}
 	return companion.DefaultName
 }
@@ -63,8 +103,15 @@ func cmdCompanion(args []string) int {
 	if len(args) == 0 {
 		cur := companionPref()
 		fmt.Printf("companion: %s\n", cur)
-		if src := strings.TrimSpace(envx.Lookup("XSCAPES_COMPANION")); src != "" {
-			fmt.Printf("  (from XSCAPES_COMPANION; the saved setting is not in use)\n")
+		if src := companionEnv(); src != "" {
+			name := "XSCAPES_COMPANION"
+			if strings.TrimSpace(envx.Lookup("COMPANION")) == "" {
+				name = "XSCAPES_XSCAPES_COMPANION (the old spelling; use XSCAPES_COMPANION)"
+			}
+			fmt.Printf("  (from %s = %q; the saved setting is not in use)\n", name, src)
+			if companionName(src) != strings.ToLower(strings.TrimSpace(src)) {
+				fmt.Printf("  ⚠ %q is not a companion, so the default is drawn instead\n", src)
+			}
 		}
 		fmt.Printf("available: %s\n", strings.Join(companion.Names(), ", "))
 		return 0

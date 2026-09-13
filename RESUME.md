@@ -4,84 +4,91 @@
 
 ```
 cd ~/Documents/claude/xscapes/ and read CLAUDE.md (the brief, authoritative)
-and RESUME.md before responding. Session 28 is WRAPPED: HEAD 8a65298, pushed,
-tree clean, suite + vet + fmt green, installed.
-Seven things shipped yesterday and I have only seen some of them live -- the
-crab that walks up when it asks, a constellation scattered across the sky, a
-daytime sky that keeps its dust, a companion that stops sleeping while it
-works, and xscapes' own droplet sound. Skim origin-chat.md only if you need
-the why; ignore ideas.md -- it is parked.
-Tell me where we left off, then pick up from the NEXT queue -- items 0 and 2
-are mine, not work for you.
+and RESUME.md before responding. Session 29 is WRAPPED: HEAD <SHA>, tree clean,
+suite + vet + fmt green. NOT PUSHED and NOT INSTALLED -- I have seen none of it
+running.
+Two days went into the COMPANION and it is all built: the cat asks with its
+ears, both animals have a finish pose, the cat walks up its own three-rung
+ladder, and the crab's near eye rotates through four faces. Four defects I
+named are fixed. Skim origin-chat.md only if you need the why; ignore ideas.md.
+Tell me where we left off, then pick up from the NEXT queue.
 
 Four things about how to work on this, and they were ALL paid for:
 build the instrument before trusting the picture; measure the RENDERED frame
 rather than what the source says it should do; when a question is about what my
 sessions actually DO, go and count the event log in ~/.config/xscapes/run/*.jsonl
 instead of reasoning about it; and A MEASUREMENT AT ONE SEED, ONE GEOMETRY OR
-ONE HOUR IS NOT A MEASUREMENT -- that is what made you confidently wrong to my
-face twice in two sessions.
+ONE HOUR IS NOT A MEASUREMENT.
+⚠ And the one this session added: WHEN A FIX MAKES THE NUMBER WORSE, SAY SO AND
+PUT IT BACK. Twice in session 29 the obvious fix measured worse than the bug.
 Do NOT drive Terminal.app (osascript, System Events) without asking me first.
 ```
 
-## ▶ NEXT (session 28 left it here)
+## ▶ NEXT (session 29 left it here)
 
-**0. ⏳ HIS LOOK, and almost everything below is waiting on it.** Seven things shipped today and he
-has seen only some of them live. ⚠ **His running scapes hold OLD binaries until restarted** — check
-by inode, never by assumption:
+**0. ⏳ NOTHING HAS BEEN SEEN RUNNING.** Two days of companion work is committed and green and has
+never reached his screen. **Push, install, restart a scape, and look** before anything else:
 
 ```
+git push                                    # not done; his call
+go build -o ~/.local/bin/xscapes . && xscapes claude
 lsof -p <pid> -a -d txt | grep xscapes      # against: stat -f %i ~/.local/bin/xscapes
-xscapes claude                              # restart to pick it up
 ```
+⚠ **Install via a NEW inode** (`rm` then build, or `go build -o`): macOS SIGKILLs a binary
+overwritten in place after it has run.
 
-New since he last looked properly: **the droplet sound** (and only ONE sound per event now, his
-settings are edited) · **the daytime sky keeps 3 specks at noon and loses none to the cube** · **the
-companion stops sleeping while it works** · the crab comes closer **by default**.
+**1. ⭐ THE SHOOTING STAR IS RULED AND NOT BUILT — it is the one feature left.** His word, 09-12:
+*"lets go with 'the fall'"* = arm A3 on `assets/frames/s29-starfall.html`. **The star ITSELF moves**,
+6 columns, 3 rows, away from the moon, **0.50 s, linear, NO TAIL**. The study is built
+(`go run . -starfall <path>`, ~2 min, sweep to stderr) and every number it needs is measured:
+1,805 arrivals swept over 8 geometries x 6 hours x 3 seeds x 3 contexts x both mirrors x both
+balloons gave **0 count errors, 0 marks eaten, 0 off-canvas, 0 on the disc**, 93.5% streak.
+⚠ **What building it costs, all of it known:** two fields on `scape.Activity` (`Arriving bool` +
+`ArrivalPhase float64` — NEVER a bare float whose zero reads as "launching now", or `ambientFrame`'s
+19 pinned cells all fire at once) · a rising-edge trigger where TodoDone increases · the phase driven
+by WALL-CLOCK age, never an integrated dt, because `Shore.Update` clamps a gap over a second and a
+suspended laptop must wake with the star landed · a new test, because `star_steady_test.go` is blind
+to it. ⚠ **14:00 is the binding hour** — 64 path cells exhaust the ink search there and at no other
+hour. ⚠ **At 40x12, 47% of the sky is readout/balloon ground** and the balloon was caught eating a
+head; "no fall below this size" is a decision he has not made.
 
-**1. HIS, OPEN, both small:**
-- **Magnitude: widen or drop?** Measured: 4–8 distinct tones, luma spread 49.4 at midnight and
-  **32.6 at midday** against a sky gap of 92.5. It renders; it is just the weakest case at his hour,
-  and with 19 stars over 114 columns two magnitudes are almost never adjacent to compare.
-- **The shooting star.** ⭐ **HIS RULING IS ALREADY MADE** — *"ok let the shooting star be the star
-  arriving"* — and it is DESIGNED but NOT BUILT. It flies in and lands where the new star will sit,
-  so the meaning is the channel's own. ⚠ One open design question: the trail glyphs a streak needs
-  (`.`, `·`, `+`) are **the ambient field's**, so a tail is indistinguishable from the dust it flies
-  through. Either no tail, or a glyph the dust never uses.
+**2. HIS, OPEN:**
+- **The rotating eye repeats 24.3% of the time** — four-way random does that. He answered every item
+  around this one and not this one, so it is NOT decided by silence. Options are rendered on
+  `assets/frames/s29-decisions.html`: pure random (built) · never-twice-running (0%) · shuffled bag
+  (6.1%). One line either way.
+- **Andale Mono and the Commons publish**, untouched since s27. ⏰ **Commons closes 09-17.**
+- **The site has not been started** and it is his item (b) from 09-11. All 860 published frames are
+  stale; `~/Desktop/xscapes-commons/` is the 09-07 CAT page and would ship the wrong animal;
+  `go install ...@latest` is 52 commits behind. ⚠ Nothing in the repo can render the NEAR crab into
+  a clip — `Approach` has one non-test caller, the live TUI — so `gifs.go` needs one line before the
+  best feature can have an asset. ⚠ His last word on Commons itself is a HOLD: *"once we are ready,
+  I will let you know when."*
 
-**2. Andale Mono and the Commons publish** — both still his, both untouched since s27. ⏰ Commons
-closes **09-17**, six days.
+**3. Open defects, measured, NOT fixed:**
+- ⚠ **Two stars still touch, and I was wrong TWICE about why.** His ruling: *"dont let em touch"*.
+  (a) The bar has no headroom — a vertical neighbour is exactly `starHardSep` — but making the test
+  strict measured **WORSE**, 10 pairs → 12, because a rejected dart falls through to `roomiestCell`.
+  (b) The sky is not too small: at 40x12 the band is 3 rows of 40 columns and **eight** stars still
+  touch three times. **The cause is in the placement and is not found.** Likely direction, UNMEASURED:
+  `constellationCells` keeps stars off the disc's columns and the disc may be eating most of a
+  three-row band. `star_touch_test.go` characterises it at **54 pairs** worst and fails either way.
+- ⚠ **The tide's churn spike is still there, and the obvious fix is worse.** A fractional depth
+  churns **53.62% every frame** against ~64% on crossing frames only; `depth` scales the whole
+  gradient so there is no small change. Fixing it means anchoring the backdrop to something that is
+  not the tide. The swell's reference IS fractional now — it paints nothing.
+- ⚠ **`hyFloor` at 12 rows: FIXED.** ⚠ **`-mirror=false` pace direction: FIXED.** ⚠ **`emit` rejects
+  unknown kinds: FIXED.** ⚠ **The cat's mid-stride: FIXED.**
+- ⚠ **30x8 draws 21 of 32 stars.** Below the floor; untouched.
+- ⚠ **A junk `done` event is in `~/.config/xscapes/run/d6d42f888818.jsonl`** — I wrote it testing
+  `emit` and the removal was blocked as a destructive write. One line, his call:
+  `grep -v '"ts":1789243988792.*"src":"manual"' d6d42f888818.jsonl > t && mv t d6d42f888818.jsonl`
+- ✅ **The scrollback merge is CLOSED ON HIS WORD**, 09-12: *"The scrollback issue seems resolved."*
+  Not a measurement, and the evidence window is long gone. Reopen if it recurs.
 
-**3. Open defects, measured and NOT fixed, in the order I would take them:**
-- ⚠ **The scrollback merge is BACK in the fixed build** and it is a DIFFERENT mechanism from the s26
-  strikethrough. Signature, diffed against the exact emitted text: **zero non-space cells altered**,
-  18 of 22 spaces filled in one row and 27 of 29 in another, and the paragraph appears twice. A row
-  whose blank cells hold another row's glyphs was never CLEARED before being drawn. **Leading
-  hypothesis, untested: `feed()` holds back a trailing partial UTF-8 rune (the s26 fix) — does it
-  hold back a trailing partial CSI?** A split, dropped `ESC[2K` produces exactly this. Parked at his
-  word (*"focus on the draft"*); the evidence is in a live window and a restart destroys it.
-- ⚠ **The tide's churn ceiling breaks while the tide MOVES** — 139 of 216 cells, settling to 0.00%
-  against the 8% bar. Cause isolated: **`s.tideRow` is an INTEGER**, so every row boundary the easing
-  tide crosses re-ramps the whole open sea in one frame.
-- ⚠ **`hyFloor` cannot do its job at 12-row heights** — it is a function of `sy` alone and never
-  references the horizon, so at 40x12 it permits the water four rows ABOVE it.
-- ⚠ **`-mirror=false` draws the companion at column −1** at 124 columns. `pace()` calls `paceSpan(w)`
-  unconditionally but `compose()` sets `PaceSpan = 0` in the unmirrored layout. Pre-existing.
-- ⚠ **At 40x12 two stars can touch** (8 pairs at 19 stars, 97 at 32): the separation bar is 2.0
-  screen units and two stars one row apart in the same column measure exactly 2.00. Below the design
-  floor, but two touching stars read as one, which is a count error.
-- ⚠ **30x8 draws 21 of 32 stars.** Below the floor; the old layout drew 16.
-- ⚠ **`emit` accepts any word as a kind and confirms delivery of nothing.** `emit ask` is not a kind;
-  it went to the socket, was dropped by the reducer, and printed "sent ask to session…". **Three
-  `ask` events are in his log as junk** because of it. It should reject an undefined kind.
-
-**4. Residues, his call, none blocking:** the sea's sideways motion is the DOMINANT motion on screen
-(~9 cells/s against ~2 rows/s inward) and is GEOMETRY, not a term — the crests lie 4.78 cells of x
-per row of y, and `sea()` and `swells()` each produce it independently · 2.76 h of the "asleep while
-working" figure remains, some of it my measure counting sessions abandoned mid-turn.
-
-**5. Parked:** the brand workstream · Milestone 2 · `SetEyeFill` (confirmed product-dead, 3 call
-sites, all study/test).
+**4. Cleanup carried:** the chosen art now exists TWICE — in `internal/companion/bitmaps_poses.go`
+(shipped) and in the root study files (`catalts_picks.go`, `catalts_art.go`, `cattop_art.go`). Point
+the study pages at the shipped art and delete the duplicates before they drift.
 
 ## Instruments built in session 28 (do not re-derive these)
 

@@ -264,3 +264,55 @@ var KittenSwim = []string{
 	".########.",
 	"..######..",
 }
+
+// CatBodyStep is the cat mid-stride, front view, in its own 12x7 box.
+//
+// ⚠ IT EXISTS BECAUSE OF A LIVE DEFECT HE AGREED TO ON 2026-09-12, having
+// never once noticed it: the cat had NO mid-stride body, so Draw reached for
+// CatWalk -- a SIDE view, 32 source columns wide -- and drew it inside the
+// 24-column box, then plotted the front-view eye glyphs at their usual cells.
+// The eyes landed on nothing. Folded through the real reducer over his 126
+// spools it rendered 4,037 times across 31 sessions, about 65 times an hour of
+// working time, 0.28 s each, which is why it read as a flicker rather than as
+// a wrong picture.
+//
+// The fix is the crab's: one extra bitmap for the lower half, the way
+// crabLowerStep sits under crabLower. Only the PAWS move -- the near one
+// forward, the far one tucked -- so the head, the eye sockets and the whole
+// silhouette above the waist are byte-identical to the standing pose and
+// nothing downstream can shift. A step that changed the head would move the
+// eye cells and the balloon's pointer with them.
+//
+// The alternative was to stop swapping the body at all, which costs no art and
+// loses the stride. His very first note on this companion was "i liked the cat
+// before much better. also, I dont see this one moving", so the stride stays.
+var CatBodyStep = []string{
+	"...##.........##........",
+	"...###.......###........",
+	"...####.....####........",
+	"...#############........",
+	"..###############.......",
+	".#################......",
+	".#################......",
+	".#################......",
+	".###...#####...###......",
+	".###...#####...###......",
+	".#################......",
+	".#######...#######......",
+	".#################......",
+	"..###############.......",
+	"...#############........",
+	"....###########.........",
+	".....#########..........",
+	"....###########.........",
+	"...#############........",
+	"..###############.......",
+	"..###############.......",
+	".#################......",
+	".#################......",
+	".#################......",
+	".#################......",
+	".#################......",
+	".####..#####...##.......",
+	".####..#####...##.......",
+}

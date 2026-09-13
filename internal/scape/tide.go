@@ -70,7 +70,23 @@ func tideTarget(level, scale float64) float64 {
 
 // hyFloor is the highest row the water may withdraw to, so a long quiet stretch
 // cannot pull the shoreline up into the sky.
-func hyFloor(sy int) float64 { return float64(sy) - TideRange - 1 }
+//
+// ⚠ IT HAS TO KNOW WHERE THE SKY IS. It was a function of sy alone -- the row
+// the beach starts at -- and TideRange is five rows, so at a short window the
+// arithmetic permitted a waterline ABOVE THE HORIZON: measured at 40x12, four
+// rows above it. The scene has a sea in the sky and nothing in the layout could
+// notice, because the only guard was against the WRITING band below.
+//
+// So the horizon is a hard floor and the tide gives up its range rather than
+// its meaning. One row of clearance, because a waterline exactly on the horizon
+// has no sea left to draw. Fixed 2026-09-12 at his "address it".
+func hyFloor(sy, hy int) float64 {
+	f := float64(sy) - TideRange - 1
+	if sky := float64(hy) + 1; f < sky {
+		return sky
+	}
+	return f
+}
 
 // tideEdge is the waterline under Tide: one phase for every column, so the
 // whole sheet advances and retreats together, over a coast whose own shape

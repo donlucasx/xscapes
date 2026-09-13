@@ -285,7 +285,14 @@ func crabUpper(st State, t float64) []string {
 	case NeedsYou:
 		return crabAsk
 	case Done:
-		return crabDone
+		// His pick, 2026-09-12: "settled on the sand", with the near pincer
+		// shutting every so often -- "it should not be completely static."
+		// See crabSettledClaw for why an idle twitch is allowed inside a pose
+		// that pace.go otherwise freezes.
+		if math.Mod(t, crabClawPeriod) < crabClawHold {
+			return crabSettledClaw
+		}
+		return crabSettled
 	case Worried:
 		return crabWorried
 	}
@@ -324,7 +331,11 @@ func (c *Cat) drawCrab(l *canvas.Layer, x, y int, t float64, st State) {
 		return
 	}
 	lower := crabLower
-	if c.stepping && st != Worried {
+	if st == Done {
+		// The settled finish sits lower on its legs than the standing stance.
+		lower = crabSettledLower
+	}
+	if c.stepping && st != Worried && st != Done {
 		// Mid-stride: the legs swap phase and the body drops a pixel. Only the
 		// LOWER half changes, so a step costs one extra bitmap and nothing else.
 		lower = crabLowerStep

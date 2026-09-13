@@ -31,6 +31,39 @@ const (
 	Context      Kind = "context"
 )
 
+// Kinds is every kind the reducer understands, in protocol order.
+//
+// It exists because `xscapes emit <word>` used to cast its first argument
+// straight to a Kind with no validation: an unknown word went to the socket,
+// was dropped by the reducer, and the command printed "sent ... to session".
+// THREE JUNK `ask` EVENTS ARE IN HIS REAL LOG because of it -- `ask` is a
+// reasonable guess, since `xscapes notify ask` accepts exactly that word.
+var Kinds = []Kind{
+	SessionStart, SessionEnd, Prompt, ToolStart, ToolEnd, Error,
+	TestPass, TestFail, Compact, NeedsInput, Done, SubStart, SubEnd,
+	Todo, Context,
+}
+
+// Known says the reducer has a meaning for this kind.
+func Known(k Kind) bool {
+	for _, v := range Kinds {
+		if v == k {
+			return true
+		}
+	}
+	return false
+}
+
+// KindNames is Kinds as plain strings, for an error message that tells the
+// caller what it could have said instead.
+func KindNames() []string {
+	out := make([]string, len(Kinds))
+	for i, k := range Kinds {
+		out[i] = string(k)
+	}
+	return out
+}
+
 // Op is the coarse class of a tool. The brief killed the per-tool weather
 // taxonomy, and this is deliberately not a revival of it: nothing in the scene
 // keys a *visual* off Op. It exists so the sand can say "read" instead of

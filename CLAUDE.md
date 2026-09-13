@@ -2,6 +2,66 @@
 
 *(Renamed end to end on 2026-09-03: directory, env vars, state path and hook marker. Two names are kept on purpose and are not leftovers -- `internal/envx` still reads `ASCIISCAPES_*` and warns, and `install.go` still RECOGNISES the `# asciiscapes:v1` marker so the hooks it wrote before the rename can be found and removed.)*
 
+> **Session 29 (2026-09-11 into 09-12), WRAPPED. HEAD `<SHA>`, tree clean, suite + vet + fmt green.
+> ⚠ NOT PUSHED AND NOT INSTALLED — he has seen none of it running. Two days, and almost all of it
+> was HIS design round: I drew, he ruled.**
+>
+> ⭐⭐ **THE CAT IS A FIRST-CLASS COMPANION NOW**, his ask of 09-11: *"update the cat companion to have
+> all the existing behaviors, come close when prompting and ensure its ready for the user to swap
+> companions on demand"*, then *"later include him as an alt companion on the site"* — which settles
+> that **the crab stays the DEFAULT**. It asks with its ears (*"Pricked ears"*), finishes with its
+> chin up, and **walks up its own three-rung ladder**, 12x7 → 16x9 → 24x14.
+> ⚠ **THE MEASUREMENT THAT MATTERED WAS AMBIGUITY, and two instruments lied before it.** Diffing
+> BITMAPS compares a thing to itself (the shipped ask WAS CatBody). Diffing two frames at one clock
+> measures the poses' breath and wag being out of PHASE — 2.2 s against 1.6 s — and calls a rate
+> difference a still-frame one; it said "37 cells" about two identical bitmaps. The real question is
+> whether a SCREENSHOT IS AMBIGUOUS: 1,200 frames a pose, bodies only, set overlap. **Asking 97% ·
+> done 100% · resting 97% · worried 0%.** Worried at 0% is the positive control. **All five ask
+> candidates took 97% → 0%.**
+> ⭐ **`crabDone` WAS DEAD ART.** It raised one claw by a SINGLE source row and ToQuadrant ORs rows in
+> pairs, so all six of its half-rows were byte-identical to `crabWork`'s. The crab's finish cue has
+> been the eye glyph alone since it was written. That is what his "both animals" ruling bought.
+>
+> ⭐⭐ **THE SAME OR-TRAP, CAUGHT BY HIM FROM BOTH SIDES.** `CatBody` row 11 is a muzzle gap that row 10
+> covers, so **the cat has never had a mouth on screen** — an accident of the halving, not a decision.
+> A drafted 16x9 laid its muzzle across a boundary and GREW A NOSE (*"the original rung 0 doesnt have
+> any nose/mouth"*); doubling the body for the top rung made a MOUTH APPEAR (*"just fix the eyes and
+> remove the mouth"*). ⚠ Two general fixes were measured and both rejected: half-row doubling removes
+> the mouth and **flattens every tapered edge** (nine rows), and "fill every covered interior gap"
+> also eats **the notch between the ears**, which is structurally identical to a mouth. It is targeted
+> at the muzzle pair, with both failures written into the test.
+> ⭐ **AND MOST OF WHAT HE WAS LOOKING AT WAS MY BUG**: the rung-2 mockup passed the CRAB's eye cells
+> `{8,14}`; mirrored they land on INK, so both eyes were painted on the animal's forehead.
+>
+> ⭐ **HIS PICKS, all from rendered options:** ask = Pricked ears · cat finish = Chin up · crab finish =
+> Settled on the sand **with one pincer shutting every 7 s** (*"it should not be completely static"*)
+> · rung 1 = the Faithful Scale-Up minus the nose · **rung 2 = "Ruffed sit", hand-drawn** (the 2x
+> blow-up was *"no good"* — the only rung nobody had drawn, and it is the size the animal STOPS at) ·
+> **four near eyes on RANDOM rotation** (*"round off, high pupil, hood, hooded ring"*).
+> ⭐ **WHY RANDOM IS LEGAL, and it is the same argument that lets the claw twitch exist: a random eye
+> carries NO INFORMATION**, so it cannot put a second meaning on a channel that already says "the
+> agent needs you". ⚠ It is picked on the RISING EDGE and held for the whole ask — per-frame would
+> change the face twenty times a second while he reads the question.
+>
+> ⭐ **`DrawnHeadCol` IGNORED THE MIRROR AND THE CRAB HID IT.** The moment the cat climbed, the
+> balloon-aim test put the pointer **5 cells off the face at every width and both rungs**: near poses
+> are mirrored then the eyes placed in CELL space. The crab's `{8,14}` are symmetric under that map in
+> a 24-cell box, so the error cancelled and nobody ever saw it.
+>
+> ⭐ **FOUR DEFECTS HE NAMED, FIXED:** the cat's mid-stride drew a 16-cell SIDE view inside the 12-cell
+> box and put the eyes 6 and 10 cells off the head — **4,037 times across 31 sessions**, and he had
+> never once noticed it · `hyFloor` ignored the horizon and let water sit **above** it in 81 swept
+> configurations · the unmirrored layout paced the companion **toward** the frame edge · `emit`
+> accepted any word as a kind and confirmed delivery of nothing.
+> ⚠⚠ **AND TWO FIXES MEASURED WORSE THAN THE BUG, BOTH PUT BACK.** A fractional tide depth churns
+> **53.62% EVERY frame** against ~64% on crossings alone. Making the star separation strict took
+> touching pairs from **10 to 12**, because a rejected dart falls through to `roomiestCell`. Neither
+> is fixed; both are carded with the number. **An average that passes is not a ceiling that holds.**
+>
+> ⏭ **THE SHOOTING STAR IS RULED AND NOT BUILT** — *"lets go with 'the fall'"*: the star itself moves,
+> 6 columns, 3 rows, 0.50 s, linear, no tail. It is the one feature left.
+> ⏰ **Commons closes 09-17.** The site is untouched and every published frame is stale.
+
 > **Session 28 (2026-09-10 into 09-11), WRAPPED. Six commits, PUSHED, HEAD `8a65298`, tree clean,
 > suite + vet + fmt green, installed. HIS SESSION, start to finish: he reported, I measured, he ruled.**
 >

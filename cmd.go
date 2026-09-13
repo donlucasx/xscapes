@@ -112,6 +112,20 @@ func runEmit(args []string) {
 		os.Exit(2)
 	}
 	kind := args[0]
+	// REJECT AN UNDEFINED KIND, his ruling of 2026-09-12: "fix it".
+	//
+	// Without this the word went to the socket, the reducer dropped it, and
+	// this command printed "sent ask to session ..." -- a success message for
+	// a delivery of nothing. `ask` is the obvious guess, because `xscapes
+	// notify ask` takes exactly that word, and three of them are in his log.
+	if !event.Known(event.Kind(kind)) {
+		fmt.Fprintf(os.Stderr, "xscapes emit: %q is not an event kind.\nkinds: %s\n",
+			kind, strings.Join(event.KindNames(), ", "))
+		if alt := emitDidYouMean(kind); alt != "" {
+			fmt.Fprintf(os.Stderr, "did you mean %q?\n", alt)
+		}
+		os.Exit(2)
+	}
 	fs.Parse(args[1:])
 
 	sess := *session
@@ -291,4 +305,21 @@ func runReplay(args []string) {
 		n++
 	}
 	fmt.Printf("replayed %d events\n", n)
+}
+
+// emitDidYouMean catches the two words a person actually types. They are not
+// guesses: `ask` is what `xscapes notify` calls the same moment, and `finish`
+// is the other half of that pair.
+func emitDidYouMean(kind string) string {
+	switch strings.ToLower(kind) {
+	case "ask", "needs-input", "needsinput", "permission":
+		return string(event.NeedsInput)
+	case "finish", "complete", "finished":
+		return string(event.Done)
+	case "start", "session":
+		return string(event.SessionStart)
+	case "sub", "subagent":
+		return string(event.SubStart)
+	}
+	return ""
 }

@@ -122,11 +122,27 @@ const shippedCrabCells = 12
 // asymmetric -- notes/s28-closer/critic/ladder.go) and would have read as a
 // camera push rather than as an animal walking.
 func (c *Cat) Approach(dt float64, near bool) {
+	// THE ASK ORDINAL, counted on the RISING EDGE and nowhere else.
+	//
+	// It exists for the rotating near eye, his ruling of 2026-09-12: four eyes,
+	// "random each time". Random ACROSS asks is what makes it safe under the
+	// encoding rule -- a random eye carries no information, so it cannot put a
+	// second meaning on a channel that already says "the agent needs you", and
+	// that is the same argument that permits the crab's claw twitch.
+	//
+	// ⚠ Constant WITHIN an ask is the half that decides whether it reads as
+	// character or as a glitch. An eye picked per frame would change the
+	// companion's face twenty times a second while he is reading the question.
+	// So the eye is a function of THIS counter and never of the clock.
+	if near && !c.asking {
+		c.askN++
+	}
+	c.asking = near
+
 	steps := c.nearSteps()
 	if steps == 0 {
-		// Off, or the cat, which has no near art. Pin it: a progress left
-		// part-way by a flag flipped mid-session would size a box that no
-		// longer has a pose to fill it.
+		// Off. Pin it: a progress left part-way by a flag flipped mid-session
+		// would size a box that no longer has a pose to fill it.
 		c.approach = 0
 		return
 	}
@@ -167,7 +183,7 @@ func (c *Cat) DrawnBox(frameW int) (dx, w, h int) {
 	if r == 0 {
 		return 0, w, h
 	}
-	b := nearBoxes[r]
+	b := c.boxes()[r]
 	return c.nearDX(b.w), b.w, b.h
 }
 
@@ -231,8 +247,8 @@ func (c *Cat) nearDX(w int) int {
 // picture has stopped being a companion IN a scene and become the scene. At 40
 // columns that drops rung 2 to rung 1 (16 of 40) and the tail comes back; at 48
 // and up rung 2 stands, which covers every window he works in.
-func nearFits(rung, frameW int) int {
-	for rung > 0 && nearBoxes[rung].w*2 > frameW {
+func (c *Cat) nearFits(rung, frameW int) int {
+	for rung > 0 && c.boxes()[rung].w*2 > frameW {
 		rung--
 	}
 	return rung
@@ -249,30 +265,47 @@ func nearFits(rung, frameW int) int {
 // redrawn -- which is the same reason HeadCol reads catEyeCells.
 func (c *Cat) DrawnHeadCol(frameW int) int {
 	r := c.nearRung(frameW)
-	if r == 0 || c.kind != KindCrab {
+	if r == 0 {
 		return c.HeadCol()
 	}
 	p := c.nearPoseFor(r, NeedsYou, 0)
-	// eyeCells are the LEFT cell of each 2-cell eye, so the pair spans
-	// eyeCells[0] .. eyeCells[1]+1 and the midpoint is between them.
-	return c.nearDX(nearBoxes[r].w) + (p.eyeCells[0]+p.eyeCells[1]+nearEyeWide)/2
+	w := c.boxes()[r].w
+	// ⚠ MIRROR THE EYE CELLS THE WAY THE DRAW DOES. The sprite is flipped and
+	// the eyes are then placed in CELL space, so a mirrored pose's eyes are at
+	// w-eyeWide-e -- not at e.
+	//
+	// This went unnoticed for as long as the crab was the only animal with a
+	// near pose, because its eyeCells {8, 14} are symmetric under that map in a
+	// 24-cell box (8 and 14 swap) and the midpoint comes out the same either
+	// way. The cat's {5, 13} are not, and the pointer landed FIVE CELLS off the
+	// face at every width and both rungs -- caught by the balloon-aim test the
+	// moment the cat started climbing.
+	a, b := p.eyeCells[0], p.eyeCells[1]
+	if c.mirror {
+		a, b = w-p.eyeWide-a, w-p.eyeWide-b
+	}
+	if a > b {
+		a, b = b, a
+	}
+	// eyeCells are the LEFT cell of each eye, so the pair spans a to
+	// b+eyeWide-1 and the midpoint is between them. eyeWide is the pose's own,
+	// because the crab's near eye is a 2-cell bitmap and the cat's is a 1-cell
+	// glyph -- his ruling of 2026-09-05, "keep holes (as is)".
+	return c.nearDX(w) + (a+b+p.eyeWide)/2
 }
 
 // nearSteps is how many rungs the walk climbs. Zero disables everything in this
 // file.
 func (c *Cat) nearSteps() int {
-	if c.kind != KindCrab {
-		// The near pose is Hero's. The cat has no art at this size and is not
-		// getting any redrawn for a switch he has not ruled on yet, so the cat
-		// simply never approaches -- and the root package can still call
-		// Approach and DrawnBox unconditionally.
-		return 0
-	}
+	// BOTH animals climb now. The cat's near art landed 2026-09-12 at his
+	// ruling -- "the goal is for the cat to come closer when it needs human
+	// input, right? like the crab" -- and before that this returned 0 for the
+	// cat, because the near pose was Hero's alone.
 	if Near < 1 {
 		return 0
 	}
-	if Near > len(nearBoxes)-1 {
-		return len(nearBoxes) - 1
+	if Near > len(crabNearBoxes)-1 {
+		return len(crabNearBoxes) - 1
 	}
 	return Near
 }
@@ -300,7 +333,7 @@ func (c *Cat) nearRung(frameW int) int {
 	// the frame is, and an unknown width must not silently shrink the animal --
 	// every study page and every test that predates this draws without one.
 	if frameW > 0 {
-		r = nearFits(r, frameW)
+		r = c.nearFits(r, frameW)
 	}
 	return r
 }
@@ -587,13 +620,19 @@ var nearEyeDone = []string{
 // nearEye picks the eye bitmap and its colour for a state, on exactly the
 // shipped mapping and the shipped blink schedule, so the near pose says the
 // same things the small one does.
-func nearEye(st State, t float64) ([]string, term.RGB) {
+func (c *Cat) nearEye(st State, t float64) ([]string, term.RGB) {
 	art, col := nearEyeOpen, eyeCol
 	switch st {
 	case Resting:
 		art = nearEyeShut
 	case NeedsYou:
-		art, col = nearEyeAlert, EyeAlert
+		art, col = nearEyeRotation[c.eyePick()], EyeAlert
+		if StudyNearEyeAlert != nil {
+			art = StudyNearEyeAlert // a design round; nil in the product
+		}
+		if StudyNearEyeCol != nil {
+			col = *StudyNearEyeCol
+		}
 	case Worried:
 		col = eyeWorried
 	case Done:
@@ -619,23 +658,58 @@ type nearPose struct {
 	// lift is the breath, in source rows. Even, because one quadrant subpixel
 	// is two source rows and an odd lift would land between subpixels.
 	lift int
+	// eyeWide is how many CELLS one eye spans: 2 for the crab's near bitmap,
+	// 1 for the cat, whose eye stays a glyph in a hole.
+	eyeWide int
+	// glyphEye draws the eye as a character rather than a bitmap, and does NOT
+	// paint a ground, so the scene shows through it. That is the cat's, and it
+	// is his ruling of 2026-09-05: "regarding eyes, keep holes (as is)."
+	glyphEye bool
+	// tailScale draws the cat's procedural tail at this rung. Zero for the
+	// crab, whose whole body is bitmap.
+	tailScale float64
 }
 
-// nearBoxes is each rung's drawn footprint in cells. Rung 0 is the shipped box.
-// The other two are measured off the art at startup rather than written down,
-// so a change to the art cannot leave the layout describing the old size.
-var nearBoxes = [3]struct{ w, h int }{
-	{shippedCrabCells, 7},
-	nearBoxOf(nearAsk1, nearLower1),
-	// nearDouble rather than double2x: package var initialisers run BEFORE
-	// init(), so the cache is still empty here. Same answer, no dependence on
-	// the order.
-	nearBoxOf(nearDouble(crabAsk), nearDouble(crabLower)),
+// nearBox is one rung's drawn footprint in cells.
+type nearBox struct{ w, h int }
+
+// The box tables, one per animal. Rung 0 is the shipped box for both -- Size()
+// returns it forever, because compose() derives the companion's margin, the
+// litter's room, the sand's extent and the moon's column from it. The other two
+// are MEASURED off the art at startup rather than written down, so a change to
+// the art cannot leave the layout describing the old size.
+//
+// nearDouble rather than double2x throughout: package var initialisers run
+// BEFORE init(), so the cache is still empty here. Same answer, no dependence
+// on the order.
+var (
+	crabNearBoxes = [3]nearBox{
+		{shippedCrabCells, 7},
+		nearBoxOf(nearAsk1, nearLower1),
+		nearBoxOf(nearDouble(crabAsk), nearDouble(crabLower)),
+	}
+
+	// The cat's ladder, his rulings of 2026-09-11 and 09-12: the middle rung
+	// is hand-drawn ("The Faithful Scale-Up" with the nose removed) and the top
+	// rung is the shipped body doubled with the muzzle filled.
+	catNearBoxes = [3]nearBox{
+		{shippedCrabCells, 7},
+		nearBoxOf(CatNear1Ask, CatNear1Lower),
+		nearBoxOf(nearDouble(nearFillHidden(CatAsk)), nil),
+	}
+)
+
+// boxes is this animal's ladder.
+func (c *Cat) boxes() *[3]nearBox {
+	if c.kind == KindCat {
+		return &catNearBoxes
+	}
+	return &crabNearBoxes
 }
 
-func nearBoxOf(upper, lower []string) struct{ w, h int } {
+func nearBoxOf(upper, lower []string) nearBox {
 	q := ParseBitmap(append(append([]string{}, upper...), lower...)).ToQuadrant()
-	return struct{ w, h int }{len([]rune(q[0])), len(q)}
+	return nearBox{len([]rune(q[0])), len(q)}
 }
 
 // nearPoseFor assembles the rung's art for this state and frame.
@@ -656,6 +730,9 @@ func nearBoxOf(upper, lower []string) struct{ w, h int } {
 // The eye pass paints its own ground, so a row above the body costs nothing and
 // simply carries the stalk up: the tile IS the head.
 func (c *Cat) nearPoseFor(rung int, st State, t float64) nearPose {
+	if c.kind == KindCat {
+		return c.catPoseFor(rung, st, t)
+	}
 	if rung >= 2 {
 		lower := crabLower
 		if c.stepping && st != Worried {
@@ -670,6 +747,7 @@ func (c *Cat) nearPoseFor(rung int, st State, t float64) nearPose {
 			// starts at 5.
 			eyeCells: [2]int{8, 14},
 			eyeRow:   2,
+			eyeWide:  nearEyeWide,
 			// TWO source rows, not four, and this one was measured rather than
 			// reasoned. A doubled bitmap shifted by two rows moves by exactly
 			// ONE ORIGINAL source row, which is half a character cell -- the
@@ -689,7 +767,8 @@ func (c *Cat) nearPoseFor(rung int, st State, t float64) nearPose {
 	// The stalks are authored at source cols 11-12 and 19-20, straddling a cell
 	// boundary on purpose, so a 4px (2 cell) eye caps them exactly: cells 5-6
 	// and 9-10. Symmetry in this medium is a property of even column parity.
-	return nearPose{upper: upper, lower: nearLower1, eyeCells: [2]int{5, 9}, eyeRow: 0, lift: 2}
+	return nearPose{upper: upper, lower: nearLower1, eyeCells: [2]int{5, 9},
+		eyeRow: 0, lift: 2, eyeWide: nearEyeWide}
 }
 
 // drawCrabNear is the whole near draw: one branch off drawCrab, the same
@@ -721,7 +800,7 @@ func (c *Cat) drawCrabNear(l *canvas.Layer, x, y int, t float64, st State, rung 
 	plotRim(l, q, bx, y)
 	(&Sprite{Rows: q, Body: c.coat}).Draw(l, bx, y)
 
-	art, col := nearEye(st, t)
+	art, col := c.nearEye(st, t)
 	ground, ok := c.eyeGround()
 	if !ok {
 		ground = c.coat
