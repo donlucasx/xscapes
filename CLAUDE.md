@@ -2,6 +2,40 @@
 
 *(Renamed end to end on 2026-09-03: directory, env vars, state path and hook marker. Two names are kept on purpose and are not leftovers -- `internal/envx` still reads `ASCIISCAPES_*` and warns, and `install.go` still RECOGNISES the `# asciiscapes:v1` marker so the hooks it wrote before the rename can be found and removed.)*
 
+> **Session 30 (2026-09-12). ⭐⭐ THE SHOOTING STAR IS BUILT, and it was the one feature left.**
+> HEAD `f5ebade`, tree clean, suite + vet + fmt green, **INSTALLED** (inode 85156170).
+> ⚠ **STILL NOT PUSHED** — three commits sit ahead of `origin/main` now (s29's two and this).
+> Push needs `gh auth switch --user donlucasx` FIRST, every time; it is his call.
+>
+> ⭐ **"The fall", his ruling: the star ITSELF travels** six columns and three rows into its own
+> place, 0.50 s, linear, no tail. Built exactly as the study costed it — `Arriving bool` +
+> `ArrivalPhase float64`, the rising edge in `Apply` (NOT `State`, which runs several times a frame
+> in three study pages and would never let the star land), the phase from WALL-CLOCK age so a
+> suspended laptop wakes with the star **landed**. The path walks OUTWARD from home and flies in
+> reverse, so a guard can only ever trim the launch — the drafted inward search put 8.7–33.6% of
+> launches off canvas, and that class of bug is now unreachable rather than fixed.
+> ⚠⚠ **AND I WROTE A CONFIDENT WRONG CLAIM INTO THE SOURCE BEFORE COUNTING IT.** I argued that
+> choosing the side away from the moon makes the disc and readout guards structurally dead. Over
+> **30,132 swept arrivals both fire**: the disc 90 times and **every one on the FLIP** (the fallback
+> that walks back toward the moon when the outward side has no room), the readout **108 times on the
+> PRIMARY direction**, because `readoutGround` covers the label's alternate placement BESIDE the
+> disc, nine columns out on the same side a star may be walking. **All four guards mutation-tested;
+> all four turn the sweep red at his own 125x28.** The corrected numbers are in `arrival.go`.
+> ⇒ **88.6% of arrivals fly.** ⚠ **40x12 flies 38.0% and that is NOT a defect** — a refused track
+> degrades to exactly the pre-feature behaviour (the star appears in its place). But **an average
+> that passes is not a ceiling that holds**, so 125x28 / 143x27 / 107x51 / 80x24 / 60x20 each carry
+> their own **95% floor** in the test. ⏭ **"No fall below some size" is a decision he has not been
+> asked for.**
+> ⇒ **Read back off COMPOSED frames, 174 arrivals: 0 count errors, 0 heads eaten, 0 on the disc**,
+> every landing on the star's own cell. That is what answers the balloon — `drawScene` paints an
+> opaque balloon and the readout into the same near layer AFTER the scape — and **no extra plumbing
+> is needed**.
+> ⇒ **The demo cycle flies it too**, or the feature is invisible where the product shows itself off:
+> `xscapes` with no agent has no reducer, and every site clip renders from `demoState`.
+> ⚠ **No-skip holds at 12 fps (hosted `xscapes claude`) and 20 (standalone). Below 12, half a second
+> cannot show six columns** and the head jumps two at a time. Stated limit, not a defect.
+> ⏰ **Commons closes 09-17, 5 days. The site is untouched and every published frame is stale.**
+
 > **Session 29 (2026-09-11 into 09-12), WRAPPED. HEAD `d02530b`, tree clean, suite + vet + fmt green.
 > ⚠ NOT PUSHED AND NOT INSTALLED — he has seen none of it running. Two days, and almost all of it
 > was HIS design round: I drew, he ruled.**

@@ -4,13 +4,13 @@
 
 ```
 cd ~/Documents/claude/xscapes/ and read CLAUDE.md (the brief, authoritative)
-and RESUME.md before responding. Session 29 is WRAPPED: HEAD d02530b, tree clean,
-suite + vet + fmt green. NOT PUSHED and NOT INSTALLED -- I have seen none of it
-running.
-Two days went into the COMPANION and it is all built: the cat asks with its
-ears, both animals have a finish pose, the cat walks up its own three-rung
-ladder, and the crab's near eye rotates through four faces. Four defects I
-named are fixed. Skim origin-chat.md only if you need the why; ignore ideas.md.
+and RESUME.md before responding. Session 30 left HEAD f5ebade, tree clean,
+suite + vet + fmt green, INSTALLED. NOT PUSHED -- three commits ahead.
+THE SHOOTING STAR IS BUILT -- "the fall", the last feature on the list. Before
+it, two days went into the COMPANION: the cat asks with its ears, both animals
+have a finish pose, the cat walks up its own three-rung ladder, and the crab's
+near eye rotates through four faces. I have seen NONE of it running yet.
+Skim origin-chat.md only if you need the why; ignore ideas.md.
 Tell me where we left off, then pick up from the NEXT queue.
 
 Four things about how to work on this, and they were ALL paid for:
@@ -24,33 +24,44 @@ PUT IT BACK. Twice in session 29 the obvious fix measured worse than the bug.
 Do NOT drive Terminal.app (osascript, System Events) without asking me first.
 ```
 
-## ▶ NEXT (session 29 left it here)
+## ▶ NEXT (session 30 left it here)
 
-**0. ⏳ NOTHING HAS BEEN SEEN RUNNING.** Two days of companion work is committed and green and has
-never reached his screen. **Push, install, restart a scape, and look** before anything else:
+**0. ⏳ HIS LOOK IS THE WHOLE QUEUE NOW.** Three days of work — the companion round AND the shooting
+star — is committed, green and **installed** (inode 85156170), and he has seen none of it running.
+**Restart a scape and look.** Nothing else in the product is waiting on me.
 
 ```
-git push                                    # not done; his call
-go build -o ~/.local/bin/xscapes . && xscapes claude
-lsof -p <pid> -a -d txt | grep xscapes      # against: stat -f %i ~/.local/bin/xscapes
+git push                                    # NOT done; 3 commits ahead; his call
+gh auth switch --user donlucasx && git push origin main   # the switch is host-global and does NOT stay put
+xscapes claude                              # already installed; just restart
+lsof -p <pid> -a -d txt | grep xscapes      # against: stat -f %i ~/.local/bin/xscapes  -> 85156170
 ```
 ⚠ **Install via a NEW inode** (`rm` then build, or `go build -o`): macOS SIGKILLs a binary
 overwritten in place after it has run.
+⚠ **A running scape keeps the OLD binary** (that is what the new inode buys). Restart or you
+re-photograph the old picture.
 
-**1. ⭐ THE SHOOTING STAR IS RULED AND NOT BUILT — it is the one feature left.** His word, 09-12:
-*"lets go with 'the fall'"* = arm A3 on `assets/frames/s29-starfall.html`. **The star ITSELF moves**,
-6 columns, 3 rows, away from the moon, **0.50 s, linear, NO TAIL**. The study is built
-(`go run . -starfall <path>`, ~2 min, sweep to stderr) and every number it needs is measured:
-1,805 arrivals swept over 8 geometries x 6 hours x 3 seeds x 3 contexts x both mirrors x both
-balloons gave **0 count errors, 0 marks eaten, 0 off-canvas, 0 on the disc**, 93.5% streak.
-⚠ **What building it costs, all of it known:** two fields on `scape.Activity` (`Arriving bool` +
-`ArrivalPhase float64` — NEVER a bare float whose zero reads as "launching now", or `ambientFrame`'s
-19 pinned cells all fire at once) · a rising-edge trigger where TodoDone increases · the phase driven
-by WALL-CLOCK age, never an integrated dt, because `Shore.Update` clamps a gap over a second and a
-suspended laptop must wake with the star landed · a new test, because `star_steady_test.go` is blind
-to it. ⚠ **14:00 is the binding hour** — 64 path cells exhaust the ink search there and at no other
-hour. ⚠ **At 40x12, 47% of the sky is readout/balloon ground** and the balloon was caught eating a
-head; "no fall below this size" is a decision he has not made.
+**What to look for, because the fall is easy to miss:** it fires when the star COUNT rises, which
+today is **every closed turn** — so one falls at the end of every answer. Half a second, six columns,
+three rows, away from the moon. At 12 fps that is six frames.
+
+**1. ✅ THE SHOOTING STAR IS BUILT AND INSTALLED** (`f5ebade`). "The fall", arm A3, exactly as ruled:
+the star itself travels 6 columns and 3 rows into its place, 0.50 s, linear, no tail.
+⇒ `internal/scape/arrival.go` is the path and the constants · `Activity.Arriving` / `ArrivalPhase` ·
+the rising edge is in `reduce.Apply` and the phase is wall-clock age off `StarFall` (500 ms).
+⇒ Three tests: `internal/scape/arrival_test.go` (30,132 swept arrivals, the path's own guarantees and
+the no-skip cadence), `internal/reduce/starfall_test.go` (the edge, the clock, reset, a falling
+count), `starfall_live_test.go` (174 arrivals read back off COMPOSED frames — the one that answers
+the balloon).
+⚠ **The claim I wrote into the source before counting it was WRONG**: away-from-the-moon does NOT
+make the disc and readout guards dead. Disc fires 90 times, **all on the flip**; readout fires 108
+times **on the primary direction**. Both mutation-tested red. Numbers live in `arrival.go`.
+⏭ **The one open decision is his: "no fall below some size."** 40x12 flies only 38.0% (the sky is
+5 rows, the band 3, and 32 places leave no clear six-column corridor). A refused track degrades to
+the pre-feature behaviour, so nothing is broken — the question is whether the small end should stop
+trying at all.
+⏭ **And the fall has no ASSET.** `demoState` flies it now, so `go run . -site site` CAN render it —
+but the clip would need to catch a phase boundary (t = 8.0, 16.0, 24.0 in the cycle).
 
 **2. HIS, OPEN:**
 - **The rotating eye repeats 24.3% of the time** — four-way random does that. He answered every item
