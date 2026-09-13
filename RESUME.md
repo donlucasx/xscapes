@@ -27,14 +27,16 @@ Do NOT drive Terminal.app (osascript, System Events) without asking me first.
 ## ▶ NEXT (session 30 left it here)
 
 **0. ⏳ HIS LOOK IS THE WHOLE QUEUE NOW.** Three days of work — the companion round AND the shooting
-star — is committed, green and **installed** (inode 85156170), and he has seen none of it running.
+star — is committed, green and **installed** (inode 85156875, stamped `417414e`), and he has seen
+none of it running.
 **Restart a scape and look.** Nothing else in the product is waiting on me.
 
 ```
 git push                                    # NOT done; 3 commits ahead; his call
 gh auth switch --user donlucasx && git push origin main   # the switch is host-global and does NOT stay put
 xscapes claude                              # already installed; just restart
-lsof -p <pid> -a -d txt | grep xscapes      # against: stat -f %i ~/.local/bin/xscapes  -> 85156170
+go version -m ~/.local/bin/xscapes | grep vcs.revision    # the binary names its own commit
+lsof -p <pid> -a -d txt | grep xscapes                    # which binary a running scape holds
 ```
 ⚠ **Install via a NEW inode** (`rm` then build, or `go build -o`): macOS SIGKILLs a binary
 overwritten in place after it has run.
