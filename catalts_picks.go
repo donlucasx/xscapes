@@ -1,5 +1,7 @@
 package main
 
+import "github.com/donlucasx/xscapes/internal/companion"
+
 // The art HE RULED ON, 2026-09-11, with the edits his rulings called for.
 // Derived from the drafting round in catalts_art.go; kept separate because that
 // file is generated and this one is hand-edited.
@@ -106,57 +108,6 @@ var crabSettledUpper = []string{
 	"..##......####......##..",
 }
 
-var crabSettledLower = []string{
-	"..####################..",
-	"..####################..",
-	"########################",
-	"########################",
-	"########################",
-	"########################",
-	"########################",
-	"########################",
-	"##..################..##",
-	"##..################..##",
-	"########################",
-	"########################",
-	"######..########..######",
-	"######..########..######",
-	"..####..########..####..",
-	"..####..########..####..",
-}
-
-// crabSettledClaw is the same pose with the NEAR claw shut.
-//
-// His condition on the pick, and it is a design instruction in its own right:
-// "it should not be completely static. it could close a claw every so often, or
-// something similar."
-//
-// ⚠ Every other held pose in this project is deliberately STILL -- pace.go's
-// stillFor() freezes the companion for NeedsYou, Done and Worried, because a
-// held pose that drifts reads as the animal being unsure. An idle twitch is
-// allowed here for one reason and it should be stated: a claw that shuts every
-// so often carries NO INFORMATION. It is not a rate encoding of anything,
-// because nothing varies with it. It says only "this animal is alive", which is
-// the one thing the finish pose was missing.
-//
-// One claw, not both: two pincers closing in unison is a machine. The pincer is
-// literally "##..##" in the source -- a two-column gap -- so closing it is
-// filling that gap, and nothing else about the pose moves.
-var crabSettledClaw = []string{
-	"........................",
-	"........................",
-	"........................",
-	"........................",
-	"######............##..##",
-	"######............##..##",
-	"######............######",
-	"######............######",
-	"..####..##....##..####..",
-	"..####..##....##..####..",
-	"..##......####......##..",
-	"..##......####......##..",
-}
-
 // crabSettledBoth is the louder version: BOTH pincers shut.
 //
 // On the page beside the single claw, because one claw is a single CELL of
@@ -184,48 +135,6 @@ var crabSettledBoth = []string{
 // eyes and remove the mouth."
 // ---------------------------------------------------------------------------
 
-// catBodyNoMouth is CatBody with the muzzle gap filled.
-//
-// ⭐ HE CAUGHT THE SAME TRAP FROM THE OTHER SIDE. The shipped cat carries a
-// muzzle gap at row 11 that NEVER REACHES THE SCREEN: ToQuadrant ORs source
-// rows 2k and 2k+1, row 10 is solid, and the gap is swallowed. Doubling puts
-// that same gap on a clean cell boundary, so a mouth APPEARS at 24x14 that
-// exists nowhere else in the product. Two days ago he removed a nose from the
-// 16x9 for the same reason; this is the mirror image of it.
-//
-// ⚠ Filling row 11 is provably invisible at 12x7 -- the OR already hid it --
-// which is why this is one source and not two. Asserted in the test suite.
-var catBodyNoMouth = []string{
-	"...##.........##........",
-	"...###.......###........",
-	"...####.....####........",
-	"...#############........",
-	"..###############.......",
-	".#################......",
-	".#################......",
-	".#################......",
-	".###...#####...###......",
-	".###...#####...###......",
-	".#################......",
-	".#################......", // <- was ".#######...#######......", the muzzle
-	".#################......",
-	"..###############.......",
-	"...#############........",
-	"....###########.........",
-	".....#########..........",
-	"....###########.........",
-	"...#############........",
-	"..###############.......",
-	"..###############.......",
-	".#################......",
-	".#################......",
-	".#################......",
-	".#################......",
-	".#################......",
-	"..###..#####..###.......",
-	"..###..#####..###.......",
-}
-
 // catRung2EyeCells is where the doubled cat's eye sockets actually are, on the
 // rendered frame: cells 4..6 and 12..14 of row 4, three cells wide each.
 //
@@ -248,7 +157,7 @@ var (
 // at the same rung by going to a 2x2 bitmap. Only the doubled art is touched,
 // so nothing at 12x7 or 16x9 moves.
 func catRung2DeepEye() []string {
-	rows := double2x(catBodyNoMouth)
+	rows := double2x(companion.CatBodyNear2)
 	// Source rows 16..19 are the existing socket (cell row 4). Carrying it to
 	// rows 20..23 makes the socket cell rows 4 and 5.
 	for y := 20; y <= 23; y++ {

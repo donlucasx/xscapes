@@ -223,10 +223,6 @@ func TestZZShortPaneSeaGap(t *testing.T) {
 	}
 }
 
-func writeBandColorExport(s *Shore) term.RGB { return writeBandColor(s.pal) }
-
-func (s *Shore) LastEdgeExport() []float64 { return s.lastEdge }
-
 // TestZZWaterlineSeam checks continuity between the last SEA ramp row and the
 // waterline-mix row directly below it (which is painted the old, non-ramp
 // way), at several hours and activity levels, to see whether switching only

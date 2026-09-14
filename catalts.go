@@ -533,7 +533,7 @@ func catIsEyeCell(x, y int) bool {
 // treatment: "glyph" one centred glyph · "outline" the socket edged in eye
 // colour with a dark pupil · "tall" a two-cell pupil in a deepened socket.
 func catRung2Shot(treatment string, pose companion.State, t float64, px int, mirror bool) string {
-	rows := double2x(catBodyNoMouth)
+	rows := double2x(companion.CatBodyNear2)
 	if treatment == "tall" {
 		rows = catRung2DeepEye()
 	}

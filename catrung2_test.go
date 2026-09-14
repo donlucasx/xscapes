@@ -16,7 +16,7 @@ import (
 // claim about the RENDERED frame, so it gets asserted rather than argued.
 func TestFillingTheMuzzleIsInvisibleAtTheShippedSize(t *testing.T) {
 	a := companion.ParseBitmap(companion.CatBody).ToQuadrant()
-	b := companion.ParseBitmap(catBodyNoMouth).ToQuadrant()
+	b := companion.ParseBitmap(companion.CatBodyNear2).ToQuadrant()
 	if strings.Join(a, "\n") != strings.Join(b, "\n") {
 		t.Fatalf("filling the muzzle changed the 12x7 render:\nwas  %q\nnow  %q", a, b)
 	}
@@ -25,12 +25,12 @@ func TestFillingTheMuzzleIsInvisibleAtTheShippedSize(t *testing.T) {
 	// sides were accidentally the same bitmap.
 	same := 0
 	for i := range companion.CatBody {
-		if companion.CatBody[i] == catBodyNoMouth[i] {
+		if companion.CatBody[i] == companion.CatBodyNear2[i] {
 			same++
 		}
 	}
 	if same == len(companion.CatBody) {
-		t.Fatal("catBodyNoMouth is identical to CatBody -- the fill is missing, " +
+		t.Fatal("companion.CatBodyNear2 is identical to CatBody -- the fill is missing, " +
 			"so the invisibility check above proves nothing")
 	}
 }
@@ -38,7 +38,7 @@ func TestFillingTheMuzzleIsInvisibleAtTheShippedSize(t *testing.T) {
 // And it must be VISIBLE at 24x14, or it is not a fix.
 func TestFillingTheMuzzleRemovesTheMouthAt2x(t *testing.T) {
 	with := companion.ParseBitmap(double2x(companion.CatBody)).ToQuadrant()
-	without := companion.ParseBitmap(double2x(catBodyNoMouth)).ToQuadrant()
+	without := companion.ParseBitmap(double2x(companion.CatBodyNear2)).ToQuadrant()
 	diff := 0
 	for i := range with {
 		if with[i] != without[i] {
@@ -64,7 +64,7 @@ func TestFillingTheMuzzleRemovesTheMouthAt2x(t *testing.T) {
 // the animal's forehead: it passed {8, 14}, which are the CRAB's near-pose eye
 // cells, and mirrored they land on ink.
 func TestTheDoubledCatsEyeSocketsAreEmpty(t *testing.T) {
-	bm := companion.ParseBitmap(double2x(catBodyNoMouth))
+	bm := companion.ParseBitmap(double2x(companion.CatBodyNear2))
 	// ⚠ CHECK THE MIRRORED FRAME, not a mirrored INDEX into the unmirrored one.
 	// The body occupies cells 1..17 of a 24-cell box -- the right six are the
 	// tail's corridor -- so it is NOT centred, and mirroring slides the whole

@@ -226,7 +226,10 @@ var crabSettled = []string{
 	"..##......####......##..",
 }
 
-// crabSettledClaw is the same pose with the NEAR pincer shut.
+// CrabSettledClaw is the same pose with the NEAR pincer shut.
+//
+// Exported, like CatAsk and CatDone above it, because the study pages draw the
+// shipped art rather than keeping a second copy of it that can drift.
 //
 // His condition on the pick: "it should not be completely static. it could
 // close a claw every so often, or something similar."
@@ -242,7 +245,7 @@ var crabSettled = []string{
 // One claw, not both: two pincers closing in unison is a machine. The pincer is
 // literally "##..##" in the source, so shutting it is filling that gap, and
 // nothing else on the animal moves.
-var crabSettledClaw = []string{
+var CrabSettledClaw = []string{
 	"........................",
 	"........................",
 	"........................",
@@ -257,8 +260,9 @@ var crabSettledClaw = []string{
 	"..##......####......##..",
 }
 
-// crabSettledLower sits lower on its legs than the standing crabLower.
-var crabSettledLower = []string{
+// CrabSettledLower sits lower on its legs than the standing crabLower. Exported
+// for the study pages, for the same reason as CrabSettledClaw.
+var CrabSettledLower = []string{
 	"..####################..",
 	"..####################..",
 	"########################",

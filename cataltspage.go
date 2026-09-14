@@ -444,13 +444,13 @@ func catPicksHTML(seed int64) string {
 		`which is the complaint that started the constellation work &mdash; so both are here.` +
 		`</div></div><div class="grid">` +
 		`<div class="cell"><div class="lv">settled &mdash; open</div>` +
-		catRungStage(append(append([]string{}, crabSettledUpper...), crabSettledLower...),
+		catRungStage(append(append([]string{}, crabSettledUpper...), companion.CrabSettledLower...),
 			[2]int{4, 7}, 2, 0, companion.Done, 26) + `</div>` +
 		`<div class="cell"><div class="lv">near claw shut &mdash; 1 cell</div>` +
-		catRungStage(append(append([]string{}, crabSettledClaw...), crabSettledLower...),
+		catRungStage(append(append([]string{}, companion.CrabSettledClaw...), companion.CrabSettledLower...),
 			[2]int{4, 7}, 2, 0, companion.Done, 26) + `</div>` +
 		`<div class="cell"><div class="lv">both claws shut &mdash; 2 cells</div>` +
-		catRungStage(append(append([]string{}, crabSettledBoth...), crabSettledLower...),
+		catRungStage(append(append([]string{}, crabSettledBoth...), companion.CrabSettledLower...),
 			[2]int{4, 7}, 2, 0, companion.Done, 26) + `</div>` +
 		`<div class="cell"><div class="lv">the twitch, at 1 close every 7 s</div>` +
 		crabClawIdle(7.0, 0.45, 26) + `</div>` +
@@ -462,8 +462,8 @@ func catPicksHTML(seed int64) string {
 // so the cadence can be looked at rather than argued about. period is seconds
 // between closes, hold is how long the claw stays shut.
 func crabClawIdle(period, hold float64, px int) string {
-	open := append(append([]string{}, crabSettledUpper...), crabSettledLower...)
-	shut := append(append([]string{}, crabSettledClaw...), crabSettledLower...)
+	open := append(append([]string{}, crabSettledUpper...), companion.CrabSettledLower...)
+	shut := append(append([]string{}, companion.CrabSettledClaw...), companion.CrabSettledLower...)
 	var b strings.Builder
 	b.WriteString(`<div class="stage cstage">`)
 	// 24 frames at 12 fps is 2 s, so the slider alone cannot show a 7 s cycle.
@@ -585,7 +585,7 @@ func catRung2FixSection() string {
 		`<div class="cell"><div class="lv">with the mouth &mdash; what you screenshotted</div>` +
 		catRungStage(double2x(companion.CatBody), [2]int{8, 14}, 4, 2, companion.NeedsYou, 20) + `</div>` +
 		`<div class="cell"><div class="lv">mouth removed</div>` +
-		catRungStage(double2x(catBodyNoMouth), [2]int{8, 14}, 4, 2, companion.NeedsYou, 20) + `</div>` +
+		catRungStage(double2x(companion.CatBodyNear2), [2]int{8, 14}, 4, 2, companion.NeedsYou, 20) + `</div>` +
 		`</div></div>`)
 
 	b.WriteString(`<div class="card wide"><div class="meta">` +
