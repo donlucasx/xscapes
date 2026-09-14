@@ -42,10 +42,17 @@ import (
 // and :59), so drawing past the bottom is safe and this file contains no
 // clipping logic of its own. Verified, not assumed.
 //
-// ⚠ OFF BY DEFAULT. With XSCAPES_NEAR unset nothing in this file runs: the
-// ladder has one rung, Approach pins the progress at 0, and drawCrab takes the
-// shipped path it always took. TestNothingMovesWithTheNearPoseUnset holds that
-// against a hash of the pre-change render.
+// ⚠ ON BY DEFAULT since 2026-09-11 — see nearFromEnv below for his ruling and
+// why it is rung 2. This header said "OFF BY DEFAULT" until 2026-09-13, which
+// was true for the hours between writing this file and his word to push it
+// live, and wrong for the two days after; it contradicted nearDefault thirty
+// lines down. A stale comment that a reader believes is worse than none.
+//
+// With XSCAPES_NEAR=0 nothing in this file runs: the ladder has one rung,
+// Approach pins the progress at 0, and drawCrab takes the shipped path it
+// always took. TestNothingMovesWithTheNearPoseUnset holds that against a hash
+// of the pre-change render — it pins RUNG 0, so its name is a misnomer now that
+// unset means rung 2. What it guards is still exactly right.
 //
 // Two rungs on purpose, because the size is HIS call and not mine -- he picked
 // Hero from four silhouettes over two rounds and the coat from five, and the
