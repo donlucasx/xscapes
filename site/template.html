@@ -5,20 +5,34 @@
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>xscapes</title>
 <meta name="description" content="A thinking screen for terminal agents. Cozy ASCII scenes that react to your agent while it works: the tide rises as it gets busy, crablets walk into the water when subagents report back, and the moon thins as the context fills.">
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Geist+Mono:wght@400;500;700&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&display=swap">
 <style>
 :root{--g:#121212;--s:#1a1a1a;--ln:#2e2e2e;--ln2:#242424;--d:#8a8a8a;--dd:#bcbcbc;--i:#eeeeee;--acc:#87afff;--warm:#d7af5f;
---mono:"Geist Mono",ui-monospace,"SF Mono",Menlo,monospace}
+--mono:"JetBrains Mono",ui-monospace,"SF Mono",Menlo,monospace;
+/* One line unit. Every vertical measure on this page is a multiple of it, so
+   the page sits on the same grid the scape does. */
+--lh:1.55rem}
 *{box-sizing:border-box}
 html{scroll-behavior:smooth}
 html,body{margin:0;padding:0;background:var(--g);color:var(--i)}
 /* All mono, his ruling. Which is also why this page is short: a monospace
    face is a poor vehicle for long prose, so every paragraph has to earn it. */
-body{font-family:var(--mono);font-size:15px;line-height:1.6;-webkit-font-smoothing:antialiased}
+/* THE PAGE IS ON A CHARACTER GRID, not merely set in a monospace face -- which
+   is the difference between ASCII as architecture and ASCII as ornament.
+   Widths are in ch, vertical measures are multiples of --lh, digits are
+   tabular so a number cannot change a column, and JetBrains Mono is here
+   because it keeps box-drawing joined at line heights above 110%, where most
+   monospace faces come apart. */
+body{font-family:var(--mono);font-size:15px;line-height:var(--lh);
+  font-variant-numeric:tabular-nums lining-nums;-webkit-font-smoothing:antialiased}
 a{color:var(--acc);text-decoration:none;border-bottom:1px solid rgba(135,175,255,.35)}
 a:hover{border-bottom-color:var(--acc)}
-main{max-width:1000px;margin:0 auto;padding:0 20px 90px}
-p{max-width:62ch}
+main{max-width:min(94ch,100%);margin:0 auto;padding:0 2ch calc(var(--lh)*4)}
+/* Resize in whole CHARACTERS, never half a cell. Declared after the plain
+   min() so a browser without round() keeps the first rule instead of losing
+   max-width altogether. */
+@supports (width: round(down, 100%, 1ch)){main{max-width:calc(min(94ch, round(down, 100%, 1ch)))}}
+p{max-width:74ch;margin:0 0 var(--lh)}
 .lockup{font:700 1em/1.2 var(--mono);letter-spacing:0;white-space:nowrap}
 .blk{display:inline-block;width:1ch;line-height:1.2em;text-align:center;vertical-align:top;background:var(--i);color:var(--g)}
 
@@ -43,6 +57,11 @@ p{max-width:62ch}
 
 /* the reading rail: how far down the page you are, drawn the way the scape
    draws anything -- in cells. */
+.far{position:fixed;inset:0;z-index:0;pointer-events:none;overflow:hidden;
+  display:flex;align-items:center;justify-content:center;opacity:.05}
+.far pre{margin:0;font:700 14px/1 var(--mono);white-space:pre;color:var(--acc)}
+.cover,main{position:relative;z-index:1}
+@media (prefers-reduced-motion:reduce){.far{display:none}}
 .rail{position:fixed;top:50%;right:14px;transform:translateY(-50%);z-index:30;font-size:11px;line-height:1.05;
   color:var(--ln);white-space:pre;-webkit-user-select:none;user-select:none;pointer-events:none}
 .rail b{color:var(--acc);font-weight:400}
@@ -61,13 +80,20 @@ h3{font-size:14px;font-weight:700;margin:0 0 4px}
 .sec .rule-fx{width:100%;overflow:hidden;opacity:.85;margin:0 0 14px;border-radius:3px}
 .sec h2{color:var(--i)}
 
-/* the window frame: the terminal as an object inside a page, never as the page */
-.win{border:1px solid var(--ln);border-radius:7px;overflow:hidden;background:#000;max-width:100%}
-.bar{display:flex;align-items:center;gap:7px;padding:8px 12px;background:var(--s);border-bottom:1px solid var(--ln);font-size:11.5px;color:var(--d)}
-.bar i{width:9px;height:9px;border-radius:50%;background:#3a3a3a;display:block}
-.bar span{margin-left:6px}
-.bar .live{margin-left:auto;color:var(--d)}
+/* THE WINDOW IS DRAWN, NOT BORDERED. No CSS box, no fake traffic lights: a
+   rule of box-drawing characters above and below, generated to fill the
+   container in whole characters. It is the same furniture a terminal draws
+   for itself, and it is why the page needed a face that keeps box-drawing
+   joined. */
+.win{max-width:100%;margin:0}
+/* A drawn rule is TYPE, not a border: at --ln (a 1px hairline colour) the
+   characters were invisible. They take the dim text colour instead. */
+.boxtop,.boxbot{white-space:pre;overflow:hidden;color:var(--d);font-size:13px;
+  line-height:1.15;-webkit-user-select:none;user-select:none}
+.boxtop b{color:var(--i);font-weight:500}
+.boxtop i{color:var(--d);font-style:normal}
 .stage{overflow-x:auto;overflow-y:hidden;background:#000}
+.claim{color:var(--dd);border-left:2px solid var(--warm);padding-left:2ch;margin:0 0 var(--lh);max-width:72ch}
 /* Every row's descenders spill into the row below, where the next row's own
    background covers them. The LAST row has nothing below it, so without this
    the container cuts it. */
@@ -93,7 +119,7 @@ h3{font-size:14px;font-weight:700;margin:0 0 4px}
 .reads{margin:13px 0 0;color:var(--dd);font-size:14px;max-width:66ch;min-height:3em}
 
 .grid2{display:grid;grid-template-columns:repeat(auto-fit,minmax(320px,1fr));gap:22px}
-.cmd{font-size:13px;background:var(--s);border:1px solid var(--ln);border-radius:6px;padding:13px 15px;margin:18px 0 0;overflow-x:auto;white-space:pre;line-height:1.75;color:var(--dd)}
+.cmd{font-size:13px;background:var(--s);border:1px solid var(--ln);border-radius:2px;padding:calc(var(--lh)*.5) 2ch;margin:var(--lh) 0 0;overflow-x:auto;white-space:pre;line-height:1.75;color:var(--dd)}
 .cmd .c{color:var(--d)}
 .cmd .pr{color:var(--warm)}
 ul.feats{list-style:none;padding:0;margin:22px 0 0;display:grid;gap:11px;max-width:70ch}
@@ -110,6 +136,10 @@ ul.feats b{color:var(--i)}
 </head>
 <body>
 
+<!-- The renderer has three depth layers and the page showed none of them.
+     This is the far one: the real sea, fixed behind the whole page at low
+     contrast, drifting slower than the content scrolls. -->
+<div class="far" id="far" aria-hidden="true"></div>
 <div class="rail" id="rail" aria-hidden="true"></div>
 
 <section class="cover">
@@ -125,13 +155,15 @@ ul.feats b{color:var(--i)}
 <section id="top">
 <h1>Cozy ASCII scenes that react to your agent while it works<span class="cur"></span></h1>
 
-<div class="win">
-  <div class="bar"><i></i><i></i><i></i><span>xscapes claude</span><span class="live">a whole session, sped up</span></div>
+<p class="claim">Every character below is a fact about the agent &mdash; not a filter over a picture. The page is drawing what your terminal draws.</p>
+
+<div class="win" data-title="xscapes claude" data-right="a whole session, sped up"><div class="boxtop" aria-hidden="true"></div>
   <div class="stage" aria-hidden="true"><div class="fx" id="hero-fx"></div></div>
+  <div class="boxbot" aria-hidden="true"></div>
 </div>
 <p class="cap">One whole session. The agent works in the top rows exactly as it always has; underneath, the sea comes up with the work and settles when it stops, a crablet arrives for each subagent and walks into the water when that one reports back, stars light as the plan gets done, and the moon sinks as the context fills. The day turns underneath the whole time, on your real clock &mdash; which is why nothing else in the scene has to carry the hour.</p>
 
-<div class="cmd"><span class="pr">$</span> go install github.com/donlucasx/xscapes@latest
+<div class="cmd" data-title="install"><span class="pr">$</span> go install github.com/donlucasx/xscapes@latest
 <span class="pr">$</span> xscapes install claude --apply   <span class="c"># writes its hooks, after a backup</span>
 <span class="pr">$</span> xscapes claude                   <span class="c"># the agent on top, the scape underneath</span>
 <span class="pr">$</span> xscapes inside &lt;any command&gt;      <span class="c"># anything else, hosted the same way</span></div>
@@ -141,9 +173,9 @@ ul.feats b{color:var(--i)}
 <section>
 <p class="sub">The same beach in five moments. Press one and only the thing that carries it changes &mdash; that is the whole language, and it is why you never have to read the screen.</p>
 <div class="tabs" role="tablist" id="st-tabs"></div>
-<div class="win">
-  <div class="bar"><i></i><i></i><i></i><span id="st-name">&nbsp;</span></div>
+<div class="win" data-title=" " data-titleid="st-name"><div class="boxtop" aria-hidden="true"></div>
   <div class="stage" aria-hidden="true"><div class="fx st-fx" id="st-fx"></div></div>
+  <div class="boxbot" aria-hidden="true"></div>
 </div>
 <p class="reads" id="st-note"></p>
 </section>
@@ -156,8 +188,8 @@ ul.feats b{color:var(--i)}
 <div class="cmd"><span class="pr">$</span> xscapes companion cat</div>
 </div>
 <div>
-<div class="win"><div class="bar"><i></i><i></i><i></i><span id="sw-name">&nbsp;</span></div>
-<div class="stage" aria-hidden="true"><div class="fx sw-fx" id="sw-fx"></div></div></div>
+<div class="win" data-title=" " data-titleid="sw-name"><div class="boxtop" aria-hidden="true"></div>
+<div class="stage" aria-hidden="true"><div class="fx sw-fx" id="sw-fx"></div></div><div class="boxbot" aria-hidden="true"></div></div>
 </div>
 </section>
 
@@ -165,8 +197,8 @@ ul.feats b{color:var(--i)}
 <section>
 <p class="sub">A landscape only needs six things to carry the whole system: a light, a sky, something that moves with the work, a surface, somewhere the work piles up, and someone living in it. So there is no reason to stop at one.</p>
 <div class="grid2">
-<div><div class="win"><div class="bar"><i></i><i></i><i></i><span>the rainy window &middot; with the cat</span></div><div class="stage" aria-hidden="true"><div class="fx" data-cols="80">{{scaperain}}</div></div></div><p class="cap"><b>The rainy window, with the cat.</b> Rain on the glass carries the work and comes down harder the busier your agent gets. The city behind it carries the hour, and the sill is where the day's work settles.</p></div>
-<div><div class="win"><div class="bar"><i></i><i></i><i></i><span>the aquarium &middot; with the frog</span></div><div class="stage" aria-hidden="true"><div class="fx" data-cols="80">{{scapeaq}}</div></div></div><p class="cap"><b>The aquarium, with the frog.</b> More fish come out as the work picks up, the tank's lamp is the light, and the gravel is where it settles. Water is the work again, for the same reason it is on the shore.</p></div>
+<div><div class="win" data-title="the rainy window &middot; with the cat"><div class="boxtop" aria-hidden="true"></div><div class="stage" aria-hidden="true"><div class="fx" data-cols="80">{{scaperain}}</div></div><div class="boxbot" aria-hidden="true"></div></div><p class="cap"><b>The rainy window, with the cat.</b> Rain on the glass carries the work and comes down harder the busier your agent gets. The city behind it carries the hour, and the sill is where the day's work settles.</p></div>
+<div><div class="win" data-title="the aquarium &middot; with the frog"><div class="boxtop" aria-hidden="true"></div><div class="stage" aria-hidden="true"><div class="fx" data-cols="80">{{scapeaq}}</div></div><div class="boxbot" aria-hidden="true"></div></div><p class="cap"><b>The aquarium, with the frog.</b> More fish come out as the work picks up, the tank's lamp is the light, and the gravel is where it settles. Water is the work again, for the same reason it is on the shore.</p></div>
 </div>
 </section>
 
@@ -190,14 +222,20 @@ ul.feats b{color:var(--i)}
   "use strict";
   var FX = window.FX || {};
   var reduce = window.matchMedia && window.matchMedia("(prefers-reduced-motion:reduce)").matches;
+  function esc(t){ return String(t).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;"); }
 
-  // One player per stage. Frames are markup, so only the visible one is ever
-  // in the DOM; the rest sit in an array costing nothing but bytes.
-  // A frame is COLS characters wide and must fill the window it sits in, so
-  // the font size comes from the container rather than a hand-tuned clamp.
-  // Geist Mono advances 0.6em per character; measured once from the rendered
-  // frame rather than assumed, because a fallback face would advance
-  // differently and silently misfit every clip.
+  // ---- the character width of whatever face an element is actually using --
+  function chWidth(el){
+    var p = document.createElement("span");
+    p.style.cssText = "position:absolute;visibility:hidden;white-space:pre";
+    p.textContent = new Array(101).join("0");
+    el.appendChild(p);
+    var w = p.getBoundingClientRect().width / 100;
+    el.removeChild(p);
+    return w > 1 ? w : 8;
+  }
+
+  // ---- the frames -------------------------------------------------------
   var ADV = null;
   function advance(el){
     if(ADV) return ADV;
@@ -212,113 +250,141 @@ ul.feats b{color:var(--i)}
   }
   function fit(el, cols){
     if(!el || !cols) return;
-    var box = el.parentElement;
-    var w = box ? box.clientWidth : 0;
+    var box = el.parentElement, w = box ? box.clientWidth : 0;
     if(!w) return;
-    var px = w / (cols * advance(el));
-    // The cap is high on purpose: a small crop in a wide column is a DETAIL
-    // shot and should fill it. Capping at 20px was what left the companion
-    // panel with a black band down its side.
-    el.style.fontSize = Math.max(4, Math.min(44, px)) + "px";
+    el.style.fontSize = Math.max(4, Math.min(44, w / (cols * advance(el)))) + "px";
   }
-
   var fitted = [];
   function play(el, key, startFrac){
     var clip = FX[key];
     if(!el || !clip || !clip.frames.length) return null;
-    var i = Math.floor((startFrac||0) * clip.frames.length) % clip.frames.length;
-    el.innerHTML = clip.frames[i];
-    fit(el, clip.cols);
-    fitted.push([el, clip.cols]);
-    if(reduce) return {stop:function(){}};
-    var id = setInterval(function(){
-      i = (i + 1) % clip.frames.length;
-      el.innerHTML = clip.frames[i];
-    }, 1000 / (clip.fps || 6));
-    return {stop:function(){clearInterval(id);}};
+    var n = clip.frames.length;
+    var i = Math.floor((startFrac||0) * n) % n;
+    var id = null;
+    function show(k){ i = ((k % n) + n) % n; el.innerHTML = clip.frames[i]; }
+    show(i); fit(el, clip.cols); fitted.push([el, clip.cols]);
+    function start(){ if(reduce || id) return; id = setInterval(function(){ show(i+1); }, 1000/(clip.fps||6)); }
+    function stop(){ if(id){ clearInterval(id); id = null; } }
+    start();
+    return {show:show, start:start, stop:stop, clip:clip, el:el};
   }
 
-  // THE HERO OPENS AT YOUR OWN TIME OF DAY. The loop runs a full day across
-  // its frames starting at 0.30, so the offset is just where your clock sits
-  // in that circle. The product's sky is the real wall clock; this is the
-  // cheapest possible way for the page to make that claim without saying it.
-  var now = new Date();
-  var dayFrac = (now.getHours()*3600 + now.getMinutes()*60 + now.getSeconds()) / 86400;
-  var HERO_START = 0.30;
-  var off = dayFrac - HERO_START; while(off < 0) off += 1;
-  play(document.getElementById("hero-fx"), "hero", off);
-  var clock = document.getElementById("clock");
-  if(clock){
-    var hh = String(now.getHours()).padStart(2,"0"), mm = String(now.getMinutes()).padStart(2,"0");
-    clock.textContent = "your clock · " + hh + ":" + mm;
+  // ---- the furniture is DRAWN ------------------------------------------
+  // A rule of box-drawing characters filling the container in whole
+  // characters, above and below. The page needed a face that keeps these
+  // joined at line heights over 110%, which is why it is JetBrains Mono.
+  function drawBox(win){
+    var top = win.querySelector(".boxtop"), bot = win.querySelector(".boxbot");
+    if(!top || !bot) return;
+    var n = Math.max(14, Math.floor(win.clientWidth / chWidth(top)));
+    var title = (win.getAttribute("data-title") || "").trim();
+    var right = (win.getAttribute("data-right") || "").trim();
+    var head = title ? "┌─ " + title + " " : "┌─";
+    var tail = right ? " " + right + " ─┐" : "┐";
+    var fill = n - head.length - tail.length;
+    if(fill < 2){ tail = "┐"; fill = n - head.length - tail.length; }
+    if(fill < 2){ head = "┌─"; fill = n - 3; }
+    var dash = new Array(Math.max(1, fill) + 1).join("─");
+    var html = title
+      ? "┌─ <b>" + esc(title) + "</b> " + dash
+      : "┌─" + dash;
+    html += right ? " <i>" + esc(right) + "</i> ─┐" : "┐";
+    top.innerHTML = html;
+    bot.textContent = "└" + new Array(Math.max(2, n - 2) + 1).join("─") + "┘";
+  }
+  function drawAllBoxes(){
+    Array.prototype.forEach.call(document.querySelectorAll(".win"), drawBox);
   }
 
-  // A switcher: tabs built from the payload, so the page cannot name a clip
-  // that was not rendered.
-  function switcher(keys, tabsId, stageId, nameId, noteId){
+  // ---- the hero ---------------------------------------------------------
+  var hero = play(document.getElementById("hero-fx"), "hero", Math.random());
+
+  // POINTER SCRUBS THE SESSION. Not a ripple effect over the picture: the
+  // pointer picks the frame, so what you are dragging through is the real
+  // recorded turn. Leave and it carries on by itself.
+  var heroStage = document.getElementById("hero-fx");
+  if(hero && heroStage && !reduce){
+    var stage = heroStage.parentElement;
+    var scrubbing = false;
+    var toFrame = function(ev){
+      var r = stage.getBoundingClientRect();
+      var x = (ev.clientX - r.left) / Math.max(1, r.width);
+      hero.show(Math.floor(Math.max(0, Math.min(0.999, x)) * hero.clip.frames.length));
+    };
+    stage.addEventListener("pointerenter", function(){ scrubbing = true; hero.stop(); });
+    stage.addEventListener("pointermove", function(ev){ if(scrubbing) toFrame(ev); });
+    stage.addEventListener("pointerleave", function(){ scrubbing = false; hero.start(); });
+    stage.style.cursor = "ew-resize";
+  }
+
+  // ---- switchers --------------------------------------------------------
+  function switcher(keys, tabsId, stageId, noteId){
     var tabs = document.getElementById(tabsId), stage = document.getElementById(stageId);
-    var nameEl = document.getElementById(nameId), noteEl = document.getElementById(noteId);
+    var noteEl = noteId ? document.getElementById(noteId) : null;
     if(!tabs || !stage) return;
+    var win = stage.closest ? stage.closest(".win") : null;
     var cur = null, active = null;
+    function select(k, b){
+      if(active) active.setAttribute("aria-selected","false");
+      b.setAttribute("aria-selected","true"); active = b;
+      if(cur) cur.stop();
+      cur = play(stage, k, 0);
+      if(win){ win.setAttribute("data-title", FX[k].label); drawBox(win); }
+      if(noteEl) noteEl.textContent = FX[k].note;
+    }
     keys.forEach(function(k, n){
-      var clip = FX[k]; if(!clip) return;
+      if(!FX[k]) return;
       var b = document.createElement("button");
       b.className = "tab"; b.type = "button"; b.setAttribute("role","tab");
-      b.textContent = clip.label; b.setAttribute("aria-selected", n===0 ? "true":"false");
-      b.addEventListener("click", function(){
-        if(active) active.setAttribute("aria-selected","false");
-        b.setAttribute("aria-selected","true"); active = b;
-        if(cur) cur.stop();
-        cur = play(stage, k, 0);
-        if(nameEl) nameEl.textContent = clip.label;
-        if(noteEl) noteEl.textContent = clip.note;
-      });
+      b.textContent = FX[k].label; b.setAttribute("aria-selected","false");
+      b.addEventListener("click", function(){ select(k, b); });
       tabs.appendChild(b);
-      if(n===0){ active = b; cur = play(stage, k, 0);
-        if(nameEl) nameEl.textContent = clip.label;
-        if(noteEl) noteEl.textContent = clip.note; }
+      if(n === 0) select(k, b);
     });
   }
-  // Every section rule plays the same strip of sea.
-  Array.prototype.forEach.call(document.querySelectorAll('[data-clip]'), function(el){
-    var k = el.getAttribute("data-clip");
-    play(el, k, Math.random());
-  });
 
-  // The two other scapes are stills, not clips, but they are the same kind of
-  // object and must fill their window the same way.
+  Array.prototype.forEach.call(document.querySelectorAll('[data-clip]'), function(el){
+    play(el, el.getAttribute("data-clip"), Math.random());
+  });
   Array.prototype.forEach.call(document.querySelectorAll(".fx[data-cols]"), function(el){
     var cols = parseInt(el.getAttribute("data-cols"), 10);
     fit(el, cols); fitted.push([el, cols]);
   });
-  switcher(["needs","working","broke","done","quiet"], "st-tabs", "st-fx", "st-name", "st-note");
-  switcher(["crab","cat"], "sw-tabs", "sw-fx", "sw-name", null);
+  switcher(["needs","working","broke","done","quiet"], "st-tabs", "st-fx", "st-note");
+  switcher(["crab","cat"], "sw-tabs", "sw-fx", null);
+  drawAllBoxes();
 
-  // The reading rail: how far down the page you are, in cells. The scape
-  // measures everything this way, so the page does too.
-  function refit(){ ADV = null; fitted.forEach(function(f){ fit(f[0], f[1]); }); }
+  function refit(){ ADV = null; fitted.forEach(function(f){ fit(f[0], f[1]); }); drawAllBoxes(); }
   window.addEventListener("resize", refit);
-  // The first fit runs against whatever face is available at script time; the
-  // web font arrives later and advances differently. Measure again when it
-  // lands, and once on the next frame for grid columns whose width has not
-  // settled yet -- that is what left the companion panel short of its window.
   requestAnimationFrame(refit);
   if(document.fonts && document.fonts.ready){ document.fonts.ready.then(refit); }
 
-  var rail = document.getElementById("rail");
-  if(rail){
-    var N = 18;
-    var paint = function(){
-      var h = document.documentElement.scrollHeight - window.innerHeight;
-      var p = h > 0 ? Math.min(1, Math.max(0, window.scrollY / h)) : 0;
-      var at = Math.round(p * (N-1)), s = "";
-      for(var i=0;i<N;i++) s += (i===at ? "<b>█</b>" : "│") + (i<N-1 ? "\n" : "");
-      rail.innerHTML = s;
-    };
-    paint();
-    window.addEventListener("scroll", paint, {passive:true});
-    window.addEventListener("resize", paint);
+  // ---- the far layer, drifting --------------------------------------------
+  var far = document.getElementById("far");
+  var cover = document.querySelector(".cover .sea.d pre");
+  if(far && cover && !reduce){
+    var clone = cover.cloneNode(true);
+    clone.style.animation = "none"; clone.style.opacity = "1"; clone.style.position = "static";
+    far.appendChild(clone);
   }
+
+  // ---- the rail, and the drift ------------------------------------------
+  var rail = document.getElementById("rail");
+  var N = 18;
+  function onScroll(){
+    var h = document.documentElement.scrollHeight - window.innerHeight;
+    var p = h > 0 ? Math.min(1, Math.max(0, window.scrollY / h)) : 0;
+    if(rail){
+      var at = Math.round(p * (N-1)), s2 = "";
+      for(var i=0;i<N;i++) s2 += (i===at ? "<b>█</b>" : "│") + (i<N-1 ? "\n" : "");
+      rail.innerHTML = s2;
+    }
+    // The far layer moves a fraction of the page: parallax, in cells.
+    if(far) far.style.transform = "translateY(" + (-window.scrollY * 0.12) + "px)";
+  }
+  onScroll();
+  window.addEventListener("scroll", onScroll, {passive:true});
+  window.addEventListener("resize", onScroll);
 })();
 </script>
 </body>
