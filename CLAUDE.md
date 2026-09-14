@@ -240,8 +240,17 @@
 > a level step **teleported** it 1.03 rows against a 0.02 normal frame. All fixed. ⚠ And the fix for
 > the third SILENTLY ATE THE FEATURE — the swell rescale measured from `sy`, counted the tide as
 > swell and squashed it 5.1 rows → 1.7. ⚠ **Sideways is HALVED, NOT GONE** (26% → 5%); a weak pull
-> at ~3 cells remains, uncharted. ⚠ Swimmers follow the tide; **sitters do not** (pinned to the
-> companion), so at full activity crablets stand in the water.
+> at ~3 cells remains, uncharted. ~~⚠ Swimmers follow the tide; **sitters do not** (pinned to the
+> companion), so at full activity crablets stand in the water.~~ ⭐ **MEASURED AND CLOSED ON HIS
+> RULING 2026-09-13 ("leave it"), and the implication was BACKWARDS: the tide is what FIXED this.**
+> The two anchors are real -- the companion and its sitters hang off `c.H-2-chh`, the swimmers off
+> `SandTop()-2` -- but `TestSittersAndTheTide` sweeps six geometries x nine levels against the
+> renderer's own sea test and says: with the tide, the litter's own columns are wet **0% of frames at
+> rest and 30% at level 1.00** (125x28); **without** it, **36% at rest and 65% at full**. The fixed
+> waterline sat on them permanently. ⚠ And the litter's rows (22-25) are INSIDE the companion's
+> (19-25), which is wet from level 0.50, so the litter can never be the wetter of the two and there
+> is no pinning them lower -- they already hold the driest rows in the frame. An opaque sprite over
+> the shallows reads as an animal at the water's edge, which is the picture.
 >
 > ⭐⭐ **THE CONSTELLATION IS ALIVE FOR THE FIRST TIME, and he was right against me twice.**
 > TodoWrite has fired **ZERO times in 60,000+ tool calls**, so the channel had never lit. His ruling

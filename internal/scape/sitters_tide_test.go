@@ -28,6 +28,20 @@ import (
 // A cell is WATER on exactly the renderer's own condition -- shore.go's
 // `case fy < ex-0.5` -- against the shore's real per-column edge, so this is
 // the painted waterline and not a model of it.
+//
+// ⇒ HIS RULING 2026-09-13, on the numbers below: LEAVE IT. Three of the four
+// grounds are things this test measures and the fourth is arithmetic:
+//
+//   - The litter sits INSIDE the companion's own row span (22-25 against 19-25
+//     at 125x28), so it can never be wetter than the animal beside it. The
+//     companion's rows are wet from level 0.50 and 100% of frames from 0.90.
+//     There is no fixing one without moving the other off the beach.
+//   - There is nowhere to pin them to. They already hold the driest rows in the
+//     frame, with two rows left below; pinning to the waterline means moving
+//     them DOWN, and there is no down.
+//   - The TIDE IMPROVED THIS. See the !Tide branch below for the numbers.
+//   - An opaque sprite on the near layer over the shallows reads as an animal
+//     at the water's edge, which is the picture the scape is for.
 func TestSittersAndTheTide(t *testing.T) {
 	tiers := map[string]int{
 		"Crablet":      companion.ParseBitmap(companion.Crablet).H / 4,
@@ -62,7 +76,12 @@ func TestSittersAndTheTide(t *testing.T) {
 
 			sitTop := g.h - 2 - ch
 			sitBot := g.h - 3
-			frames, wetFrames, wetRightFrames := 0, 0, 0
+			// The companion's own span, from the same call site: chh is the
+			// box height, 7 for both animals. The litter sits INSIDE this, so
+			// whenever a sitter row is wet a companion row is wet too.
+			const chh = 7
+			catTop := g.h - 2 - chh
+			frames, wetFrames, wetRightFrames, wetCat := 0, 0, 0, 0
 			worstReach, worstCols := 0.0, 0
 			for i := 0; i < 120; i++ { // 6s of samples
 				tt += 0.05
@@ -72,10 +91,16 @@ func TestSittersAndTheTide(t *testing.T) {
 					t.Fatalf("%dx%d: no waterline, so this measures nothing", g.w, g.h)
 				}
 				frames++
-				cols, colsRight, reach := 0, 0, 0.0
+				cols, colsRight, reach, catCols := 0, 0, 0.0, 0
 				for x, e := range edge {
 					if e > reach {
 						reach = e
+					}
+					for y := catTop; y <= sitBot; y++ {
+						if float64(y) < e-0.5 {
+							catCols++
+							break
+						}
 					}
 					// Does the water cover any row the litter stands on?
 					for y := sitTop; y <= sitBot; y++ {
@@ -95,6 +120,9 @@ func TestSittersAndTheTide(t *testing.T) {
 				if cols > 0 {
 					wetFrames++
 				}
+				if catCols > 0 {
+					wetCat++
+				}
 				if colsRight > 0 {
 					wetRightFrames++
 				}
@@ -106,10 +134,10 @@ func TestSittersAndTheTide(t *testing.T) {
 				}
 			}
 			pct := 100 * wetFrames / frames
-			t.Logf("%3dx%-3d level %.2f | sitters on rows %2d-%2d | water reaches row %5.2f | "+
-				"frames with water on a sitter row: %3d%% (right third: %3d%%) | worst %d of %d columns",
-				g.w, g.h, lv, sitTop, sitBot, worstReach,
-				pct, 100*wetRightFrames/frames, worstCols, g.w)
+			t.Logf("%3dx%-3d level %.2f | litter rows %2d-%2d, companion rows %2d-%2d | water to row %5.2f | "+
+				"wet frames: litter %3d%% (its own columns %3d%%), COMPANION %3d%% | worst %d of %d columns",
+				g.w, g.h, lv, sitTop, sitBot, catTop, sitBot, worstReach,
+				pct, 100*wetRightFrames/frames, 100*wetCat/frames, worstCols, g.w)
 
 			// THE GUARANTEE THIS MEASUREMENT EARNS, and it is the useful half:
 			// at rest and through ordinary work the litter is on DRY SAND at
@@ -122,6 +150,16 @@ func TestSittersAndTheTide(t *testing.T) {
 			// the shooting star. Excluding it quietly would have hidden a
 			// measurement; this way a reader sees it.
 			if g.w == 40 && g.h == 12 {
+				continue
+			}
+			// AND THE GUARANTEE IS THE TIDE'S, which is the finding that
+			// settled the card. With XSCAPES_TIDE=0 the sea sits at a fixed
+			// high waterline and the litter has ALWAYS stood in it: at 125x28
+			// its own columns are wet 36% of frames at level 0.00 and 65% at
+			// 1.00, against 0% and 30% with the tide on. So the feature the
+			// card blamed is the one that halved it, and asserting this without
+			// the tide would be asserting something that was never true.
+			if !Tide {
 				continue
 			}
 			if lv <= 0.75 && pct != 0 {
