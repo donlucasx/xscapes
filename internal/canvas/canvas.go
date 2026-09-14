@@ -629,6 +629,20 @@ func (c *Canvas) HTMLFragmentCropAs(x0, y0, x1, y1, fontPx int, p term.Profile) 
 	return c.htmlFragmentRect(fontPx, p, true, nil, x0, y0, x1, y1)
 }
 
+// HTMLFragmentCropClassed is HTMLFragmentCropAs with the colours taken out of
+// the markup and into pal, for a page that carries many frames of one crop.
+func (c *Canvas) HTMLFragmentCropClassed(x0, y0, x1, y1, fontPx int, p term.Profile, pal *HTMLPalette) string {
+	x0, y0 = max(x0, 0), max(y0, 0)
+	x1, y1 = min(x1, c.W), min(y1, c.H)
+	if x1 <= x0 || y1 <= y0 {
+		return ""
+	}
+	was := term.NoSplitCells
+	term.NoSplitCells = false
+	defer func() { term.NoSplitCells = was }()
+	return c.htmlFragmentRect(fontPx, p, true, pal, x0, y0, x1, y1)
+}
+
 func (c *Canvas) htmlFragmentWith(fontPx int, p term.Profile, quantise bool, pal *HTMLPalette) string {
 	// Every HTML writer funnels through here, and that is deliberate: it is the
 	// one seam where term.NoSplitCells can be taken out of the picture. main()

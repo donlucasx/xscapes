@@ -105,6 +105,30 @@ func sitePage(seed int64, dir string) (string, error) {
 	page := string(tmpl)
 	cover := coverLayers(seed)
 	page = strings.Replace(page, "{{cover}}", cover, 1)
+	// The animations are embedded as text, not screenshotted into GIFs. See
+	// siteframes.go for why, and for what it costs.
+	fxjs, fxcss, err := renderFX(seed)
+	if err != nil {
+		return "", err
+	}
+	// The other two scapes are stills rendered by notes/scapestudy and checked
+	// in, because that study is its own command and the site generator cannot
+	// call into it. They are embedded as text like everything else here, so the
+	// page carries no rasters at all.
+	//
+	// ⚠ They live in site/scapes/ and NOT in site/anim/, which .gitignore
+	// excludes: dropped there they would be invisible to a fresh checkout and
+	// this build would fail for anyone but me. The same trap ate a renamed
+	// still once already.
+	for marker, file := range map[string]string{"{{scaperain}}": "scape-rain.html", "{{scapeaq}}": "scape-aquarium.html"} {
+		frag, err := os.ReadFile(filepath.Join(dir, "scapes", file))
+		if err != nil {
+			return "", fmt.Errorf("scape still %s: %w (regenerate: go run ./notes/scapestudy -frames <tmp>, then keep the <pre> in site/scapes/)", file, err)
+		}
+		page = strings.Replace(page, marker, string(frag), 1)
+	}
+	page = strings.Replace(page, "{{fxjs}}", fxjs, 1)
+	page = strings.Replace(page, "{{fxcss}}", fxcss, 1)
 	if err := os.WriteFile(filepath.Join(dir, "anim", "cover.html"), []byte(cover), 0o644); err != nil {
 		return "", err
 	}

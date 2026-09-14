@@ -124,12 +124,15 @@ type framePick struct {
 	tod  float64
 }
 
-// sitePicks are what the page shows. His pick, 2026-09-06: two scapes, each
-// with the companion drawn for it, the rainy window at dusk and the aquarium
-// at night.
+// sitePicks are what the page shows. His pick 2026-09-06 was two scapes, each
+// with a companion drawn for it; his ruling of 2026-09-13 reassigned which
+// animal goes where -- the cat on the rainy sill, the frog in front of the
+// tank, and the owl held back for a forest scape that does not exist yet.
 var sitePicks = []framePick{
-	{file: "scape-rain.png", scene: "Rainy window", with: "Frog", tod: 0.75},
-	{file: "scape-aquarium.png", scene: "Aquarium", with: "Owl", tod: 0.0245},
+	// The cat is every scene's own default occupant, so it is named by
+	// leaving `with` empty rather than by a companion entry that does not exist.
+	{file: "scape-rain.png", scene: "Rainy window", tod: 0.75},
+	{file: "scape-aquarium.png", scene: "Aquarium", with: "Frog", tod: 0.0245},
 }
 
 // FramePx is the clips' cell size: 14px Menlo is 8.4 by 14, so 80x24 lands on

@@ -46,9 +46,41 @@ type gifScene struct {
 	// crop, when set, is the cell rectangle of the scape the frame keeps:
 	// x0, y0, x1, y1. It is how one channel is shown on its own.
 	crop [4]int
+	// pal, when set, takes the colours out of every frame's markup and into a
+	// shared stylesheet. The page embeds its frames as text rather than
+	// screenshotting them, and inline colours on every run is the difference
+	// between a page that ships and one that does not.
+	pal *canvas.HTMLPalette
+	// prof overrides the render profile. The GIF clips are truecolor -- "the
+	// scene at its best" -- but an embedded frame pays for its colours in the
+	// stylesheet, and truecolor gradients give almost every run its own pair:
+	// measured, 920KB of CSS against 158KB of frames. The cube is both far
+	// cheaper AND what the product actually shows in a terminal, which is the
+	// ruling the whole scape is designed around.
+	// ⚠ A bool, not a term.Profile: Profile256 is the ZERO VALUE of that type,
+	// so a profile field would have silently taken every existing GIF scene
+	// off truecolor the moment it was added.
+	cube bool
+	// animal names the companion to draw, for the one clip pair whose whole
+	// subject is that you can change it. Empty means the shipped default,
+	// which is what every other clip must use: the page has to render the same
+	// on any checkout and show what a fresh install gets.
+	animal string
+	// fps overrides GIFFPS. A page playing frames from JS can run slower than
+	// a GIF without looking like it is stuttering, and every frame dropped is
+	// markup not shipped.
+	fps int
 }
 
 const gifRows = 24
+
+// rate is this clip's frame rate: its own, or the shared GIF one.
+func (sc gifScene) rate() int {
+	if sc.fps > 0 {
+		return sc.fps
+	}
+	return GIFFPS
+}
 
 // cropped reports whether this clip keeps only part of the scape.
 func (sc gifScene) cropped() bool { return sc.crop != [4]int{} }
@@ -167,7 +199,7 @@ func gifPages(seed int64, dir string) error {
 			}
 			pages++
 		}
-		manifest = append(manifest, entry{sc.name, len(frames), GIFFPS, sc.note, sc.secs, GIFPx, sc.colsOf(), sc.rowsOf(), pages})
+		manifest = append(manifest, entry{sc.name, len(frames), sc.rate(), sc.note, sc.secs, GIFPx, sc.colsOf(), sc.rowsOf(), pages})
 	}
 	js, _ := json.MarshalIndent(manifest, "", "  ")
 	return os.WriteFile(filepath.Join(dir, "manifest.json"), js, 0o644)
@@ -186,7 +218,11 @@ func gifFrames(seed int64, sc gifScene) ([]string, error) {
 	// actually gets. companionPref() would make the entry depend on whatever is
 	// in ~/.config/xscapes/companion, which is the one thing a submission must
 	// not do.
-	cat := companion.New(companion.DefaultName)
+	name := companion.DefaultName
+	if sc.animal != "" {
+		name = sc.animal
+	}
+	cat := companion.New(name)
 	cat.FaceLeft(true)
 	ccw, chh := cat.Size()
 	speed := sc.speed
@@ -230,12 +266,12 @@ func gifFrames(seed int64, sc gifScene) ([]string, error) {
 	c := canvas.New(sc.sceneCols(), gifRows, canvas.AlphaFar, canvas.AlphaMid, canvas.AlphaNear)
 	lay := compose(c.W, ccw, true)
 	sh.MoonX = lay.MoonX
-	n := int(sc.secs * GIFFPS)
+	n := int(sc.secs * float64(sc.rate()))
 	var out []string
 	for i := 0; i < n; i++ {
 		// t is the picture's own clock, in real seconds, so the swell and the
 		// breathing read at their designed rate whatever the session does.
-		t := float64(i) / GIFFPS
+		t := float64(i) / float64(sc.rate())
 		session := t * speed
 		if sc.beats == nil {
 			t = sc.at + t
@@ -255,16 +291,30 @@ func gifFrames(seed int64, sc gifScene) ([]string, error) {
 		// Truecolor, his direction of 2026-09-05: the page shows the scene at
 		// its best, not as the cube rounds it. The product still runs on the
 		// cube; the clips are what it is reaching for.
+		prof := term.ProfileTrueColor
+		if sc.cube {
+			prof = term.Profile256
+		}
 		var frame string
-		if sc.cropped() {
-			frame = c.HTMLFragmentCropAs(sc.crop[0], sc.crop[1], sc.crop[2], sc.crop[3], GIFPx, term.ProfileTrueColor)
-		} else {
+		switch {
+		case sc.cropped() && sc.pal != nil:
+			frame = c.HTMLFragmentCropClassed(sc.crop[0], sc.crop[1], sc.crop[2], sc.crop[3], GIFPx, prof, sc.pal)
+		case sc.cropped():
+			frame = c.HTMLFragmentCropAs(sc.crop[0], sc.crop[1], sc.crop[2], sc.crop[3], GIFPx, prof)
+		case sc.pal != nil:
+			frame = c.HTMLFragmentClassed(GIFPx, prof, sc.pal)
+		default:
 			frame = c.HTMLFragment(GIFPx)
 		}
 		if sc.agentRows > 0 {
 			// The agent's own output sits above its scape, in the same
 			// window, which is the thing the page is actually claiming.
-			frame = agentPane(sc.sceneCols(), sc.agentRows, lines).HTMLFragment(GIFPx) + frame
+			pane := agentPane(sc.sceneCols(), sc.agentRows, lines)
+			if sc.pal != nil {
+				frame = pane.HTMLFragmentClassed(GIFPx, prof, sc.pal) + frame
+			} else {
+				frame = pane.HTMLFragment(GIFPx) + frame
+			}
 		}
 		out = append(out, frame)
 	}
