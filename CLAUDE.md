@@ -49,9 +49,12 @@
 > hold inodes 84245880 / 84730008 / one older; installed is 85156875. Five days of shipped work —
 > the tide as default, the near crab, the scattered sky, the droplet cue, the cat companion round,
 > the shooting star — **has never reached a screen. Restart is the whole queue.**
-> ⚠ Two ORPHANED s28 smoke tests are also still up (pids 51733, 64720, `-live -session s28smoke` /
-> `s28verify`). Safe to kill, but **ask and check `lsof -a -d cwd` first** — s25 read two same-named
-> processes as orphans and nearly cost him live work.
+> ⇒ **AND `lsof -a -d cwd` SETTLES WHICH ARE HIS, which is the check s25's retraction was about.**
+> All three `xscapes claude` are HIS, one per project — Validators, tyastie, xscapes — the pattern s25
+> established. ⚠ **The xscapes one (pid 25316) may be hosting the very session reading this**, so
+> "restart" there means restarting his current session. Only pids 51733/64720 are leftovers, and on
+> THREE signals rather than a name: a temp `go-build` path instead of an installed binary,
+> `-live -session s28smoke`/`s28verify`, and cwd in the repo. **Ask before killing anything.**
 >
 > ⭐ **A FULL STATUS REPORT was built by checking the CODE against the NOTES, and it caught a real
 > defect the notes had hidden:** `crab_near.go`'s header said `OFF BY DEFAULT` while `nearDefault = 2`

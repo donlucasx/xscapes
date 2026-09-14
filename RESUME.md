@@ -41,10 +41,16 @@ xscapes claude                              # already installed; just restart
 go version -m ~/.local/bin/xscapes | grep vcs.revision    # the binary names its own commit
 lsof -p <pid> -a -d txt | grep xscapes                    # which binary a running scape holds
 ```
-⚠ **TWO ORPHANED SMOKE TESTS from s28 are still running** and are NOT his work — pid 51733
-(`-live -session s28smoke`, up 2d 22h) and pid 64720 (`-live -session s28verify`, up 2d 21h),
-~0.3–0.6% CPU each. Safe to kill; **ask first and check `lsof -a -d cwd`**, because s25 nearly cost
-him live work by reading two same-named processes as orphans.
+⚠ **WHICH SCAPES ARE HIS, settled by `lsof -a -d cwd` and NOT by the process name** — the check whose
+absence caused the s25 retraction:
+- **HIS, all three, one per project he works in** — exactly the pattern s25 established: pid 24108
+  `~/Documents/claude/Validators` · pid 74228 `~/Documents/claude/tyastie` · pid 25316
+  `~/Documents/claude/xscapes`. ⚠ **The xscapes one may be hosting the session you are reading this
+  in**, so "restart a scape" there means restarting his current session. Leave all three alone.
+- **LEFTOVER TEST RUNS, safe to kill** — pid 51733 (up 2d 22h) and pid 64720 (up 2d 21h). Three
+  independent signals, not one: they run from a **temp `go-build` path** (`/var/folders/…/exe/xscapes`)
+  rather than an installed binary, they are `-live -session s28smoke` / `s28verify`, and their cwd is
+  the repo. ~0.3–0.6% CPU each. **Still ask before killing.**
 ⚠ **Install via a NEW inode** (`rm` then build, or `go build -o`): macOS SIGKILLs a binary
 overwritten in place after it has run.
 ⚠ **A running scape keeps the OLD binary** (that is what the new inode buys). Restart or you
