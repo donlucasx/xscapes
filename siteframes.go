@@ -82,9 +82,27 @@ func heroClip(pal *canvas.HTMLPalette) fxClip {
 // the thing being named different. Nine unrelated clips could not do that,
 // which is why the section they replace needed 392 words of prose.
 func stateClips(pal *canvas.HTMLPalette) []fxClip {
+	// CROPPED, and all five identically. His note of 2026-09-14 was that the
+	// ask needs to be a close-up -- at 80 columns the companion is a thumbnail
+	// and the balloon it raises is the whole point of that state. But the
+	// crop has to be the SAME for all five, because the section's argument is
+	// that only the thing being named changes; a different framing per state
+	// would break exactly the comparison it exists to make.
+	//
+	// NARROWER, NOT CROPPED. His note asked for the ask to be a close-up, and
+	// cropping an 80-column scene was the wrong way to get one: it cut the
+	// moon in half at x=20, and at x=14 it sliced the writing in the sand
+	// mid-word, which reads as a broken render rather than a detail shot.
+	//
+	// Rendering the scene AT 62 columns instead lets the layout do it properly
+	// -- the companion, the moon, the litter and the sand text are all placed
+	// for that width, so everything is a third bigger and nothing is cut. The
+	// five stay identical to each other, which is the whole point of the
+	// section: only the thing being named changes.
+	const cols = 62
 	mk := func(key, label, note string, at, tod, secs float64) fxClip {
 		return fxClip{key: key, label: label, note: note,
-			sc: gifScene{name: "st-" + key, at: at, tod: tod, secs: secs, fps: 6, pal: pal, cube: !truecolorFX}}
+			sc: gifScene{name: "st-" + key, at: at, tod: tod, secs: secs, fps: 6, cols: cols, pal: pal, cube: !truecolorFX}}
 	}
 	return []fxClip{
 		mk("needs", "it needs you", "A solid balloon and a chime. The companion comes closer and puts a claw up, and it holds the pose until you come back.", 30, 0.80, 4),
@@ -111,12 +129,32 @@ func swapClips(pal *canvas.HTMLPalette) []fxClip {
 	}
 }
 
+// ruleClip is the page's section divider, and it is a real strip of the
+// product rather than a row of punctuation.
+//
+// His note of 2026-09-14: "I dont see any use of ascii that stands out
+// (except the splash page, which I love)" -- the dotted rules and the prompt
+// glyphs were decoration pretending to be terminal. The splash works because
+// it is the actual sea. So every section rule is three rows of the actual
+// sea, moving, full width.
+func ruleClip(pal *canvas.HTMLPalette) fxClip {
+	return fxClip{
+		key: "rule", label: "rule",
+		// Rows 9..12 are OPEN SEA. Taking the waterline instead put sand,
+		// crablets and a bit of the writing band into a decorative strip,
+		// which read as a slice of something rather than as water.
+		sc: gifScene{name: "rule", at: 14, tod: 0.52, secs: 4, fps: 6, cols: 120,
+			crop: [4]int{0, 9, 120, 12}, pal: pal, cube: !truecolorFX},
+	}
+}
+
 // renderFX renders every embedded animation and returns the page's script
 // payload and the stylesheet the frames share.
 func renderFX(seed int64) (js, css string, err error) {
 	pal := &canvas.HTMLPalette{}
 	clips := append([]fxClip{heroClip(pal)}, stateClips(pal)...)
 	clips = append(clips, swapClips(pal)...)
+	clips = append(clips, ruleClip(pal))
 	out := map[string]fxPayload{}
 	for _, cl := range clips {
 		frames, err := gifFrames(seed, cl.sc)

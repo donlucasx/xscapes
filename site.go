@@ -105,6 +105,7 @@ func sitePage(seed int64, dir string) (string, error) {
 	page := string(tmpl)
 	cover := coverLayers(seed)
 	page = strings.Replace(page, "{{cover}}", cover, 1)
+	page = strings.Replace(page, "{{covermobile}}", coverLayersMobile(seed), 1)
 	// The animations are embedded as text, not screenshotted into GIFs. See
 	// siteframes.go for why, and for what it costs.
 	fxjs, fxcss, err := renderFX(seed)
@@ -146,8 +147,19 @@ func sitePage(seed int64, dir string) (string, error) {
 // night, glyphs only, stacked as <pre> layers a CSS step animation cycles.
 // The mark sits over its own sea. Written to <dir>/anim/cover.html too, so
 // the deck's title slide can carry the same.
-func coverLayers(seed int64) string {
-	const w, h = 168, 44
+func coverLayers(seed int64) string { return coverLayersAt(seed, 168, 44) }
+
+// coverLayersMobile is the same sea at a width a phone can actually show.
+//
+// His note, 2026-09-14: the splash reads on desktop and does not on mobile,
+// and the reason is that the cover frame is a FIXED 168 columns at a fixed
+// 14px. On a 390px screen that is a 1400px picture behind a 390px window, so
+// a phone sees a crop of the middle of the sea rather than a sea. A narrower
+// render is the only honest fix: scaling 168 columns down to fit would put the
+// cell under 2px, which is not an animation, it is noise.
+func coverLayersMobile(seed int64) string { return coverLayersAt(seed, 60, 30) }
+
+func coverLayersAt(seed int64, w, h int) string {
 	var b strings.Builder
 	sh := scape.NewShore(seed, false)
 	sh.MoonX = 0.28

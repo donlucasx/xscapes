@@ -26,6 +26,15 @@ p{max-width:62ch}
 .cover{position:relative;min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;overflow:hidden;padding:20px}
 .cover .sea{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;pointer-events:none}
 .cover .sea pre{position:absolute;margin:0;font:700 14px/1 var(--mono);color:#3a3a3a;letter-spacing:0;white-space:pre;opacity:0;animation:step 4.2s steps(1) infinite}
+.cover .sea.m{display:none}
+/* The desktop cover is a fixed 168 columns. On a phone that is a 1400px
+   picture behind a 390px window, so it shows the middle of the sea rather
+   than a sea. Below 720px the narrow render takes over. */
+@media (max-width:720px){
+  .cover .sea.d{display:none}
+  .cover .sea.m{display:flex}
+  .cover .sea.m pre{font-size:11px}
+}
 .cover .sea pre:nth-child(1){animation-delay:0s}
 @keyframes step{0%{opacity:1}16.6%{opacity:0}100%{opacity:0}}
 .cover .lockup{position:relative;font-size:clamp(64px,13vw,150px);text-shadow:0 0 40px #121212,0 0 12px #121212}
@@ -48,9 +57,9 @@ h3{font-size:14px;font-weight:700;margin:0 0 4px}
 .note{color:var(--d);font-size:13.5px}
 
 /* section headers as a prompt line, which is the page's one terminal ritual */
-.sec{display:flex;align-items:center;gap:14px;margin:74px 0 18px}
-.sec .pr{color:var(--warm)}
-.sec .gl{flex:1;overflow:hidden;white-space:nowrap;color:var(--ln);font-size:12px;letter-spacing:.2em}
+.sec{margin:76px 0 20px}
+.sec .rule-fx{width:100%;overflow:hidden;opacity:.85;margin:0 0 14px;border-radius:3px}
+.sec h2{color:var(--i)}
 
 /* the window frame: the terminal as an object inside a page, never as the page */
 .win{border:1px solid var(--ln);border-radius:7px;overflow:hidden;background:#000;max-width:100%}
@@ -62,7 +71,7 @@ h3{font-size:14px;font-weight:700;margin:0 0 4px}
 /* Every row's descenders spill into the row below, where the next row's own
    background covers them. The LAST row has nothing below it, so without this
    the container cuts it. */
-.fx{display:block;width:max-content;min-height:1px;padding-bottom:.35em}
+.fx{display:block;width:max-content;min-height:1px;padding-bottom:.45em}
 /* The frames carry their own font stack, and it is NOT the page's.
    Every cell paints its own background, so line-height must stay exactly 1
    or the rows stop tiling and a hairline of page shows between them. At that
@@ -88,8 +97,10 @@ h3{font-size:14px;font-weight:700;margin:0 0 4px}
 .cmd .c{color:var(--d)}
 .cmd .pr{color:var(--warm)}
 ul.feats{list-style:none;padding:0;margin:22px 0 0;display:grid;gap:11px;max-width:70ch}
-ul.feats li{padding-left:18px;position:relative;color:var(--dd);font-size:14px}
-ul.feats li::before{content:"\25B8";position:absolute;left:0;color:var(--warm)}
+ul.feats li{padding-left:26px;position:relative;color:var(--dd);font-size:14px}
+/* The marker is the brand's own cell -- a block cursor in reverse video --
+   rather than a bullet glyph borrowed from a word processor. */
+ul.feats li::before{content:"\00A0";position:absolute;left:0;top:.28em;width:1ch;height:1.05em;background:var(--warm)}
 ul.feats b{color:var(--i)}
 .clip img{display:block;width:100%;height:auto;border:1px solid var(--ln);border-radius:6px}
 .foot{margin-top:70px;color:var(--d);font-size:13px;border-top:1px solid var(--ln);padding-top:18px}
@@ -102,7 +113,8 @@ ul.feats b{color:var(--i)}
 <div class="rail" id="rail" aria-hidden="true"></div>
 
 <section class="cover">
-<div class="sea">{{cover}}</div>
+<div class="sea d">{{cover}}</div>
+<div class="sea m">{{covermobile}}</div>
 <div class="lockup"><span class="blk">x</span>scapes</div>
 <p class="line">a thinking screen for terminal agents</p>
 <div class="scrolltip">&#8595;</div>
@@ -111,14 +123,13 @@ ul.feats b{color:var(--i)}
 <main>
 
 <section id="top">
-<h1>A thinking screen for terminal agents<span class="cur"></span></h1>
-<p class="sub">Cozy ASCII scenes that react to your agent while it works.</p>
+<h1>Cozy ASCII scenes that react to your agent while it works<span class="cur"></span></h1>
 
 <div class="win">
-  <div class="bar"><i></i><i></i><i></i><span>xscapes claude</span><span class="live" id="clock"></span></div>
+  <div class="bar"><i></i><i></i><i></i><span>xscapes claude</span><span class="live">a whole session, sped up</span></div>
   <div class="stage" aria-hidden="true"><div class="fx" id="hero-fx"></div></div>
 </div>
-<p class="cap">One whole session. The agent works in the top rows exactly as it always has; underneath, the sea comes up with the work and settles when it stops, a crablet arrives for each subagent and walks into the water when that one reports back, stars light as the plan gets done, and the moon sinks as the context fills. <b>It opens at your own time of day</b> &mdash; the sky is the real clock, which is why nothing else in the scene has to be.</p>
+<p class="cap">One whole session. The agent works in the top rows exactly as it always has; underneath, the sea comes up with the work and settles when it stops, a crablet arrives for each subagent and walks into the water when that one reports back, stars light as the plan gets done, and the moon sinks as the context fills. The day turns underneath the whole time, on your real clock &mdash; which is why nothing else in the scene has to carry the hour.</p>
 
 <div class="cmd"><span class="pr">$</span> go install github.com/donlucasx/xscapes@latest
 <span class="pr">$</span> xscapes install claude --apply   <span class="c"># writes its hooks, after a backup</span>
@@ -126,7 +137,7 @@ ul.feats b{color:var(--i)}
 <span class="pr">$</span> xscapes inside &lt;any command&gt;      <span class="c"># anything else, hosted the same way</span></div>
 </section>
 
-<div class="sec"><span class="pr">$</span><h2>Read it at a glance</h2><div class="gl">&#183; . + * &#183; . &#176; &#183; + . &#183; * &#176; . &#183; + . &#183; * &#183; . &#176; &#183; + . &#183; * &#176; . &#183; + . &#183; * &#183; . &#176; &#183; + . &#183; * &#176; . &#183; + . &#183; *</div></div>
+<div class="sec"><div class="fx rule-fx" data-clip="rule" aria-hidden="true"></div><h2>Read it at a glance</h2></div>
 <section>
 <p class="sub">The same beach in five moments. Press one and only the thing that carries it changes &mdash; that is the whole language, and it is why you never have to read the screen.</p>
 <div class="tabs" role="tablist" id="st-tabs"></div>
@@ -137,7 +148,7 @@ ul.feats b{color:var(--i)}
 <p class="reads" id="st-note"></p>
 </section>
 
-<div class="sec"><span class="pr">$</span><h2>Pick your companion</h2><div class="gl">&#8776; ~ &#8776;&#8776; ~ &#8776; ~&#8776; &#8776; ~ &#8776;&#8776; ~ &#8776; ~&#8776; &#8776; ~ &#8776;&#8776; ~ &#8776; ~&#8776; &#8776; ~ &#8776;&#8776; ~ &#8776; ~&#8776; &#8776; ~ &#8776;&#8776; ~ &#8776;</div></div>
+<div class="sec"><div class="fx rule-fx" data-clip="rule" aria-hidden="true"></div><h2>Pick your companion</h2></div>
 <section class="grid2">
 <div>
 <p class="sub">Hero the crab ships as the default. The cat came first, and is one command away &mdash; a scape that is already running picks the change up on its next frame, without restarting your session.</p>
@@ -150,7 +161,7 @@ ul.feats b{color:var(--i)}
 </div>
 </section>
 
-<div class="sec"><span class="pr">$</span><h2>More than one shore</h2><div class="gl">| ~ o | &#8776; o | ~ &#8776; o | ~ o | &#8776; o | ~ &#8776; o | ~ o | &#8776; o | ~ &#8776; o | ~ o | &#8776; o | ~ &#8776; o | ~ o | &#8776; o | ~ &#8776; o</div></div>
+<div class="sec"><div class="fx rule-fx" data-clip="rule" aria-hidden="true"></div><h2>More than one shore</h2></div>
 <section>
 <p class="sub">A landscape only needs six things to carry the whole system: a light, a sky, something that moves with the work, a surface, somewhere the work piles up, and someone living in it. So there is no reason to stop at one.</p>
 <div class="grid2">
@@ -159,7 +170,7 @@ ul.feats b{color:var(--i)}
 </div>
 </section>
 
-<div class="sec"><span class="pr">$</span><h2>Underneath, a protocol</h2><div class="gl">&#183; &#8212; &#183; &#8212;&#8212; &#183; &#8212; &#183; &#8212;&#8212; &#183; &#8212; &#183; &#8212;&#8212; &#183; &#8212; &#183; &#8212;&#8212; &#183; &#8212; &#183; &#8212;&#8212; &#183; &#8212; &#183; &#8212;&#8212; &#183; &#8212; &#183; &#8212;&#8212; &#183; &#8212; &#183;</div></div>
+<div class="sec"><div class="fx rule-fx" data-clip="rule" aria-hidden="true"></div><h2>Underneath, a protocol</h2></div>
 <section>
 <p class="sub">The scene is one implementation. Underneath it is a small event protocol and a thin adapter for each agent, which is the part that outlives the shoreline.</p>
 <ul class="feats">
@@ -268,6 +279,12 @@ ul.feats b{color:var(--i)}
         if(noteEl) noteEl.textContent = clip.note; }
     });
   }
+  // Every section rule plays the same strip of sea.
+  Array.prototype.forEach.call(document.querySelectorAll('[data-clip]'), function(el){
+    var k = el.getAttribute("data-clip");
+    play(el, k, Math.random());
+  });
+
   // The two other scapes are stills, not clips, but they are the same kind of
   // object and must fill their window the same way.
   Array.prototype.forEach.call(document.querySelectorAll(".fx[data-cols]"), function(el){

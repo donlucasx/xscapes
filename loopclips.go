@@ -49,33 +49,39 @@ func windowLoop() []loopBeat {
 			tool(event.ToolStart, "t1", event.OpRead, "Read", "internal/auth/handler.go", ""),
 			tool(event.ToolEnd, "t1", event.OpRead, "Read", "internal/auth/handler.go", "142 lines"),
 		}, print: []string{"*Read\tinternal/auth/handler.go\t142 lines"}},
-		{at: 11, evs: []event.Event{
+		{at: 13, evs: []event.Event{
 			tool(event.ToolStart, "t2", event.OpSearch, "Grep", "rate.Limiter", ""),
 			tool(event.ToolEnd, "t2", event.OpSearch, "Grep", "rate.Limiter", "3 files"),
 			todo(1, 5),
 		}, print: []string{"*Grep\trate.Limiter\t3 files"}},
-		{at: 18, evs: []event.Event{
+		// THE AGENT WORKS ALONE FIRST, and for long enough to be seen doing it.
+		// His note on the timelapse, 2026-09-14: the fan-out used to land at
+		// 18s of a 132s session, which is under two seconds of a fifteen-second
+		// clip -- the sea had barely got up before the beach filled with
+		// crablets, and the one agent never had a moment of its own. It reads
+		// alone now from the prompt to 36s, a third of the arc.
+		{at: 20, evs: []event.Event{
+			tool(event.ToolStart, "t3", event.OpEdit, "Edit", "internal/auth/handler.go", ""),
+			tool(event.ToolEnd, "t3", event.OpEdit, "Edit", "internal/auth/handler.go", "+18 -2"),
+			todo(2, 5), ctx(0.18),
+		}, print: []string{"*Edit\tinternal/auth/handler.go\t+18 -2"}},
+		{at: 28, evs: []event.Event{
+			tool(event.ToolStart, "t4", event.OpWrite, "Write", "internal/auth/limiter.go", ""),
+			tool(event.ToolEnd, "t4", event.OpWrite, "Write", "internal/auth/limiter.go", "64 lines"),
+			todo(3, 5), ctx(0.24),
+		}, print: []string{"*Write\tinternal/auth/limiter.go\t64 lines"}},
+		{at: 36, evs: []event.Event{
 			sub("a1", "Explore", event.SubStart),
 			sub("a2", "Explore", event.SubStart),
 			sub("a3", "general-purpose", event.SubStart),
 		}, print: []string{"*Task\tExplore x2, general-purpose\t3 agents"}},
-		{at: 26, evs: []event.Event{
-			tool(event.ToolStart, "t3", event.OpEdit, "Edit", "internal/auth/handler.go", ""),
-			tool(event.ToolEnd, "t3", event.OpEdit, "Edit", "internal/auth/handler.go", "+18 -2"),
-			todo(2, 5), ctx(0.24),
-		}, print: []string{"*Edit\tinternal/auth/handler.go\t+18 -2"}},
-		{at: 34, evs: []event.Event{
-			tool(event.ToolStart, "t4", event.OpWrite, "Write", "internal/auth/limiter.go", ""),
-			tool(event.ToolEnd, "t4", event.OpWrite, "Write", "internal/auth/limiter.go", "64 lines"),
-			todo(3, 5),
-		}, print: []string{"*Write\tinternal/auth/limiter.go\t64 lines"}},
-		{at: 42, evs: []event.Event{sub("a1", "Explore", event.SubEnd), sub("a2", "Explore", event.SubEnd)}},
-		{at: 48, evs: []event.Event{
+		{at: 50, evs: []event.Event{sub("a1", "Explore", event.SubEnd), sub("a2", "Explore", event.SubEnd)}},
+		{at: 44, evs: []event.Event{
 			tool(event.ToolStart, "t5", event.OpShell, "Bash", "go test ./internal/auth", ""),
 			tool(event.Error, "t5", event.OpShell, "Bash", "go test ./internal/auth", "exit 1"),
 			ctx(0.44),
 		}, print: []string{"*Bash\tgo test ./internal/auth\texit 1"}},
-		{at: 56, evs: []event.Event{sub("a4", "code-reviewer", event.SubStart), sub("a5", "general-purpose", event.SubStart)}},
+		{at: 58, evs: []event.Event{sub("a4", "code-reviewer", event.SubStart), sub("a5", "general-purpose", event.SubStart)}},
 		{at: 66, evs: []event.Event{{Kind: event.NeedsInput, Text: "allow Bash?"}},
 			print: []string{"", "!allow Bash?"}},
 		{at: 78, evs: []event.Event{{Kind: event.Prompt, Text: "yes"}, ctx(0.62)},
