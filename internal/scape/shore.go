@@ -575,7 +575,13 @@ func (s *Shore) paintBG(c *canvas.Canvas, hy int, edge []float64) {
 		// change to make. Spreading a spike that big just makes it permanent.
 		//
 		// So the depth is rounded again, deliberately, and the spike stands as
-		// a known defect rather than being traded for a worse one. Fixing it
+		// a known defect rather than being traded for a worse one. HIS RULING
+		// 2026-09-13, asked what accepting it costs: keep the step, and make
+		// the test see it. TestTheTideStepIsTheOnlyRestlessFrame is that guard,
+		// and it measures the step BIGGER than the 139-of-216 above: at 120x26
+		// every cell of the open sea changes, 100.00%, on the crossing frame
+		// and 0.00% on every other one. Which is where the pooled test's 4.35%
+		// comes from -- one whole frame divided by 23 pairs. Fixing it
 		// properly means anchoring the backdrop gradient to something that is
 		// not the tide, which is a design change to the sea and not a one-line
 		// fix to this expression. Carded rather than bodged.

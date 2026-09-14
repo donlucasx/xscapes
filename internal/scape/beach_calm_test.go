@@ -1,6 +1,7 @@
 package scape
 
 import (
+	"math"
 	"testing"
 
 	"github.com/donlucasx/xscapes/internal/canvas"
@@ -123,6 +124,112 @@ func TestTheBackdropHoldsStillBetweenFrames(t *testing.T) {
 	if pct > 8 {
 		t.Errorf("the open sea is restless again: %.2f%% of its cells change every frame, want under 8%%", pct)
 	}
+}
+
+// TestTheTideStepIsTheOnlyRestlessFrame is the PER-FRAME half of the backdrop's
+// stillness guarantee, and it exists because the pooled one cannot see a spike.
+//
+// TestTheBackdropHoldsStillBetweenFrames divides every changed cell by every
+// cell over the whole run, so the frame where the tide crosses a row -- which
+// re-ramps the entire open sea at once, 139 of 216 cells -- is averaged against
+// the still frames either side of it and reads as 4.35%% against an 8%% bar. The
+// ceiling therefore holds on the AVERAGE and is unenforced exactly where the
+// feature does its work, which is the worst place for a ceiling to fail.
+//
+// HIS RULING 2026-09-13, having been shown both numbers and asked what
+// accepting it cost: "proceed w C" -- keep the step, make the test see it. The
+// exemption is written down and numbered here instead of hiding in an average.
+//
+// Every frame pair is classified by whether the ROUNDED tide row moved, because
+// depth is rounded off that row and so it is the only thing that can step the
+// gradient:
+//   - a QUIET pair is the backdrop at rest, and takes the 8%% guarantee itself.
+//   - a CROSSING pair is the exemption, and it is bigger than the note in
+//     shore.go says: at 120x26 the step changes 100.00%% of the open sea, every
+//     cell of it, in one frame. Which also settles where the pooled 4.35%%
+//     comes from -- one 100%% frame in 23 pairs is 4.35%%, so the average IS
+//     the spike, divided by the still frames around it.
+//   - the exemption is capped by COUNT as well as by size, because spreading the
+//     spike across more frames is precisely the fix that measured WORSE -- a
+//     fractional depth churns 53.62%% of the open sea EVERY frame (see shore.go;
+//     do not try it again).
+func TestTheTideStepIsTheOnlyRestlessFrame(t *testing.T) {
+	if !Tide {
+		t.Skip("the step belongs to the tide; with XSCAPES_TIDE=0 there is nothing to exempt")
+	}
+	sh := NewShore(7, false)
+	const frames = 24
+	fr := make([]*canvas.Canvas, 0, frames)
+	row := make([]float64, 0, frames)
+	for i := 0; i < frames; i++ {
+		c := canvas.New(120, 26, canvas.AlphaFar, canvas.AlphaMid, canvas.AlphaNear)
+		sh.Update(c, float64(i)*0.1, Activity{Level: 0.7, TimeOfDay: 0.3868})
+		fr = append(fr, c)
+		row = append(row, math.Round(sh.tideRow))
+	}
+	from, to := openSea(sh, fr[0])
+	churn := func(a, b *canvas.Canvas) float64 {
+		changed, total := 0, 0
+		for y := from; y <= to; y++ {
+			for x := 0; x < b.W; x++ {
+				total++
+				if b.BGAt(x, y) != a.BGAt(x, y) {
+					changed++
+				}
+			}
+		}
+		if total == 0 {
+			t.Fatal("the open sea is empty here, so this measures nothing")
+		}
+		return 100 * float64(changed) / float64(total)
+	}
+
+	quietWorst, quietAt, stepWorst, stepAt, steps := 0.0, 0, 0.0, 0, 0
+	for i := 1; i < len(fr); i++ {
+		pct := churn(fr[i-1], fr[i])
+		if row[i] != row[i-1] {
+			steps++
+			if pct > stepWorst {
+				stepWorst, stepAt = pct, i
+			}
+			continue
+		}
+		if pct > quietWorst {
+			quietWorst, quietAt = pct, i
+		}
+	}
+	t.Logf("%d pairs: %d crossings, worst step %.2f%% at frame %d, worst quiet %.2f%% at frame %d",
+		len(fr)-1, steps, stepWorst, stepAt, quietWorst, quietAt)
+
+	// A window with no crossing in it would pass every bar below while
+	// measuring nothing -- the same way a clean read of a trace window holding
+	// no mirror blocks once looked like a pass.
+	if steps == 0 {
+		t.Fatal("no crossing in the window: the exemption is untested and the quiet bar is measuring nothing")
+	}
+	if quietWorst > 8 {
+		t.Errorf("the backdrop is restless on a frame the tide did NOT move: %.2f%% of the open sea changes at frame %d, want under 8%%",
+			quietWorst, quietAt)
+	}
+	// TWO BARS WERE DRAFTED HERE AND BOTH ARE DELIBERATELY ABSENT, because
+	// neither could be made to fail -- and a guard that cannot fail is the
+	// crabDone trap: art that looks like a check and is not one.
+	//
+	// A bar on the step's SIZE is pointless: it is already a complete re-map,
+	// so there is no headroom for a regression to eat, and asserting it STAYS
+	// 100% would fail the day someone anchors the gradient off the tide and
+	// fixes it properly.
+	//
+	// A bar on the step's COUNT looked reasonable and is unreachable. Three
+	// mutations, none of which moved it past 2 of 23 pairs: TideEase 3.0 ->
+	// 0.12 (a snapping tide crosses the same rows, just sooner) and TideRange
+	// 5.0 -> 14.0 (the guards that keep the waterline off the horizon and out
+	// of the writing clamp the travel anyway). The step's rarity is bounded by
+	// those clamps, structurally, and not by anything a number here could add.
+	//
+	// What IS enforced is the quiet bar above, and that one is proven: making
+	// depth fractional -- the fix measured worse on 2026-09-12 -- turns frame 8
+	// into 100.00% and this test red.
 }
 
 // The writing band is the page the agent's work is written on: the bottom rows,
