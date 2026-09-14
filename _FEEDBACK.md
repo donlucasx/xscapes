@@ -3005,3 +3005,21 @@ judged reads as a flicker rather than an arrival at 12 fps).
 
 ⚠ **STILL UNANSWERED, carried from s29 and not decided by silence:** the rotating eye's 24.3%
 back-to-back repeat. It was not put to him this session.
+
+**Later on 09-12/13 — the status report, and why it earned its keep.** He asked for *"a full status
+report on xscapes"*, then `/wrap`. No feedback and no defect report from him in either.
+
+⭐ **The report was built by checking the CODE against the NOTES rather than summarising the notes,
+and that is what found something.** `internal/companion/crab_near.go` opened with a ⚠ block saying
+`OFF BY DEFAULT` while `nearDefault = 2` sat thirty lines below it — true for the few hours between
+writing the file and his word to push the come-closer pose live, wrong for the two days after. Fixed
+in `a5acda7`. **A stale comment a reader believes is worse than no comment**, and this project has
+been wrong from its own notes before.
+
+⚠ **Two figures in RESUME.md were stale and are corrected**: `go install ...@latest` is **61** commits
+behind, not 52; and the claim that the paste kit shows the cat is now confirmed with word-boundary
+counts (crab 0, crablet 0) rather than a substring grep that would match "indicate".
+
+⚠ **And the thing the report measured that nobody had checked: he is not running any of it.** Four
+scapes up, not one holding the installed binary. Three days of work had been reported to him as
+"installed" twice, which was true and was not the same thing as seen.

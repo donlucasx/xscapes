@@ -26,17 +26,25 @@ Do NOT drive Terminal.app (osascript, System Events) without asking me first.
 
 ## ▶ NEXT (session 30 left it here)
 
-**0. ⏳ HIS LOOK IS THE WHOLE QUEUE NOW.** Three days of work — the companion round AND the shooting
-star — is committed, green and **installed** (inode 85156875, stamped `417414e`), and he has seen
-none of it running.
+**0. ⏳ HIS LOOK IS THE WHOLE QUEUE NOW, AND IT IS MEASURED THAT HE HAS NOT TAKEN IT.** Three days of
+work — the companion round AND the shooting star — is committed, green and **installed** (inode
+85156875, stamped `417414e`), and **nothing on this machine is running it.**
+⚠ **Checked 2026-09-13: FOUR scapes up, NONE holding the installed binary.** Three `xscapes claude`
+(up 3d 6h, 2d 2h, 19h) hold inodes **84245880 / 84730008 / one older**; installed is **85156875**.
+So the tide-as-default (s27), the near crab + scattered sky + droplet cue (s28), the cat companion
+round (s29) and the shooting star (s30) have **never reached a screen**.
 **Restart a scape and look.** Nothing else in the product is waiting on me.
 
 ```
-# PUSHED 2026-09-12: origin/main is 27ecb1b, nothing unpushed.
+# PUSHED: origin/main is a5acda7, nothing unpushed.
 xscapes claude                              # already installed; just restart
 go version -m ~/.local/bin/xscapes | grep vcs.revision    # the binary names its own commit
 lsof -p <pid> -a -d txt | grep xscapes                    # which binary a running scape holds
 ```
+⚠ **TWO ORPHANED SMOKE TESTS from s28 are still running** and are NOT his work — pid 51733
+(`-live -session s28smoke`, up 2d 22h) and pid 64720 (`-live -session s28verify`, up 2d 21h),
+~0.3–0.6% CPU each. Safe to kill; **ask first and check `lsof -a -d cwd`**, because s25 nearly cost
+him live work by reading two same-named processes as orphans.
 ⚠ **Install via a NEW inode** (`rm` then build, or `go build -o`): macOS SIGKILLs a binary
 overwritten in place after it has run.
 ⚠ **A running scape keeps the OLD binary** (that is what the new inode buys). Restart or you
@@ -69,12 +77,20 @@ but the clip would need to catch a phase boundary (t = 8.0, 16.0, 24.0 in the cy
   `assets/frames/s29-decisions.html`: pure random (built) · never-twice-running (0%) · shuffled bag
   (6.1%). One line either way.
 - **Andale Mono and the Commons publish**, untouched since s27. ⏰ **Commons closes 09-17.**
-- **The site has not been started** and it is his item (b) from 09-11. All 860 published frames are
-  stale; `~/Desktop/xscapes-commons/` is the 09-07 CAT page and would ship the wrong animal;
-  `go install ...@latest` is 52 commits behind. ⚠ Nothing in the repo can render the NEAR crab into
-  a clip — `Approach` has one non-test caller, the live TUI — so `gifs.go` needs one line before the
-  best feature can have an asset. ⚠ His last word on Commons itself is a HOLD: *"once we are ready,
-  I will let you know when."*
+- **The site has not been started** and it is his item (b) from 09-11. ⚠ **MEASURED 2026-09-13, and
+  one figure here was stale:**
+  - **The live page is up (HTTP 200, 74 KB) and 47 COMMITS BEHIND**, published **2026-09-08 01:12**
+    from gh-pages `16502ea`. It DOES show the crab — 7 mentions of "crablet" against 1 stray
+    "kitten", so s24's rebuild held. What it predates is every visible feature since; **"the fall"
+    appears 0 times.**
+  - **`go install ...@latest` serves v0.3.0, 61 commits behind** — ~~52~~, corrected. That is the
+    command printed on the README *and* on the live page, so a judge who installs it gets a build
+    from before the tide.
+  - **`~/Desktop/xscapes-commons/` is the CAT page**, confirmed with word-boundary counts rather than
+    substrings: cat 2–4 per file, **crab 0, crablet 0**. Pasting it ships the wrong animal.
+  ⚠ Nothing in the repo can render the NEAR crab into a clip — `Approach` has one non-test caller,
+  the live TUI — so `gifs.go` needs one line before the best feature can have an asset. ⚠ His last
+  word on Commons itself is a HOLD: *"once we are ready, I will let you know when."*
 
 **3. Open defects, measured, NOT fixed:**
 - ⚠ **Two stars still touch, and I was wrong TWICE about why.** His ruling: *"dont let em touch"*.
@@ -100,6 +116,24 @@ but the clip would need to catch a phase boundary (t = 8.0, 16.0, 24.0 in the cy
 **4. Cleanup carried:** the chosen art now exists TWICE — in `internal/companion/bitmaps_poses.go`
 (shipped) and in the root study files (`catalts_picks.go`, `catalts_art.go`, `cattop_art.go`). Point
 the study pages at the shipped art and delete the duplicates before they drift.
+
+**5. ⚠ THE DISK IS THE ONE THING THAT COULD STOP WORK, and it is NOT xscapes' fault.** Measured
+2026-09-13: **17 GiB free of 1.8 TiB, 100% used** — it was 111 GiB at s27. `~/Documents` is **299 GB**
+and `~/Library/Caches` **45 GB**; xscapes owns only **3.1 GB of traces** plus 18 MB of run logs.
+⇒ **The one xscapes-side recovery worth offering is HIS CALL and irreversible:**
+`~/.config/xscapes/traces/20260908-005450.bin` is **2.8 GB of the 3.1** and s26 said KEEP it, because
+it holds the only full recording of the strikethrough occurrence and is what a future re-check would
+compare against. **That defect is now CLOSED on his word (09-12)**, so the trace's only purpose is
+gone — but closing-on-his-word is not a measurement, and deleting it forecloses reopening. Ask.
+
+**6. Status report, 2026-09-13:** every figure in this file's §0/§2 was re-verified against the repo,
+the running processes, the installed binary and a live fetch. Published as an artifact for him:
+https://claude.ai/code/artifact/5c43c9c0-80cd-42c0-9031-f1ab68dc3bae
+⇒ **It found a real defect**: `internal/companion/crab_near.go`'s header said `OFF BY DEFAULT` while
+`nearDefault = 2` sat thirty lines below it, so the come-closer pose had been ON for two days while
+its own file denied it. Fixed in `a5acda7`. **Checking the notes against the code is how that
+surfaced** — and the test it names, `TestNothingMovesWithTheNearPoseUnset`, pins rung 0, so its name
+is now a misnomer even though what it guards is right.
 
 ## Instruments built in session 28 (do not re-derive these)
 

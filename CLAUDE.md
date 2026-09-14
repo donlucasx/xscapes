@@ -41,7 +41,32 @@
 > `xscapes` with no agent has no reducer, and every site clip renders from `demoState`.
 > ⚠ **No-skip holds at 12 fps (hosted `xscapes claude`) and 20 (standalone). Below 12, half a second
 > cannot show six columns** and the head jumps two at a time. Stated limit, not a defect.
-> ⏰ **Commons closes 09-17, 5 days. The site is untouched and every published frame is stale.**
+> ⏰ **Commons closes 09-17, 4 days. The site is untouched and every published frame is stale.**
+>
+> **WRAPPED 2026-09-13. HEAD `a5acda7`, pushed, tree clean, suite 10/10 + vet + fmt green, installed.**
+> ⚠⚠ **HE HAS STILL NOT SEEN ANY OF IT, AND THAT IS NOW MEASURED RATHER THAN ASSUMED: FOUR scapes are
+> running and NOT ONE holds the installed binary.** Three `xscapes claude` (up 3d 6h / 2d 2h / 19h)
+> hold inodes 84245880 / 84730008 / one older; installed is 85156875. Five days of shipped work —
+> the tide as default, the near crab, the scattered sky, the droplet cue, the cat companion round,
+> the shooting star — **has never reached a screen. Restart is the whole queue.**
+> ⚠ Two ORPHANED s28 smoke tests are also still up (pids 51733, 64720, `-live -session s28smoke` /
+> `s28verify`). Safe to kill, but **ask and check `lsof -a -d cwd` first** — s25 read two same-named
+> processes as orphans and nearly cost him live work.
+>
+> ⭐ **A FULL STATUS REPORT was built by checking the CODE against the NOTES, and it caught a real
+> defect the notes had hidden:** `crab_near.go`'s header said `OFF BY DEFAULT` while `nearDefault = 2`
+> sat thirty lines below, so the come-closer pose had been ON for two days while its own file denied
+> it. Fixed, `a5acda7`. ⇒ Report: https://claude.ai/code/artifact/5c43c9c0-80cd-42c0-9031-f1ab68dc3bae
+> ⇒ **THE PUBLIC FACE IS THE DEADLINE RISK, all re-measured:** the live page is **47 commits behind**
+> (published 09-08 01:12; it does show the crab, and "the fall" appears 0 times) · **`go install
+> …@latest` serves v0.3.0, 61 commits behind** — ~~52~~, corrected — and that is the command on the
+> README AND the live page · the Desktop paste kit is the **CAT** page (word-boundary counts: crab 0,
+> crablet 0). ⚠ `gifs.go` still needs one line before the near crab can have a clip at all.
+> ⚠⚠ **AND THE DISK COULD STOP WORK: 17 GiB free of 1.8 TiB, 100% used**, down from 111 GiB at s27.
+> **NOT xscapes** — `~/Documents` is 299 GB, `~/Library/Caches` 45 GB, xscapes owns 3.1 GB of traces.
+> The one xscapes-side recovery is HIS CALL: `traces/20260908-005450.bin` is 2.8 GB of that 3.1 and
+> s26 said KEEP it, but the defect it records is closed-on-his-word — which is not a measurement, so
+> deleting it forecloses reopening. **Ask.**
 
 > **Session 29 (2026-09-11 into 09-12), WRAPPED. HEAD `d02530b`, tree clean, suite + vet + fmt green.
 > ⚠ NOT PUSHED AND NOT INSTALLED — he has seen none of it running. Two days, and almost all of it
