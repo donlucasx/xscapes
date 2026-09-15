@@ -110,10 +110,13 @@ animal is the companion's job or nobody's.
   (fire fixed as the night light; smoke/flame lean, fraction of scrub flat, debris) · **B the fire**
   (height, sparks, smoke). ⭐ **HIS RULING 2026-09-15: A** (*"love this! aligned with your recommendations"*).
   **The vista is ON THE PAGE as a clip** (`sceneClips` "vista", dusk, 10.6 KB gz; page 501 KB gz).
-  ⏭ **THE OWL, awaiting his pick** (`internal/scenes/owl.go`): three shapes (round / egg / perched) × two
-  placements (mound / a branch from the right edge, owlets along it), coat BUFF 215,175,135 (a cube entry;
-  slate was lost in the lake at noon, taupe split into grey + orange). Defaults: round, on the branch.
-  Strip: scratchpad `shots/owl-place.png`, sent to him. Then the owl's five states. ⚠ Flagged for him: the lake is scenery (does not react);
+  ⏭ **THE OWL, awaiting his pick** (`internal/scenes/owl.go`). Round 1 (round / egg / perched) was
+  rejected: *"needs to be simpler in shape. more adorable"*. Round 2: FOUR cell-level silhouettes (A bell
+  with a face disc · B puff with a belly · C loaf · D barn with a heart face), two colours (brown 175,135,95
+  + pale 255,215,175; both cube entries that survive ground AND boosted-glyph paths — slate was lost in the
+  lake at noon, taupe split into grey + orange), 3x2 eyes with a highlight. Placement: the BRANCH from the
+  right edge above the treeline (owlets along it) is the default; the mound remains as `OwlPlace = 0`.
+  Sheet: scratchpad `shots/owl-sheet.png`, sent. Then the owl's five states. ⚠ Flagged for him: the lake is scenery (does not react);
   no clouds (weather deferred). ⚠ Canvas rule met for the first time: a plain `Plot` glyph over a
   quarter-cell background LOSES to the quarters (the owl's eye row vanished under the shoreline); keep
   whole cells under sprites. Not yet drawn: the owl's five states and its litter (owlet bitmap exists).

@@ -3192,3 +3192,10 @@ placements too, keep in mind the sub agents"* ⇒ Three owls generated from curv
 two-cell eyes with a round pupil, a beak; two placements, the mound in the meadow and a limb from the
 right edge above the treeline, which is also the rail the owlets sit along. Strip sent 2026-09-15; the
 defaults in the code are the round owl on the branch, awaiting his pick.
+**HIS VERDICT ON THE FIRST OWL ROUND, verbatim:** *"not loving the owl, needs to be simpler in shape.
+more adorable. Did u make any alternative designs like I asked you?"* ⇒ Fair: round / egg / perched were
+one blob three ways, same eyes, same colour. Second round: FOUR silhouettes authored at cell level (bell
+with a face disc · puffball with a belly · loaf · barn owl with a heart face), two colours (brown
+175,135,95 + pale 255,215,175, both cube entries), eyes three cells wide with a pupil column and a
+highlight, a two-cell beak. Sheet sent 2026-09-15 (`shots/owl-sheet.png`); code defaults to A Bell on
+the branch, awaiting his pick.
