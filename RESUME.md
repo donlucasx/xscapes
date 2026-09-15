@@ -60,6 +60,9 @@ question the page never asks) · **Repeatability (15%) is absent** -- nothing sa
 want it in a month · **Fit (20%) is implied, never said** ("same window as the agent, no tab, no app,
 no account" is the highest-scoring sentence available and is not on the page). Roughly 45% of the
 rubric is carried by copy that does not exist yet.
+⇒ ⭐ **s32 WROTE THE COPY FOR EVERY BEAT, verbatim-ready, each claim checked against the code, with the five
+rulings it needs (order · the three new beats · the Fit line · the merge · the caption trim):**
+https://claude.ai/artifact/Enod3TiFWUfiHe8u9EH4km  ⇐ HE HAS NOT SEEN IT. Nothing on the page changed.
 ⇒ **The nine-beat structure proposed:** splash → **the problem** (a spinner beside the scape, which
 is the pitch and is itself an ASCII moment) → what it is, running → **what it buys you** (leave the
 room; never miss a failure; see the context run out before it compacts) → how to read it → **how you
