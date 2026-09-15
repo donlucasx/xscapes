@@ -3178,3 +3178,17 @@ and the treeline as a skyline, the third found the owl's eye row lost to the sho
 ⇒ https://claude.ai/artifact/N5Cvri266YgbtsufPXhiGV — **awaiting his pick.** Two things in the picture
 flagged for him: the lake is scenery and does not react (the shore's and aquarium's water is the work);
 no clouds, because weather is deferred in v1.
+
+**HIS RULING ON THE VISTA, verbatim:** *"love this! aligned with your recommendations. but the Owl art is
+broken (something changed?). Also, the companion color does not work great at noon (gets lost in the sky
+a bit)"* ⇒ **A, the wind, with the fire as the night light, is the third scape.** The owl's art was not
+changed; the terrain under it was: the redraw put quarter-cells under the sprite for the first time, and
+the canvas's rule that a split background wins over a plain glyph took the owl's tuft row, its head row
+and its feet. The colour: slate is lost in the lake at noon; charcoal in the meadow at night; taupe
+quantises to grey as ground and boosts to orange as a glyph. **Buff (215,175,135) survives both paths.**
+Then: *"owl does not have to be anatomically perfect-gotta ne likable and cute. create some alt
+approaches"* and *"owl could perch on a branch that appears from the right edge of the frame. try alt
+placements too, keep in mind the sub agents"* ⇒ Three owls generated from curves (round, egg, perched),
+two-cell eyes with a round pupil, a beak; two placements, the mound in the meadow and a limb from the
+right edge above the treeline, which is also the rail the owlets sit along. Strip sent 2026-09-15; the
+defaults in the code are the round owl on the branch, awaiting his pick.

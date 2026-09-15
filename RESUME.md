@@ -108,7 +108,12 @@ animal is the companion's job or nobody's.
   resolution (`SetBGQuad`) with snow in the gullies and alpenglow at dawn/dusk, a lake reflecting the sky
   with a wandering shore, a meadow, two black pines framing the left, the owl on a mound. **A the wind**
   (fire fixed as the night light; smoke/flame lean, fraction of scrub flat, debris) · **B the fire**
-  (height, sparks, smoke). **Recommended A.** ⚠ Flagged for him: the lake is scenery (does not react);
+  (height, sparks, smoke). ⭐ **HIS RULING 2026-09-15: A** (*"love this! aligned with your recommendations"*).
+  **The vista is ON THE PAGE as a clip** (`sceneClips` "vista", dusk, 10.6 KB gz; page 501 KB gz).
+  ⏭ **THE OWL, awaiting his pick** (`internal/scenes/owl.go`): three shapes (round / egg / perched) × two
+  placements (mound / a branch from the right edge, owlets along it), coat BUFF 215,175,135 (a cube entry;
+  slate was lost in the lake at noon, taupe split into grey + orange). Defaults: round, on the branch.
+  Strip: scratchpad `shots/owl-place.png`, sent to him. Then the owl's five states. ⚠ Flagged for him: the lake is scenery (does not react);
   no clouds (weather deferred). ⚠ Canvas rule met for the first time: a plain `Plot` glyph over a
   quarter-cell background LOSES to the quarters (the owl's eye row vanished under the shoreline); keep
   whole cells under sprites. Not yet drawn: the owl's five states and its litter (owlet bitmap exists).
