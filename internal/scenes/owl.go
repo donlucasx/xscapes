@@ -1,6 +1,8 @@
 package scenes
 
 import (
+	"strings"
+
 	"github.com/donlucasx/xscapes/internal/canvas"
 	"github.com/donlucasx/xscapes/internal/companion"
 	"github.com/donlucasx/xscapes/internal/scape"
@@ -10,43 +12,121 @@ import (
 // THE OWL, DRAWN FOR CUTE.
 //
 // His notes, 2026-09-15: "owl does not have to be anatomically perfect -
-// gotta be likable and cute. create some alt approaches" and "owl could perch
-// on a branch that appears from the right edge of the frame. try alt
-// placements too, keep in mind the sub agents." The study's owl (animals.go)
-// is a rectangle with two 'O' glyphs; on the vista it read as a box.
+// gotta be likable and cute. create some alt approaches"; "owl could perch on
+// a branch that appears from the right edge of the frame. try alt placements
+// too, keep in mind the sub agents"; and on the first round, "not loving the
+// owl, needs to be simpler in shape. more adorable." That round was one blob
+// three ways. This one is four silhouettes, authored at CELL level -- 12x7,
+// the box every companion gets -- because at this size the shape is decided
+// by cells and the pixels only round the corners.
 //
-// The silhouettes below are generated from curves at the companion's own
-// 24x28, so they go through the same halving as every animal. Three rules
-// learned on the first strip, all kept here:
+// What makes a small character adorable, and each design has all of it: the
+// head is most of the body; the eyes take up the face, with a highlight in
+// the pupil; a pale face disc or belly in a second colour; a tiny beak.
+//
+// Three rules from the strips, kept:
 //
 //   - FULL CELLS ARE GROUND, NOT GLYPHS. A block glyph's ink stops short of
-//     the cell in every terminal measured, and the scene showed through as a
-//     rule between every row of the body.
+//     the cell and the scene shows through as a rule between the rows.
 //   - EVERY CELL BRINGS ITS OWN GROUND (PlotOn), so a split background under
-//     the sprite cannot win over it. That is what lost the study owl its eye
-//     row and its feet on the vista.
-//   - THE COAT IS A CUBE ENTRY. Taupe quantised to grey as ground and was
-//     boosted to orange as a glyph, so the body and its edges disagreed.
-//     Buff, 215,175,135, survives both paths unchanged, like the crab's
-//     salmon; and it is neither the cat's cream nor the crab's salmon.
+//     the sprite cannot win over it.
+//   - EVERY COLOUR IS A CUBE ENTRY that survives both the ground path and the
+//     boosted glyph path unchanged (see the probe in the commit message).
 type OwlAlt struct {
 	Name, Note string
-	rows       []string
-	eyeRow     int    // cell row of the eyes
-	eyeL, eyeR int    // the left cell of each two-cell eye
-	beakRow    int    // cell row of the beak
-	wings      bool   // a folded-wing stroke down each side
-	wingRows   [2]int // first and last cell row of the stroke
+	// art is 12 columns by 7 rows. '#' a whole cell; 'v' its lower half;
+	// '^' its upper half; '<' its right half; '>' its left half; '.' none.
+	art []string
+	// light marks whole cells painted in the pale colour: a face disc, a belly.
+	light []string
+	// The eyes: top-left cell of each, their size in cells, and where the
+	// pupil column sits inside (0 = outer, 1 = middle).
+	eyeRow, eyeL, eyeR, eyeW, eyeH, pupil int
+	beakRow                               int
 }
 
 // OwlAlts are the candidates, lettered in this order on the strip.
 var OwlAlts = []OwlAlt{
-	{Name: "Round", Note: "One circle, no neck, tufts on top, feet under. Everything about it is soft.",
-		rows: owlRound(), eyeRow: 2, eyeL: 3, eyeR: 7, beakRow: 3},
-	{Name: "Egg", Note: "Taller and narrower, flat on its perch, the face in the upper third so it looks up.",
-		rows: owlEgg(), eyeRow: 2, eyeL: 3, eyeR: 7, beakRow: 3},
-	{Name: "Perched", Note: "A round head on a smaller body with folded wings as strokes, so it reads as a bird and not a ball.",
-		rows: owlPerched(), eyeRow: 1, eyeL: 3, eyeR: 7, beakRow: 2, wings: true, wingRows: [2]int{4, 5}},
+	{Name: "Bell", Note: "A dome with a flat bottom, two tufts, a pale face disc around huge eyes. The emoji owl.",
+		art: []string{
+			"..^......^..",
+			".v########v.",
+			"############",
+			"############",
+			"############",
+			"############",
+			"...^....^...",
+		},
+		light: []string{
+			"............",
+			"....oooo....",
+			"..oooooooo..",
+			"..oooooooo..",
+			"...oooooo...",
+			"............",
+			"............",
+		},
+		eyeRow: 2, eyeL: 2, eyeR: 7, eyeW: 3, eyeH: 2, pupil: 1, beakRow: 4},
+	{Name: "Puff", Note: "A ball. No tufts, no neck, eyes that are most of the face, a belly.",
+		art: []string{
+			"...v####v...",
+			".v########v.",
+			"############",
+			"############",
+			"############",
+			".^########^.",
+			"...^....^...",
+		},
+		light: []string{
+			"............",
+			"............",
+			"............",
+			"............",
+			"....oooo....",
+			"...oooooo...",
+			"............",
+		},
+		eyeRow: 1, eyeL: 2, eyeR: 7, eyeW: 3, eyeH: 2, pupil: 1, beakRow: 3},
+	{Name: "Loaf", Note: "Wide and low, sitting, tufts at the corners, eyes far apart, a pale belly. The hunched owl.",
+		art: []string{
+			"............",
+			".^........^.",
+			"v##########v",
+			"############",
+			"############",
+			"############",
+			".^########^.",
+		},
+		light: []string{
+			"............",
+			"............",
+			"............",
+			"............",
+			"...oooooo...",
+			"...oooooo...",
+			"....oooo....",
+		},
+		eyeRow: 2, eyeL: 1, eyeR: 8, eyeW: 3, eyeH: 2, pupil: 1, beakRow: 4},
+	{Name: "Barn", Note: "Tall and narrow, no tufts, the heart-shaped face of a barn owl in pale, close-set eyes.",
+		art: []string{
+			"...v####v...",
+			"..########..",
+			"..########..",
+			"..########..",
+			"..########..",
+			"..########..",
+			"...^....^...",
+		},
+		light: []string{
+			"............",
+			"..ooo..ooo..",
+			"..oooooooo..",
+			"..oooooooo..",
+			"...oooooo...",
+			"....oooo....",
+			"............",
+		},
+		eyeRow: 2, eyeL: 3, eyeR: 7, eyeW: 2, eyeH: 2, pupil: 0, beakRow: 4},
 }
 
 // OwlPick is which alternative the vista draws; OwlPlace is where: 0 on the
@@ -56,71 +136,99 @@ var (
 	OwlPlace = 1
 )
 
-// OwlCoat is the owl's colour, a cube entry (see above).
-var OwlCoat = term.RGB{R: 215, G: 175, B: 135}
-
+// The owl's colours, all cube entries that survive both paths.
 var (
+	OwlCoat  = term.RGB{R: 175, G: 135, B: 95}  // a warm brown
+	owlLight = term.RGB{R: 255, G: 215, B: 175} // the face and the belly
 	owlWhite = term.RGB{R: 255, G: 255, B: 255}
 	owlDark  = term.RGB{R: 38, G: 38, B: 38}
 	owlBeak  = term.RGB{R: 135, G: 95, B: 0}
 )
 
-// shape builds a 24x28 bitmap from a predicate over pixels.
-func shape(on func(x, y int) bool) []string {
-	rows := make([]string, 28)
-	for y := 0; y < 28; y++ {
-		b := make([]byte, 24)
-		for x := 0; x < 24; x++ {
-			b[x] = '.'
-			if on(x, y) {
-				b[x] = '#'
+// expand turns 12x7 cell art into the 24x28 bitmap every companion is.
+func expand(art []string) []string {
+	px := make([][]byte, 28)
+	for y := range px {
+		px[y] = []byte(strings.Repeat(".", 24))
+	}
+	for cy, row := range art {
+		for cx, m := range row {
+			x0, y0 := 2*cx, 4*cy
+			set := func(dx0, dx1, dy0, dy1 int) {
+				for y := y0 + dy0; y <= y0+dy1; y++ {
+					for x := x0 + dx0; x <= x0+dx1; x++ {
+						px[y][x] = '#'
+					}
+				}
+			}
+			switch m {
+			case '#':
+				set(0, 1, 0, 3)
+			case 'v':
+				set(0, 1, 2, 3)
+			case '^':
+				set(0, 1, 0, 1)
+			case '<':
+				set(1, 1, 0, 3)
+			case '>':
+				set(0, 0, 0, 3)
 			}
 		}
-		rows[y] = string(b)
 	}
-	return rows
+	out := make([]string, 28)
+	for y := range px {
+		out[y] = string(px[y])
+	}
+	return out
 }
 
-func inEllipse(x, y int, cx, cy, rx, ry float64) bool {
-	dx, dy := (float64(x)+0.5-cx)/rx, (float64(y)+0.5-cy)/ry
-	return dx*dx+dy*dy <= 1
-}
-
-// Tufts and feet are drawn in ROW PAIRS, because the halving ORs rows 2k and
-// 2k+1 and a feature on one row of a pair is either doubled or lost.
-func box(x, y, x0, x1, y0, y1 int) bool { return x >= x0 && x <= x1 && y >= y0 && y <= y1 }
-
-func owlRound() []string {
-	return shape(func(x, y int) bool {
-		return inEllipse(x, y, 12, 14.5, 11.5, 11.5) ||
-			box(x, y, 5, 5, 0, 1) || box(x, y, 18, 18, 0, 1) ||
-			box(x, y, 4, 7, 2, 3) || box(x, y, 16, 19, 2, 3) ||
-			box(x, y, 7, 9, 26, 27) || box(x, y, 14, 16, 26, 27)
-	})
-}
-
-func owlEgg() []string {
-	return shape(func(x, y int) bool {
-		return (inEllipse(x, y, 12, 15, 9.5, 13) && y >= 2 && y <= 25) ||
-			box(x, y, 6, 8, 0, 1) || box(x, y, 15, 17, 0, 1) ||
-			box(x, y, 4, 19, 24, 25) ||
-			box(x, y, 7, 9, 26, 27) || box(x, y, 14, 16, 26, 27)
-	})
-}
-
-func owlPerched() []string {
-	return shape(func(x, y int) bool {
-		return inEllipse(x, y, 12, 8, 8.5, 7.5) ||
-			(inEllipse(x, y, 12, 19, 8.5, 8.5) && y <= 25) ||
-			box(x, y, 5, 7, 0, 1) || box(x, y, 16, 18, 0, 1) ||
-			box(x, y, 7, 9, 26, 27) || box(x, y, 14, 16, 26, 27)
-	})
-}
-
-// plotBody draws quadrant rows with every cell as its own ground: full cells
-// as a flat ground, edge cells as the glyph over what is behind.
-func plotBody(c *canvas.Canvas, q []string, coat term.RGB, x, y int) {
+// DrawOwl draws one alternative with its top-left cell at x, y.
+func DrawOwl(c *canvas.Canvas, alt *OwlAlt, coat term.RGB, x, y int) {
 	near := c.Near()
+	q := mustBitmap(expand(alt.art), 24, 28, alt.Name).ToQuadrant()
+	companion.PlotRim(near, q, x, y)
+	for dy, row := range q {
+		for dx, r := range []rune(row) {
+			switch r {
+			case ' ':
+				continue
+			case '█':
+				g := coat
+				if alt.light != nil && alt.light[dy][dx] == 'o' {
+					g = owlLight
+				}
+				near.PlotOn(x+dx, y+dy, ' ', g, g, 1)
+			default:
+				near.PlotOn(x+dx, y+dy, r, coat, c.BGAt(x+dx, y+dy), 1)
+			}
+		}
+	}
+	// The eyes: white, with a pupil column and a highlight in its top cell.
+	for _, ex := range []int{alt.eyeL, alt.eyeR} {
+		for r := 0; r < alt.eyeH; r++ {
+			for k := 0; k < alt.eyeW; k++ {
+				near.PlotOn(x+ex+k, y+alt.eyeRow+r, ' ', owlWhite, owlWhite, 1)
+			}
+		}
+		pc := ex + alt.pupil
+		for r := 0; r < alt.eyeH; r++ {
+			near.PlotOn(x+pc, y+alt.eyeRow+r, ' ', owlDark, owlDark, 1)
+		}
+		near.PlotOn(x+pc, y+alt.eyeRow, '˙', owlWhite, owlDark, 1)
+	}
+	near.PlotOn(x+5, y+alt.beakRow, '\\', owlBeak, c.BGAt(x+5, y+alt.beakRow), 1)
+	near.PlotOn(x+6, y+alt.beakRow, '/', owlBeak, c.BGAt(x+6, y+alt.beakRow), 1)
+}
+
+// DrawOwlet draws one of the litter, 6x4 cells, in the same manner.
+func DrawOwlet(c *canvas.Canvas, coat term.RGB, x, y int, faceLeft bool) {
+	bm := mustBitmap(owlet, 12, 16, "owlet")
+	if faceLeft {
+		bm = bm.Mirrored()
+	}
+	q := bm.ToQuadrant()
+	near := c.Near()
+	companion.PlotRim(near, q, x, y)
 	for dy, row := range q {
 		for dx, r := range []rune(row) {
 			switch r {
@@ -133,41 +241,8 @@ func plotBody(c *canvas.Canvas, q []string, coat term.RGB, x, y int) {
 			}
 		}
 	}
-}
-
-// DrawOwl draws one alternative facing left with its top-left cell at x, y.
-func DrawOwl(c *canvas.Canvas, alt *OwlAlt, coat term.RGB, x, y int) {
-	near := c.Near()
-	q := mustBitmap(alt.rows, 24, 28, alt.Name).Mirrored().ToQuadrant()
-	companion.PlotRim(near, q, x, y)
-	plotBody(c, q, coat, x, y)
-	// Two cells an eye: a round pupil in the outer cell, white beside it, so
-	// both eyes look the way the owl faces.
-	for _, ex := range []int{alt.eyeL, alt.eyeR} {
-		near.PlotOn(x+ex, y+alt.eyeRow, '●', owlDark, owlWhite, 1)
-		near.PlotOn(x+ex+1, y+alt.eyeRow, ' ', owlWhite, owlWhite, 1)
-	}
-	near.PlotOn(x+6, y+alt.beakRow, 'v', owlBeak, coat, 1)
-	if alt.wings {
-		wing := term.RGB{R: 135, G: 95, B: 95}
-		for r := alt.wingRows[0]; r <= alt.wingRows[1]; r++ {
-			near.PlotOn(x+2, y+r, '(', wing, coat, 1)
-			near.PlotOn(x+9, y+r, ')', wing, coat, 1)
-		}
-	}
-}
-
-// DrawOwlet draws one of the litter, 6x4 cells, facing left.
-func DrawOwlet(c *canvas.Canvas, coat term.RGB, x, y int, faceLeft bool) {
-	bm := mustBitmap(owlet, 12, 16, "owlet")
-	if faceLeft {
-		bm = bm.Mirrored()
-	}
-	q := bm.ToQuadrant()
-	companion.PlotRim(c.Near(), q, x, y)
-	plotBody(c, q, coat, x, y)
-	c.Near().PlotOn(x+1, y+1, '•', owlDark, owlWhite, 1)
-	c.Near().PlotOn(x+4, y+1, '•', owlDark, owlWhite, 1)
+	near.PlotOn(x+1, y+1, '•', owlDark, owlWhite, 1)
+	near.PlotOn(x+4, y+1, '•', owlDark, owlWhite, 1)
 }
 
 // The branch: from the right edge, its top edge flat where the birds sit, its
