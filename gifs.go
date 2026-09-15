@@ -287,6 +287,15 @@ func gifFrames(seed int64, sc gifScene) ([]string, error) {
 		}
 		sh.Update(c, t, st.Act)
 		st.Tail = st.FitTail(now, lay.SandTo-lay.SandFrom)
+		// THE COMPANION WALKS UP BEFORE IT ASKS, in the clips too.
+		//
+		// This line is why the come-closer pose -- the best thing in the
+		// product -- had never appeared anywhere on the page. Approach had
+		// exactly one non-test caller, the live TUI (frames.go), so every
+		// rendered clip drew the animal at rung 0 and the ask read as a
+		// thumbnail with a balloon over it. The live loop drives the walk off
+		// its own frame time; so does this one.
+		cat.Approach(1/float64(sc.rate()), st.Pose == companion.NeedsYou)
 		drawScene(c, sh, cat, lay, st, t, seed, c.H-2-chh)
 		// Truecolor, his direction of 2026-09-05: the page shows the scene at
 		// its best, not as the cube rounds it. The product still runs on the

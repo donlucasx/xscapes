@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>xscapes</title>
 <meta name="description" content="A thinking screen for terminal agents. Cozy ASCII scenes that react to your agent while it works: the tide rises as it gets busy, crablets walk into the water when subagents report back, and the moon thins as the context fills.">
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&family=Geist+Mono:wght@400;700&display=swap">
 <style>
 :root{--g:#121212;--s:#1a1a1a;--ln:#2e2e2e;--ln2:#242424;--d:#8a8a8a;--dd:#bcbcbc;--i:#eeeeee;--acc:#87afff;--warm:#d7af5f;
 --mono:"JetBrains Mono",ui-monospace,"SF Mono",Menlo,monospace;
@@ -33,13 +33,17 @@ main{max-width:min(94ch,100%);margin:0 auto;padding:0 2ch calc(var(--lh)*4)}
    max-width altogether. */
 @supports (width: round(down, 100%, 1ch)){main{max-width:calc(min(94ch, round(down, 100%, 1ch)))}}
 p{max-width:74ch;margin:0 0 var(--lh)}
-.lockup{font:700 1em/1.2 var(--mono);letter-spacing:0;white-space:nowrap}
+/* ⚠ THE LOCKUP IS GEIST MONO 700 AND CARRIES NO SHADOW. Both are locked in
+   assets/brand/README.md, whose "Not this" list names an outline and a shadow
+   explicitly -- and switching the page to JetBrains Mono had quietly taken the
+   mark with it. The page's grid face is not the identity's face. */
+.lockup{font:700 1em/1.2 "Geist Mono",var(--mono);letter-spacing:0;white-space:nowrap}
 .blk{display:inline-block;width:1ch;line-height:1.2em;text-align:center;vertical-align:top;background:var(--i);color:var(--g)}
 
 /* the cover: the mark over the shore's own glyphs, six frames of the real sea stepping */
 .cover{position:relative;min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;overflow:hidden;padding:20px}
 .cover .sea{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;pointer-events:none}
-.cover .sea pre{position:absolute;margin:0;font:700 14px/1 var(--mono);color:#3a3a3a;letter-spacing:0;white-space:pre;opacity:0;animation:step 4.2s steps(1) infinite}
+.cover .sea pre{position:absolute;margin:0;font:700 14px/1 var(--mono);color:#333;letter-spacing:0;white-space:pre;opacity:0;animation:step 4.2s steps(1) infinite}
 .cover .sea.m{display:none}
 /* The desktop cover is a fixed 168 columns. On a phone that is a 1400px
    picture behind a 390px window, so it shows the middle of the sea rather
@@ -51,7 +55,7 @@ p{max-width:74ch;margin:0 0 var(--lh)}
 }
 .cover .sea pre:nth-child(1){animation-delay:0s}
 @keyframes step{0%{opacity:1}16.6%{opacity:0}100%{opacity:0}}
-.cover .lockup{position:relative;font-size:clamp(64px,13vw,150px);text-shadow:0 0 40px #121212,0 0 12px #121212}
+.cover .lockup{position:relative;font-size:clamp(64px,13vw,150px)}
 .cover .line{position:relative;color:var(--dd);margin:10px 0 0;font-size:clamp(13px,1.6vw,17px);letter-spacing:.02em;text-align:center}
 .cover .scrolltip{position:absolute;bottom:26px;color:var(--d);font-size:12px;letter-spacing:.1em}
 
