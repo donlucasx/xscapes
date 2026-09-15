@@ -81,7 +81,9 @@ h3{font-size:14px;font-weight:700;margin:0 0 4px}
 
 /* section headers as a prompt line, which is the page's one terminal ritual */
 .sec{margin:76px 0 20px}
-.sec .rule-fx{width:100%;overflow:hidden;opacity:.85;margin:0 0 14px;border-radius:3px}
+/* Four rules, four different worlds. The page's own furniture makes the
+   plural argument so no sentence has to. */
+.sec .rule-fx{width:100%;overflow:hidden;margin:0 0 calc(var(--lh)*.6);border-radius:2px}
 .sec h2{color:var(--i)}
 
 /* THE WINDOW IS DRAWN, NOT BORDERED. No CSS box, no fake traffic lights: a
@@ -173,7 +175,7 @@ ul.feats b{color:var(--i)}
 <span class="pr">$</span> xscapes inside &lt;any command&gt;      <span class="c"># anything else, hosted the same way</span></div>
 </section>
 
-<div class="sec"><div class="fx rule-fx" data-clip="rule" aria-hidden="true"></div><h2>Read it at a glance</h2></div>
+<div class="sec"><div class="fx rule-fx" data-cols="120" aria-hidden="true">{{rule-hearth}}</div><h2>Read it at a glance</h2></div>
 <section>
 <p class="sub">The same beach in five moments. Press one and only the thing that carries it changes &mdash; that is the whole language, and it is why you never have to read the screen.</p>
 <div class="tabs" role="tablist" id="st-tabs"></div>
@@ -184,7 +186,7 @@ ul.feats b{color:var(--i)}
 <p class="reads" id="st-note"></p>
 </section>
 
-<div class="sec"><div class="fx rule-fx" data-clip="rule" aria-hidden="true"></div><h2>Pick your companion</h2></div>
+<div class="sec"><div class="fx rule-fx" data-cols="120" aria-hidden="true">{{rule-rain}}</div><h2>Pick your companion</h2></div>
 <section class="grid2">
 <div>
 <p class="sub">Hero the crab ships as the default. The cat came first, and is one command away &mdash; a scape that is already running picks the change up on its next frame, without restarting your session.</p>
@@ -197,7 +199,7 @@ ul.feats b{color:var(--i)}
 </div>
 </section>
 
-<div class="sec"><div class="fx rule-fx" data-clip="rule" aria-hidden="true"></div><h2>More than one shore</h2></div>
+<div class="sec"><div class="fx rule-fx" data-cols="120" aria-hidden="true">{{rule-cafe}}</div><h2>More than one shore</h2></div>
 <section>
 <p class="sub">A landscape only needs six things to carry the whole system: a light, a sky, something that moves with the work, a surface, somewhere the work piles up, and someone living in it. So there is no reason to stop at one.</p>
 <div class="grid2">
@@ -206,7 +208,7 @@ ul.feats b{color:var(--i)}
 </div>
 </section>
 
-<div class="sec"><div class="fx rule-fx" data-clip="rule" aria-hidden="true"></div><h2>Underneath, a protocol</h2></div>
+<div class="sec"><div class="fx rule-fx" data-cols="120" aria-hidden="true">{{rule-aquarium}}</div><h2>Underneath, a protocol</h2></div>
 <section>
 <p class="sub">The scene is one implementation. Underneath it is a small event protocol and a thin adapter for each agent, which is the part that outlives the shoreline.</p>
 <ul class="feats">

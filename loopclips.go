@@ -76,28 +76,40 @@ func windowLoop() []loopBeat {
 			sub("a3", "general-purpose", event.SubStart),
 		}, print: []string{"*Task\tExplore x2, general-purpose\t3 agents"}},
 		{at: 50, evs: []event.Event{sub("a1", "Explore", event.SubEnd), sub("a2", "Explore", event.SubEnd)}},
-		{at: 44, evs: []event.Event{
+		// ⚠ THE ASK COMES BEFORE THE FAILURE, and the order is load-bearing.
+		// Worried outranks NeedsYou in the reducer -- correctly, since a
+		// failure you have not seen must not be cancelled by the next
+		// question -- so with the exit 1 first, the ask beat drew a hunched
+		// crab and the come-closer walk could never fire. It is also the
+		// better story: it asks for permission to run the command, and THEN
+		// the command fails.
+		{at: 44, evs: []event.Event{{Kind: event.NeedsInput, Text: "allow Bash?"}},
+			print: []string{"", "!allow Bash?"}},
+		// ⚠ AND THE ASK HAS TO LAST. Measured: with the answer at 58 the
+		// question held for 14 session-seconds, which at this clip's speed is
+		// 1.6 seconds -- the companion got one rung up the ladder and was
+		// walking back before it arrived. The walk is 0.56s a rung, so the
+		// question needs roughly thirty session-seconds to read as an arrival.
+		// It is also the truer number: an ask waits for a human.
+		{at: 76, evs: []event.Event{{Kind: event.Prompt, Text: "yes"}, ctx(0.44)},
+			print: []string{"> yes"}},
+		{at: 82, evs: []event.Event{
 			tool(event.ToolStart, "t5", event.OpShell, "Bash", "go test ./internal/auth", ""),
 			tool(event.Error, "t5", event.OpShell, "Bash", "go test ./internal/auth", "exit 1"),
-			ctx(0.44),
 		}, print: []string{"*Bash\tgo test ./internal/auth\texit 1"}},
-		{at: 58, evs: []event.Event{sub("a4", "code-reviewer", event.SubStart), sub("a5", "general-purpose", event.SubStart)}},
-		{at: 66, evs: []event.Event{{Kind: event.NeedsInput, Text: "allow Bash?"}},
-			print: []string{"", "!allow Bash?"}},
-		{at: 78, evs: []event.Event{{Kind: event.Prompt, Text: "yes"}, ctx(0.62)},
-			print: []string{"> yes"}},
-		{at: 86, evs: []event.Event{
+		{at: 90, evs: []event.Event{sub("a4", "code-reviewer", event.SubStart), sub("a5", "general-purpose", event.SubStart), ctx(0.62)}},
+		{at: 100, evs: []event.Event{
 			tool(event.ToolStart, "t6", event.OpShell, "Bash", "go test ./internal/auth", ""),
 			tool(event.ToolEnd, "t6", event.OpShell, "Bash", "go test ./internal/auth", "ok 1.4s"),
 			todo(4, 5),
 		}, print: []string{"*Bash\tgo test ./internal/auth\tok 1.4s"}},
-		{at: 94, evs: []event.Event{
+		{at: 108, evs: []event.Event{
 			sub("a3", "general-purpose", event.SubEnd),
 			sub("a4", "code-reviewer", event.SubEnd),
 			sub("a5", "general-purpose", event.SubEnd),
 			ctx(0.82),
 		}},
-		{at: 104, evs: []event.Event{todo(5, 5), {Kind: event.Done, Text: "Rate limiting is in. 100 req/min per IP."}},
+		{at: 116, evs: []event.Event{todo(5, 5), {Kind: event.Done, Text: "Rate limiting is in. 100 req/min per IP."}},
 			print: []string{"", "!Rate limiting is in. 100 req/min per IP."}},
 		// The window fills, the transcript is compacted, and a fresh list
 		// starts: the scene lands back where it opened and the loop closes.

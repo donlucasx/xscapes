@@ -139,8 +139,53 @@ var sitePicks = []framePick{
 // 672x336, which is what site/anim/*.gif already are.
 const FramePx = 14
 
+// ruleStrips are the page's section dividers, and each one is a DIFFERENT
+// scape.
+//
+// His note of 2026-09-14, and it is the same one he has made several times: a
+// strip of sea says "this beach", and the product is not a beach, it is
+// xscapes. Four rules, four worlds -- a hearth, rain on a window, a café
+// table, an aquarium -- so the furniture of the page makes the plural argument
+// without a sentence spent on it.
+var ruleStrips = []framePick{
+	{file: "rule-hearth.html", scene: "Hearth and cabin", tod: 0.92},
+	{file: "rule-rain.html", scene: "Rainy window", tod: 0.70},
+	{file: "rule-cafe.html", scene: "Café table", tod: 0.40},
+	{file: "rule-aquarium.html", scene: "Aquarium", tod: 0.05},
+}
+
+// writeRuleStrips renders each one wide and keeps three rows out of the middle
+// of the scene, where the motion channel lives in every one of them.
+func writeRuleStrips(dir string, seed int64, level, t float64) error {
+	for _, p := range ruleStrips {
+		var sc *scene
+		for i := range scenes {
+			if scenes[i].name == p.scene {
+				sc = &scenes[i]
+			}
+		}
+		if sc == nil {
+			return fmt.Errorf("no scene %q", p.scene)
+		}
+		const w, h = 120, 24
+		c := canvas.New(w, h, canvas.AlphaFar, canvas.AlphaMid, canvas.AlphaNear)
+		c.Clear()
+		sceneCompanion = nil
+		sc.paint(c, p.tod, t, level, seed)
+		frag := c.HTMLFragmentCropAs(0, 10, w, 13, FramePx, term.ProfileTrueColor)
+		if err := os.WriteFile(dir+"/"+p.file, []byte(frag), 0o644); err != nil {
+			return err
+		}
+		fmt.Println(dir + "/" + p.file)
+	}
+	return nil
+}
+
 func writeFrames(dir string, seed int64, level, t float64) error {
 	if err := os.MkdirAll(dir, 0o755); err != nil {
+		return err
+	}
+	if err := writeRuleStrips(dir, seed, level, t); err != nil {
 		return err
 	}
 	for _, p := range sitePicks {

@@ -25,7 +25,6 @@ func TestWhatTheEmbeddedFramesCost(t *testing.T) {
 	}
 	clips := append([]fxClip{heroClip(pal)}, stateClips(pal)...)
 	clips = append(clips, swapClips(pal)...)
-	clips = append(clips, ruleClip(pal))
 	totalRaw, totalGz := 0, 0
 	for _, cl := range clips {
 		frames, err := gifFrames(7, cl.sc)

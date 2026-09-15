@@ -121,7 +121,13 @@ func sitePage(seed int64, dir string) (string, error) {
 	// excludes: dropped there they would be invisible to a fresh checkout and
 	// this build would fail for anyone but me. The same trap ate a renamed
 	// still once already.
-	for marker, file := range map[string]string{"{{scaperain}}": "scape-rain.html", "{{scapeaq}}": "scape-aquarium.html"} {
+	for marker, file := range map[string]string{
+		"{{scaperain}}": "scape-rain.html", "{{scapeaq}}": "scape-aquarium.html",
+		// The section rules are four DIFFERENT scapes, his note of 2026-09-14:
+		// a strip of sea says "this beach", and the product is not a beach.
+		"{{rule-hearth}}": "rule-hearth.html", "{{rule-rain}}": "rule-rain.html",
+		"{{rule-cafe}}": "rule-cafe.html", "{{rule-aquarium}}": "rule-aquarium.html",
+	} {
 		frag, err := os.ReadFile(filepath.Join(dir, "scapes", file))
 		if err != nil {
 			return "", fmt.Errorf("scape still %s: %w (regenerate: go run ./notes/scapestudy -frames <tmp>, then keep the <pre> in site/scapes/)", file, err)

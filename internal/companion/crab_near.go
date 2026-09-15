@@ -233,12 +233,22 @@ func (c *Cat) DrawnBox(frameW int) (dx, w, h int) {
 // the pointer landed on column 3 with the eyes at 4 and 5 at every width. The
 // rule that covers both is "grow into the scene, away from your own edge", so
 // unmirrored grows RIGHT from CatX and needs no offset at all.
+// ⚠ HIS RULING 2026-09-14 REPLACES THE QUARTER-GROWTH TERM ABOVE. He is right
+// and it is only visible in a cramped frame: measured at 62 columns, the near
+// pose left SIX columns of air on its right while the writing in the sand
+// starts TWO columns from the left. Three times the margin on one side, and it
+// reads as the animal having drifted rather than arrived.
+//
+// So the right edge simply does not move: the sprite's right edge is the
+// shipped crab's right edge at every rung, and all the growth goes left into
+// the scene. His session-28 note is still honoured -- the air never SHRINKS as
+// the animal comes closer, which was the regression that note caught. It now
+// holds instead of opening, and holding is what balances the frame.
 func (c *Cat) nearDX(w int) int {
 	if !c.mirror {
 		return 0
 	}
-	grow := w - shippedCrabCells
-	return -grow - grow/4
+	return -(w - shippedCrabCells)
 }
 
 // nearFits caps the rung at what the frame can actually pay for.

@@ -172,32 +172,12 @@ func swapClips(pal *canvas.HTMLPalette) []fxClip {
 	}
 }
 
-// ruleClip is the page's section divider, and it is a real strip of the
-// product rather than a row of punctuation.
-//
-// His note of 2026-09-14: "I dont see any use of ascii that stands out
-// (except the splash page, which I love)" -- the dotted rules and the prompt
-// glyphs were decoration pretending to be terminal. The splash works because
-// it is the actual sea. So every section rule is three rows of the actual
-// sea, moving, full width.
-func ruleClip(pal *canvas.HTMLPalette) fxClip {
-	return fxClip{
-		key: "rule", label: "rule",
-		// Rows 9..12 are OPEN SEA. Taking the waterline instead put sand,
-		// crablets and a bit of the writing band into a decorative strip,
-		// which read as a slice of something rather than as water.
-		sc: gifScene{name: "rule", at: 14, tod: 0.52, secs: 4, fps: 6, cols: 120,
-			crop: [4]int{0, 9, 120, 12}, pal: pal, cube: !truecolorFX},
-	}
-}
-
 // renderFX renders every embedded animation and returns the page's script
 // payload and the stylesheet the frames share.
 func renderFX(seed int64) (js, css string, err error) {
 	pal := &canvas.HTMLPalette{}
 	clips := append([]fxClip{heroClip(pal)}, stateClips(pal)...)
 	clips = append(clips, swapClips(pal)...)
-	clips = append(clips, ruleClip(pal))
 	out := map[string]fxPayload{}
 	for _, cl := range clips {
 		frames, err := gifFrames(seed, cl.sc)
