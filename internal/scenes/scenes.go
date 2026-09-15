@@ -394,6 +394,11 @@ func paintCafe(c *canvas.Canvas, tod, t, level float64, seed int64) {
 	writeBand(c, 21, band)
 }
 
+// AquariumLoop is the seconds a seamless aquarium loop takes: every fish's
+// swim, every bubble's rise and the plants' sway close on it exactly, so a
+// clip of AquariumLoop*fps frames has no seam.
+const AquariumLoop = 8.0
+
 func paintAquarium(c *canvas.Canvas, tod, t, level float64, seed int64) {
 	p := scape.PaletteAt(tod)
 	l := lit(p)
@@ -428,42 +433,83 @@ func paintAquarium(c *canvas.Canvas, tod, t, level float64, seed int64) {
 			}
 		}
 	}
-	// Plants, rooted in the gravel.
+	// Everything that moves closes on the loop: one turn of this angle is
+	// one loop, so a clip of AquariumLoop seconds has no seam.
+	loop := 2 * math.Pi * t / AquariumLoop
+	// Plants, rooted in the gravel. The tops sway a cell, slowly.
 	for _, px := range []int{8, 14, 40, 47} {
 		h := 4 + int(scape.HashF(px, 0, seed+31)*6)
 		for k := 0; k < h; k++ {
 			y := 17 - k
-			plot(c.Mid(), px, y, '|', cube(0, 135, 0), 1)
+			sway := 0
+			if k >= 3 {
+				sway = int(math.Round(math.Sin(loop + float64(px)*0.7)))
+			}
+			plot(c.Mid(), px+sway, y, '|', cube(0, 135, 0), 1)
 			if k%2 == 1 {
-				plot(c.Mid(), px-1, y, '(', cube(95, 175, 95), 1)
-				plot(c.Mid(), px+1, y, ')', cube(95, 175, 95), 1)
+				plot(c.Mid(), px+sway-1, y, '(', cube(95, 175, 95), 1)
+				plot(c.Mid(), px+sway+1, y, ')', cube(95, 175, 95), 1)
 			}
 		}
 	}
-	// Fish are the work: how many are out.
+	// Fish are the work: how many are out. Each swims back and forth in its
+	// own lane on a period that divides the loop, and turns to face the way
+	// it is going. A fish the level brings out FADES in through the glyph's
+	// alpha rather than popping into the tank mid-water; a fish the level
+	// takes back fades the same way.
 	near := c.Near()
-	n := 2 + int(level*6)
 	fishCols := []rgb{cube(255, 215, 135), cube(215, 175, 135), cube(255, 175, 175)}
-	for k := 0; k < n; k++ {
-		x := 6 + int(scape.HashF(k, 1, seed+32)*54)
-		y := 5 + int(scape.HashF(k, 2, seed+33)*11)
-		s := "<><"
-		if scape.HashF(k, 3, seed+34) > 0.5 {
-			s = "><>"
+	for k := 0; k < 8; k++ {
+		// The k-th fish is out once 2+level*6 exceeds k; the first two always.
+		vis := 1.0
+		if k >= 2 {
+			vis = math.Max(0, math.Min(1, (level-float64(k-2)/6)/0.1))
 		}
-		text(near, x, y, s, fishCols[k%3], 1)
+		if vis <= 0 {
+			continue
+		}
+		home := 10 + scape.HashF(k, 1, seed+32)*54
+		amp := 6 + scape.HashF(k, 4, seed+35)*8
+		y := 5 + int(scape.HashF(k, 2, seed+33)*11)
+		// Quick fish make two passes a loop, slow ones one.
+		turns := 1.0
+		if scape.HashF(k, 3, seed+34) > 0.5 {
+			turns = 2
+		}
+		ph := loop*turns + scape.HashF(k, 5, seed+36)*2*math.Pi
+		x := int(math.Round(home + amp*math.Sin(ph)))
+		s := "><>"
+		if math.Cos(ph) < 0 {
+			s = "<><"
+		}
+		if x < 3 {
+			x = 3
+		}
+		if x > 74 {
+			x = 74
+		}
+		text(near, x, y, s, fishCols[k%3], vis)
 	}
-	// Bubbles from the airstone.
-	for k := 0; k < 2+int(level*6); k++ {
-		y := 17 - k*2 - int(t)%2
+	// Bubbles from the airstone, rising: the column climbs 3.5 rows a second,
+	// which is 28 rows a loop, two whole wraps of the 14-row water.
+	for k := 0; k < 8; k++ {
+		vis := 1.0
+		if k >= 2 {
+			vis = math.Max(0, math.Min(1, (level-float64(k-2)/6)/0.1))
+		}
+		if vis <= 0 {
+			continue
+		}
+		rise := math.Mod(t*3.5+float64(k)*3.7, 14)
+		y := 17 - int(rise)
 		if y < 4 {
-			break
+			continue
 		}
 		r := 'o'
 		if k%3 == 2 {
 			r = '.'
 		}
-		plot(c.Mid(), 30+(k%3)-1, y, r, cube(175, 215, 255), 0.7)
+		plot(c.Mid(), 30+(k%3)-1, y, r, cube(175, 215, 255), 0.7*vis)
 	}
 	catAt(c, 64, 14, true, t)
 	writeBand(c, 21, greyBetween(3, 6, l))

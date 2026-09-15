@@ -45,6 +45,16 @@ var Animals = []Animal{
 		body: otterBody, young: pup, eyes: [2]int{4, 9}, eyeRow: 1, yeyes: [2]int{2, 4}, yeyeRow: 0, eyeGlyph: 'o', nose: -1},
 }
 
+// FindAnimal returns the candidate with that name, or nil.
+func FindAnimal(name string) *Animal {
+	for i := range Animals {
+		if Animals[i].Name == name {
+			return &Animals[i]
+		}
+	}
+	return nil
+}
+
 func mustBitmap(rows []string, w, h int, name string) *companion.Bitmap {
 	if len(rows) != h {
 		panic(fmt.Sprintf("%s: %d rows, want %d", name, len(rows), h))

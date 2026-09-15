@@ -57,6 +57,8 @@ type fxClip struct {
 	tod    float64
 	frames int
 	fps    int
+	// with is the study companion drawn in the scene, or nil for the cat.
+	with *scenes.Animal
 }
 
 // sceneClips are the other scapes, animated. Until 2026-09-15 they were
@@ -70,6 +72,11 @@ func sceneClips(pal *canvas.HTMLPalette) []fxClip {
 		// Dusk, because that is when the peaks take the light.
 		{key: "vista", label: "the mountain vista", note: "The wind is the work.",
 			scene: &scenes.Forest[0], tod: 0.78, frames: int(scenes.LoopSecs * 6), fps: 6, sc: gifScene{pal: pal}},
+		// The last still on the page, animated 2026-09-15 at his word. Night,
+		// so the lamp is lit; the frog, which is the companion drawn for it.
+		{key: "aquarium", label: "the aquarium", note: "More fish come out as the work picks up.",
+			scene: scenes.Find("Aquarium"), tod: 0.02, frames: int(scenes.AquariumLoop * 6), fps: 6,
+			with: scenes.FindAnimal("Frog"), sc: gifScene{pal: pal}},
 	}
 }
 
@@ -92,7 +99,8 @@ func sceneFrames(cl fxClip) ([]string, error) {
 	if !truecolorFX {
 		prof = term.Profile256
 	}
-	scenes.SetCompanion(nil)
+	scenes.SetCompanion(cl.with)
+	defer scenes.SetCompanion(nil)
 	out := make([]string, 0, cl.frames)
 	for k := 0; k < cl.frames; k++ {
 		t := float64(k) / float64(cl.fps)
