@@ -68,9 +68,14 @@ func heroClip(pal *canvas.HTMLPalette) fxClip {
 		key:   "hero",
 		label: "a whole session",
 		note:  "one turn, start to finish, with the day turning under it",
+		// A REAL WINDOW, not a thumbnail of one. His own is 125x62; this
+		// renders at 124x44 -- 14 rows of transcript over a 30-row scape --
+		// because the page had been showing a cramped version of a product
+		// whose whole argument is that it has room to breathe. The detail
+		// clips below stay tight on purpose; this one is the wide shot.
 		sc: gifScene{
-			name: "hero-live", tod: 0.30, todEnd: 1.30, secs: 15, cols: 96,
-			agentRows: 12, speed: loopSecs / 15.0, beats: windowLoop(),
+			name: "hero-live", tod: 0.30, todEnd: 1.30, secs: 15, cols: 124,
+			agentRows: 14, rows: 30, speed: loopSecs / 15.0, beats: windowLoop(),
 			fps: 6, pal: pal, cube: !truecolorFX,
 		},
 	}

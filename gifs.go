@@ -61,6 +61,11 @@ type gifScene struct {
 	// so a profile field would have silently taken every existing GIF scene
 	// off truecolor the moment it was added.
 	cube bool
+	// rows overrides the SCAPE's height in cells. His screenshot of 2026-09-14
+	// is the reason it exists: his real window is 125x62 and the hero was
+	// rendering at 96x36, so the page was showing a cramped version of a
+	// product that has room to breathe.
+	rows int
 	// animal names the companion to draw, for the one clip pair whose whole
 	// subject is that you can change it. Empty means the shipped default,
 	// which is what every other clip must use: the page has to render the same
@@ -90,7 +95,15 @@ func (sc gifScene) rowsOf() int {
 	if sc.cropped() {
 		return sc.crop[3] - sc.crop[1]
 	}
-	return gifRows + sc.agentRows
+	return sc.scapeRows() + sc.agentRows
+}
+
+// scapeRows is the height of the scape itself, before the agent's pane.
+func (sc gifScene) scapeRows() int {
+	if sc.rows > 0 {
+		return sc.rows
+	}
+	return gifRows
 }
 
 // colsOf is the frame's width in cells, after any crop.
@@ -263,7 +276,7 @@ func gifFrames(seed int64, sc gifScene) ([]string, error) {
 		apply(sc.at)
 	}
 
-	c := canvas.New(sc.sceneCols(), gifRows, canvas.AlphaFar, canvas.AlphaMid, canvas.AlphaNear)
+	c := canvas.New(sc.sceneCols(), sc.scapeRows(), canvas.AlphaFar, canvas.AlphaMid, canvas.AlphaNear)
 	lay := compose(c.W, ccw, true)
 	sh.MoonX = lay.MoonX
 	n := int(sc.secs * float64(sc.rate()))

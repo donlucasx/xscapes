@@ -256,7 +256,12 @@ ul.feats b{color:var(--i)}
     if(!el || !cols) return;
     var box = el.parentElement, w = box ? box.clientWidth : 0;
     if(!w) return;
-    el.style.fontSize = Math.max(4, Math.min(44, w / (cols * advance(el)))) + "px";
+    var px = w / (cols * advance(el));
+    // A FLOOR, not just a cap. The hero is a real 124-column window, and on a
+    // phone that computes to about 5px a cell -- legible as texture and not as
+    // text. Below the floor the frame keeps a readable size and its own stage
+    // scrolls sideways instead; the page itself never does.
+    el.style.fontSize = Math.max(7, Math.min(44, px)) + "px";
   }
   var fitted = [];
   function play(el, key, startFrac){
