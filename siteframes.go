@@ -7,6 +7,7 @@ import (
 
 	"github.com/donlucasx/xscapes/internal/canvas"
 	"github.com/donlucasx/xscapes/internal/companion"
+	"github.com/donlucasx/xscapes/internal/event"
 )
 
 // THE PAGE'S ANIMATIONS ARE TEXT, NOT PICTURES.
@@ -86,6 +87,40 @@ func heroClip(pal *canvas.HTMLPalette) fxClip {
 // comparison: the same beach, the same companion, the same width, and only
 // the thing being named different. Nine unrelated clips could not do that,
 // which is why the section they replace needed 392 words of prose.
+// askBeats is a session that arrives at a question WITH NOTHING BROKEN, and it
+// exists because of a defect I introduced and he had to report twice.
+//
+// The four other states read their moment out of the shared demo turn, which
+// is right: one session, five moments, and only the named thing different.
+// But that turn has a command exit 1 at beat 22, and Worried OUTRANKS
+// NeedsYou in the reducer -- it is supposed to, because a failure you have not
+// seen must not be cancelled by the next question. So the ask clip was drawing
+// a WORRIED crab with a question balloon over it, and since the pose was never
+// NeedsYou the companion never walked up either. The rung was never the
+// problem; the pose was.
+//
+// The clip the old page shipped had its own beats for exactly this reason.
+// This restores that, at full scene size: work lands, subagents arrive, and
+// then it asks, with no error outstanding.
+func askBeats() []loopBeat {
+	return []loopBeat{
+		{at: 0, evs: []event.Event{{Kind: event.Prompt, Text: "add rate limiting to the auth endpoint"}, todo(0, 5), ctx(0.46)}},
+		{at: 1, evs: []event.Event{
+			tool(event.ToolStart, "t1", event.OpSearch, "Grep", "rate.Limiter", ""),
+			tool(event.ToolEnd, "t1", event.OpSearch, "Grep", "rate.Limiter", "3 files"),
+			tool(event.ToolStart, "t2", event.OpEdit, "Edit", "internal/auth/handler.go", ""),
+			tool(event.ToolEnd, "t2", event.OpEdit, "Edit", "internal/auth/handler.go", "+18 -2"),
+			tool(event.ToolStart, "t3", event.OpWrite, "Write", "internal/auth/limiter.go", ""),
+			tool(event.ToolEnd, "t3", event.OpWrite, "Write", "internal/auth/limiter.go", "64 lines"),
+			todo(2, 5),
+			sub("a1", "Explore", event.SubStart),
+			sub("a2", "Explore", event.SubStart),
+			sub("a3", "general-purpose", event.SubStart),
+		}},
+		{at: 2, evs: []event.Event{{Kind: event.NeedsInput, Text: "allow Bash?"}}},
+	}
+}
+
 func stateClips(pal *canvas.HTMLPalette) []fxClip {
 	// CROPPED, and all five identically. His note of 2026-09-14 was that the
 	// ask needs to be a close-up -- at 80 columns the companion is a thumbnail
@@ -110,7 +145,10 @@ func stateClips(pal *canvas.HTMLPalette) []fxClip {
 			sc: gifScene{name: "st-" + key, at: at, tod: tod, secs: secs, fps: 6, cols: cols, pal: pal, cube: !truecolorFX}}
 	}
 	return []fxClip{
-		mk("needs", "it needs you", "A solid balloon and a chime. The companion comes closer and puts a claw up, and it holds the pose until you come back.", 30, 0.80, 4),
+		{key: "needs", label: "it needs you",
+			note: "A solid balloon and a chime, and the companion walks up the beach to ask -- three strides, twice its resting size, so the question is impossible to miss from across the room. It holds the pose until you come back.",
+			sc: gifScene{name: "st-needs", tod: 0.80, secs: 5, fps: 6, cols: cols,
+				beats: askBeats(), speed: 2, pal: pal, cube: !truecolorFX}},
 		mk("working", "it is working", "The sea. How many swells are travelling and how tall, whitecaps once it is flat out. Flat water means it is waiting on you.", 14, 0.52, 4),
 		mk("broke", "something broke", "The companion carries it, never the weather: claws down, stalks short, amber eyes, until the trouble clears.", 22, 0.62, 4),
 		mk("done", "it finished", "A dotted balloon and a low note, both claws up, the constellation lit and the moon carrying what is left of the context.", 44, 0.96, 4),
