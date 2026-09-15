@@ -419,24 +419,12 @@ func drawScene(c *canvas.Canvas, sh *scape.Shore, cat *companion.Cat, lay layout
 	// the frame cannot pay for, so the drawn box DEPENDS on the frame, and an
 	// argument cannot be forgotten the way a setter can.
 	boxDX, boxW, _ := cat.DrawnBox(c.W)
-	// THE COMPANION'S AIR ON THE RIGHT EQUALS THE WRITING'S AIR ON THE LEFT.
-	//
-	// His rule, 2026-09-14, and it is a composition rule rather than a nudge:
-	// "the left margin between edge and text should match the far right margin
-	// between edge and companion." Measured at 62 columns before this, the near
-	// pose left three columns of air while the sand text started two from the
-	// left -- close, but the imbalance is what he kept seeing, and every column
-	// the companion is pulled back from its own edge is a column it takes out
-	// of the writing instead (drawSand clamps SandTo to nearLeft-1).
-	//
-	// Only when a NEAR rung is drawn: the resting composition is his and is
-	// untouched.
-	ccwBox, _ := cat.Size()
-	if lay.Mirror && boxW > ccwBox {
-		if want := c.W - lay.SandFrom - boxW; want != catX+boxDX {
-			catX += want - (catX + boxDX)
-		}
-	}
+	// ⚠ DO NOT SHIFT catX HERE. Tried 2026-09-14, to pull the near pose out to
+	// its own edge: it broke three of his locked guarantees at once, because
+	// the sand, the litter and the tests all locate the companion through
+	// DrawnBox, which reports the sprite's own arithmetic and knew nothing
+	// about a local adjustment made here. Moving the animal is the companion's
+	// job or nobody's; see nearDX.
 	nearLeft := catX + boxDX
 	nearRight := nearLeft + boxW - 1
 
