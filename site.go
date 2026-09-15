@@ -123,10 +123,6 @@ func sitePage(seed int64, dir string) (string, error) {
 	// still once already.
 	for marker, file := range map[string]string{
 		"{{scaperain}}": "scape-rain.html", "{{scapeaq}}": "scape-aquarium.html",
-		// The section rules are four DIFFERENT scapes, his note of 2026-09-14:
-		// a strip of sea says "this beach", and the product is not a beach.
-		"{{rule-hearth}}": "rule-hearth.html", "{{rule-rain}}": "rule-rain.html",
-		"{{rule-cafe}}": "rule-cafe.html", "{{rule-aquarium}}": "rule-aquarium.html",
 	} {
 		frag, err := os.ReadFile(filepath.Join(dir, "scapes", file))
 		if err != nil {

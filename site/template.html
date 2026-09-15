@@ -80,11 +80,12 @@ h3{font-size:14px;font-weight:700;margin:0 0 4px}
 .note{color:var(--d);font-size:13.5px}
 
 /* section headers as a prompt line, which is the page's one terminal ritual */
-.sec{margin:76px 0 20px}
-/* Four rules, four different worlds. The page's own furniture makes the
-   plural argument so no sentence has to. */
-.sec .rule-fx{width:100%;overflow:hidden;margin:0 0 calc(var(--lh)*.6);border-radius:2px}
-.sec h2{color:var(--i)}
+/* A section opens the way a window does: one drawn rule with its name inset.
+   The strip dividers are gone -- a slice of one scape said "this beach", and
+   a row of punctuation said nothing at all. */
+.sec{margin:calc(var(--lh)*3) 0 var(--lh)}
+.sec .boxtop{font-size:14px}
+.sec .boxtop b{color:var(--i);font-weight:700;letter-spacing:.08em;text-transform:uppercase}
 
 /* THE WINDOW IS DRAWN, NOT BORDERED. No CSS box, no fake traffic lights: a
    rule of box-drawing characters above and below, generated to fill the
@@ -175,7 +176,7 @@ ul.feats b{color:var(--i)}
 <span class="pr">$</span> xscapes inside &lt;any command&gt;      <span class="c"># anything else, hosted the same way</span></div>
 </section>
 
-<div class="sec"><div class="fx rule-fx" data-cols="120" aria-hidden="true">{{rule-hearth}}</div><h2>Read it at a glance</h2></div>
+<div class="sec" data-title="Read it at a glance"><div class="boxtop" aria-hidden="true"></div></div>
 <section>
 <p class="sub">The same beach in five moments. Press one and only the thing that carries it changes &mdash; that is the whole language, and it is why you never have to read the screen.</p>
 <div class="tabs" role="tablist" id="st-tabs"></div>
@@ -186,7 +187,7 @@ ul.feats b{color:var(--i)}
 <p class="reads" id="st-note"></p>
 </section>
 
-<div class="sec"><div class="fx rule-fx" data-cols="120" aria-hidden="true">{{rule-rain}}</div><h2>Pick your companion</h2></div>
+<div class="sec" data-title="Pick your companion"><div class="boxtop" aria-hidden="true"></div></div>
 <section class="grid2">
 <div>
 <p class="sub">Hero the crab ships as the default. The cat came first, and is one command away &mdash; a scape that is already running picks the change up on its next frame, without restarting your session.</p>
@@ -199,7 +200,7 @@ ul.feats b{color:var(--i)}
 </div>
 </section>
 
-<div class="sec"><div class="fx rule-fx" data-cols="120" aria-hidden="true">{{rule-cafe}}</div><h2>More than one shore</h2></div>
+<div class="sec" data-title="More than one shore"><div class="boxtop" aria-hidden="true"></div></div>
 <section>
 <p class="sub">A landscape only needs six things to carry the whole system: a light, a sky, something that moves with the work, a surface, somewhere the work piles up, and someone living in it. So there is no reason to stop at one.</p>
 <div class="grid2">
@@ -208,7 +209,7 @@ ul.feats b{color:var(--i)}
 </div>
 </section>
 
-<div class="sec"><div class="fx rule-fx" data-cols="120" aria-hidden="true">{{rule-aquarium}}</div><h2>Underneath, a protocol</h2></div>
+<div class="sec" data-title="Underneath, a protocol"><div class="boxtop" aria-hidden="true"></div></div>
 <section>
 <p class="sub">The scene is one implementation. Underneath it is a small event protocol and a thin adapter for each agent, which is the part that outlives the shoreline.</p>
 <ul class="feats">
@@ -286,7 +287,7 @@ ul.feats b{color:var(--i)}
   // joined at line heights over 110%, which is why it is JetBrains Mono.
   function drawBox(win){
     var top = win.querySelector(".boxtop"), bot = win.querySelector(".boxbot");
-    if(!top || !bot) return;
+    if(!top) return;
     var n = Math.max(14, Math.floor(win.clientWidth / chWidth(top)));
     var title = (win.getAttribute("data-title") || "").trim();
     var right = (win.getAttribute("data-right") || "").trim();
@@ -301,10 +302,10 @@ ul.feats b{color:var(--i)}
       : "┌─" + dash;
     html += right ? " <i>" + esc(right) + "</i> ─┐" : "┐";
     top.innerHTML = html;
-    bot.textContent = "└" + new Array(Math.max(2, n - 2) + 1).join("─") + "┘";
+    if(bot) bot.textContent = "└" + new Array(Math.max(2, n - 2) + 1).join("─") + "┘";
   }
   function drawAllBoxes(){
-    Array.prototype.forEach.call(document.querySelectorAll(".win"), drawBox);
+    Array.prototype.forEach.call(document.querySelectorAll(".win, .sec"), drawBox);
   }
 
   // ---- the hero ---------------------------------------------------------
