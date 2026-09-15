@@ -33,6 +33,22 @@ the rain fell UPWARDS for ten days and nobody could tell until it moved.
 Do NOT drive Terminal.app (osascript, System Events) without asking me first.
 ```
 
+## ▶ NEXT (session 33, 2026-09-15, in progress)
+
+**Where it stands (checkpoint, mid-session):** HEAD `ce5b37c`, pushed, gh-pages = HEAD, suite 10/10 + vet
++ fmt green. He prompted through thirteen open items (rulings verbatim in `_FEEDBACK.md` §Session 33) and
+the site batch that came out of them is LIVE: the clock as a feature · which scapes ship, said · touch
+scrub · the aquarium ANIMATED (seamless 8 s loop, the frog) · **the legend is the companion ALONE,
+floating on the page, no ground, no box** (his note: *"no background whatsoever"*) · **the cast: crab,
+cat, owl, frog** in *A layer, not a screen* · **six per-section animated backdrops** (his idea, one
+subtle pass, 12%). Instruments: `XSCAPES_CLIPSHOTS=<dir> go test -run TestClipShots .` writes every
+clip as a frame page for headless Chrome; Playwright against `python3 -m http.server` in `site/` for the
+whole page. ⏭ **Waiting on his look** at the backdrops' strength and the cast. Then: the deck on the
+nine beats (*"once we are done w the site, we'll update it"*) · Commons later today (*"lets make sure
+xscapes and site are polished before we move onto this"*). After 09-17: the owl's five states → the
+vista as a real scape. Closed at his word: balance column (leave) · typed prompt (skip) · owlets = egg ·
+GIF pipeline (keep for now).
+
 ## ▶ NEXT (session 32 left it here)
 
 **0. ⏰ THE DEADLINE IS THE QUEUE. Commons closes 09-17.** The 09-14 build is live (gh-pages `afd23a2`); ⚠ **NONE OF SESSION 32 IS LIVE** (nine beats, vista,
