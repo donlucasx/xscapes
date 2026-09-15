@@ -15,8 +15,15 @@
 > clip can now be a painter looped (24 frames, seam = 5 cells, 17 KB gz). ⭐ **THE MOUNTAIN VISTA WITH THE OWL,
 > REDRAWN FROM HIS FIVE REFERENCES after *"the scape reads pretty 'basic'"*** — three ranges receding by
 > haze, a jagged massif at QUARTER-CELL resolution with snow and alpenglow, a lake, a meadow, black pines
-> framing, the owl on a mound; two variants, **A wind / B fire, recommended A, awaiting his pick**:
-> https://claude.ai/artifact/N5Cvri266YgbtsufPXhiGV. Looked at through headless Chrome, three passes.
+> framing, the owl on a mound; two variants, **A wind / B fire — HIS RULING: A** (*"love this!"*):
+> https://claude.ai/artifact/N5Cvri266YgbtsufPXhiGV. **THE VISTA IS ON THE PAGE as a clip** (501 KB gz).
+> ⭐ **THE OWL, three rounds on his notes, PICKED: the barn owl on the mound with egg owlets.** Round 1
+> (curves) was *"not simpler, not adorable"*; round 2 was four cell-level silhouettes in two colours.
+> ⚠ Three rules paid for: full sprite cells paint as GROUND (block glyphs leave a rule between rows) ·
+> every sprite cell brings its own ground (a split background wins over a plain glyph; the study owl lost
+> its eyes and feet to the shoreline's quarter-cells) · coats are CUBE ENTRIES that survive both paths
+> (taupe = grey as ground, orange as glyph). Headless Chrome at `/Applications/Google Chrome.app`
+> screenshots a frame page; every one of these was seen that way, not inferred.
 > ⚠ Login flipped to donlucasx mid-session (flip 8); the s32 nine-beats proposal page is unreachable
 > from it, source in the scratchpad. Earlier in the session, resumed on the record and found it one step stale:
 > **he published and pushed himself at 19:24, four minutes after the wrap** (gh-pages `afd23a2` =

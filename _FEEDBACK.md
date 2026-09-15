@@ -3199,3 +3199,11 @@ with a face disc · puffball with a belly · loaf · barn owl with a heart face)
 175,135,95 + pale 255,215,175, both cube entries), eyes three cells wide with a pupil column and a
 highlight, a two-cell beak. Sheet sent 2026-09-15 (`shots/owl-sheet.png`); code defaults to A Bell on
 the branch, awaiting his pick.
+**HIS PICKS ON THE OWL, verbatim, in order:** *"leaning towards barn, can we fill the nose so its not
+transparent and keep the V symbol on it as well. Also, lets try some alts for both a) sub agents b)
+placement within the scene"* → *"let me see another 2 variants of the sub agents. for placement, im
+leaning either on p0 (good) but would love to see p3 a bit more polished, the post does not read great"*
+→ **"lets go w B for the subs, and p0 for placement"**. ⇒ LOCKED 2026-09-15: **the barn owl** (heart
+face, filled amber beak with the V), **on the mound in the meadow**, **egg owlets with a pale belly on the
+grass** ("B" read as the second row of the sheet he had open; the chick is `OwletPick = 1` if he meant
+that). Five owlet looks and five perches remain in the code as options.

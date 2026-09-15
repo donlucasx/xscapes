@@ -110,13 +110,15 @@ animal is the companion's job or nobody's.
   (fire fixed as the night light; smoke/flame lean, fraction of scrub flat, debris) · **B the fire**
   (height, sparks, smoke). ⭐ **HIS RULING 2026-09-15: A** (*"love this! aligned with your recommendations"*).
   **The vista is ON THE PAGE as a clip** (`sceneClips` "vista", dusk, 10.6 KB gz; page 501 KB gz).
-  ⏭ **THE OWL, awaiting his pick** (`internal/scenes/owl.go`). Round 1 (round / egg / perched) was
-  rejected: *"needs to be simpler in shape. more adorable"*. Round 2: FOUR cell-level silhouettes (A bell
-  with a face disc · B puff with a belly · C loaf · D barn with a heart face), two colours (brown 175,135,95
-  + pale 255,215,175; both cube entries that survive ground AND boosted-glyph paths — slate was lost in the
-  lake at noon, taupe split into grey + orange), 3x2 eyes with a highlight. Placement: the BRANCH from the
-  right edge above the treeline (owlets along it) is the default; the mound remains as `OwlPlace = 0`.
-  Sheet: scratchpad `shots/owl-sheet.png`, sent. Then the owl's five states. ⚠ Flagged for him: the lake is scenery (does not react);
+  ⭐ **THE OWL IS PICKED, 2026-09-15** (`internal/scenes/owl.go`): **the barn owl** (heart face, 3x2 eyes
+  with a highlight, filled amber beak with the V), **on the mound** (`OwlPlace = 0`), **egg owlets** with a
+  pale belly on the grass (`OwletPick = 3`; "B" read as the sheet's second row, the chick is 1 if he meant
+  that). Colours are cube entries that survive ground AND boosted-glyph paths (brown 175,135,95, pale
+  255,215,175): slate was lost in the lake at noon, taupe split into grey + orange. Round 1 (blobs) was
+  rejected; round 2 was four cell-level silhouettes. Still in the code as options: five owlet looks, five
+  perches (mound · upper branch · lower branch over the lake · stump · fence). Sheets in the scratchpad
+  `shots/owl-sheet*.png`. ⏭ **NEXT for the owl: its five states** (resting / working / needs-you / done /
+  worried) and the owlets' arrive-and-leave, so the vista can be a real scape and not only a clip. ⚠ Flagged for him: the lake is scenery (does not react);
   no clouds (weather deferred). ⚠ Canvas rule met for the first time: a plain `Plot` glyph over a
   quarter-cell background LOSES to the quarters (the owl's eye row vanished under the shoreline); keep
   whole cells under sprites. Not yet drawn: the owl's five states and its litter (owlet bitmap exists).

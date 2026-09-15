@@ -134,9 +134,10 @@ var OwlAlts = []OwlAlt{
 // from the right edge above the treeline, 2 on a lower branch over the lake,
 // 3 on a stump in the meadow, 4 on the end post of a fence from the right
 // edge, the owlets on its rail. OwletCount is how many of the litter are drawn.
+// HIS PICKS, 2026-09-15: the barn owl, on the mound, with the egg owlets.
 var (
 	OwlPick    = 3
-	OwlPlace   = 1
+	OwlPlace   = 0
 	OwletCount = 2
 )
 
@@ -260,8 +261,8 @@ var OwletStyles = []OwletStyle{
 		eyes:  true, beak: true},
 }
 
-// OwletPick is the look the vista draws.
-var OwletPick = 1
+// OwletPick is the look the vista draws: his pick is the egg.
+var OwletPick = 3
 
 // expandSmall turns 6x4 cell art into the 12x16 bitmap the litter is.
 func expandSmall(art []string) []string {
