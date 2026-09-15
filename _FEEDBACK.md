@@ -3143,3 +3143,38 @@ is absent, and Fit is implied rather than said. Proposed nine-beat structure in 
 inside drawScene, which moved the sprite without moving what the sand, the litter and three of his
 locked tests believe about the sprite. I then read "9 packages ok" and committed without reading the
 result. Reverted in `68bf89c`. **The count is not the verdict.**
+
+### Session 32 (2026-09-14 into 09-15) — the page argues, the rain moves, the mountain is redrawn from his references
+
+**HIS FIVE RULINGS ON THE NINE BEATS, verbatim:** *"1. ok w your recommendation 2. regarding step 4,
+what it buys you: is 'never miss a failure' a great selling point? Sound cues and visual representation
+of the sessions context surely are. also "what it buys you" is not a great title 3. keep 4. instead of
+'the same picture everywhere', should it mention xscapes renders in truecolor in platforms that support
+it? or is there a better section for that? 5. shorter."* ⇒ Built: problem first; "While you wait" with the
+cues, the context, and what it is doing, "never miss a failure" a clause; the Fit line kept; the caption
+cut. ⇒ On 4 the answer was NO from the code: the product ships the cube on every terminal by his own
+09-04 ruling and truecolor is an untuned opt-in, and the page's own clips being truecolor made "what you
+see here is what you get" an overstatement, so the bullet went rather than moved.
+
+**THEN:** *"'The Wait' should read 'The Problem'- titles should be very clear. Start working on animating
+the rainy window and sketching out some options for the 3rd scape, the mountain scape in the woods w the
+owl"* ⇒ Renamed. The painters moved to `internal/scenes`; the rain is a 24-frame loop on the page. Three
+mountain options drawn on one ridge (wind / fire / creek).
+
+**HIS VERDICT ON THE FIRST SKETCH, verbatim:** *"I like the wind and the fireplaces. The trees, not so
+much. And the scape reads pretty 'basic'. Here are some beautiful references FYI, can we try emulate a
+scene like this? /Users/lucasgarzoli/Downloads/mountainscapes"* (five files: the Tetons over the Snake
+River at golden hour, a Sierra peak over a meadow at dusk, an alpine lake in the Alps, a painting of
+blue ranges under a crescent and a pink sky, Gran Canaria's ridges at sunset). ⇒ Read for what they
+share: depth by haze (ranges receding toward the sky's colour), a jagged skyline with snow in the
+gullies, warm light on the peaks against cool shadow, a valley in front with the foreground in
+silhouette. ⇒ **Redrawn at quarter-cell resolution** (`SetBGQuad`, the first scape to use it for
+terrain): three ranges, alpenglow at dawn and dusk, a lake reflecting the sky with a wandering shore and
+a headland, a meadow of scrub, two black pines framing the left, the owl on a mound. His two channels as
+two variants on the one vista: A the wind (fire fixed as the night's light; smoke and flames lean, the
+fraction of scrub flat, debris in the air) · B the fire (height, sparks, smoke thickness). Recommended
+A. Looked at through headless Chrome, three times; the second look found the lake reading as a stripe
+and the treeline as a skyline, the third found the owl's eye row lost to the shore's quarter-cells.
+⇒ https://claude.ai/artifact/N5Cvri266YgbtsufPXhiGV — **awaiting his pick.** Two things in the picture
+flagged for him: the lake is scenery and does not react (the shore's and aquarium's water is the work);
+no clouds, because weather is deferred in v1.

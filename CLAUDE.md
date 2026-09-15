@@ -12,9 +12,11 @@
 > overstatement — bullet dropped.** Preview https://claude.ai/artifact/GsALdkkvK48pL7cWm3SWcg. **Not
 > published; his.**
 > ⭐ **THE RAINY WINDOW IS ANIMATED** (`875ea8a`): the study painters moved to `internal/scenes`, a
-> clip can now be a painter looped (24 frames, seam = 5 cells, 17 KB gz). ⭐ **THREE MOUNTAIN OPTIONS
-> WITH THE OWL DRAWN, awaiting his pick** — wind / fire / creek, recommended A wind:
-> https://claude.ai/artifact/N5Cvri266YgbtsufPXhiGV
+> clip can now be a painter looped (24 frames, seam = 5 cells, 17 KB gz). ⭐ **THE MOUNTAIN VISTA WITH THE OWL,
+> REDRAWN FROM HIS FIVE REFERENCES after *"the scape reads pretty 'basic'"*** — three ranges receding by
+> haze, a jagged massif at QUARTER-CELL resolution with snow and alpenglow, a lake, a meadow, black pines
+> framing, the owl on a mound; two variants, **A wind / B fire, recommended A, awaiting his pick**:
+> https://claude.ai/artifact/N5Cvri266YgbtsufPXhiGV. Looked at through headless Chrome, three passes.
 > ⚠ Login flipped to donlucasx mid-session (flip 8); the s32 nine-beats proposal page is unreachable
 > from it, source in the scratchpad. Earlier in the session, resumed on the record and found it one step stale:
 > **he published and pushed himself at 19:24, four minutes after the wrap** (gh-pages `afd23a2` =

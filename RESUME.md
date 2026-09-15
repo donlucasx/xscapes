@@ -99,12 +99,19 @@ animal is the companion's job or nobody's.
   (`25dfb79`); `sceneClips` in `siteframes.go` renders a painter as a seamless loop (24 frames at 6 fps,
   the work on one cosine 0.1→0.9→0.1; the seam differs in 5 cells, all the cat's breath). 17 KB gzipped.
   The aquarium is still a still and can follow the same way once its loop is designed.
-- **A third scape: forest/mountain with the owl — THREE OPTIONS DRAWN, AWAITING HIS PICK:**
-  https://claude.ai/artifact/N5Cvri266YgbtsufPXhiGV (`internal/scenes/forest.go`, `go run ./notes/forest`).
-  A wind in the pines (count + coverage, collides with nothing) · B the fire in the clearing (strongest
-  read, but the fire is also the light) · C the creek (water again). **Recommended A.** Whichever wins
-  goes through the rain pipeline above and onto the page the same day. Not yet drawn: the owl's five
-  states and its litter (owlets exist as a bitmap).
+- **A third scape: the mountain vista with the owl — REDRAWN FROM HIS REFERENCES, TWO VARIANTS, AWAITING
+  HIS PICK:** https://claude.ai/artifact/N5Cvri266YgbtsufPXhiGV (`internal/scenes/forest.go`, `go run
+  ./notes/forest`; screenshot a frame with headless Chrome as `notes/s32-vistashots` did, it is at
+  `/Applications/Google Chrome.app`). His verdict on the first sketch: *"I like the wind and the
+  fireplaces. The trees, not so much. And the scape reads pretty 'basic'"* + five references in
+  `~/Downloads/mountainscapes/`. Now: three ranges receding by haze, a jagged massif at QUARTER-CELL
+  resolution (`SetBGQuad`) with snow in the gullies and alpenglow at dawn/dusk, a lake reflecting the sky
+  with a wandering shore, a meadow, two black pines framing the left, the owl on a mound. **A the wind**
+  (fire fixed as the night light; smoke/flame lean, fraction of scrub flat, debris) · **B the fire**
+  (height, sparks, smoke). **Recommended A.** ⚠ Flagged for him: the lake is scenery (does not react);
+  no clouds (weather deferred). ⚠ Canvas rule met for the first time: a plain `Plot` glyph over a
+  quarter-cell background LOSES to the quarters (the owl's eye row vanished under the shoreline); keep
+  whole cells under sprites. Not yet drawn: the owl's five states and its litter (owlet bitmap exists).
 
 **5. Smaller, all open:**
 - **The typed prompt** -- a fake Claude prompt in the hero the visitor types into. The "wow" item.

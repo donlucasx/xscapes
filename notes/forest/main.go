@@ -69,7 +69,7 @@ func main() {
 	}
 	js, _ := json.Marshal(loops)
 
-	page := `<title>Three Ways Up the Mountain</title>
+	page := `<title>The Vista, Two Ways</title>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&family=Geist:wght@400;500;600&display=swap">
 <style>
 :root{--g:#f3f2ee;--s:#e9e7e1;--ln:#d3d0c8;--d:#5f5c55;--i:#141412;--acc:#2f5f8f;--warm:#8a6a1e;--win:#000}
@@ -111,22 +111,21 @@ td:first-child{color:var(--i);font-weight:600;white-space:nowrap}
 </style>
 <div class="wrap">
 <div class="lockup"><span class="blk">x</span>scapes</div>
-<h1>Three ways up the mountain</h1>
-<p class="lede">The third scape is a mountain in the woods with the owl, and the design question is the one the shore never had to answer, because the sea answered it: <b>with no water, what carries the work?</b> Each option below gives one answer. Everything else is held the same: the same ridge, the same real sky and moon, the same owl on the right where the companion always sits, the same writing on the floor. All three loop through one cycle of work at dusk and are shown still at night working hard and at noon idle, as a 256-colour terminal draws them.</p>
-<p class="ask">Pick one letter, or say what to change. Whichever wins goes through the pipeline built this morning for the rainy window and is on the page the same day.</p>
+<h1>The vista, two ways</h1>
+<p class="lede">Redrawn from your references. What they share, and what the first sketch lacked: <b>depth by haze</b> (three ranges, each farther one closer to the sky's colour), <b>a jagged skyline</b> (drawn at quarter-cell resolution now, so a summit is a shape and not a staircase, with snow in the gullies rather than a cap), <b>light on the peaks</b> at dawn and dusk against cool shadow, and <b>a valley in front</b> with the foreground in silhouette: a lake taking the sky's colour, a meadow of scrub, two black pines at the edge framing the view instead of being it.</p>
+<p class="lede">You liked the wind and the fire, so both are here, on the one vista, and only the work channel differs. Each loops through one cycle of work at dusk and is shown still at night working hard and at noon idle, as a 256-colour terminal draws it.</p>
+<p class="ask">Pick a letter, or say what to change in the picture. Whichever wins goes through the rainy window's pipeline and is on the page the same day.</p>
 ` + body.String() + `
 <h3>Recommendation</h3>
 <div class="rec">
-<p><b>A, the wind.</b> It is the only one of the three whose motion is neither water nor fire. The aquarium already carries the work as water and the hearth as fire, so B and C would each be a second instance of a scape the study already has; A is the first of its kind, and a third scape has to be a third kind or it is not worth its section. It also encodes the way the rule asks: how many crowns lean is a count, how far is a coverage, and both survive a screenshot.</p>
-<p><b>The risk with A</b> is the quiet end. At level 0.1 one crown moves a cell and there are a couple of dozen needles in the air, which is subtler than one swell on a flat sea. If that reads as "nothing is happening", the fix is a floor on the needles rather than a change of channel.</p>
-<p><b>B reads strongest and costs the most.</b> The flame's height is the most legible work channel of the three, but the fire is also the light, so a busy agent brightens the whole clearing, which puts two meanings on one thing. The hearth lives with the same collision indoors; outdoors it is more visible.</p>
-<p><b>C is the safe one.</b> It works because the shore works. That is also the argument against it.</p>
+<p><b>A, the wind, with the fire kept as the night's light.</b> Both of your picks are in it: the fire is there, but fixed, so it lights the meadow at night the way the moon lights the lake, and the wind is what moves. That gives the whole frame the work, the smoke, the flames, the grass and the air, instead of one spot, and it keeps the light slot honest. The hearth already carries the work as a fire; this is the first scape where the work is the weather in the frame, which is what makes it a third kind.</p>
+<p><b>B reads strongest at a glance</b> and costs one thing: the fire is also the light, so a busy agent brightens the meadow it sits in. Outdoors that collision is more visible than it is indoors.</p>
+<p><b>Two things in the picture for you to rule on.</b> The lake: it is scenery here and does not react, while the shore's and the aquarium's water is the work; if that reads wrong, the valley becomes meadow. The clouds in every one of your photographs: weather is deferred in v1, so there are none, and if you want them they would be still.</p>
 </div>
 <table><tr><th>option</th><th>the work is</th><th>encoded as</th><th>collides with</th></tr>
-<tr><td>A wind</td><td>how many crowns sway, how far, needles in the air</td><td>count + coverage</td><td>nothing</td></tr>
-<tr><td>B fire</td><td>flame height, sparks</td><td>position + count</td><td>the light slot</td></tr>
-<tr><td>C creek</td><td>foam coverage</td><td>coverage</td><td>the aquarium and the shore, which are already water</td></tr></table>
-<p class="foot">go run ./notes/forest · internal/scenes/forest.go · seed ` + fmt.Sprint(*seed) + ` · Profile256 (as the product draws it; the page's clips are truecolor)</p>
+<tr><td>A wind</td><td>the smoke's and flames' lean, the fraction of scrub flat, what is in the air</td><td>position + coverage</td><td>nothing</td></tr>
+<tr><td>B fire</td><td>flame height, sparks, smoke thickness</td><td>position + count</td><td>the light slot</td></tr></table>
+<p class="foot">go run ./notes/forest · internal/scenes/forest.go (redrawn from his references, 2026-09-15) · seed ` + fmt.Sprint(*seed) + ` · Profile256 (as the product draws it; the page's clips are truecolor)</p>
 </div>
 <script>
 (function(){
