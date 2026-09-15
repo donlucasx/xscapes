@@ -134,18 +134,25 @@ func paintRange(c *canvas.Canvas, top []int, col term.RGB, until int, tint func(
 }
 
 // pineSilhouette draws a conifer as a dark shape at quarter-cell resolution:
-// a notched taper from tip to base, in the near ridge's own colour.
+// a taper from tip to base in tiers, each bough wider at its bottom edge, in
+// the near ridge's own colour. It widens all the way down -- the first
+// version capped the width and the tree became a tower below the cap, with
+// a wall one cell inside the frame that read as cut ("any reason why the
+// trees cut abruptly on the left edge?", 2026-09-15). The frame's edge is
+// what cuts a tree, never a wall of its own.
 func pineSilhouette(c *canvas.Canvas, cu, tip, base int, col term.RGB, seed int64) {
 	width := func(v int) float64 {
 		if v < tip {
 			return -1
 		}
-		w := float64(v-tip) / 2.4
-		w += (scape.HashF(v, 5, seed) - 0.5) * 1.6
-		return math.Min(w, 7)
+		d := float64(v - tip)
+		tier := math.Mod(d, 5) / 5 // 0 at a bough's top, 1 at its skirt
+		w := d / 2.6 * (0.7 + 0.3*tier)
+		w += (scape.HashF(v, 5, seed) - 0.5) * 1.2
+		return w
 	}
 	for y := tip / 2; y <= base/2 && y < c.H; y++ {
-		for x := max(0, (cu-8)/2); x <= (cu+8)/2 && x < c.W; x++ {
+		for x := max(0, (cu-14)/2); x <= (cu+14)/2 && x < c.W; x++ {
 			var mask uint8
 			for _, q := range []struct {
 				u, v int

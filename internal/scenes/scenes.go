@@ -294,10 +294,17 @@ func paintRain(c *canvas.Canvas, tod, t, level float64, seed int64) {
 	// Rain, on the glass: density is the work. The streaks fall six rows a
 	// second through a pattern RainPeriod rows tall, so a clip of RainPeriod
 	// frames at six a second closes on itself and the page can loop it.
+	//
+	// ⚠ FALL means the pattern row a screen row shows DEcreases as time goes
+	// on: a drop at pattern row k is on screen row k+shift, one lower each
+	// frame. The first animated build added the shift instead, and the rain
+	// rose ("the rain is falling upwards", his note 2026-09-15). The still
+	// had carried the same sign for ten days and nobody could tell.
 	d := 0.04 + 0.16*level
+	shift := int(math.Round(t * 6))
 	for y := 0; y <= 19; y++ {
 		for x := 0; x < c.W; x++ {
-			h := scape.HashF(x, (y+int(math.Round(t*6)))%RainPeriod, seed+20)
+			h := scape.HashF(x, ((y-shift)%RainPeriod+RainPeriod)%RainPeriod, seed+20)
 			if h < d {
 				r := '|'
 				if h < d*0.35 {
