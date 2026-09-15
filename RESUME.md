@@ -50,7 +50,12 @@ gh auth switch --user donlucasx && git push origin main
 ⚠ `gh auth`'s active account is host-global and flips back on its own. Switch immediately before
 every push. The account is **donlucasx** (CLAUDE.md said `donlucas`, which does not exist; corrected).
 
-**1. ⭐⭐ HIS OPEN QUESTION, and it is the biggest lever left.** Verbatim: *"is this a winning
+**1. ⭐⭐ ~~HIS OPEN QUESTION~~ RULED AND BUILT 2026-09-15.** He took the nine beats with five rulings
+(problem first · "never miss a failure" is not a headline, the cues and the context are · keep the Fit
+line · no truecolor claim, the product ships the cube · shorter), then *"'The Wait' should read 'The
+Problem' — titles should be very clear."* The page is rebuilt on `site/template.html` (commits `099f5dd`,
+`8a190e9`); preview https://claude.ai/artifact/GsALdkkvK48pL7cWm3SWcg. **NOT PUBLISHED to gh-pages;
+that is his.** The original question, verbatim: *"is this a winning
 structure to communicate what xscapes is, how it works and why would people care for it? How does it
 fit on the hackathon? what is the problem it solves? What are the features it offers? all in a very
 digestible, eye cathing way?"*
@@ -89,13 +94,17 @@ once (`TestTheSandNeverWritesUnderTheCompanionInEitherComposition`,
 because the sand, the litter and the tests all locate the companion through DrawnBox. Moving the
 animal is the companion's job or nobody's.
 
-**4. NOT BUILT, and both are his asks:**
-- **Animate the rainy window.** The scapes live in `notes/scapestudy`, a separate `main` package the
-  site generator cannot import, so they are checked-in stills in `site/scapes/`. Animating means
-  moving the painters into an internal package. ~half a day.
-- **A third scape: forest/mountain with the owl.** New art, and the real question is the design one:
-  with no sea, what carries the work? My proposal, unruled: **wind through the treeline** (how many
-  trees bend and how far), with snow on the ridge as the accumulator.
+**4. Both his asks of 2026-09-15, and one is DONE:**
+- ~~**Animate the rainy window.**~~ **DONE `875ea8a`.** The painters moved to `internal/scenes`
+  (`25dfb79`); `sceneClips` in `siteframes.go` renders a painter as a seamless loop (24 frames at 6 fps,
+  the work on one cosine 0.1→0.9→0.1; the seam differs in 5 cells, all the cat's breath). 17 KB gzipped.
+  The aquarium is still a still and can follow the same way once its loop is designed.
+- **A third scape: forest/mountain with the owl — THREE OPTIONS DRAWN, AWAITING HIS PICK:**
+  https://claude.ai/artifact/N5Cvri266YgbtsufPXhiGV (`internal/scenes/forest.go`, `go run ./notes/forest`).
+  A wind in the pines (count + coverage, collides with nothing) · B the fire in the clearing (strongest
+  read, but the fire is also the light) · C the creek (water again). **Recommended A.** Whichever wins
+  goes through the rain pipeline above and onto the page the same day. Not yet drawn: the owl's five
+  states and its litter (owlets exist as a bitmap).
 
 **5. Smaller, all open:**
 - **The typed prompt** -- a fake Claude prompt in the hero the visitor types into. The "wow" item.
@@ -119,7 +128,11 @@ overriding my recommendation).
 
 - `site/template.html` -- the page. Markers `{{cover}}`, `{{covermobile}}`, `{{fxjs}}`, `{{fxcss}}`,
   `{{scaperain}}`, `{{scapeaq}}` are filled by `sitePage` in `site.go`.
-- `siteframes.go` -- which animations are embedded and how much they cost.
+- `internal/scenes/` -- the study painters (five scenes, five companion candidates, and `Forest`,
+  the three mountain options), importable since 2026-09-15. `notes/scapestudy` and `notes/forest` are
+  page writers over it.
+- `siteframes.go` -- which animations are embedded and how much they cost. `allFX` is the one list;
+  `sceneClips` renders a painter as a loop, `gifFrames` renders a shore session.
   `TestWhatTheEmbeddedFramesCost` prints every clip and FAILS over 900KB gzipped.
 - `gifs.go` -- `gifScene` grew `pal`, `cube`, `fps`, `rows`, `animal`. ⚠ `cube` is a bool and not a
   `term.Profile` because Profile256 is that type's ZERO VALUE, which would have taken every clip off

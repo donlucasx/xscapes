@@ -2,7 +2,21 @@
 
 *(Renamed end to end on 2026-09-03: directory, env vars, state path and hook marker. Two names are kept on purpose and are not leftovers -- `internal/envx` still reads `ASCIISCAPES_*` and warns, and `install.go` still RECOGNISES the `# asciiscapes:v1` marker so the hooks it wrote before the rename can be found and removed.)*
 
-> **Session 32 (2026-09-14 evening), IN PROGRESS.** Resumed on the record and found it one step stale:
+> **Session 32 (2026-09-14 into 09-15), IN PROGRESS.** ⭐ **THE PAGE ARGUES NOW: nine beats on his five
+> rulings** — *The problem* opens with Claude Code's own spinner over empty rows · *While you wait* says
+> what it buys you (the cues, the context, and what it is doing; "never miss a failure" demoted to a
+> clause at his word) · *How you get it* carries the install block and the Fit line · *A layer, not a
+> screen* merges companion + scapes + protocol, two dividers gone · *Still good in a month* is the first
+> sentence about repeatability. ⚠ **No truecolor claim: the product ships the cube on every terminal by
+> his 09-04 ruling, and the page's clips being truecolor made "what you see here is what you get" an
+> overstatement — bullet dropped.** Preview https://claude.ai/artifact/GsALdkkvK48pL7cWm3SWcg. **Not
+> published; his.**
+> ⭐ **THE RAINY WINDOW IS ANIMATED** (`875ea8a`): the study painters moved to `internal/scenes`, a
+> clip can now be a painter looped (24 frames, seam = 5 cells, 17 KB gz). ⭐ **THREE MOUNTAIN OPTIONS
+> WITH THE OWL DRAWN, awaiting his pick** — wind / fire / creek, recommended A wind:
+> https://claude.ai/artifact/N5Cvri266YgbtsufPXhiGV
+> ⚠ Login flipped to donlucasx mid-session (flip 8); the s32 nine-beats proposal page is unreachable
+> from it, source in the scratchpad. Earlier in the session, resumed on the record and found it one step stale:
 > **he published and pushed himself at 19:24, four minutes after the wrap** (gh-pages `afd23a2` =
 > `site: 4336fbf`, `origin/main` = `4336fbf`; the live page's hash equals `site/index.html`, verified
 > by fetch). HEAD's binary is INSTALLED (inode 85539368, stamped `4336fbf`, clean tree). Two of four
