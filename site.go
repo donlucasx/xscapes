@@ -114,6 +114,10 @@ func sitePage(seed int64, dir string) (string, error) {
 	}
 	page = strings.Replace(page, "{{fxjs}}", fxjs, 1)
 	page = strings.Replace(page, "{{fxcss}}", fxcss, 1)
+	// Each section's quiet moving field, his idea of 2026-09-14. See backdrops.go.
+	for key, frames := range renderBackdrops(seed) {
+		page = strings.Replace(page, "{{bg:"+key+"}}", frames, 1)
+	}
 	if err := os.WriteFile(filepath.Join(dir, "anim", "cover.html"), []byte(cover), 0o644); err != nil {
 		return "", err
 	}
