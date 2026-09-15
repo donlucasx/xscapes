@@ -129,11 +129,14 @@ var OwlAlts = []OwlAlt{
 		eyeRow: 2, eyeL: 3, eyeR: 7, eyeW: 2, eyeH: 2, pupil: 0, beakRow: 4},
 }
 
-// OwlPick is which alternative the vista draws; OwlPlace is where: 0 on the
-// mound in the meadow, 1 on a branch from the right edge.
+// OwlPick is which alternative the vista draws. OwlPlace is where, his ask
+// of 2026-09-15 for alternatives: 0 on a mound in the meadow, 1 on a branch
+// from the right edge above the treeline, 2 on a lower branch over the lake,
+// 3 on a post in the meadow. OwletCount is how many of the litter are drawn.
 var (
-	OwlPick  = 0
-	OwlPlace = 1
+	OwlPick    = 3
+	OwlPlace   = 1
+	OwletCount = 2
 )
 
 // The owl's colours, all cube entries that survive both paths.
@@ -142,7 +145,7 @@ var (
 	owlLight = term.RGB{R: 255, G: 215, B: 175} // the face and the belly
 	owlWhite = term.RGB{R: 255, G: 255, B: 255}
 	owlDark  = term.RGB{R: 38, G: 38, B: 38}
-	owlBeak  = term.RGB{R: 135, G: 95, B: 0}
+	owlBeak  = term.RGB{R: 215, G: 135, B: 0}
 )
 
 // expand turns 12x7 cell art into the 24x28 bitmap every companion is.
@@ -216,15 +219,88 @@ func DrawOwl(c *canvas.Canvas, alt *OwlAlt, coat term.RGB, x, y int) {
 		}
 		near.PlotOn(x+pc, y+alt.eyeRow, '˙', owlWhite, owlDark, 1)
 	}
-	near.PlotOn(x+5, y+alt.beakRow, '\\', owlBeak, c.BGAt(x+5, y+alt.beakRow), 1)
-	near.PlotOn(x+6, y+alt.beakRow, '/', owlBeak, c.BGAt(x+6, y+alt.beakRow), 1)
+	// The beak is FILLED, his note: two cells of beak colour with the V on
+	// them, not two strokes over the face.
+	near.PlotOn(x+5, y+alt.beakRow, '\\', owlDark, owlBeak, 1)
+	near.PlotOn(x+6, y+alt.beakRow, '/', owlDark, owlBeak, 1)
 }
 
-// DrawOwlet draws one of the litter, 6x4 cells, in the same manner.
+// THE LITTER. A subagent is an owlet, the way it is a kitten on the shore
+// and a crablet on the beach; the count is the channel. Three looks, his
+// ask of 2026-09-15 for alternatives:
+//
+//	0  the study's owlet bitmap, dot eyes -- the control
+//	1  a chick in the parent's own style: tufts, a pale face, big eyes, a beak
+//	2  a puff: a ball with eyes and nothing else
+type OwletStyle struct {
+	Name  string
+	art   []string // 6 columns by 4 rows, the marks of OwlAlt.art
+	light []string
+	eyes  bool // white eyes with a dot, or the bitmap's own dots
+	beak  bool
+}
+
+var OwletStyles = []OwletStyle{
+	{Name: "Study owlet"},
+	{Name: "Chick, the parent's style",
+		art:   []string{".^..^.", "######", "######", ".^..^."},
+		light: []string{"......", ".oooo.", ".oooo.", "......"},
+		eyes:  true, beak: true},
+	{Name: "Puff",
+		art:  []string{".v##v.", "######", "######", ".^..^."},
+		eyes: true},
+}
+
+// OwletPick is the look the vista draws.
+var OwletPick = 1
+
+// expandSmall turns 6x4 cell art into the 12x16 bitmap the litter is.
+func expandSmall(art []string) []string {
+	px := make([][]byte, 16)
+	for y := range px {
+		px[y] = []byte(strings.Repeat(".", 12))
+	}
+	for cy, row := range art {
+		for cx, m := range row {
+			x0, y0 := 2*cx, 4*cy
+			set := func(dx0, dx1, dy0, dy1 int) {
+				for y := y0 + dy0; y <= y0+dy1; y++ {
+					for x := x0 + dx0; x <= x0+dx1; x++ {
+						px[y][x] = '#'
+					}
+				}
+			}
+			switch m {
+			case '#':
+				set(0, 1, 0, 3)
+			case 'v':
+				set(0, 1, 2, 3)
+			case '^':
+				set(0, 1, 0, 1)
+			}
+		}
+	}
+	out := make([]string, 16)
+	for y := range px {
+		out[y] = string(px[y])
+	}
+	return out
+}
+
+// DrawOwlet draws one of the litter, 6x4 cells, in the picked look.
 func DrawOwlet(c *canvas.Canvas, coat term.RGB, x, y int, faceLeft bool) {
-	bm := mustBitmap(owlet, 12, 16, "owlet")
-	if faceLeft {
-		bm = bm.Mirrored()
+	st := &OwletStyles[0]
+	if OwletPick >= 0 && OwletPick < len(OwletStyles) {
+		st = &OwletStyles[OwletPick]
+	}
+	var bm *companion.Bitmap
+	if st.art == nil {
+		bm = mustBitmap(owlet, 12, 16, "owlet")
+		if faceLeft {
+			bm = bm.Mirrored()
+		}
+	} else {
+		bm = mustBitmap(expandSmall(st.art), 12, 16, st.Name)
 	}
 	q := bm.ToQuadrant()
 	near := c.Near()
@@ -235,7 +311,11 @@ func DrawOwlet(c *canvas.Canvas, coat term.RGB, x, y int, faceLeft bool) {
 			case ' ':
 				continue
 			case '█':
-				near.PlotOn(x+dx, y+dy, ' ', coat, coat, 1)
+				g := coat
+				if st.light != nil && st.light[dy][dx] == 'o' {
+					g = owlLight
+				}
+				near.PlotOn(x+dx, y+dy, ' ', g, g, 1)
 			default:
 				near.PlotOn(x+dx, y+dy, r, coat, c.BGAt(x+dx, y+dy), 1)
 			}
@@ -243,6 +323,9 @@ func DrawOwlet(c *canvas.Canvas, coat term.RGB, x, y int, faceLeft bool) {
 	}
 	near.PlotOn(x+1, y+1, '•', owlDark, owlWhite, 1)
 	near.PlotOn(x+4, y+1, '•', owlDark, owlWhite, 1)
+	if st.beak {
+		near.PlotOn(x+2, y+2, 'v', owlDark, owlBeak, 1)
+	}
 }
 
 // The branch: from the right edge, its top edge flat where the birds sit, its
@@ -250,12 +333,13 @@ func DrawOwlet(c *canvas.Canvas, coat term.RGB, x, y int, faceLeft bool) {
 // treeline, against the lit ranges, or it is a dark limb on dark trees and
 // vanishes -- which is what the first strip showed.
 const (
-	branchTip  = 100 // sub-column the branch reaches, x 50
-	branchTop  = 18  // the perch, row 9's upper half
-	branchOwlY = 2   // the owl's box rows 2..8, feet on row 8
+	branchTip  = 88 // sub-column the branch reaches, x 44: room for three owlets
+	branchTop  = 18 // the perch, row 9's upper half
+	branchOwlY = 2  // the owl's box rows 2..8, feet on row 8
 )
 
-func paintBranch(c *canvas.Canvas, col term.RGB, seed int64) {
+// paintBranch draws the limb with its perch at sub-row top.
+func paintBranch(c *canvas.Canvas, col term.RGB, seed int64, top0 int) {
 	W2 := c.W * 2
 	top := make([]int, W2)
 	bot := make([]int, W2)
@@ -266,14 +350,14 @@ func paintBranch(c *canvas.Canvas, col term.RGB, seed int64) {
 		}
 		f := float64(u-branchTip) / float64(W2-1-branchTip) // 0 at the tip, 1 at the edge
 		thick := 1 + 2.4*f
-		top[u] = branchTop
-		bot[u] = branchTop + int(thick+0.5) - 1
+		top[u] = top0
+		bot[u] = top0 + int(thick+0.5) - 1
 		if u < branchTip+4 {
-			top[u] = branchTop + 1 // the tip thins from below
+			top[u] = top0 + 1 // the tip thins from below
 		}
 	}
 	for x := branchTip / 2; x < c.W; x++ {
-		for y := branchTop / 2; y <= (branchTop+4)/2; y++ {
+		for y := top0 / 2; y <= (top0+4)/2; y++ {
 			var mask uint8
 			for _, q := range []struct {
 				u, v int
@@ -295,9 +379,9 @@ func paintBranch(c *canvas.Canvas, col term.RGB, seed int64) {
 	}
 	// A few needles hanging from it.
 	mid := c.Mid()
-	for _, tx := range []int{53, 58, 62, 70, 76} {
+	for _, tx := range []int{47, 53, 58, 62, 70, 76} {
 		if scape.HashF(tx, 1, seed+97) < 0.8 {
-			plot(mid, tx, branchTop/2+2, '\'', col, 1)
+			plot(mid, tx, top0/2+2, '\'', col, 1)
 		}
 	}
 }

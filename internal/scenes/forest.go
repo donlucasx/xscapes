@@ -179,12 +179,12 @@ func owlAt(c *canvas.Canvas, x, y int) {
 		pick = 0
 	}
 	DrawOwl(c, &OwlAlts[pick], OwlCoat, x, y)
-	if OwlPlace == 1 {
-		DrawOwlet(c, OwlCoat, x-12, y+3, true)
-		DrawOwlet(c, OwlCoat, x-6, y+3, false)
-	} else {
-		DrawOwlet(c, OwlCoat, x-14, meadowTop+1, true)
-		DrawOwlet(c, OwlCoat, x-7, meadowTop+1, false)
+	for k := 1; k <= OwletCount; k++ {
+		if OwlPlace == 1 || OwlPlace == 2 {
+			DrawOwlet(c, OwlCoat, x-6*k, y+3, k%2 == 1) // along the limb
+		} else {
+			DrawOwlet(c, OwlCoat, x-7*k, meadowTop+1, k%2 == 1) // on the grass
+		}
 	}
 }
 
@@ -462,10 +462,20 @@ func paintVista(c *canvas.Canvas, tod, t, level float64, seed int64, fireIsWork 
 
 	// The owl, right: on a branch from the right edge, or on a low mound
 	// drawn as quarters with a flat top under its feet.
-	if OwlPlace == 1 {
-		paintBranch(c, pineCol, seed)
+	switch OwlPlace {
+	case 1:
+		paintBranch(c, pineCol, seed, branchTop)
 		owlAt(c, owlX, branchOwlY)
-	} else {
+	case 2:
+		// A lower limb, its perch on row 13, so it crosses the lake and
+		// reads against the water.
+		paintBranch(c, pineCol, seed, 26)
+		owlAt(c, owlX, 6)
+	case 3:
+		// A post in the meadow, two cells wide, the owl on top of it.
+		fill(c, owlX+4, 15, owlX+5, bandTop-1, pineCol)
+		owlAt(c, owlX, 8)
+	default:
 		mound := make([]int, W2)
 		for u := 0; u < W2; u++ {
 			mound[u] = 999
