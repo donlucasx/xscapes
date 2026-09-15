@@ -1,4 +1,9 @@
-package main
+// Package scenes holds the study painters: every proposed scape drawn through
+// the product's own canvas, palette rules and sprite pipeline. It lives here
+// rather than in notes/scapestudy so the site can ANIMATE a scene -- the page
+// generator cannot import a main package, which is why the rainy window was a
+// checked-in still until 2026-09-15.
+package scenes
 
 import (
 	"fmt"
@@ -134,12 +139,16 @@ func skyWindow(c *canvas.Canvas, x0, y0, x1, y1 int, p scape.Palette, t float64,
 // sceneCompanion, when set, is drawn in the cat's place in every scene, so a
 // scape can be shown with the companion drawn for it rather than always with
 // the one that ships.
-var sceneCompanion *animal
+var sceneCompanion *Animal
+
+// SetCompanion names the animal drawn in the cat's place in every scene, or
+// puts the cat back with nil.
+func SetCompanion(a *Animal) { sceneCompanion = a }
 
 // catAt draws the scene's companion, working, at a cell.
 func catAt(c *canvas.Canvas, x, y int, faceLeft bool, t float64) {
 	if a := sceneCompanion; a != nil {
-		drawAnimal(c.Near(), a.body, 24, 28, a.name, companion.Coats[a.coat],
+		drawAnimal(c.Near(), a.body, 24, 28, a.Name, companion.Coats[a.Coat],
 			a.eyes, a.eyeRow, a.eyeGlyph, a.nose, a.noseRow, x, y, faceLeft)
 		return
 	}
@@ -148,15 +157,15 @@ func catAt(c *canvas.Canvas, x, y int, faceLeft bool, t float64) {
 	cat.Draw(c.Near(), x, y, t, companion.Working)
 }
 
-// A scene is one painter. level is the work, 0..1, carried by the motion slot.
-type scene struct {
-	name  string
-	slots [6]string // light, sky, motion (the work), surface, accumulator, companion
-	note  string
-	paint func(c *canvas.Canvas, tod, t, level float64, seed int64)
+// A Scene is one painter. level is the work, 0..1, carried by the motion slot.
+type Scene struct {
+	Name  string
+	Slots [6]string // light, sky, motion (the work), surface, accumulator, companion
+	Note  string
+	Paint func(c *canvas.Canvas, tod, t, level float64, seed int64)
 }
 
-var scenes = []scene{
+var Scenes = []Scene{
 	{"Hearth and cabin",
 		[6]string{"the fire, and daylight through one window", "the window: the real sky, stars, the moon", "the fire's height and its sparks", "stone, floorboards, a rug", "the floorboards in front of the rug", "the cat on the rug, facing the fire"},
 		"Indoors, so the clock has to come in through the window. The fire is the only warm colour the cube gives freely, which is why this scene reads so easily on 256.",

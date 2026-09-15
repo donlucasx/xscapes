@@ -13,6 +13,7 @@ import (
 	"strings"
 
 	"github.com/donlucasx/xscapes/internal/canvas"
+	"github.com/donlucasx/xscapes/internal/scenes"
 	"github.com/donlucasx/xscapes/internal/term"
 )
 
@@ -69,17 +70,17 @@ p{max-width:66ch;color:var(--d);margin:0 0 12px}
 <p>Every frame below is rendered through the product's own canvas, palette rules and sprite pipeline at the design size of 80 by 24, quantised the way Terminal.app will show it. Nothing is chosen. The shore stays as it ships; these are the candidates from the session 19 research, each drawn once so the choice can be made by looking.</p>
 <p>Each scene fills the six slots the brief requires. The motion slot carries the work at a middle level; the sky slot carries the real clock, shown at night, noon and dusk. The writing band is the same three lines in every scene, on whatever surface the scene offers.</p>
 <h2>Five scenes</h2>`)
-	for _, sc := range scenes {
-		b.WriteString(`<div class="blk-sec"><div class="head"><span class="nm">` + html.EscapeString(sc.name) + `</span></div>`)
-		b.WriteString(`<p>` + html.EscapeString(sc.note) + `</p><div class="slots">`)
+	for _, sc := range scenes.Scenes {
+		b.WriteString(`<div class="blk-sec"><div class="head"><span class="nm">` + html.EscapeString(sc.Name) + `</span></div>`)
+		b.WriteString(`<p>` + html.EscapeString(sc.Note) + `</p><div class="slots">`)
 		for i, k := range []string{"light", "sky", "motion", "surface", "accumulator", "companion"} {
-			b.WriteString(`<b>` + k + `</b><span>` + html.EscapeString(sc.slots[i]) + `</span>`)
+			b.WriteString(`<b>` + k + `</b><span>` + html.EscapeString(sc.Slots[i]) + `</span>`)
 		}
 		b.WriteString(`</div><div class="frames">`)
 		for _, hr := range hours {
 			c := canvas.New(80, 24, canvas.AlphaFar, canvas.AlphaMid, canvas.AlphaNear)
 			c.Clear()
-			sc.paint(c, hr.tod, *t, *level, *seed)
+			sc.Paint(c, hr.tod, *t, *level, *seed)
 			b.WriteString(`<div><div class="cap">` + hr.name + `</div><div class="win">` + c.HTMLFragmentAs(*px, term.Profile256) + `</div></div>`)
 		}
 		b.WriteString(`</div></div>`)
@@ -92,16 +93,16 @@ p{max-width:66ch;color:var(--d);margin:0 0 12px}
 	}{{"night", 0.0245}, {"noon", 0.5}}
 	b.WriteString(`<div class="blk-sec"><div class="head"><span class="nm">Cat</span><span class="coat">cream, as shipped</span></div><p>The companion that ships, with two kittens, for scale and for the style every candidate has to sit beside.</p><div class="frames">`)
 	for _, hr := range two {
-		c := catFrame(hr.tod, *t, *seed)
+		c := scenes.CatFrame(hr.tod, *t, *seed)
 		b.WriteString(`<div><div class="cap">` + hr.name + `</div><div class="win">` + c.HTMLFragmentAs(*px, term.Profile256) + `</div></div>`)
 	}
 	b.WriteString(`</div></div>`)
-	for i := range animals {
-		a := &animals[i]
-		b.WriteString(`<div class="blk-sec"><div class="head"><span class="nm">` + html.EscapeString(a.name) + `</span><span class="coat">` + html.EscapeString(a.coat) + `</span></div>`)
-		b.WriteString(`<p>` + html.EscapeString(a.note) + `</p><div class="frames">`)
+	for i := range scenes.Animals {
+		a := &scenes.Animals[i]
+		b.WriteString(`<div class="blk-sec"><div class="head"><span class="nm">` + html.EscapeString(a.Name) + `</span><span class="coat">` + html.EscapeString(a.Coat) + `</span></div>`)
+		b.WriteString(`<p>` + html.EscapeString(a.Note) + `</p><div class="frames">`)
 		for _, hr := range two {
-			c := companionFrame(a, hr.tod, *t, *seed)
+			c := scenes.CompanionFrame(a, hr.tod, *t, *seed)
 			b.WriteString(`<div><div class="cap">` + hr.name + `</div><div class="win">` + c.HTMLFragmentAs(*px, term.Profile256) + `</div></div>`)
 		}
 		b.WriteString(`</div></div>`)
@@ -158,10 +159,10 @@ var ruleStrips = []framePick{
 // of the scene, where the motion channel lives in every one of them.
 func writeRuleStrips(dir string, seed int64, level, t float64) error {
 	for _, p := range ruleStrips {
-		var sc *scene
-		for i := range scenes {
-			if scenes[i].name == p.scene {
-				sc = &scenes[i]
+		var sc *scenes.Scene
+		for i := range scenes.Scenes {
+			if scenes.Scenes[i].Name == p.scene {
+				sc = &scenes.Scenes[i]
 			}
 		}
 		if sc == nil {
@@ -170,8 +171,8 @@ func writeRuleStrips(dir string, seed int64, level, t float64) error {
 		const w, h = 120, 24
 		c := canvas.New(w, h, canvas.AlphaFar, canvas.AlphaMid, canvas.AlphaNear)
 		c.Clear()
-		sceneCompanion = nil
-		sc.paint(c, p.tod, t, level, seed)
+		scenes.SetCompanion(nil)
+		sc.Paint(c, p.tod, t, level, seed)
 		frag := c.HTMLFragmentCropAs(0, 10, w, 13, FramePx, term.ProfileTrueColor)
 		if err := os.WriteFile(dir+"/"+p.file, []byte(frag), 0o644); err != nil {
 			return err
@@ -192,41 +193,43 @@ func writeFrames(dir string, seed int64, level, t float64) error {
 		var c *canvas.Canvas
 		switch {
 		case p.scene != "":
-			var sc *scene
-			for i := range scenes {
-				if scenes[i].name == p.scene {
-					sc = &scenes[i]
+			var sc *scenes.Scene
+			for i := range scenes.Scenes {
+				if scenes.Scenes[i].Name == p.scene {
+					sc = &scenes.Scenes[i]
 				}
 			}
 			if sc == nil {
 				return fmt.Errorf("no scene %q", p.scene)
 			}
-			sceneCompanion = nil
+			scenes.SetCompanion(nil)
 			if p.with != "" {
-				for i := range animals {
-					if animals[i].name == p.with {
-						sceneCompanion = &animals[i]
+				picked := false
+				for i := range scenes.Animals {
+					if scenes.Animals[i].Name == p.with {
+						scenes.SetCompanion(&scenes.Animals[i])
+						picked = true
 					}
 				}
-				if sceneCompanion == nil {
+				if !picked {
 					return fmt.Errorf("no companion %q", p.with)
 				}
 			}
 			c = canvas.New(80, 24, canvas.AlphaFar, canvas.AlphaMid, canvas.AlphaNear)
 			c.Clear()
-			sc.paint(c, p.tod, t, level, seed)
-			sceneCompanion = nil
+			sc.Paint(c, p.tod, t, level, seed)
+			scenes.SetCompanion(nil)
 		case p.animal != "":
-			var a *animal
-			for i := range animals {
-				if animals[i].name == p.animal {
-					a = &animals[i]
+			var a *scenes.Animal
+			for i := range scenes.Animals {
+				if scenes.Animals[i].Name == p.animal {
+					a = &scenes.Animals[i]
 				}
 			}
 			if a == nil {
 				return fmt.Errorf("no animal %q", p.animal)
 			}
-			c = companionFrame(a, p.tod, t, seed)
+			c = scenes.CompanionFrame(a, p.tod, t, seed)
 		}
 		// Truecolor, his direction of 2026-09-05, the same as the clips: the
 		// page shows the scene at its best rather than as the cube rounds it.

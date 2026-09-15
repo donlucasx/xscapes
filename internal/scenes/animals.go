@@ -1,4 +1,4 @@
-package main
+package scenes
 
 import (
 	"fmt"
@@ -14,8 +14,9 @@ import (
 // a one-cell rim, and eyes plotted as characters into gaps the bitmap leaves.
 // The young are 12x16, the kittens' size. Authored facing right and mirrored
 // on the right-hand side of the frame, like the cat.
-type animal struct {
-	name, coat, note string
+// An Animal is one companion candidate, drawn through the cat's pipeline.
+type Animal struct {
+	Name, Coat, Note string
 	body, young      []string
 	eyes, yeyes      [2]int // eye cells, left to right in the authored frame; -1 = none
 	eyeRow, yeyeRow  int    // the cell row the eyes sit on
@@ -26,21 +27,21 @@ type animal struct {
 
 var eyeShine = term.RGB{R: 168, G: 236, B: 176} // the cat's
 
-var animals = []animal{
-	{name: "Owl", coat: "slate",
-		note: "Top of the ranking. Night-native, sits still, blinks; the tufts and the round head survive the quadrant halving, and the big eyes are two full cells. Owlets as the litter.",
+var Animals = []Animal{
+	{Name: "Owl", Coat: "slate",
+		Note: "Top of the ranking. Night-native, sits still, blinks; the tufts and the round head survive the quadrant halving, and the big eyes are two full cells. Owlets as the litter.",
 		body: owlBody, young: owlet, eyes: [2]int{2, 9}, eyeRow: 2, yeyes: [2]int{1, 3}, yeyeRow: 1, eyeGlyph: 'O', nose: 5, noseRow: 3},
-	{name: "Rabbit", coat: "fog",
-		note: "The ears are the whole silhouette and they carry the worried pose for free (flat ears). Kits as the litter. The pale coat is close to the cat's; a darker one would separate them.",
+	{Name: "Rabbit", Coat: "fog",
+		Note: "The ears are the whole silhouette and they carry the worried pose for free (flat ears). Kits as the litter. The pale coat is close to the cat's; a darker one would separate them.",
 		body: rabbitBody, young: kit, eyes: [2]int{2, 9}, eyeRow: 3, yeyes: [2]int{1, 3}, yeyeRow: 1, eyeGlyph: 'o', nose: -1},
-	{name: "Frog", coat: "sage",
-		note: "Ranked for the rainy window: the eyes are domes on top rather than gaps in a face, so the silhouette reads at any size, and the litter swims (froglets here, tadpoles later).",
+	{Name: "Frog", Coat: "sage",
+		Note: "Ranked for the rainy window: the eyes are domes on top rather than gaps in a face, so the silhouette reads at any size, and the litter swims (froglets here, tadpoles later).",
 		body: frogBody, young: froglet, eyes: [2]int{2, 9}, eyeRow: 0, yeyes: [2]int{1, 4}, yeyeRow: 0, eyeGlyph: 'o', nose: -1},
-	{name: "Hedgehog", coat: "charcoal",
-		note: "A profile animal: one eye, a snout, a jagged back. Reads best small and still, which is what the resting state is. Hoglets as the litter.",
+	{Name: "Hedgehog", Coat: "charcoal",
+		Note: "A profile animal: one eye, a snout, a jagged back. Reads best small and still, which is what the resting state is. Hoglets as the litter.",
 		body: hedgehogBody, young: hoglet, eyes: [2]int{8, -1}, eyeRow: 4, yeyes: [2]int{4, -1}, yeyeRow: 2, eyeGlyph: 'o', nose: 11, noseRow: 4},
-	{name: "Otter", coat: "taupe",
-		note: "Water-native for the shore: sits upright, the tail along the sand. Pups as the litter, and they would swim where the kittens do. Taupe, because the honest brown is the banned orange.",
+	{Name: "Otter", Coat: "taupe",
+		Note: "Water-native for the shore: sits upright, the tail along the sand. Pups as the litter, and they would swim where the kittens do. Taupe, because the honest brown is the banned orange.",
 		body: otterBody, young: pup, eyes: [2]int{4, 9}, eyeRow: 1, yeyes: [2]int{2, 4}, yeyeRow: 0, eyeGlyph: 'o', nose: -1},
 }
 
@@ -82,26 +83,27 @@ func drawAnimal(near *canvas.Layer, rows []string, w, h int, name string, coat t
 	}
 }
 
-// companionFrame is the shore at an hour with one animal where the cat sits
-// and two of its young where the kittens sit, laid out exactly as live.go
+// Laid out exactly as live.go
 // lays the cat out at 80x24: four columns off the right edge, two rows off
 // the bottom, the litter growing leftward.
-func companionFrame(a *animal, tod, t float64, seed int64) *canvas.Canvas {
+// CompanionFrame is the shore at an hour with one animal where the cat sits
+// and two of its young where the kittens sit.
+func CompanionFrame(a *Animal, tod, t float64, seed int64) *canvas.Canvas {
 	return shoreFrame(tod, t, seed, func(c *canvas.Canvas, sh *scape.Shore) {
 		near := c.Near()
-		coat := companion.Coats[a.coat]
+		coat := companion.Coats[a.Coat]
 		px, py := c.W-12-4, c.H-2-7
-		drawAnimal(near, a.body, 24, 28, a.name, coat, a.eyes, a.eyeRow, a.eyeGlyph, a.nose, a.noseRow, px, py, true)
+		drawAnimal(near, a.body, 24, 28, a.Name, coat, a.eyes, a.eyeRow, a.eyeGlyph, a.nose, a.noseRow, px, py, true)
 		ky := py + 7 - 4
 		for i := 0; i < 2; i++ {
 			x := px - 1 - 6 - i*7
-			drawAnimal(near, a.young, 12, 16, a.name+" young", coat, a.yeyes, a.yeyeRow, 'o', -1, 0, x, ky, i == 0)
+			drawAnimal(near, a.young, 12, 16, a.Name+" young", coat, a.yeyes, a.yeyeRow, 'o', -1, 0, x, ky, i == 0)
 		}
 	})
 }
 
-// catFrame is the reference: the shipped cat and two real kittens.
-func catFrame(tod, t float64, seed int64) *canvas.Canvas {
+// CatFrame is the reference: the shipped cat and two real kittens.
+func CatFrame(tod, t float64, seed int64) *canvas.Canvas {
 	return shoreFrame(tod, t, seed, func(c *canvas.Canvas, sh *scape.Shore) {
 		cat := companion.NewCat()
 		cat.FaceLeft(true)
