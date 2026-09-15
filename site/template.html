@@ -137,6 +137,18 @@ ul.feats li::before{content:"\00A0";position:absolute;left:0;top:.28em;width:1ch
 ul.feats b{color:var(--i)}
 .clip img{display:block;width:100%;height:auto;border:1px solid var(--ln);border-radius:6px}
 .foot{margin-top:70px;color:var(--d);font-size:13px;border-top:1px solid var(--ln);padding-top:18px}
+/* THE WAIT: Claude Code's own idle screen, redrawn in the page's face. It is
+   the one frame on the page that is not the renderer, and the empty rows are
+   the point: this is everything the terminal tells you while it works. */
+.wait pre{margin:0;padding:calc(var(--lh)*.5) 2ch calc(var(--lh)*.75);white-space:pre;overflow-x:auto;color:var(--dd);font-size:13.5px;line-height:var(--lh)}
+.wait .sp{color:var(--warm)}
+.wait .t{color:var(--d)}
+.wait .pr{color:var(--warm)}
+.after{margin-top:var(--lh)}
+ul.feats.lead{margin-top:0;gap:var(--lh)}
+ul.feats.lead li{font-size:15px}
+.grid2+.grid2{margin-top:calc(var(--lh)*1.5)}
+.sub.wide{max-width:74ch}
 {{fxcss}}
 @media (prefers-reduced-motion:reduce){.cover .sea pre{animation:none}.cover .sea pre:first-child{opacity:1}.cur{animation:none}html{scroll-behavior:auto}}
 </style>
@@ -159,6 +171,21 @@ ul.feats b{color:var(--i)}
 
 <main>
 
+<div class="sec" data-title="The wait"><div class="boxtop" aria-hidden="true"></div></div>
+<section id="wait">
+<div class="win wait" data-title="claude"><div class="boxtop" aria-hidden="true"></div>
+  <div class="stage"><pre><span class="pr">&gt;</span> refactor the auth module and run the tests
+
+<span class="sp" id="spin">&#10035;</span> Thinking&hellip; <span class="t">(esc to interrupt &middot; <span id="spin-t">2m 14s</span>)</span>
+
+
+
+</pre></div>
+  <div class="boxbot" aria-hidden="true"></div>
+</div>
+<p class="sub after">You send a prompt and the terminal goes quiet. A spinner, a verb that changes every few seconds, and nothing else: not whether this is a five-second read or a five-minute refactor, not that a command just failed, not how much context is left before it compacts. So you tab away, and come back late.</p>
+</section>
+
 <section id="top">
 <h1>Cozy ASCII scenes that react to your agent while it works<span class="cur"></span></h1>
 
@@ -168,12 +195,16 @@ ul.feats b{color:var(--i)}
   <div class="stage" aria-hidden="true"><div class="fx" id="hero-fx"></div></div>
   <div class="boxbot" aria-hidden="true"></div>
 </div>
-<p class="cap">One whole session. The agent works in the top rows exactly as it always has; underneath, the sea comes up with the work and settles when it stops, a crablet arrives for each subagent and walks into the water when that one reports back, stars light as the plan gets done, and the moon sinks as the context fills. The day turns underneath the whole time, on your real clock &mdash; which is why nothing else in the scene has to carry the hour.</p>
+<p class="cap">One session, sped up. The agent runs untouched in the top rows. Everything under it is drawn from what it is doing.</p>
+</section>
 
-<div class="cmd" data-title="install"><span class="pr">$</span> go install github.com/donlucasx/xscapes@latest
-<span class="pr">$</span> xscapes install claude --apply   <span class="c"># writes its hooks, after a backup</span>
-<span class="pr">$</span> xscapes claude                   <span class="c"># the agent on top, the scape underneath</span>
-<span class="pr">$</span> xscapes inside &lt;any command&gt;      <span class="c"># anything else, hosted the same way</span></div>
+<div class="sec" data-title="While you wait"><div class="boxtop" aria-hidden="true"></div></div>
+<section>
+<ul class="feats lead">
+<li><b>Leave the room.</b> A solid balloon and one sound when it needs an answer, a dotted balloon and a different sound when it is done. Silent while it works, so the two you hear are the two that matter.</li>
+<li><b>Know what it is doing without reading the screen.</b> The sea says how hard it is working, the sand says what it just did, a crablet stands for each subagent it has running, and a failed command shows on the companion's face until your next prompt.</li>
+<li><b>See the context running out before it compacts.</b> The moon thins and sinks as the context fills, and from 40% used what is left is written under it as a number.</li>
+</ul>
 </section>
 
 <div class="sec" data-title="Read it at a glance"><div class="boxtop" aria-hidden="true"></div></div>
@@ -187,10 +218,21 @@ ul.feats b{color:var(--i)}
 <p class="reads" id="st-note"></p>
 </section>
 
-<div class="sec" data-title="Pick your companion"><div class="boxtop" aria-hidden="true"></div></div>
-<section class="grid2">
+<div class="sec" data-title="How you get it"><div class="boxtop" aria-hidden="true"></div></div>
+<section>
+<p class="sub wide">Three commands. No app, no tab, no account, no tmux. It runs in the same window as the agent, which is the point: you never look away from the work to see the work.</p>
+<div class="cmd" data-title="install"><span class="pr">$</span> go install github.com/donlucasx/xscapes@latest
+<span class="pr">$</span> xscapes install claude --apply   <span class="c"># writes its hooks, after a backup</span>
+<span class="pr">$</span> xscapes claude                   <span class="c"># the agent on top, the scape underneath</span>
+<span class="pr">$</span> xscapes inside &lt;any command&gt;      <span class="c"># anything else, hosted the same way</span></div>
+</section>
+
+<div class="sec" data-title="A layer, not a screen"><div class="boxtop" aria-hidden="true"></div></div>
+<section>
+<p class="sub wide">The shoreline is the first scape, not the product. Underneath it is a small event protocol &mdash; session, prompt, tool, error, needs input, done, compact &mdash; and a thin adapter for each agent: Claude Code arrives wired through its own hooks, and anything else that runs in a terminal is hosted the same way. Any landscape that provides six things carries all of it unchanged: a light, a sky, something that moves with the work, a surface, somewhere the work piles up, and someone living in it.</p>
+<div class="grid2">
 <div>
-<p class="sub">Hero the crab ships as the default. The cat came first, and is one command away &mdash; a scape that is already running picks the change up on its next frame, without restarting your session.</p>
+<p class="sub">Hero the crab ships as the default. The cat came first and is one command away; a running scape picks the change up on its next frame.</p>
 <div class="tabs" role="tablist" id="sw-tabs"></div>
 <div class="cmd"><span class="pr">$</span> xscapes companion cat</div>
 </div>
@@ -198,29 +240,20 @@ ul.feats b{color:var(--i)}
 <div class="win" data-title=" " data-titleid="sw-name"><div class="boxtop" aria-hidden="true"></div>
 <div class="stage" aria-hidden="true"><div class="fx sw-fx" id="sw-fx"></div></div><div class="boxbot" aria-hidden="true"></div></div>
 </div>
-</section>
-
-<div class="sec" data-title="More than one shore"><div class="boxtop" aria-hidden="true"></div></div>
-<section>
-<p class="sub">A landscape only needs six things to carry the whole system: a light, a sky, something that moves with the work, a surface, somewhere the work piles up, and someone living in it. So there is no reason to stop at one.</p>
-<div class="grid2">
-<div><div class="win" data-title="the rainy window &middot; with the cat"><div class="boxtop" aria-hidden="true"></div><div class="stage" aria-hidden="true"><div class="fx" data-cols="80">{{scaperain}}</div></div><div class="boxbot" aria-hidden="true"></div></div><p class="cap"><b>The rainy window, with the cat.</b> Rain on the glass carries the work and comes down harder the busier your agent gets. The city behind it carries the hour, and the sill is where the day's work settles.</p></div>
-<div><div class="win" data-title="the aquarium &middot; with the frog"><div class="boxtop" aria-hidden="true"></div><div class="stage" aria-hidden="true"><div class="fx" data-cols="80">{{scapeaq}}</div></div><div class="boxbot" aria-hidden="true"></div></div><p class="cap"><b>The aquarium, with the frog.</b> More fish come out as the work picks up, the tank's lamp is the light, and the gravel is where it settles. Water is the work again, for the same reason it is on the shore.</p></div>
 </div>
+<div class="grid2">
+<div><div class="win" data-title="the rainy window &middot; with the cat"><div class="boxtop" aria-hidden="true"></div><div class="stage" aria-hidden="true"><div class="fx" data-cols="80">{{scaperain}}</div></div><div class="boxbot" aria-hidden="true"></div></div><p class="cap"><b>The rainy window, with the cat.</b> Rain on the glass is the work, and comes down harder the busier your agent gets. The city behind it carries the hour.</p></div>
+<div><div class="win" data-title="the aquarium &middot; with the frog"><div class="boxtop" aria-hidden="true"></div><div class="stage" aria-hidden="true"><div class="fx" data-cols="80">{{scapeaq}}</div></div><div class="boxbot" aria-hidden="true"></div></div><p class="cap"><b>The aquarium, with the frog.</b> More fish come out as the work picks up, the tank's lamp is the light, and the gravel is where it settles.</p></div>
+</div>
+<p class="claim after">One rule holds it together: activity, subagents, finished work and context left each own their own part of the picture, and nothing shares a channel. That is why a glance is enough.</p>
 </section>
 
-<div class="sec" data-title="Underneath, a protocol"><div class="boxtop" aria-hidden="true"></div></div>
+<div class="sec" data-title="Still good in a month"><div class="boxtop" aria-hidden="true"></div></div>
 <section>
-<p class="sub">The scene is one implementation. Underneath it is a small event protocol and a thin adapter for each agent, which is the part that outlives the shoreline.</p>
-<ul class="feats">
-<li><b>Any agent, any terminal.</b> Claude Code arrives already wired. Anything that can run one command can drive the scene.</li>
-<li><b>One fact, one place.</b> Activity, subagents, finished work, context left: each owns its own part of the picture, and nothing shares a channel. That rule is why a glance is enough.</li>
-<li><b>Two knocks you can tell apart from across the room.</b> A solid balloon and a chime when it needs you, a dotted one and a low note when it is done. Silent while it works.</li>
-<li><b>The same picture everywhere.</b> It draws in the 256 colours every terminal agrees on, so what you see here is what you get.</li>
-</ul>
+<p class="sub wide">It is not a loop. The sea is your agent's work and the sand is its last few actions, so no two sessions draw the same picture, and the sky runs on your clock. It asks nothing of you: no keys, no score, nothing to feed. And the agent's own output reaches your terminal byte for byte, so it can never get in the way of the work it is drawing.</p>
 </section>
 
-<p class="foot">Every frame on this page is the real renderer folding the events a Claude Code session emits &mdash; text, not video, drawn by the same code that runs in your terminal. Nothing is posed. <a href="https://github.com/donlucasx/xscapes">github.com/donlucasx/xscapes</a> &middot; MIT</p>
+<p class="foot">Every scene on this page is the real renderer folding the events a Claude Code session emits &mdash; text, not video, drawn by the same code that runs in your terminal. Nothing is posed. <a href="https://github.com/donlucasx/xscapes">github.com/donlucasx/xscapes</a> &middot; MIT</p>
 </main>
 
 <script>{{fxjs}}</script>
@@ -378,6 +411,14 @@ ul.feats b{color:var(--i)}
     var clone = cover.cloneNode(true);
     clone.style.animation = "none"; clone.style.opacity = "1"; clone.style.position = "static";
     far.appendChild(clone);
+  }
+
+  // ---- the wait: the spinner turns and the clock counts ------------------
+  var spin = document.getElementById("spin"), spinT = document.getElementById("spin-t");
+  if(spin && spinT && !reduce){
+    var glyphs = ["\u273b","\u2733","\u2736","\u273d","\u2722","\u00b7"], g = 0, secs = 134;
+    setInterval(function(){ g = (g + 1) % glyphs.length; spin.textContent = glyphs[g]; }, 220);
+    setInterval(function(){ secs++; spinT.textContent = Math.floor(secs/60) + "m " + (secs%60) + "s"; }, 1000);
   }
 
   // ---- the rail, and the drift ------------------------------------------
