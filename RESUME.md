@@ -4,36 +4,40 @@
 
 ```
 cd ~/Documents/claude/xscapes/ and read CLAUDE.md (the brief, authoritative)
-and RESUME.md before responding. Session 31 rebuilt the SUBMISSION PAGE from
-scratch, on his direction; he published and pushed it himself 2026-09-14
-19:24 (gh-pages afd23a2 = site: 4336fbf). Session 32 found the Commons
-paste kit cannot carry a 5.5 MB single-file page and rewrote the brief as a
-proxy Worker (site/commons-brief.md, ~/Desktop/xscapes-commons/).
-The page is no longer GIFs: every animation is real text frames embedded in a
-single self-contained file, 5.1MB of clips became ~465KB gzipped, and the whole
-page sits on a character grid. Preview (private, mobile-friendly):
-https://claude.ai/code/artifact/801c9f09-e722-4368-86dd-4aec62ddc6d8
+and RESUME.md before responding. Session 32 (09-14 into 09-15) rebuilt the
+SUBMISSION PAGE as nine beats on his rulings, animated the rainy window,
+redrew the THIRD SCAPE (a mountain vista with the owl) from his references
+and drew the owl three rounds until he picked. HEAD af41078 + the wrap
+commit: tree clean, suite 10/10 + vet + fmt green, ~21 COMMITS UNPUSHED,
+and gh-pages still serves the 09-14 build -- NONE of session 32 is live.
+Page preview (private): https://claude.ai/artifact/GsALdkkvK48pL7cWm3SWcg
+Vista options page:     https://claude.ai/artifact/N5Cvri266YgbtsufPXhiGV
 Skim origin-chat.md only if you need the why; ignore ideas.md.
 Tell me where we left off, then pick up from the NEXT queue.
 
-⏰ COMMONS CLOSES 2026-09-17. Publishing is one command and is his call.
+⏰ COMMONS CLOSES 2026-09-17. Publishing is two commands and is his call;
+the Commons entry is a proxy Worker (site/commons-brief.md), unverified.
 
 Five things about how to work on this, all paid for:
 build the instrument before trusting the picture; measure the RENDERED frame
 rather than what the source says it should do; go and count the real event log
 instead of reasoning about it; A MEASUREMENT AT ONE SEED IS NOT A MEASUREMENT;
 and when a fix makes the number worse, say so and put it back.
-⚠ s31 added two: WHEN A VISUAL IS WRONG, INSTRUMENT THE PIPELINE, NOT THE API
-(the companion's ladder tested perfect at every width while the thing on the
-page sat at rung 0 -- because the POSE was wrong, not the rung). And THE COUNT
-IS NOT THE VERDICT: I read "9 packages ok" and committed a red suite.
+⚠ s31 added two: WHEN A VISUAL IS WRONG, INSTRUMENT THE PIPELINE, NOT THE API,
+and THE COUNT IS NOT THE VERDICT (read failures, never a tally).
+⚠ s32 added: LOOK AT THE RENDERED FRAME. Headless Chrome is at
+/Applications/Google Chrome.app and `go run ./notes/vistashots <dir>` makes
+frame pages to screenshot; every visual defect this session was seen that
+way and none in a text dump. And A STILL CANNOT SHOW A SIGN ERROR IN A RATE:
+the rain fell UPWARDS for ten days and nobody could tell until it moved.
 Do NOT drive Terminal.app (osascript, System Events) without asking me first.
 ```
 
-## ▶ NEXT (session 31 left it here)
+## ▶ NEXT (session 32 left it here)
 
-**0. ⏰ THE DEADLINE IS THE QUEUE. Commons closes 09-17.** ~~Publish~~ **DONE by him 2026-09-14 19:24**
-(gh-pages `afd23a2`, main pushed). **What remains is the Commons app, and the plan changed in s32:** the
+**0. ⏰ THE DEADLINE IS THE QUEUE. Commons closes 09-17.** The 09-14 build is live (gh-pages `afd23a2`); ⚠ **NONE OF SESSION 32 IS LIVE** (nine beats, vista,
+rain). Publish = `go run . -site site && sh site/publish.sh`, then `gh auth switch --user donlucasx && git
+push origin main` (~21 commits). **What remains is the Commons app, and the plan changed in s32:** the
 kit since s18 pasted a 74 KB `index.html` into the Commons builder; the page is now ONE 5.5 MB file
 (465 KB gzipped), so it cannot be pasted, and the old kit's clip URLs 404. **The entry is a Commons
 Worker that proxies https://donlucasx.github.io/xscapes/ verbatim**, iframe fallback if the builder
@@ -119,7 +123,10 @@ animal is the companion's job or nobody's.
   rejected; round 2 was four cell-level silhouettes. Still in the code as options: five owlet looks, five
   perches (mound · upper branch · lower branch over the lake · stump · fence). Sheets in the scratchpad
   `shots/owl-sheet*.png`. ⏭ **NEXT for the owl: its five states** (resting / working / needs-you / done /
-  worried) and the owlets' arrive-and-leave, so the vista can be a real scape and not only a clip. ⚠ Flagged for him: the lake is scenery (does not react);
+  worried) and the owlets' arrive-and-leave, so the vista can be a real scape and not only a clip. ⚠ That is a PRODUCT change, not a study one:
+  `internal/scenes` painters take (tod, t, level); a shipped scape implements `scape.Scape` off the reducer
+  (level, needs-you / done / worried on the owl, owlets for subagents, stars, the moon's context) and
+  `live.go` picks it. Half a day to a day. ⚠ Flagged for him: the lake is scenery (does not react);
   no clouds (weather deferred). ⚠ Canvas rule met for the first time: a plain `Plot` glyph over a
   quarter-cell background LOSES to the quarters (the owl's eye row vanished under the shoreline); keep
   whole cells under sprites. Not yet drawn: the owl's five states and its litter (owlet bitmap exists).
@@ -133,7 +140,8 @@ animal is the companion's job or nobody's.
   page now -- it loads nothing beside itself. Delete?
 - **Section order.** "Pick your companion" and "more than one shore" are their own sections rather
   than part of the five-state legend; his earlier ask was features sorted by UX relevance.
-- **The protocol section copy** -- he has not read it.
+- ~~The protocol section copy~~ merged into *A layer, not a screen* (s32); he has looked at the page
+  (*"looking great"*).
 - **`assets/deck/`** -- still his parked draft. Same treatment, or leave it?
 
 **6. Closed this session, do not reopen:** the tide's step is exempted by name and mutation-proven ·
@@ -146,9 +154,10 @@ overriding my recommendation).
 
 - `site/template.html` -- the page. Markers `{{cover}}`, `{{covermobile}}`, `{{fxjs}}`, `{{fxcss}}`,
   `{{scaperain}}`, `{{scapeaq}}` are filled by `sitePage` in `site.go`.
-- `internal/scenes/` -- the study painters (five scenes, five companion candidates, and `Forest`,
-  the three mountain options), importable since 2026-09-15. `notes/scapestudy` and `notes/forest` are
-  page writers over it.
+- `internal/scenes/` -- the study painters (five scenes, five companion candidates, `Forest` = the vista
+  in two variants, `owl.go` = the owl, its owlets and its perches), importable since 2026-09-15.
+  `notes/scapestudy` and `notes/forest` are page writers over it; **`notes/vistashots` renders frame pages
+  to screenshot with headless Chrome -- the way to LOOK.**
 - `siteframes.go` -- which animations are embedded and how much they cost. `allFX` is the one list;
   `sceneClips` renders a painter as a loop, `gifFrames` renders a shore session.
   `TestWhatTheEmbeddedFramesCost` prints every clip and FAILS over 900KB gzipped.

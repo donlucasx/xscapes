@@ -2,42 +2,47 @@
 
 *(Renamed end to end on 2026-09-03: directory, env vars, state path and hook marker. Two names are kept on purpose and are not leftovers -- `internal/envx` still reads `ASCIISCAPES_*` and warns, and `install.go` still RECOGNISES the `# asciiscapes:v1` marker so the hooks it wrote before the rename can be found and removed.)*
 
-> **Session 32 (2026-09-14 into 09-15), IN PROGRESS.** ⭐ **THE PAGE ARGUES NOW: nine beats on his five
-> rulings** — *The problem* opens with Claude Code's own spinner over empty rows · *While you wait* says
-> what it buys you (the cues, the context, and what it is doing; "never miss a failure" demoted to a
-> clause at his word) · *How you get it* carries the install block and the Fit line · *A layer, not a
-> screen* merges companion + scapes + protocol, two dividers gone · *Still good in a month* is the first
-> sentence about repeatability. ⚠ **No truecolor claim: the product ships the cube on every terminal by
-> his 09-04 ruling, and the page's clips being truecolor made "what you see here is what you get" an
-> overstatement — bullet dropped.** Preview https://claude.ai/artifact/GsALdkkvK48pL7cWm3SWcg. **Not
-> published; his.**
-> ⭐ **THE RAINY WINDOW IS ANIMATED** (`875ea8a`): the study painters moved to `internal/scenes`, a
-> clip can now be a painter looped (24 frames, seam = 5 cells, 17 KB gz). ⭐ **THE MOUNTAIN VISTA WITH THE OWL,
-> REDRAWN FROM HIS FIVE REFERENCES after *"the scape reads pretty 'basic'"*** — three ranges receding by
-> haze, a jagged massif at QUARTER-CELL resolution with snow and alpenglow, a lake, a meadow, black pines
-> framing, the owl on a mound; two variants, **A wind / B fire — HIS RULING: A** (*"love this!"*):
-> https://claude.ai/artifact/N5Cvri266YgbtsufPXhiGV. **THE VISTA IS ON THE PAGE as a clip** (501 KB gz).
-> ⭐ **THE OWL, three rounds on his notes, PICKED: the barn owl on the mound with egg owlets.** Round 1
-> (curves) was *"not simpler, not adorable"*; round 2 was four cell-level silhouettes in two colours.
-> ⚠ Three rules paid for: full sprite cells paint as GROUND (block glyphs leave a rule between rows) ·
-> every sprite cell brings its own ground (a split background wins over a plain glyph; the study owl lost
-> its eyes and feet to the shoreline's quarter-cells) · coats are CUBE ENTRIES that survive both paths
-> (taupe = grey as ground, orange as glyph). Headless Chrome at `/Applications/Google Chrome.app`
-> screenshots a frame page; every one of these was seen that way, not inferred.
-> ⚠ Login flipped to donlucasx mid-session (flip 8); the s32 nine-beats proposal page is unreachable
-> from it, source in the scratchpad. Earlier in the session, resumed on the record and found it one step stale:
-> **he published and pushed himself at 19:24, four minutes after the wrap** (gh-pages `afd23a2` =
-> `site: 4336fbf`, `origin/main` = `4336fbf`; the live page's hash equals `site/index.html`, verified
-> by fetch). HEAD's binary is INSTALLED (inode 85539368, stamped `4336fbf`, clean tree). Two of four
-> running scapes (this window and auctions) hold the s30 build; tyastie and Validators still hold older
-> ones. `gofmt -l .` had flagged one study file since 09-07; formatted.
-> ⚠⚠ **THE COMMONS KIT CANNOT CARRY THE NEW PAGE.** The plan since s18 was to paste `index.html` into
-> the Commons builder verbatim; that was a 74 KB shell loading 15 clips by absolute URL. The page is now
-> ONE 5.5 MB file, and those clip URLs 404 since `publish.sh` stopped shipping `anim/`. **The entry has
-> to be a Commons Worker that PROXIES https://donlucasx.github.io/xscapes/** (iframe as the fallback);
-> the page loads nothing by relative path, so it renders identically from any origin.
-> `site/commons-brief.md` and the Desktop kit are rewritten for that. **Unverified until he runs it:
-> the builder is login-gated.** ⏰ **Commons closes 09-17.**
+> **Session 32 (2026-09-14 into 09-15), WRAPPED.** HEAD `af41078` + the wrap commit, tree clean, suite
+> 10/10 + vet + fmt green. ⚠⚠ **~21 COMMITS UNPUSHED, and gh-pages still serves the 09-14 build: NONE of
+> this session is live.** ⏰ **Commons closes 09-17.** Publish = `go run . -site site && sh
+> site/publish.sh`; push = `gh auth switch --user donlucasx && git push origin main`. Both his.
+>
+> ⭐ **THE PAGE ARGUES NOW: nine beats on his five rulings.** *The problem* (his title: *"titles should
+> be very clear"*) opens with Claude Code's own spinner over empty rows · *While you wait* = the cues, the
+> context, what it is doing ("never miss a failure" demoted to a clause at his word) · *How you get it*
+> carries the install block and the Fit line · *A layer, not a screen* merges companion + scapes + protocol
+> · *Still good in a month* is the first repeatability sentence. ⚠ **No truecolor claim**: the product
+> ships the cube on every terminal (his 09-04 ruling), and the page's clips being truecolor made "what you
+> see here is what you get" an overstatement, so the bullet went. Preview
+> https://claude.ai/artifact/GsALdkkvK48pL7cWm3SWcg.
+> ⭐ **THE RAINY WINDOW IS ANIMATED**: the study painters moved to `internal/scenes` (byte-identical
+> still); a page clip can be a painter looped (24 frames, seam = 5 cells). ⚠ **AND IT FELL UPWARDS** until
+> his note -- a +t shift the still had carried for ten days. Fixed, measured 212 of 224 streaks one row
+> lower. **A still cannot show a sign error in a rate.**
+> ⭐⭐ **THE THIRD SCAPE: A MOUNTAIN VISTA WITH THE OWL, his pick A (the wind is the work, the fire the
+> night light), ON THE PAGE as a clip** (501 KB gz). The first sketch drew *"the trees, not so much...
+> reads pretty 'basic'"* and five references. Redrawn from what they share: three ranges receding by haze,
+> a jagged massif at QUARTER-CELL resolution (`SetBGQuad`, first terrain use) with snow in the gullies and
+> alpenglow, a lake taking the sky, a meadow, black pines framing the left (tiered to the ground after
+> *"why do the trees cut abruptly"*). Options page https://claude.ai/artifact/N5Cvri266YgbtsufPXhiGV.
+> ⭐ **THE OWL, THREE ROUNDS ON HIS NOTES, PICKED: the barn owl on the mound with egg owlets**
+> (`internal/scenes/owl.go`). Round 1 was *"not simpler, not adorable"* and one blob three ways; round 2
+> was four cell-level silhouettes in two colours. ⚠ **Three rules paid for**: full sprite cells paint as
+> GROUND (a block glyph leaves a rule between rows) · every sprite cell brings its own ground (a split
+> background wins over a plain glyph; the study owl lost its eyes and feet to the shoreline's
+> quarter-cells) · coats are CUBE ENTRIES that survive both paths (taupe = grey as ground, orange as
+> glyph; brown 175,135,95 + pale 255,215,175 survive). ⚠ *"B for the subs"* was read as the sheet's
+> second row, the egg; the chick is `OwletPick = 1` if he meant that.
+> ⭐ **HOW ALL OF IT WAS SEEN: headless Chrome** at `/Applications/Google Chrome.app` screenshots a frame
+> page; `go run ./notes/vistashots <dir>` makes the pages. Every defect above was seen, not inferred.
+> ⚠ **THE COMMONS KIT CANNOT CARRY THE PAGE** (5.5 MB single file; the old clip URLs 404): the brief is a
+> proxy Worker now (`site/commons-brief.md`, `~/Desktop/xscapes-commons/`), unverified until he runs the
+> login-gated builder. ⚠ Login flip 8 mid-session; the nine-beats proposal page is unreachable from
+> donlucasx (source in the scratchpad). HEAD's binary was installed at the start (`4336fbf`); nothing in
+> the product's own code changed since, only site and study code.
+> ⏭ **NEXT: the owl's five states + owlets arriving and leaving, so the vista becomes a real scape** (a
+> product change: implement `scape.Scape` off the reducer; half a day to a day) · his per-section animated
+> backgrounds idea · the last column of the balance fix · publish.
 
 > **Session 31 (2026-09-13 into 09-14), WRAPPED. ⭐⭐ THE SUBMISSION PAGE IS REBUILT FROM SCRATCH
 > ON HIS DIRECTION, AND IT IS NO LONGER MADE OF PICTURES.** HEAD `68bf89c`, tree clean, suite 10/10

@@ -80,5 +80,5 @@ func main() {
 	}
 	scenes.OwletPick, scenes.OwletCount = olet, 2
 	os.WriteFile(dir+"/owlets.html", []byte(b), 0o644)
-	fmt.Println(dir + "/vista.html", dir+"/owls.html", dir+"/owlets.html")
+	fmt.Println(dir+"/vista.html", dir+"/owls.html", dir+"/owlets.html")
 }
