@@ -3207,3 +3207,10 @@ leaning either on p0 (good) but would love to see p3 a bit more polished, the po
 face, filled amber beak with the V), **on the mound in the meadow**, **egg owlets with a pale belly on the
 grass** ("B" read as the second row of the sheet he had open; the chick is `OwletPick = 1` if he meant
 that). Five owlet looks and five perches remain in the code as options.
+**HIS TWO NOTES OFF THE PAGE, verbatim:** *"looking great- any reason why the trees cut abruptly on the
+left edge?"* ⇒ the pine silhouette's width was CAPPED, so below the cap the tree was a tower with a wall
+one cell inside the frame; it widens to its base in tiers now, and the frame's edge cuts it. *"also, just
+noticed that on the 'rainy window' the rain is falling upwards"* ⇒ the pattern was shifted by +t, which
+moves a drop UP a row a frame; the still had carried the sign for ten days. Fixed and MEASURED: 212 of 224
+streaks reappear one row lower in the next frame, 33 higher. ⚠ **A still cannot show a sign error in a
+rate. The moment a channel moves, look at which way.**

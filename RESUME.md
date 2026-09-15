@@ -95,7 +95,8 @@ because the sand, the litter and the tests all locate the companion through Draw
 animal is the companion's job or nobody's.
 
 **4. Both his asks of 2026-09-15, and one is DONE:**
-- ~~**Animate the rainy window.**~~ **DONE `875ea8a`.** The painters moved to `internal/scenes`
+- ~~**Animate the rainy window.**~~ **DONE `875ea8a`** (⚠ and it fell UPWARDS until his note of 09-15 —
+  the still had carried a +t shift for ten days; fixed `1ad2461`, measured 212 of 224 streaks one row lower). The painters moved to `internal/scenes`
   (`25dfb79`); `sceneClips` in `siteframes.go` renders a painter as a seamless loop (24 frames at 6 fps,
   the work on one cosine 0.1→0.9→0.1; the seam differs in 5 cells, all the cat's breath). 17 KB gzipped.
   The aquarium is still a still and can follow the same way once its loop is designed.
