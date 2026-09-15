@@ -5,9 +5,10 @@
 ```
 cd ~/Documents/claude/xscapes/ and read CLAUDE.md (the brief, authoritative)
 and RESUME.md before responding. Session 31 rebuilt the SUBMISSION PAGE from
-scratch, on his direction, and left HEAD 68bf89c: tree clean, suite 10/10 +
-vet + fmt green, NINE COMMITS UNPUSHED, gh-pages untouched. The live page is
-still the September 8 one.
+scratch, on his direction; he published and pushed it himself 2026-09-14
+19:24 (gh-pages afd23a2 = site: 4336fbf). Session 32 found the Commons
+paste kit cannot carry a 5.5 MB single-file page and rewrote the brief as a
+proxy Worker (site/commons-brief.md, ~/Desktop/xscapes-commons/).
 The page is no longer GIFs: every animation is real text frames embedded in a
 single self-contained file, 5.1MB of clips became ~465KB gzipped, and the whole
 page sits on a character grid. Preview (private, mobile-friendly):
@@ -31,11 +32,20 @@ Do NOT drive Terminal.app (osascript, System Events) without asking me first.
 
 ## ▶ NEXT (session 31 left it here)
 
-**0. ⏰ THE DEADLINE IS THE QUEUE. Commons closes 09-17 and the live page is still September 8.**
-Publishing is his call and one command:
+**0. ⏰ THE DEADLINE IS THE QUEUE. Commons closes 09-17.** ~~Publish~~ **DONE by him 2026-09-14 19:24**
+(gh-pages `afd23a2`, main pushed). **What remains is the Commons app, and the plan changed in s32:** the
+kit since s18 pasted a 74 KB `index.html` into the Commons builder; the page is now ONE 5.5 MB file
+(465 KB gzipped), so it cannot be pasted, and the old kit's clip URLs 404. **The entry is a Commons
+Worker that proxies https://donlucasx.github.io/xscapes/ verbatim**, iframe fallback if the builder
+reserves `/`. The page loads nothing by relative path (one Google Fonts link, no `src`, no fetch), so it
+renders identically from any origin. Brief rewritten: `site/commons-brief.md`; kit:
+`~/Desktop/xscapes-commons/` (`brief.md` + `message.md`; the stale cat `index.html` is gone).
+**Unverified until he runs it: the builder is login-gated.** Fresh chat, Default · Quick, not Expert →
+paste `message.md` → publish public → Your entry → Submit → screenshot. A gh-pages republish then
+reaches the entry inside 10 minutes with no Commons step:
 ```
 go run . -site site && sh site/publish.sh     # force-pushes gh-pages, one file
-gh auth switch --user donlucasx && git push origin main   # 9 commits waiting
+gh auth switch --user donlucasx && git push origin main
 ```
 ⚠ `gh auth`'s active account is host-global and flips back on its own. Switch immediately before
 every push. The account is **donlucasx** (CLAUDE.md said `donlucas`, which does not exist; corrected).

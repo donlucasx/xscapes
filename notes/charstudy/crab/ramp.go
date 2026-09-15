@@ -30,34 +30,34 @@ func rampSweep(seed int64) {
 	bad, total := 0, 0
 	worst, worstTod, worstH := 0, 0.0, 0
 	for _, h := range []int{20, 24, 26, 28, 30, 32, 34, 36, 40, 44, 47, 50} {
-	for i := 0; i < 48; i++ {
-		tod := float64(i) / 48
-		c := canvas.New(w, h, canvas.AlphaFar, canvas.AlphaMid, canvas.AlphaNear)
-		sh := scape.NewShore(seed, false)
-		sh.MoonX = 0.28
-		act := scape.Activity{Working: true, Level: 0.55, TimeOfDay: tod, ContextUsed: 0.3}
-		for k := 0; k < 12; k++ {
-			sh.Update(c, 3+float64(k)/40, act)
-		}
-		var ls []float64
-		for y := 0; y < sh.SandTop(); y++ {
-			_, _, bg := c.ResolveAt(3, y, term.Profile256)
-			ls = append(ls, luma(bg))
-		}
-		n := 0
-		for y := 1; y < len(ls)-1; y++ {
-			if (ls[y] < ls[y-1] && ls[y] < ls[y+1]) || (ls[y] > ls[y-1] && ls[y] > ls[y+1]) {
-				n++
+		for i := 0; i < 48; i++ {
+			tod := float64(i) / 48
+			c := canvas.New(w, h, canvas.AlphaFar, canvas.AlphaMid, canvas.AlphaNear)
+			sh := scape.NewShore(seed, false)
+			sh.MoonX = 0.28
+			act := scape.Activity{Working: true, Level: 0.55, TimeOfDay: tod, ContextUsed: 0.3}
+			for k := 0; k < 12; k++ {
+				sh.Update(c, 3+float64(k)/40, act)
+			}
+			var ls []float64
+			for y := 0; y < sh.SandTop(); y++ {
+				_, _, bg := c.ResolveAt(3, y, term.Profile256)
+				ls = append(ls, luma(bg))
+			}
+			n := 0
+			for y := 1; y < len(ls)-1; y++ {
+				if (ls[y] < ls[y-1] && ls[y] < ls[y+1]) || (ls[y] > ls[y-1] && ls[y] > ls[y+1]) {
+					n++
+				}
+			}
+			total++
+			if n > 0 {
+				bad++
+			}
+			if n > worst {
+				worst, worstTod, worstH = n, tod, h
 			}
 		}
-		total++
-		if n > 0 {
-			bad++
-		}
-		if n > worst {
-			worst, worstTod, worstH = n, tod, h
-		}
-	}
 	}
 	fmt.Printf("SWEEP: 48 half-hours x 12 scape heights at 126 wide\n")
 	fmt.Printf("  %d of %d frames contain a row that reverses the gradient (%.0f%%)\n", bad, total, float64(bad)/float64(total)*100)

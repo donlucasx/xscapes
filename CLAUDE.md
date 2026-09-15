@@ -2,10 +2,25 @@
 
 *(Renamed end to end on 2026-09-03: directory, env vars, state path and hook marker. Two names are kept on purpose and are not leftovers -- `internal/envx` still reads `ASCIISCAPES_*` and warns, and `install.go` still RECOGNISES the `# asciiscapes:v1` marker so the hooks it wrote before the rename can be found and removed.)*
 
+> **Session 32 (2026-09-14 evening), IN PROGRESS.** Resumed on the record and found it one step stale:
+> **he published and pushed himself at 19:24, four minutes after the wrap** (gh-pages `afd23a2` =
+> `site: 4336fbf`, `origin/main` = `4336fbf`; the live page's hash equals `site/index.html`, verified
+> by fetch). HEAD's binary is INSTALLED (inode 85539368, stamped `4336fbf`, clean tree). Two of four
+> running scapes (this window and auctions) hold the s30 build; tyastie and Validators still hold older
+> ones. `gofmt -l .` had flagged one study file since 09-07; formatted.
+> ⚠⚠ **THE COMMONS KIT CANNOT CARRY THE NEW PAGE.** The plan since s18 was to paste `index.html` into
+> the Commons builder verbatim; that was a 74 KB shell loading 15 clips by absolute URL. The page is now
+> ONE 5.5 MB file, and those clip URLs 404 since `publish.sh` stopped shipping `anim/`. **The entry has
+> to be a Commons Worker that PROXIES https://donlucasx.github.io/xscapes/** (iframe as the fallback);
+> the page loads nothing by relative path, so it renders identically from any origin.
+> `site/commons-brief.md` and the Desktop kit are rewritten for that. **Unverified until he runs it:
+> the builder is login-gated.** ⏰ **Commons closes 09-17.**
+
 > **Session 31 (2026-09-13 into 09-14), WRAPPED. ⭐⭐ THE SUBMISSION PAGE IS REBUILT FROM SCRATCH
 > ON HIS DIRECTION, AND IT IS NO LONGER MADE OF PICTURES.** HEAD `68bf89c`, tree clean, suite 10/10
-> + vet + fmt green. ⚠ **NINE COMMITS UNPUSHED and gh-pages is UNTOUCHED — the live page is still
-> the September 8 one.** ⏰ **Commons closes 09-17. Publishing is one command and it is his call.**
+> + vet + fmt green. ⇒ **PUBLISHED AND PUSHED BY HIM 2026-09-14 19:24, four minutes after the wrap** (gh-pages
+> `afd23a2` = `site: 4336fbf`; live hash == `site/index.html`, verified by fetch in s32). ⏰ **Commons
+> closes 09-17, and the paste kit cannot carry this page: see the s32 block above.**
 >
 > ⭐ **THE ANIMATIONS ARE TEXT NOW, and the old pipeline was a downgrade of our own output.**
 > `gifPages` already wrote real `<pre>` frames with per-cell colour, and `make-gifs.py` screenshotted
