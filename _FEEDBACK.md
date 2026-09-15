@@ -3240,3 +3240,13 @@ three rounds. Verbatim where he wrote, the option label where he picked one:
 ⇒ Order of work: publish + push · label the scapes · the clock line · touch scrub · animate the aquarium ·
 the backgrounds pass · republish · the deck on the nine beats · Commons later today. After 09-17: the vista
 as a real scape.
+**HIS ADDITION, mid-publish, verbatim:** *"additionally, for the site's section 'read it at a glance', id
+like to see the companion by itself (instead of within the scene), so it reads cleaner and more focused on
+what we are showing. Every 'state' should be toggable like right now, but should only showcase the
+companion, and its states. Same for 'a layer, not a screen', where it should feature all companions we have
+drafter thus far (crab, cat, owl, frog)"* ⇒ two more site items: companion-only state clips in the legend,
+and a four-companion row in *A layer, not a screen*.
+**HIS NOTE ON THE FIRST PORTRAIT BUILD, verbatim (a screenshot of the legend on a flat dusk-sand ground):**
+*"i meant no background whatsoever. The companion can b a tad smaller and 'float' on the site, within the
+'read it at a glance' section"* ⇒ no ground and no window box: the animal on the page's own ground, a
+little smaller. Applied to the cast too, for the same reason.

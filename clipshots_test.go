@@ -34,7 +34,7 @@ func TestClipShots(t *testing.T) {
 	if err := os.MkdirAll(dir, 0o755); err != nil {
 		t.Fatal(err)
 	}
-	pal := &canvas.HTMLPalette{}
+	pal := &canvas.HTMLPalette{Transparent: &portraitGround}
 	type page struct{ key, body string }
 	var pages []page
 	for _, cl := range allFX(pal) {

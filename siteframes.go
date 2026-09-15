@@ -59,7 +59,48 @@ type fxClip struct {
 	fps    int
 	// with is the study companion drawn in the scene, or nil for the cat.
 	with *scenes.Animal
+
+	// port, when set, is the companion ALONE on a flat ground: no sea, no
+	// sand, no litter. See portraitFrames.
+	port *portrait
 }
+
+// A PORTRAIT IS THE COMPANION BY ITSELF.
+//
+// His ask of 2026-09-15: "the companion by itself (instead of within the
+// scene), so it reads cleaner and more focused on what we are showing. Every
+// 'state' should be toggable like right now, but should only showcase the
+// companion, and its states. Same for 'a layer, not a screen', where it should
+// feature all companions we have drafted thus far (crab, cat, owl, frog)."
+//
+// One animal on one flat colour, in a state, breathing, with its balloon when
+// the state raises one. The legend's five are still folded from the session
+// (sc.beats / sc.at), so the pose is the reducer's and not a posed one; the
+// cast holds a pose, because its subject is who they are and not what they
+// are doing.
+type portrait struct {
+	// who is companion.NameCrab or NameCat, drawn by the companion package
+	// itself, or "owl" / "frog", the two candidates drawn in internal/scenes.
+	who string
+	// pose is held for every frame when the clip carries no session.
+	pose companion.State
+	// ground is the flat colour under the animal; zero means portraitGround.
+	ground     term.RGB
+	cols, rows int
+	// x, y is the companion's box origin. The near poses grow DOWN from y,
+	// exactly as they do on the beach, so rows below the box are left for the
+	// ask to grow into. x is the box's column at its shipped size; a near
+	// rung is re-centred on the frame (see portraitFrames), because a
+	// portrait has no scene for it to walk into.
+	x, y int
+}
+
+// portraitGround is the colour under every portrait, and the page writes it
+// as TRANSPARENT: the animal sits on the page's own ground. "No background
+// whatsoever", his note of 2026-09-15 on the first build, which had put the
+// five states on a flat dusk sand. A colour no scene paints, so nothing else
+// on the page can fall through it.
+var portraitGround = term.RGB{R: 1, G: 0, B: 1}
 
 // sceneClips are the other scapes, animated. Until 2026-09-15 they were
 // checked-in stills, because the painters lived in a main package the site
@@ -84,7 +125,7 @@ func sceneClips(pal *canvas.HTMLPalette) []fxClip {
 // test cannot disagree about what ships.
 func allFX(pal *canvas.HTMLPalette) []fxClip {
 	clips := append([]fxClip{heroClip(pal)}, stateClips(pal)...)
-	clips = append(clips, swapClips(pal)...)
+	clips = append(clips, castClips(pal)...)
 	return append(clips, sceneClips(pal)...)
 }
 
@@ -113,11 +154,126 @@ func sceneFrames(cl fxClip) ([]string, error) {
 	return out, nil
 }
 
+// portraitFrames renders a portrait: the companion alone on a flat ground.
+func portraitFrames(cl fxClip) ([]string, error) {
+	p := cl.port
+	prof := term.ProfileTrueColor
+	if !truecolorFX {
+		prof = term.Profile256
+	}
+	n := int(cl.sc.secs * float64(cl.sc.rate()))
+	if n <= 0 {
+		return nil, fmt.Errorf("%s: no frames", cl.key)
+	}
+	// A session, when the clip carries one, decides the pose and the balloon.
+	var run *sessionRun
+	if cl.sc.beats != nil || cl.sc.at > 0 {
+		run = newSessionRun(cl.sc)
+	}
+	var cat *companion.Cat
+	switch p.who {
+	case companion.NameCrab, companion.NameCat:
+		cat = companion.New(p.who)
+		cat.FaceLeft(true)
+	}
+	ground := p.ground
+	if ground == (term.RGB{}) {
+		ground = portraitGround
+	}
+	out := make([]string, 0, n)
+	for i := 0; i < n; i++ {
+		pose, bubble, ask := p.pose, "", false
+		t := float64(i) / float64(cl.sc.rate())
+		if run != nil {
+			st, tt, _ := run.at(i, n)
+			pose, bubble, ask, t = st.Pose, st.Bubble, st.BubbleAsk, tt
+		}
+		c := canvas.New(p.cols, p.rows, canvas.AlphaFar, canvas.AlphaMid, canvas.AlphaNear)
+		c.Clear()
+		for y := 0; y < c.H; y++ {
+			for x := 0; x < c.W; x++ {
+				c.SetBG(x, y, ground)
+			}
+		}
+		// One blink a loop, at a fixed frame, so the loop closes on itself.
+		blink := i == 3
+		switch p.who {
+		case "owl":
+			scenes.DrawOwlPicked(c, p.x, p.y, blink)
+		case "frog":
+			scenes.DrawCandidate(c, scenes.FindAnimal("Frog"), p.x, p.y, true, blink)
+		default:
+			// The walk up before the ask, the same call the beach makes.
+			cat.Approach(1/float64(cl.sc.rate()), pose == companion.NeedsYou)
+			// CENTRED AT EVERY RUNG. On the beach a near pose hangs left of
+			// the box so the right margin holds (nearDX); here there is no
+			// margin and no scene, so the drawn box is centred on the frame
+			// and the approach reads as the animal coming closer.
+			dx, w, _ := cat.DrawnBox(c.W)
+			x := (c.W-w)/2 - dx
+			cat.Draw(c.Near(), x, p.y, t, pose)
+			if bubble != "" {
+				rows, col := companion.DoneBubble(bubble), bubbleCol
+				if ask {
+					rows, col = companion.Bubble(bubble), bubbleAskCol
+				}
+				rows, bx := portraitBubble(rows, x+cat.DrawnHeadCol(c.W), c.W)
+				(&companion.Sprite{Rows: rows, Body: col, Opaque: true}).Draw(c.Near(), bx, p.y-len(rows))
+			}
+		}
+		out = append(out, c.HTMLFragmentClassed(GIFPx, prof, cl.sc.pal))
+	}
+	return out, nil
+}
+
+// portraitBubble lays a balloon over a centred companion: the box is centred
+// on the head as far as the frame allows, and the POINTER is moved to sit
+// over the head wherever the box ends up.
+//
+// On the beach the pointer is fixed at a shoulder and bubbleX slides the box
+// so that shoulder is over the head, clamping at the frame edge -- which is
+// right for a scene, where the companion stands at one side. A portrait has
+// the animal in the middle of a 48-cell frame, and the done knock is 44 cells
+// wide: clamped, its shoulder pointer landed 16 cells off the head.
+func portraitBubble(rows []string, head, w int) ([]string, int) {
+	bw := bubbleWidth(rows)
+	x := head - bw/2
+	if x+bw > w {
+		x = w - bw
+	}
+	if x < 0 {
+		x = 0
+	}
+	out := append([]string(nil), rows...)
+	last := []rune(out[len(out)-1])
+	// Erase the shoulder pointer with the row's own stroke, then place it.
+	filler := last[len(last)-2]
+	for i, r := range last {
+		if r == 'v' {
+			last[i] = filler
+		}
+	}
+	at := head - x
+	if at < 1 {
+		at = 1
+	}
+	if at > len(last)-2 {
+		at = len(last) - 2
+	}
+	last[at] = 'v'
+	out[len(out)-1] = string(last)
+	return out, x
+}
+
 // framesOf renders one clip whichever way it is declared.
 func framesOf(seed int64, cl fxClip) (frames []string, cols, rows, fps int, err error) {
 	if cl.scene != nil {
 		frames, err = sceneFrames(cl)
 		return frames, 80, 24, cl.fps, err
+	}
+	if cl.port != nil {
+		frames, err = portraitFrames(cl)
+		return frames, cl.port.cols, cl.port.rows, cl.sc.rate(), err
 	}
 	frames, err = gifFrames(seed, cl.sc)
 	return frames, cl.sc.colsOf(), cl.sc.rowsOf(), cl.sc.rate(), err
@@ -197,60 +353,64 @@ func askBeats() []loopBeat {
 }
 
 func stateClips(pal *canvas.HTMLPalette) []fxClip {
-	// CROPPED, and all five identically. His note of 2026-09-14 was that the
-	// ask needs to be a close-up -- at 80 columns the companion is a thumbnail
-	// and the balloon it raises is the whole point of that state. But the
-	// crop has to be the SAME for all five, because the section's argument is
-	// that only the thing being named changes; a different framing per state
-	// would break exactly the comparison it exists to make.
+	// THE COMPANION ALONE, his ask of 2026-09-15. The five used to be the
+	// whole beach at 62 columns; the sea, the sand and the moon are named in
+	// "While you wait" now, and this section is the companion's own five
+	// states. Same frame for all five, so only the animal changes.
 	//
-	// NARROWER, NOT CROPPED. His note asked for the ask to be a close-up, and
-	// cropping an 80-column scene was the wrong way to get one: it cut the
-	// moon in half at x=20, and at x=14 it sliced the writing in the sand
-	// mid-word, which reads as a broken render rather than a detail shot.
-	//
-	// Rendering the scene AT 62 columns instead lets the layout do it properly
-	// -- the companion, the moon, the litter and the sand text are all placed
-	// for that width, so everything is a third bigger and nothing is cut. The
-	// five stay identical to each other, which is the whole point of the
-	// section: only the thing being named changes.
-	const cols = 62
+	// 48 columns, because the come-closer ladder refuses a rung wider than
+	// half the frame and the ask's top rung is 24 cells. 17 rows: three for
+	// the balloon above the box's row, and fourteen below it for the biggest
+	// rung, which grows DOWN from that row. On the beach the sand's edge
+	// crops those legs and he liked the crop; on a transparent ground a
+	// cropped leg reads as a cut one, so the whole pose fits.
+	port := func() *portrait {
+		return &portrait{who: companion.NameCrab, cols: 48, rows: 17, x: 18, y: 3}
+	}
 	mk := func(key, label, note string, at, tod, secs float64) fxClip {
-		return fxClip{key: key, label: label, note: note,
-			sc: gifScene{name: "st-" + key, at: at, tod: tod, secs: secs, fps: 6, cols: cols, pal: pal, cube: !truecolorFX}}
+		return fxClip{key: key, label: label, note: note, port: port(),
+			sc: gifScene{name: "st-" + key, at: at, tod: tod, secs: secs, fps: 6, pal: pal, cube: !truecolorFX}}
 	}
 	return []fxClip{
 		{key: "needs", label: "it needs you",
 			note: "A solid balloon and a chime, and the companion walks up the beach to ask -- three strides, twice its resting size, so the question is impossible to miss from across the room. It holds the pose until you come back.",
-			sc: gifScene{name: "st-needs", tod: 0.80, secs: 5, fps: 6, cols: cols,
+			port: port(),
+			sc: gifScene{name: "st-needs", tod: 0.80, secs: 5, fps: 6,
 				beats: askBeats(), speed: 2, pal: pal, cube: !truecolorFX}},
-		mk("working", "it is working", "The sea. How many swells are travelling and how tall, whitecaps once it is flat out. Flat water means it is waiting on you.", 14, 0.52, 4),
+		mk("working", "it is working", "Eyes open, breathing quicker, a blink now and then. How hard is the sea's to say; the companion only says that it is at it.", 14, 0.52, 4),
 		mk("broke", "something broke", "The companion carries it, never the weather: claws down, stalks short, amber eyes, until the trouble clears.", 22, 0.62, 4),
-		mk("done", "it finished", "A dotted balloon and a low note, both claws up, the constellation lit and the moon carrying what is left of the context.", 44, 0.96, 4),
-		mk("quiet", "it is waiting", "Flat sea, the writing in the sand receding as the tide takes it, the companion still.", 72, 0.27, 4),
+		// 7 s, because the settled pincer shuts once every 7 (crabClawPeriod)
+		// and a shorter loop would never show the one thing that moves.
+		mk("done", "it finished", "A dotted balloon and a low note, both claws up, settled on the sand with one pincer shutting every few seconds.", 44, 0.96, 7),
+		mk("quiet", "it is waiting", "Eyes closed, breathing slow. Nothing is running and nothing is asked; the next prompt wakes it.", 72, 0.27, 4),
 	}
 }
 
-// swapClips are the same beat with each animal, because "you can change the
-// companion" is a claim a page can only make properly by showing both. They
-// are cropped to the animal's own corner of the beach, so the pair costs a
-// fraction of a full scene.
-func swapClips(pal *canvas.HTMLPalette) []fxClip {
-	mk := func(key, label, animal, note string) fxClip {
-		return fxClip{key: key, label: label, note: note,
-			sc: gifScene{name: "sw-" + key, at: 30, tod: 0.62, secs: 3, fps: 6,
-				crop: [4]int{46, 8, 80, 24}, animal: animal, pal: pal, cube: !truecolorFX}}
+// castClips are every companion drawn so far, each by itself, working: the
+// two that ship and the two drawn for the scapes that are next. "Feature all
+// companions we have drafted thus far (crab, cat, owl, frog)", his ask of
+// 2026-09-15. One frame size, one ground, one pose, so the four compare.
+//
+// 4.4 s is two of the crab's working breaths, so the loop closes; the study
+// animals blink once a loop.
+func castClips(pal *canvas.HTMLPalette) []fxClip {
+	mk := func(key, who, label, note string) fxClip {
+		return fxClip{key: "cast-" + key, label: label, note: note,
+			port: &portrait{who: who, pose: companion.Working, cols: 18, rows: 9, x: 3, y: 1},
+			sc:   gifScene{name: "cast-" + key, tod: 0.62, secs: 4.4, fps: 6, pal: pal, cube: !truecolorFX}}
 	}
 	return []fxClip{
-		mk("crab", "crab", companion.NameCrab, "Hero the crab ships as the default."),
-		mk("cat", "cat", companion.NameCat, "The cat came first, and is one command away."),
+		mk("crab", companion.NameCrab, "Hero the crab", "Ships as the default."),
+		mk("cat", companion.NameCat, "the cat", "Came first; one command away."),
+		mk("owl", "owl", "the owl", "Drawn for the mountain vista. Next."),
+		mk("frog", "frog", "the frog", "Drawn for the aquarium. Next."),
 	}
 }
 
 // renderFX renders every embedded animation and returns the page's script
 // payload and the stylesheet the frames share.
 func renderFX(seed int64) (js, css string, err error) {
-	pal := &canvas.HTMLPalette{}
+	pal := &canvas.HTMLPalette{Transparent: &portraitGround}
 	out := map[string]fxPayload{}
 	for _, cl := range allFX(pal) {
 		frames, cols, rows, fps, err := framesOf(seed, cl)

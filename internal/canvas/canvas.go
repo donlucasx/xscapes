@@ -572,6 +572,11 @@ func (c *Canvas) HTMLFragment(fontPx int) string {
 type HTMLPalette struct {
 	idx   map[[2]term.RGB]int
 	pairs [][2]term.RGB
+	// Transparent, when set, is the one background colour CSS writes as
+	// background:transparent, so a frame painted on it sits on the page's
+	// own ground. The submission page's portraits use it -- "no background
+	// whatsoever", his note of 2026-09-15 -- with a colour no scene paints.
+	Transparent *term.RGB
 }
 
 func (h *HTMLPalette) class(fg, bg term.RGB) int {
@@ -598,7 +603,11 @@ func (h *HTMLPalette) CSS() string {
 		b.WriteString("{color:")
 		writeHex(&b, k[0])
 		b.WriteString(";background:")
-		writeHex(&b, k[1])
+		if h.Transparent != nil && k[1] == *h.Transparent {
+			b.WriteString("transparent")
+		} else {
+			writeHex(&b, k[1])
+		}
 		b.WriteString("}")
 	}
 	return b.String()

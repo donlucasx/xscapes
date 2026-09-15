@@ -218,13 +218,94 @@ func gifPages(seed int64, dir string) error {
 	return os.WriteFile(filepath.Join(dir, "manifest.json"), js, 0o644)
 }
 
+// sessionRun folds a clip's session -- the shared demo turn from one of its
+// beats, or beats of its own -- and reads the reduced state at any frame.
+// gifFrames and portraitFrames share it, so the legend's companion-only
+// clips are the same moments of the same session as the scenes they replaced,
+// and the transcript the hero shows above its scape comes from the same fold.
+type sessionRun struct {
+	sc      gifScene
+	base    time.Time
+	red     *reduce.Reducer
+	beats   []loopBeat // nil means the shared demo turn
+	demo    []turnBeat
+	applied int
+	speed   float64
+	// lines is what the agent has printed so far: the prompt that opened the
+	// turn, then whatever the beats print.
+	lines []string
+}
+
+func newSessionRun(sc gifScene) *sessionRun {
+	r := &sessionRun{sc: sc, base: time.Now(), red: reduce.New("site"), speed: sc.speed,
+		lines: []string{"> add rate limiting to the auth endpoint"}}
+	if r.speed <= 0 {
+		r.speed = 1
+	}
+	if sc.beats != nil {
+		r.beats = sc.beats
+	} else {
+		r.demo = demoTurn()
+		// The pane opens on the prompt that started the turn; beats add to it.
+		r.apply(sc.at)
+	}
+	return r
+}
+
+// apply lands every beat up to a session second.
+func (r *sessionRun) apply(upto float64) {
+	if r.beats != nil {
+		for r.applied < len(r.beats) && r.beats[r.applied].at <= upto {
+			b := r.beats[r.applied]
+			now := r.base.Add(time.Duration(b.at * float64(time.Second)))
+			for _, e := range b.evs {
+				r.red.Apply(e, now)
+			}
+			if b.clear {
+				r.lines = r.lines[:1]
+			}
+			r.lines = append(r.lines, b.print...)
+			r.applied++
+		}
+		return
+	}
+	for r.applied < len(r.demo) && r.demo[r.applied].at <= upto {
+		now := r.base.Add(time.Duration(r.demo[r.applied].at * float64(time.Second)))
+		for _, e := range r.demo[r.applied].evs {
+			r.red.Apply(e, now)
+		}
+		r.applied++
+	}
+}
+
+// at is the state at frame i of n, with the picture's own clock t and the
+// session's wall time. t is real seconds, so the swell and the breathing read
+// at their designed rate whatever the session does; only the session is wound
+// on, by the clip's speed.
+func (r *sessionRun) at(i, n int) (st reduce.State, t float64, now time.Time) {
+	t = float64(i) / float64(r.sc.rate())
+	session := t * r.speed
+	if r.beats == nil {
+		t = r.sc.at + t
+		session = t
+	}
+	r.apply(session)
+	now = r.base.Add(time.Duration(session * float64(time.Second)))
+	st = r.red.State(now)
+	st.Act.TimeOfDay = r.sc.tod
+	if r.sc.todEnd != 0 {
+		tod := r.sc.tod + (r.sc.todEnd-r.sc.tod)*float64(i)/float64(n)
+		st.Act.TimeOfDay = tod - math.Floor(tod)
+	}
+	return st, t, now
+}
+
 // gifFrames renders a clip frame by frame. A clip either walks the shared
 // demo turn from one of its beats, or runs a session of its own written to
 // end where it began; either way the waves and the companion keep real time
 // and only the session is wound on, by sc.speed.
 func gifFrames(seed int64, sc gifScene) ([]string, error) {
-	base := time.Now()
-	red := reduce.New("site")
+	run := newSessionRun(sc)
 	sh := scape.NewShore(seed, false)
 	// The SHIPPED default, not this machine's saved preference: the page has to
 	// render the same on any checkout, and it has to show what a fresh install
@@ -238,43 +319,6 @@ func gifFrames(seed int64, sc gifScene) ([]string, error) {
 	cat := companion.New(name)
 	cat.FaceLeft(true)
 	ccw, chh := cat.Size()
-	speed := sc.speed
-	if speed <= 0 {
-		speed = 1
-	}
-
-	// The pane opens on the prompt that started the turn; beats add to it.
-	lines := []string{"> add rate limiting to the auth endpoint"}
-	applied := 0
-	var apply func(upto float64)
-	if sc.beats != nil {
-		apply = func(upto float64) {
-			for applied < len(sc.beats) && sc.beats[applied].at <= upto {
-				b := sc.beats[applied]
-				now := base.Add(time.Duration(b.at * float64(time.Second)))
-				for _, e := range b.evs {
-					red.Apply(e, now)
-				}
-				if b.clear {
-					lines = lines[:1]
-				}
-				lines = append(lines, b.print...)
-				applied++
-			}
-		}
-	} else {
-		beats := demoTurn()
-		apply = func(upto float64) {
-			for applied < len(beats) && beats[applied].at <= upto {
-				now := base.Add(time.Duration(beats[applied].at * float64(time.Second)))
-				for _, e := range beats[applied].evs {
-					red.Apply(e, now)
-				}
-				applied++
-			}
-		}
-		apply(sc.at)
-	}
 
 	c := canvas.New(sc.sceneCols(), sc.scapeRows(), canvas.AlphaFar, canvas.AlphaMid, canvas.AlphaNear)
 	lay := compose(c.W, ccw, true)
@@ -282,22 +326,7 @@ func gifFrames(seed int64, sc gifScene) ([]string, error) {
 	n := int(sc.secs * float64(sc.rate()))
 	var out []string
 	for i := 0; i < n; i++ {
-		// t is the picture's own clock, in real seconds, so the swell and the
-		// breathing read at their designed rate whatever the session does.
-		t := float64(i) / float64(sc.rate())
-		session := t * speed
-		if sc.beats == nil {
-			t = sc.at + t
-			session = t
-		}
-		apply(session)
-		now := base.Add(time.Duration(session * float64(time.Second)))
-		st := red.State(now)
-		st.Act.TimeOfDay = sc.tod
-		if sc.todEnd != 0 {
-			tod := sc.tod + (sc.todEnd-sc.tod)*float64(i)/float64(n)
-			st.Act.TimeOfDay = tod - math.Floor(tod)
-		}
+		st, t, now := run.at(i, n)
 		sh.Update(c, t, st.Act)
 		st.Tail = st.FitTail(now, lay.SandTo-lay.SandFrom)
 		// THE COMPANION WALKS UP BEFORE IT ASKS, in the clips too.
@@ -331,7 +360,7 @@ func gifFrames(seed int64, sc gifScene) ([]string, error) {
 		if sc.agentRows > 0 {
 			// The agent's own output sits above its scape, in the same
 			// window, which is the thing the page is actually claiming.
-			pane := agentPane(sc.sceneCols(), sc.agentRows, lines)
+			pane := agentPane(sc.sceneCols(), sc.agentRows, run.lines)
 			if sc.pal != nil {
 				frame = pane.HTMLFragmentClassed(GIFPx, prof, sc.pal) + frame
 			} else {

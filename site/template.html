@@ -126,6 +126,17 @@ h3{font-size:14px;font-weight:700;margin:0 0 4px}
 .reads{margin:13px 0 0;color:var(--dd);font-size:14px;max-width:66ch;min-height:3em}
 
 .grid2{display:grid;grid-template-columns:repeat(auto-fit,minmax(320px,1fr));gap:22px}
+.cast{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:14px}
+.cast>div,.cast .win{min-width:0}
+@media (max-width:860px){.cast{grid-template-columns:repeat(2,minmax(0,1fr))}}
+/* A portrait has no ground: the animal sits on the page (his note of
+   2026-09-15), so its stage is transparent, the frame is centred in it, and
+   the cell can be snapped to whole pixels with nothing showing beside it. */
+.stage.port{background:transparent;overflow:visible}
+.stage.port .fx{margin:0 auto}
+.cast .cap{text-align:center;margin-top:4px}
+.cast+.cmd{margin-top:var(--lh)}
+.cast+.cmd+.wide{margin-top:calc(var(--lh)*1.5)}
 .cmd{font-size:13px;background:var(--s);border:1px solid var(--ln);border-radius:2px;padding:calc(var(--lh)*.5) 2ch;margin:var(--lh) 0 0;overflow-x:auto;white-space:pre;line-height:1.75;color:var(--dd)}
 .cmd .c{color:var(--d)}
 .cmd .pr{color:var(--warm)}
@@ -210,12 +221,9 @@ ul.feats.lead li{font-size:15px}
 
 <div class="sec" data-title="Read it at a glance"><div class="boxtop" aria-hidden="true"></div></div>
 <section>
-<p class="sub">The same beach in five moments. Press one and only the thing that carries it changes &mdash; that is the whole language, and it is why you never have to read the screen.</p>
+<p class="sub">The companion on its own, in its five states. Press one. This is everything the animal itself says; the sea, the sand and the moon carry the rest, and between them you never have to read the screen.</p>
 <div class="tabs" role="tablist" id="st-tabs"></div>
-<div class="win" data-title=" " data-titleid="st-name"><div class="boxtop" aria-hidden="true"></div>
-  <div class="stage" aria-hidden="true"><div class="fx st-fx" id="st-fx"></div></div>
-  <div class="boxbot" aria-hidden="true"></div>
-</div>
+<div class="stage port" aria-hidden="true"><div class="fx st-fx" id="st-fx"></div></div>
 <p class="reads" id="st-note"></p>
 </section>
 
@@ -231,17 +239,14 @@ ul.feats.lead li{font-size:15px}
 <div class="sec" data-title="A layer, not a screen"><div class="boxtop" aria-hidden="true"></div></div>
 <section>
 <p class="sub wide">The shoreline is the first scape, not the product. Underneath it is a small event protocol &mdash; session, prompt, tool, error, needs input, done, compact &mdash; and a thin adapter for each agent: Claude Code arrives wired through its own hooks, and anything else that runs in a terminal is hosted the same way. Any landscape that provides six things carries all of it unchanged: a light, a sky, something that moves with the work, a surface, somewhere the work piles up, and someone living in it. The shoreline is what ships today; the three below are drawn and next.</p>
-<div class="grid2">
-<div>
-<p class="sub">Hero the crab ships as the default. The cat came first and is one command away; a running scape picks the change up on its next frame.</p>
-<div class="tabs" role="tablist" id="sw-tabs"></div>
+<p class="sub wide">Four companions so far, each drawn for its scape. Hero the crab ships as the default; the cat came first and is one command away, and a running scape picks the change up on its next frame. The owl and the frog come with the vista and the aquarium.</p>
+<div class="cast">
+<div><div class="stage port" aria-hidden="true"><div class="fx" data-clip="cast-crab"></div></div><p class="cap"><b>Hero the crab.</b> Ships as the default.</p></div>
+<div><div class="stage port" aria-hidden="true"><div class="fx" data-clip="cast-cat"></div></div><p class="cap"><b>The cat.</b> Came first. One command away.</p></div>
+<div><div class="stage port" aria-hidden="true"><div class="fx" data-clip="cast-owl"></div></div><p class="cap"><b>The owl.</b> Drawn for the vista. Next.</p></div>
+<div><div class="stage port" aria-hidden="true"><div class="fx" data-clip="cast-frog"></div></div><p class="cap"><b>The frog.</b> Drawn for the aquarium. Next.</p></div>
+</div>
 <div class="cmd"><span class="pr">$</span> xscapes companion cat</div>
-</div>
-<div>
-<div class="win" data-title=" " data-titleid="sw-name"><div class="boxtop" aria-hidden="true"></div>
-<div class="stage" aria-hidden="true"><div class="fx sw-fx" id="sw-fx"></div></div><div class="boxbot" aria-hidden="true"></div></div>
-</div>
-</div>
 <div class="wide"><div class="win" data-title="the mountain vista &middot; with the owl" data-right="the wind is the work"><div class="boxtop" aria-hidden="true"></div><div class="stage" aria-hidden="true"><div class="fx" data-clip="vista"></div></div><div class="boxbot" aria-hidden="true"></div></div><p class="cap"><b>The mountain vista, with the owl.</b> The wind is the work. Still air is a straight column of smoke and upright grass; as the agent gets busy the smoke streams sideways, the scrub flattens and the air fills. The fire lights the meadow at night, and the peaks take the last light at dusk.</p></div>
 <div class="grid2">
 <div><div class="win" data-title="the rainy window &middot; with the cat"><div class="boxtop" aria-hidden="true"></div><div class="stage" aria-hidden="true"><div class="fx" data-clip="rain"></div></div><div class="boxbot" aria-hidden="true"></div></div><p class="cap"><b>The rainy window, with the cat.</b> Rain on the glass is the work: watch it come down harder as the agent gets busy, then ease. The city behind it carries the hour.</p></div>
@@ -294,7 +299,17 @@ ul.feats.lead li{font-size:15px}
     if(!el || !cols) return;
     var box = el.parentElement, w = box ? box.clientWidth : 0;
     if(!w) return;
-    var px = w / (cols * advance(el));
+    var cell = w / cols;
+    // WHOLE PIXELS A CELL once a cell is big enough to show its edges. At a
+    // fractional advance Chrome snaps each cell's background on its own and
+    // the seams show as hairlines through a flat colour -- invisible on the
+    // hero's 6px cells, plain on a portrait's 17px ones. Flooring costs the
+    // frame under a cell of width, so only a portrait's stage does it: it
+    // carries the portrait's own ground, where a scene's stage is black and
+    // the missing width would show as a strip.
+    // A portrait is a tad smaller than its stage would allow, and floats.
+    if(box.classList.contains("port")) cell = Math.floor(Math.min(cell, 13));
+    var px = cell / advance(el);
     // A FLOOR, not just a cap. The hero is a real 124-column window, and on a
     // phone that computes to about 5px a cell -- legible as texture and not as
     // text. Below the floor the frame keeps a readable size and its own stage
@@ -329,7 +344,7 @@ ul.feats.lead li{font-size:15px}
     var head = title ? "┌─ " + title + " " : "┌─";
     var tail = right ? " " + right + " ─┐" : "┐";
     var fill = n - head.length - tail.length;
-    if(fill < 2){ tail = "┐"; fill = n - head.length - tail.length; }
+    if(fill < 2){ tail = "┐"; right = ""; fill = n - head.length - tail.length; }
     if(fill < 2){ head = "┌─"; fill = n - 3; }
     var dash = new Array(Math.max(1, fill) + 1).join("─");
     var html = title
@@ -410,7 +425,6 @@ ul.feats.lead li{font-size:15px}
     fit(el, cols); fitted.push([el, cols]);
   });
   switcher(["needs","working","broke","done","quiet"], "st-tabs", "st-fx", "st-note");
-  switcher(["crab","cat"], "sw-tabs", "sw-fx", null);
   drawAllBoxes();
 
   function refit(){ ADV = null; fitted.forEach(function(f){ fit(f[0], f[1]); }); drawAllBoxes(); }
