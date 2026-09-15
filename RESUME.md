@@ -63,6 +63,8 @@ rubric is carried by copy that does not exist yet.
 ⇒ ⭐ **s32 WROTE THE COPY FOR EVERY BEAT, verbatim-ready, each claim checked against the code, with the five
 rulings it needs (order · the three new beats · the Fit line · the merge · the caption trim):**
 https://claude.ai/artifact/Enod3TiFWUfiHe8u9EH4km  ⇐ HE HAS NOT SEEN IT. Nothing on the page changed.
+⚠ Published as lgarzoli; the login flipped to donlucasx minutes later (flip 8), so this URL is UNREACHABLE
+from the live login (`read` returned "artifact not found", checked 20:15). Source: the s32 scratchpad `nine-beats.html`. Do not mint a second URL unless he cannot open it.
 ⇒ **The nine-beat structure proposed:** splash → **the problem** (a spinner beside the scape, which
 is the pitch and is itself an ASCII moment) → what it is, running → **what it buys you** (leave the
 room; never miss a failure; see the context run out before it compacts) → how to read it → **how you
