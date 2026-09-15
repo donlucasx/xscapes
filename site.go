@@ -112,17 +112,17 @@ func sitePage(seed int64, dir string) (string, error) {
 	if err != nil {
 		return "", err
 	}
-	// The other two scapes are stills rendered by notes/scapestudy and checked
-	// in, because that study is its own command and the site generator cannot
-	// call into it. They are embedded as text like everything else here, so the
-	// page carries no rasters at all.
+	// The aquarium is a still rendered by notes/scapestudy and checked in. The
+	// rainy window used to be one too; it is an embedded clip now that the
+	// painters live in internal/scenes (see sceneClips), and the aquarium can
+	// follow the same way once its loop is designed.
 	//
-	// ⚠ They live in site/scapes/ and NOT in site/anim/, which .gitignore
-	// excludes: dropped there they would be invisible to a fresh checkout and
+	// ⚠ The still lives in site/scapes/ and NOT in site/anim/, which .gitignore
+	// excludes: dropped there it would be invisible to a fresh checkout and
 	// this build would fail for anyone but me. The same trap ate a renamed
 	// still once already.
 	for marker, file := range map[string]string{
-		"{{scaperain}}": "scape-rain.html", "{{scapeaq}}": "scape-aquarium.html",
+		"{{scapeaq}}": "scape-aquarium.html",
 	} {
 		frag, err := os.ReadFile(filepath.Join(dir, "scapes", file))
 		if err != nil {

@@ -23,11 +23,9 @@ func TestWhatTheEmbeddedFramesCost(t *testing.T) {
 	if truecolorFX {
 		t.Log("rendering TRUECOLOR")
 	}
-	clips := append([]fxClip{heroClip(pal)}, stateClips(pal)...)
-	clips = append(clips, swapClips(pal)...)
 	totalRaw, totalGz := 0, 0
-	for _, cl := range clips {
-		frames, err := gifFrames(7, cl.sc)
+	for _, cl := range allFX(pal) {
+		frames, cols, rows, _, err := framesOf(7, cl)
 		if err != nil {
 			t.Fatalf("%s: %v", cl.key, err)
 		}
@@ -42,7 +40,7 @@ func TestWhatTheEmbeddedFramesCost(t *testing.T) {
 		g := gz(all)
 		totalRaw += raw
 		totalGz += g
-		t.Logf("%-8s %3d frames  %2dx%-3d  raw %7d  gzip %6d", cl.key, len(frames), cl.sc.colsOf(), cl.sc.rowsOf(), raw, g)
+		t.Logf("%-8s %3d frames  %2dx%-3d  raw %7d  gzip %6d", cl.key, len(frames), cols, rows, raw, g)
 	}
 	t.Logf("palette: %d bytes of CSS, %d gzipped", len(pal.CSS()), gz(pal.CSS()))
 	totalGz += gz(pal.CSS())

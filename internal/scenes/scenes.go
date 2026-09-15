@@ -241,6 +241,20 @@ func paintHearth(c *canvas.Canvas, tod, t, level float64, seed int64) {
 	writeBand(c, 21, greyBetween(3, 6, l))
 }
 
+// RainPeriod is the rain pattern's height in rows, and so the frame count of a
+// seamless loop at six frames a second.
+const RainPeriod = 24
+
+// Find returns the scene with that name, or nil.
+func Find(name string) *Scene {
+	for i := range Scenes {
+		if Scenes[i].Name == name {
+			return &Scenes[i]
+		}
+	}
+	return nil
+}
+
 func paintRain(c *canvas.Canvas, tod, t, level float64, seed int64) {
 	p := scape.PaletteAt(tod)
 	l := lit(p)
@@ -277,11 +291,13 @@ func paintRain(c *canvas.Canvas, tod, t, level float64, seed int64) {
 			}
 		}
 	}
-	// Rain, on the glass: density is the work.
+	// Rain, on the glass: density is the work. The streaks fall six rows a
+	// second through a pattern RainPeriod rows tall, so a clip of RainPeriod
+	// frames at six a second closes on itself and the page can loop it.
 	d := 0.04 + 0.16*level
 	for y := 0; y <= 19; y++ {
 		for x := 0; x < c.W; x++ {
-			h := scape.HashF(x, y+int(t*7), seed+20)
+			h := scape.HashF(x, (y+int(math.Round(t*6)))%RainPeriod, seed+20)
 			if h < d {
 				r := '|'
 				if h < d*0.35 {

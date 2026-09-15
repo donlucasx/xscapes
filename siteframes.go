@@ -3,11 +3,14 @@ package main
 import (
 	"encoding/json"
 	"fmt"
+	"math"
 	"strings"
 
 	"github.com/donlucasx/xscapes/internal/canvas"
 	"github.com/donlucasx/xscapes/internal/companion"
 	"github.com/donlucasx/xscapes/internal/event"
+	"github.com/donlucasx/xscapes/internal/scenes"
+	"github.com/donlucasx/xscapes/internal/term"
 )
 
 // THE PAGE'S ANIMATIONS ARE TEXT, NOT PICTURES.
@@ -46,6 +49,66 @@ type fxClip struct {
 	label string
 	note  string
 	sc    gifScene
+
+	// scene, when set, is a study painter (internal/scenes) rendered as a
+	// seamless loop instead of a shore session folded through the reducer:
+	// frames frames at fps, the work rising and settling once across them.
+	scene  *scenes.Scene
+	tod    float64
+	frames int
+	fps    int
+}
+
+// sceneClips are the other scapes, animated. Until 2026-09-15 they were
+// checked-in stills, because the painters lived in a main package the site
+// could not import.
+func sceneClips(pal *canvas.HTMLPalette) []fxClip {
+	return []fxClip{
+		{key: "rain", label: "the rainy window", note: "Rain on the glass is the work.",
+			scene: scenes.Find("Rainy window"), tod: 0.75, frames: scenes.RainPeriod, fps: 6, sc: gifScene{pal: pal}},
+	}
+}
+
+// allFX is every embedded animation, in one place so the page and the cost
+// test cannot disagree about what ships.
+func allFX(pal *canvas.HTMLPalette) []fxClip {
+	clips := append([]fxClip{heroClip(pal)}, stateClips(pal)...)
+	clips = append(clips, swapClips(pal)...)
+	return append(clips, sceneClips(pal)...)
+}
+
+// sceneFrames renders a study painter as a loop that closes on itself: the
+// painter's own time runs frame by frame, and the work follows one cosine
+// from 0.1 up to 0.9 and back, so the motion slot is seen at every level.
+func sceneFrames(cl fxClip) ([]string, error) {
+	if cl.scene == nil {
+		return nil, fmt.Errorf("%s: no scene", cl.key)
+	}
+	prof := term.ProfileTrueColor
+	if !truecolorFX {
+		prof = term.Profile256
+	}
+	scenes.SetCompanion(nil)
+	out := make([]string, 0, cl.frames)
+	for k := 0; k < cl.frames; k++ {
+		t := float64(k) / float64(cl.fps)
+		level := 0.5 - 0.4*math.Cos(2*math.Pi*float64(k)/float64(cl.frames))
+		c := canvas.New(80, 24, canvas.AlphaFar, canvas.AlphaMid, canvas.AlphaNear)
+		c.Clear()
+		cl.scene.Paint(c, cl.tod, t, level, 7)
+		out = append(out, c.HTMLFragmentClassed(GIFPx, prof, cl.sc.pal))
+	}
+	return out, nil
+}
+
+// framesOf renders one clip whichever way it is declared.
+func framesOf(seed int64, cl fxClip) (frames []string, cols, rows, fps int, err error) {
+	if cl.scene != nil {
+		frames, err = sceneFrames(cl)
+		return frames, 80, 24, cl.fps, err
+	}
+	frames, err = gifFrames(seed, cl.sc)
+	return frames, cl.sc.colsOf(), cl.sc.rowsOf(), cl.sc.rate(), err
 }
 
 // fxPayload is what the page's player receives.
@@ -176,16 +239,14 @@ func swapClips(pal *canvas.HTMLPalette) []fxClip {
 // payload and the stylesheet the frames share.
 func renderFX(seed int64) (js, css string, err error) {
 	pal := &canvas.HTMLPalette{}
-	clips := append([]fxClip{heroClip(pal)}, stateClips(pal)...)
-	clips = append(clips, swapClips(pal)...)
 	out := map[string]fxPayload{}
-	for _, cl := range clips {
-		frames, err := gifFrames(seed, cl.sc)
+	for _, cl := range allFX(pal) {
+		frames, cols, rows, fps, err := framesOf(seed, cl)
 		if err != nil {
 			return "", "", fmt.Errorf("%s: %w", cl.key, err)
 		}
 		out[cl.key] = fxPayload{
-			Cols: cl.sc.colsOf(), Rows: cl.sc.rowsOf(), FPS: cl.sc.rate(),
+			Cols: cols, Rows: rows, FPS: fps,
 			Label: cl.label, Note: cl.note, Frames: frames,
 		}
 	}
