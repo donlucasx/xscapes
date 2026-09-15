@@ -180,9 +180,12 @@ func owlAt(c *canvas.Canvas, x, y int) {
 	}
 	DrawOwl(c, &OwlAlts[pick], OwlCoat, x, y)
 	for k := 1; k <= OwletCount; k++ {
-		if OwlPlace == 1 || OwlPlace == 2 {
+		switch OwlPlace {
+		case 1, 2:
 			DrawOwlet(c, OwlCoat, x-6*k, y+3, k%2 == 1) // along the limb
-		} else {
+		case 4:
+			DrawOwlet(c, OwlCoat, x-2-6*k, 14, k%2 == 1) // standing on the top rail
+		default:
 			DrawOwlet(c, OwlCoat, x-7*k, meadowTop+1, k%2 == 1) // on the grass
 		}
 	}
@@ -472,9 +475,30 @@ func paintVista(c *canvas.Canvas, tod, t, level float64, seed int64, fireIsWork 
 		paintBranch(c, pineCol, seed, 26)
 		owlAt(c, owlX, 6)
 	case 3:
-		// A post in the meadow, two cells wide, the owl on top of it.
-		fill(c, owlX+4, 15, owlX+5, bandTop-1, pineCol)
-		owlAt(c, owlX, 8)
+		// A stump in the meadow, the owl's own width: the pale cut face on
+		// top with the owl standing on it, so the face shows around its
+		// feet, and bark below in a wood lighter than the grass. His note
+		// on the post: "does not read great" -- it was two cells of the
+		// treeline's colour on a meadow nearly as dark.
+		bark := greyBetween(6, 11, l)
+		fill(c, owlX, 19, owlX+11, bandTop-1, bark)
+		for _, bx := range []int{owlX + 2, owlX + 6, owlX + 9} {
+			plot(near, bx, 19, '|', greyBetween(4, 8, l), 1)
+			plot(near, bx+1, 20, '|', greyBetween(4, 8, l), 1)
+		}
+		fill(c, owlX, 18, owlX+11, 18, term.RGB{R: 215, G: 175, B: 135})
+		owlAt(c, owlX, owlY)
+	case 4:
+		// A fence from the right edge in weathered grey: two posts and two
+		// rails, the owl on the end post, the owlets standing on the top
+		// rail.
+		fence := greyBetween(9, 13, l)
+		for _, px := range []int{owlX + 4, owlX + 13} {
+			fill(c, px, 16, px+1, bandTop-1, fence)
+		}
+		fill(c, 50, 17, c.W-1, 17, fence)
+		fill(c, 50, 19, c.W-1, 19, fence)
+		owlAt(c, owlX, 10)
 	default:
 		mound := make([]int, W2)
 		for u := 0; u < W2; u++ {

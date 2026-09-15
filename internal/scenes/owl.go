@@ -132,7 +132,8 @@ var OwlAlts = []OwlAlt{
 // OwlPick is which alternative the vista draws. OwlPlace is where, his ask
 // of 2026-09-15 for alternatives: 0 on a mound in the meadow, 1 on a branch
 // from the right edge above the treeline, 2 on a lower branch over the lake,
-// 3 on a post in the meadow. OwletCount is how many of the litter are drawn.
+// 3 on a stump in the meadow, 4 on the end post of a fence from the right
+// edge, the owlets on its rail. OwletCount is how many of the litter are drawn.
 var (
 	OwlPick    = 3
 	OwlPlace   = 1
@@ -249,6 +250,14 @@ var OwletStyles = []OwletStyle{
 	{Name: "Puff",
 		art:  []string{".v##v.", "######", "######", ".^..^."},
 		eyes: true},
+	{Name: "Egg, pale belly",
+		art:   []string{"..##..", ".####.", "######", ".^..^."},
+		light: []string{"......", "......", ".oooo.", "......"},
+		eyes:  true},
+	{Name: "Wings up",
+		art:   []string{"^.##.^", "######", "######", ".^..^."},
+		light: []string{"......", ".oooo.", ".oooo.", "......"},
+		eyes:  true, beak: true},
 }
 
 // OwletPick is the look the vista draws.
