@@ -4,7 +4,6 @@ import (
 	"math"
 
 	"github.com/donlucasx/xscapes/internal/canvas"
-	"github.com/donlucasx/xscapes/internal/companion"
 	"github.com/donlucasx/xscapes/internal/scape"
 	"github.com/donlucasx/xscapes/internal/term"
 )
@@ -55,6 +54,9 @@ var Forest = []Scene{
 
 // LoopSecs is the loop every forest painter closes on.
 const LoopSecs = 4.0
+
+// The owl's cell, top-left of its 12x7 box: rows 12..18, on the mound.
+const owlX, owlY = 64, 12
 
 // The vista's rows, at 80x24. Sub-rows are twice these.
 const (
@@ -168,15 +170,21 @@ func pineSilhouette(c *canvas.Canvas, cu, tip, base int, col term.RGB, seed int6
 	}
 }
 
-// owlAt draws the owl, facing left, where the cat would sit.
+// owlAt draws the picked owl (owl.go) facing left, with its litter: on the
+// branch the owlets sit along the limb beside it; on the mound they sit on
+// the meadow to its left, where the crablets sit on the sand.
 func owlAt(c *canvas.Canvas, x, y int) {
-	for i := range Animals {
-		if Animals[i].Name == "Owl" {
-			a := &Animals[i]
-			drawAnimal(c.Near(), a.body, 24, 28, a.Name, companion.Coats[a.Coat],
-				a.eyes, a.eyeRow, a.eyeGlyph, a.nose, a.noseRow, x, y, true)
-			return
-		}
+	pick := OwlPick
+	if pick < 0 || pick >= len(OwlAlts) {
+		pick = 0
+	}
+	DrawOwl(c, &OwlAlts[pick], OwlCoat, x, y)
+	if OwlPlace == 1 {
+		DrawOwlet(c, OwlCoat, x-12, y+3, true)
+		DrawOwlet(c, OwlCoat, x-6, y+3, false)
+	} else {
+		DrawOwlet(c, OwlCoat, x-14, meadowTop+1, true)
+		DrawOwlet(c, OwlCoat, x-7, meadowTop+1, false)
 	}
 }
 
@@ -256,6 +264,11 @@ func paintVista(c *canvas.Canvas, tod, t, level float64, seed int64, fireIsWork 
 	// frequency of about one tree every two cells, so the tips are tips.
 	for u := 0; u < W2; u++ {
 		nearTop[u] -= int(math.Round(3.0 * ridged(float64(u), seed+53, 1.7)))
+		// Whole cells behind the owl's head: the treeline dips to a flat
+		// top under it, or its tufts are lost to the trees' quarter-cells.
+		if OwlPlace == 0 && u >= 2*owlX-2 && u < 2*(owlX+12)+2 {
+			nearTop[u] = 2 * (owlY)
+		}
 	}
 	paintRange(c, nearTop, nearCol, c.H, nil)
 
@@ -288,7 +301,7 @@ func paintVista(c *canvas.Canvas, tod, t, level float64, seed int64, fireIsWork 
 		// canvas's own rule that a star must not break the disc. The owl's
 		// eyes are plain glyphs, and the eye row lost them when the shore's
 		// edge ran under it. Seen in a screenshot, 2026-09-15.
-		if fu >= 124 {
+		if u >= 2*owlX-4 {
 			sh = float64(2 * lakeTop)
 		}
 		if fu < 8 {
@@ -404,7 +417,7 @@ func paintVista(c *canvas.Canvas, tod, t, level float64, seed int64, fireIsWork 
 	scrub := term.Lerp(grey(7), cube(135, 175, 0), lm)
 	for y := meadowTop; y < bandTop; y++ {
 		for x := 0; x < c.W; x++ {
-			if x >= 62 && y >= meadowTop+3 {
+			if OwlPlace == 0 && x >= 62 && y >= meadowTop+3 {
 				continue // the owl's boulder
 			}
 			h := scape.HashF(x, y, seed+90)
@@ -447,20 +460,24 @@ func paintVista(c *canvas.Canvas, tod, t, level float64, seed int64, fireIsWork 
 		}
 	}
 
-	// The owl on a boulder, right: a low mound drawn as quarters.
-	// The same rule as the shore: the top is flat under the owl's feet, and
-	// only the mound's shoulders are quarters.
-	mound := make([]int, W2)
-	for u := 0; u < W2; u++ {
-		mound[u] = 999
-		if d := float64(u-138) / 16; d > -1 && d < 1 {
-			mound[u] = 2*bandTop - int(math.Round(5*math.Sqrt(1-d*d)))
-			if math.Abs(d) < 0.78 {
-				mound[u] = 2*bandTop - 5
+	// The owl, right: on a branch from the right edge, or on a low mound
+	// drawn as quarters with a flat top under its feet.
+	if OwlPlace == 1 {
+		paintBranch(c, pineCol, seed)
+		owlAt(c, owlX, branchOwlY)
+	} else {
+		mound := make([]int, W2)
+		for u := 0; u < W2; u++ {
+			mound[u] = 999
+			if d := float64(u-138) / 16; d > -1 && d < 1 {
+				mound[u] = 2*bandTop - int(math.Round(5*math.Sqrt(1-d*d)))
+				if math.Abs(d) < 0.78 {
+					mound[u] = 2 * (bandTop - 3) // row 18 whole, the feet on it
+				}
 			}
 		}
+		paintRange(c, mound, greyBetween(5, 9, l), bandTop, nil)
+		owlAt(c, owlX, owlY)
 	}
-	paintRange(c, mound, greyBetween(5, 9, l), bandTop, nil)
-	owlAt(c, 64, meadowTop-4)
 	writeBand(c, bandTop, term.Lerp(grey(2), cube(95, 95, 0), l))
 }

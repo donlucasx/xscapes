@@ -66,6 +66,10 @@ func sceneClips(pal *canvas.HTMLPalette) []fxClip {
 	return []fxClip{
 		{key: "rain", label: "the rainy window", note: "Rain on the glass is the work.",
 			scene: scenes.Find("Rainy window"), tod: 0.75, frames: scenes.RainPeriod, fps: 6, sc: gifScene{pal: pal}},
+		// His pick of 2026-09-15: the wind is the work, the fire is the light.
+		// Dusk, because that is when the peaks take the light.
+		{key: "vista", label: "the mountain vista", note: "The wind is the work.",
+			scene: &scenes.Forest[0], tod: 0.78, frames: int(scenes.LoopSecs * 6), fps: 6, sc: gifScene{pal: pal}},
 	}
 }
 
