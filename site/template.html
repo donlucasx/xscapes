@@ -204,6 +204,7 @@ ul.feats.lead li{font-size:15px}
 <li><b>Leave the room.</b> A solid balloon and one sound when it needs an answer, a dotted balloon and a different sound when it is done. Silent while it works, so the two you hear are the two that matter.</li>
 <li><b>Know what it is doing without reading the screen.</b> The sea says how hard it is working, the sand says what it just did, a crablet stands for each subagent it has running, and a failed command shows on the companion's face until your next prompt.</li>
 <li><b>See the context running out before it compacts.</b> The moon thins and sinks as the context fills, and from 40% used what is left is written under it as a number.</li>
+<li><b>Keep your own hours.</b> The sky is the real time of day where you sit, dawn to night as it happens, so the window tells the hour without a clock and no two sessions look the same.</li>
 </ul>
 </section>
 
@@ -229,7 +230,7 @@ ul.feats.lead li{font-size:15px}
 
 <div class="sec" data-title="A layer, not a screen"><div class="boxtop" aria-hidden="true"></div></div>
 <section>
-<p class="sub wide">The shoreline is the first scape, not the product. Underneath it is a small event protocol &mdash; session, prompt, tool, error, needs input, done, compact &mdash; and a thin adapter for each agent: Claude Code arrives wired through its own hooks, and anything else that runs in a terminal is hosted the same way. Any landscape that provides six things carries all of it unchanged: a light, a sky, something that moves with the work, a surface, somewhere the work piles up, and someone living in it.</p>
+<p class="sub wide">The shoreline is the first scape, not the product. Underneath it is a small event protocol &mdash; session, prompt, tool, error, needs input, done, compact &mdash; and a thin adapter for each agent: Claude Code arrives wired through its own hooks, and anything else that runs in a terminal is hosted the same way. Any landscape that provides six things carries all of it unchanged: a light, a sky, something that moves with the work, a surface, somewhere the work piles up, and someone living in it. The shoreline is what ships today; the three below are drawn and next.</p>
 <div class="grid2">
 <div>
 <p class="sub">Hero the crab ships as the default. The cat came first and is one command away; a running scape picks the change up on its next frame.</p>
@@ -244,7 +245,7 @@ ul.feats.lead li{font-size:15px}
 <div class="wide"><div class="win" data-title="the mountain vista &middot; with the owl" data-right="the wind is the work"><div class="boxtop" aria-hidden="true"></div><div class="stage" aria-hidden="true"><div class="fx" data-clip="vista"></div></div><div class="boxbot" aria-hidden="true"></div></div><p class="cap"><b>The mountain vista, with the owl.</b> The wind is the work. Still air is a straight column of smoke and upright grass; as the agent gets busy the smoke streams sideways, the scrub flattens and the air fills. The fire lights the meadow at night, and the peaks take the last light at dusk.</p></div>
 <div class="grid2">
 <div><div class="win" data-title="the rainy window &middot; with the cat"><div class="boxtop" aria-hidden="true"></div><div class="stage" aria-hidden="true"><div class="fx" data-clip="rain"></div></div><div class="boxbot" aria-hidden="true"></div></div><p class="cap"><b>The rainy window, with the cat.</b> Rain on the glass is the work: watch it come down harder as the agent gets busy, then ease. The city behind it carries the hour.</p></div>
-<div><div class="win" data-title="the aquarium &middot; with the frog"><div class="boxtop" aria-hidden="true"></div><div class="stage" aria-hidden="true"><div class="fx" data-cols="80">{{scapeaq}}</div></div><div class="boxbot" aria-hidden="true"></div></div><p class="cap"><b>The aquarium, with the frog.</b> More fish come out as the work picks up, the tank's lamp is the light, and the gravel is where it settles.</p></div>
+<div><div class="win" data-title="the aquarium &middot; with the frog"><div class="boxtop" aria-hidden="true"></div><div class="stage" aria-hidden="true"><div class="fx" data-clip="aquarium"></div></div><div class="boxbot" aria-hidden="true"></div></div><p class="cap"><b>The aquarium, with the frog.</b> More fish come out as the work picks up, the tank's lamp is the light, and the gravel is where it settles.</p></div>
 </div>
 <p class="claim after">One rule holds it together: activity, subagents, finished work and context left each own their own part of the picture, and nothing shares a channel. That is why a glance is enough.</p>
 </section>
@@ -357,9 +358,21 @@ ul.feats.lead li{font-size:15px}
       var x = (ev.clientX - r.left) / Math.max(1, r.width);
       hero.show(Math.floor(Math.max(0, Math.min(0.999, x)) * hero.clip.frames.length));
     };
-    stage.addEventListener("pointerenter", function(){ scrubbing = true; hero.stop(); });
+    stage.addEventListener("pointerenter", function(ev){ if(ev.pointerType === "touch") return; scrubbing = true; hero.stop(); });
     stage.addEventListener("pointermove", function(ev){ if(scrubbing) toFrame(ev); });
-    stage.addEventListener("pointerleave", function(){ scrubbing = false; hero.start(); });
+    stage.addEventListener("pointerleave", function(ev){ if(ev.pointerType === "touch") return; scrubbing = false; hero.start(); });
+    // A FINGER SCRUBS TOO. touch-action: pan-y hands a sideways drag to the
+    // page's script and leaves an up-and-down one to the browser, so the
+    // hero can be dragged through on a phone without trapping the scroll.
+    stage.style.touchAction = "pan-y";
+    stage.addEventListener("pointerdown", function(ev){
+      if(ev.pointerType !== "touch") return;
+      scrubbing = true; hero.stop(); toFrame(ev);
+      if(stage.setPointerCapture) try{ stage.setPointerCapture(ev.pointerId); }catch(e){}
+    });
+    var touchEnd = function(ev){ if(ev.pointerType !== "touch") return; scrubbing = false; hero.start(); };
+    stage.addEventListener("pointerup", touchEnd);
+    stage.addEventListener("pointercancel", touchEnd);
     stage.style.cursor = "ew-resize";
   }
 
