@@ -3023,3 +3023,123 @@ counts (crab 0, crablet 0) rather than a substring grep that would match "indica
 ⚠ **And the thing the report measured that nobody had checked: he is not running any of it.** Four
 scapes up, not one holding the installed binary. Three days of work had been reported to him as
 "installed" twice, which was true and was not the same thing as seen.
+
+### Session 31 (2026-09-13 into 09-14) — the cards, then the entry page rebuilt
+
+He opened with a status sweep and ended it three days from the Commons deadline with the
+submission page rebuilt from scratch. Almost all of it was HIS design direction; the parts I did
+on my own judgement are the parts that needed reverting.
+
+**⭐ HIS ASK THAT SET THE SHAPE:** *"any decisions open for xscapes? card me for each open decision
+or gap w options to lock it in today"* then *"card me for each, in simple terms so I can understand
+exactly each card, and with options to move forward (and an open link with visual references when/if
+needed)"*. Fourteen cards on a page he could tap, with his picks stored where I could read them
+back. ⇒ https://claude.ai/code/artifact/fd4126d9-2eb3-47c7-a3cd-4861bdff6807
+
+**HIS PICKS, all fourteen:** 1A keep pure random (he OVERRODE my recommendation of B) · 2B forbid
+same column adjacent row · 3A delete the 2.8 GB trace · 4A remove the fake event · 5A kill the test
+scapes · 6A full page rebuild · 7A tag v0.4.0 now · 8A rebuild then submit · **9C** · 10A measure
+first · 11A close under leave-it-as-is · 12A one copy of the art · 13A drop Andale Mono · 14A close
+the three stale brief lines.
+
+⇒ **9 was a question first:** *"what does it mean 'The sea redraws too much while the tide moves'?
+is it pulling more memory than needed? whats the cost of 'accept it'"* — and answering it properly
+found that the card was describing the REJECTED fix rather than the shipped behaviour. Then
+*"proceed w C"*.
+
+⇒ **10 was "whats your recommendation? proceed with it and once your done, push"** and the
+measurement reversed the card: the tide is what FIXED the litter standing in the water. Pre-tide the
+litter's own columns are wet 36% of frames at REST and 65% at full; with the tide, 0% and 30%.
+
+**⭐⭐ THE BRAINSTORM THAT BECAME THE PAGE.** His brief, in pieces across several messages:
+
+⇒ *"Deck should have some animation / interactivity ... while leaning on the terminal / ascii themes
+... In terms of interactivity/visual effect, let's think on how we can better use the terminal within
+our visual language."*
+
+⇒ **THE TENSION HE SOLVED HIMSELF, and it is the whole design direction:** *"the instinct of
+building a terminal experience as the page sounds fun, but the truth is that the terminal
+experience, their fonts and overall characteristics are not known for being eye catching, featuring
+fun visual formats or even general legibility - its the opposite of a website. So maybe we need to
+reconcile this by approaching it in a way that feels like a website experience with terminal
+features and not the other way around."*
+
+⇒ *"I think should have a mostly b&W experience where only the companions or ascii vignettes stand
+out with color. I dont think we should do the persistent companion but have 2 or 3 instances of it
+throughout."* ⚠ Later relaxed: *"use ascii and color as needed"*.
+
+⇒ **ON LENGTH:** *"the goal is to make it much snappier and brief, but not arbitrarily. dont let the
+character count guide it, but its content."* I had been carrying a word target; dropped.
+
+⇒ **ON SLOGANS, three rounds.** *"they shouldnt lean on the specifics of the xscape (the tide, or the
+shoreline, or the weather). It should be about how the terminal reacts and visualizes the work for
+the user to decode visually, and be entertained by it simultaneously"* → then *"none of the slogans I
+like yet. Needs to depict xscapes at its highest level. 'a thinking screen for terminal agents' is
+strong, but its the shortest version. how do we expand on that. 'Cozy ascii scenes that react to your
+agent while it works' still winning."* → **HIS PICK: option 01, which uses BOTH** — the altitude line
+as the splash, the picture line as the page's headline.
+
+⇒ **TYPE, LOCKED:** *"I like ALL MONO here, and I like the cursor at the end. I would remove the
+period and keep just the cursor though."*
+
+⇒ **COLOUR, LOCKED:** *"one salmon crab, maybe a white cat, maybe a green frog. The same way the
+splash page now features a b&w animated ascii water behind the xscapes logo, Id love to identify
+other opportunities for ascii animations in color throughout the presentation, supporting it."*
+
+⇒ **AND THE SCOPE, SETTLED:** *"i was referring to the site we ll be submitting to present xscapes
+to the hackathon. build it."* ("Deck" had meant the submission page all along, not assets/deck/.)
+
+**⭐ HIS SIX NOTES ON THE FIRST BUILD**, all actioned: the splash must read on mobile (it was a
+1400px picture behind a 390px window) · *"you are repeating 'A thinking screen for terminal agents'.
+should only happen once, on the splash"* · *"if the first terminal gif is a timelapse? it shouldnt
+feature 'your time', since its not coherent w the timelapse"* · *"timelapse should feature a single
+agent working for a moment longer before it calls sub agents - so the main agent has a moment to
+stand out"* · *"'it needs you' should feature the agent closeup"* · *"I dont see any use of ascii
+that stands out (except the splash page, which I love on desktop). the '$' bullet points are weak,
+and so are the ascii separators."*
+
+**⭐ THE ASCII DEEP DIVE, his ask:** *"not loving our use of ASCII yet. Let's do a sidebar and do a
+deep dive on some of the best websites ever built using ascii. share w me to get some inspo"* →
+nine references, and the finding that mattered: every good one treats the grid as a SYSTEM, not a
+texture. ⇒ https://claude.ai/code/artifact/5e6cbd13-5393-4f4e-8e24-d3202d3e012e → *"do it all"*.
+
+**⭐⭐ THE THING HE HAD TO ASK FOR THREE TIMES, and it was mine every time.** *"'it needs you' is
+still not showing the companion walking up to the foreground like the reference I gave you, here it
+is again, do you see the difference? second time I ask you the same thing > ask me questions if u
+need clarification."*
+⇒ **I checked the RUNG twice and the rung was never the problem.** Instrumenting the render loop
+showed the pose in that clip was **Worried**, because the shared demo turn has an exit 1 before the
+ask and Worried outranks NeedsYou. So Approach never fired. Fixed by giving the ask its own session,
+and the same defect was in the hero (fixed by putting the ask BEFORE the failure, which is the better
+story anyway, and by holding the question for 32 session-seconds instead of 14).
+
+**⭐ TWO BRAND VIOLATIONS HE CAUGHT:** *"why is the X on the main title on the splash page have a
+dark glow? revert it to the cleaner version we approved on the brand manual"* — `assets/brand/
+README.md`'s "Not this" list names a shadow explicitly, and moving the page to JetBrains Mono had
+silently taken the LOCKUP off Geist Mono 700 as well.
+
+**⭐ THE CRAMPED RENDERS:** *"i wonder if most of these terminal gifs are not too cramped? Look how
+wider our window looks compared to your renders"* with a screenshot of his own 125x62 terminal
+against my 96x36 hero. *"maybe some are compressed (current) and one, perhaps the first one, is wider
+so all the elements are not cramped?"* ⇒ the hero renders at 124x44 now; the detail clips stay tight.
+
+**⭐ THE DIVIDERS, THREE ATTEMPTS AND STILL NOT RIGHT.** Dotted rules → animated sea strip → strips of
+four different scapes → drawn box rules. His notes in order: *"the ascii separators ... feel too
+specific to the beach xscape, and I have told you many times we need to explore the broader concept
+of xscapes, not just the specifics of this one beach xscape"* and finally *"I like how you are using
+ascii to frame the terminal gifs. Not so much the dividers. We need to break the mold."*
+⇒ **HIS IDEA, NOT BUILT YET:** *"each 'section' could have different animated ascii backgrounds (or
+elements), all very subtle. They dont HAVE to be b&w, as long as colors are not taking away from what
+we are communicating."*
+
+**⏭ AND THE QUESTION THE NEXT SESSION OPENS ON**, his words: *"is this a winning structure to
+communicate what xscapes is, how it works and why would people care for it? How does it fit on the
+hackathon? what is the problem it solves? What are the features it offers? all in a very digestible,
+eye cathing way?"* ⇒ My assessment, and he has not ruled on it: **no, not yet.** The page is an
+excellent demo and a weak argument. The problem is never stated, repeatability (15% of the rubric)
+is absent, and Fit is implied rather than said. Proposed nine-beat structure in the session summary.
+
+⚠⚠ **AND THE ONE I HAVE TO OWN: I COMMITTED A RED SUITE.** Chasing his balance note I shifted catX
+inside drawScene, which moved the sprite without moving what the sand, the litter and three of his
+locked tests believe about the sprite. I then read "9 packages ok" and committed without reading the
+result. Reverted in `68bf89c`. **The count is not the verdict.**

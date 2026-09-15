@@ -2,6 +2,83 @@
 
 *(Renamed end to end on 2026-09-03: directory, env vars, state path and hook marker. Two names are kept on purpose and are not leftovers -- `internal/envx` still reads `ASCIISCAPES_*` and warns, and `install.go` still RECOGNISES the `# asciiscapes:v1` marker so the hooks it wrote before the rename can be found and removed.)*
 
+> **Session 31 (2026-09-13 into 09-14), WRAPPED. ⭐⭐ THE SUBMISSION PAGE IS REBUILT FROM SCRATCH
+> ON HIS DIRECTION, AND IT IS NO LONGER MADE OF PICTURES.** HEAD `68bf89c`, tree clean, suite 10/10
+> + vet + fmt green. ⚠ **NINE COMMITS UNPUSHED and gh-pages is UNTOUCHED — the live page is still
+> the September 8 one.** ⏰ **Commons closes 09-17. Publishing is one command and it is his call.**
+>
+> ⭐ **THE ANIMATIONS ARE TEXT NOW, and the old pipeline was a downgrade of our own output.**
+> `gifPages` already wrote real `<pre>` frames with per-cell colour, and `make-gifs.py` screenshotted
+> them through headless Chrome to turn that text back into a raster: **5.1 MB of the published page
+> was photographs of markup we already had.** The frames are embedded directly — crisp at any zoom,
+> no Chrome, no gifsicle, no Pillow — and the page is **ONE self-contained file that loads nothing
+> beside itself**: 5.1 MB of GIFs → **~465 KB gzipped**. `TestWhatTheEmbeddedFramesCost` prints every
+> clip and fails over 900 KB. ⚠ Truecolor costs 156 KB of that in palette CSS against 20 KB on the
+> cube; it stays truecolor because that is **his ruling of 2026-09-05** and I had quietly switched it.
+>
+> ⭐⭐ **HIS DESIGN DIRECTION, and he solved the central tension himself:** *"the terminal experience,
+> their fonts and overall characteristics are not known for being eye catching ... its the opposite
+> of a website. So maybe we need to reconcile this by approaching it in a way that feels like a
+> website experience with terminal features and not the other way around."* ⇒ **The terminal appears
+> as framed objects inside a website, never as the website's chrome.**
+> ⇒ **LOCKED:** all mono, the cursor at the end of the headline and **no period** · slogan **01**,
+> which uses both his favourites — *"A thinking screen for terminal agents"* on the splash and
+> *"Cozy ASCII scenes that react to your agent while it works"* as the page's headline, said ONCE
+> each · colour on the animals (salmon crab, cream cat, green frog) · and on length, *"dont let the
+> character count guide it, but its content."*
+>
+> ⭐ **THE PAGE IS ON A CHARACTER GRID**, which is what the ASCII deep dive found separates every good
+> ASCII site from a decorative one: `ch` units, vertical measures in one line unit, tabular numerals,
+> `round(down, 100%, 1ch)` so it resizes in whole characters. **JetBrains Mono** draws the furniture
+> because it keeps box-drawing joined above 110% line-height. ⚠ **But the LOCKUP is Geist Mono 700
+> and carries NO SHADOW** — both locked in `assets/brand/README.md`, whose "Not this" list names a
+> shadow explicitly, and the page-wide font change had silently taken the mark with it. **A change to
+> a page-wide token reaches things the brand has already ruled on.**
+> ⇒ Deep dive, nine references: https://claude.ai/code/artifact/5e6cbd13-5393-4f4e-8e24-d3202d3e012e
+>
+> ⭐⭐ **THE DEFECT HE HAD TO REPORT THREE TIMES, and I answered the wrong question twice.** The
+> come-closer pose never appeared on the page. I checked the RUNG twice; **the rung was never the
+> problem.** Instrumenting the render loop showed the pose in that clip was **Worried** — the shared
+> demo turn has an exit 1 before the ask and **Worried outranks NeedsYou** (correctly: a failure you
+> have not seen must not be cancelled by the next question) — so `Approach` never fired. ⚠ Also
+> `Approach` had exactly ONE non-test caller, the live TUI, so no clip had ever drawn the walk.
+> ⇒ Fixed three ways: the clip renderer drives the walk; the ask clip has its own error-free session;
+> and the hero's ask moved BEFORE the failure and holds for 32 session-seconds instead of 14, because
+> the walk costs 0.56 s a rung and 1.6 s of clip time was not enough to arrive.
+> ⚠ **THE LESSON: WHEN A VISUAL IS WRONG, INSTRUMENT THE PIPELINE, NOT THE API.** The ladder tested
+> perfect at every width while the thing on the page sat at rung 0.
+>
+> ⭐ **HIS SCREENSHOT SETTLED THE SIZING:** his terminal is **125x62** and the hero was rendering at
+> 96x36. It renders at **124x44** now — 14 rows of transcript over a 30-row scape — and the detail
+> clips stay tight on purpose, which is his own suggestion. ⚠ A font FLOOR, not just a cap: a real
+> 124-column window computes to ~5 px a cell on a phone, so below 7 px the frame holds a readable
+> size and its own stage scrolls, while the page never does.
+>
+> ⚠⚠ **AND I COMMITTED A RED SUITE.** Chasing his balance note I shifted `catX` inside `drawScene`,
+> which moved the sprite without moving what the sand, the litter and **three of his locked tests**
+> believe about the sprite — they all locate the companion through `DrawnBox`. I then read "9 packages
+> ok" and committed without reading the result. Reverted in `68bf89c`. **THE COUNT IS NOT THE
+> VERDICT.** The `nearDX` half stands and is green: the near pose's air went 6 columns → 3 against a
+> sand margin of 2. **Do not shift catX; tell the COMPANION the margin instead.**
+>
+> ⏭ **THE QUESTION THE NEXT SESSION OPENS ON, his words:** *"is this a winning structure to
+> communicate what xscapes is, how it works and why would people care for it? ... what is the problem
+> it solves?"* ⇒ **My assessment, not yet ruled on: no, not yet.** An excellent demo and a weak
+> argument — the problem is never stated, **Repeatability (15%) is absent**, and Fit is implied rather
+> than said. A nine-beat structure is proposed in `RESUME.md` ▶ NEXT 1.
+> ⏭ **His unbuilt idea, which is also the answer to the dividers (failed three times):** *"each
+> 'section' could have different animated ascii backgrounds ... very subtle."*
+> ⏭ Still unbuilt: the rainy window ANIMATED, a third scape (forest/mountain + owl — the design
+> question is what carries the work with no sea), the typed prompt, touch scrub.
+>
+> ⇒ **Earlier in the session, fourteen cards he picked from** (artifact
+> `fd4126d9-2eb3-47c7-a3cd-4861bdff6807`): the tide's step is now exempted BY NAME in a per-frame test
+> instead of hiding in a 4.35% average (mutation-proven; two further bars were dropped because neither
+> could be made to fail) · **the litter-in-the-water card REVERSED on measurement — the tide is what
+> FIXED it**, 36% wet at rest pre-tide against 0% with it · one copy of the companion art (only THREE
+> of nine pieces were true duplicates; the note overstated it) · **v0.4.0 tagged, pushed and served by the
+> proxy** · and he deleted the 2.8 GB trace himself: **3.1G → 258M, disk 17 → 25 GiB free**.
+
 > **Session 30 (2026-09-12). ⭐⭐ THE SHOOTING STAR IS BUILT, and it was the one feature left.**
 > Tree clean, suite + vet + fmt green, **INSTALLED** (inode 85156875). The feature is `f5ebade`;
 > the installed binary is stamped **`417414e`** and every commit after it is docs only, so the

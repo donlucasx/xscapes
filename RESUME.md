@@ -4,142 +4,117 @@
 
 ```
 cd ~/Documents/claude/xscapes/ and read CLAUDE.md (the brief, authoritative)
-and RESUME.md before responding. Session 30 left HEAD f5ebade, tree clean,
-suite + vet + fmt green, INSTALLED. NOT PUSHED -- three commits ahead.
-THE SHOOTING STAR IS BUILT -- "the fall", the last feature on the list. Before
-it, two days went into the COMPANION: the cat asks with its ears, both animals
-have a finish pose, the cat walks up its own three-rung ladder, and the crab's
-near eye rotates through four faces. I have seen NONE of it running yet.
+and RESUME.md before responding. Session 31 rebuilt the SUBMISSION PAGE from
+scratch, on his direction, and left HEAD 68bf89c: tree clean, suite 10/10 +
+vet + fmt green, NINE COMMITS UNPUSHED, gh-pages untouched. The live page is
+still the September 8 one.
+The page is no longer GIFs: every animation is real text frames embedded in a
+single self-contained file, 5.1MB of clips became ~465KB gzipped, and the whole
+page sits on a character grid. Preview (private, mobile-friendly):
+https://claude.ai/code/artifact/801c9f09-e722-4368-86dd-4aec62ddc6d8
 Skim origin-chat.md only if you need the why; ignore ideas.md.
 Tell me where we left off, then pick up from the NEXT queue.
 
-Four things about how to work on this, and they were ALL paid for:
+⏰ COMMONS CLOSES 2026-09-17. Publishing is one command and is his call.
+
+Five things about how to work on this, all paid for:
 build the instrument before trusting the picture; measure the RENDERED frame
-rather than what the source says it should do; when a question is about what my
-sessions actually DO, go and count the event log in ~/.config/xscapes/run/*.jsonl
-instead of reasoning about it; and A MEASUREMENT AT ONE SEED, ONE GEOMETRY OR
-ONE HOUR IS NOT A MEASUREMENT.
-⚠ And the one this session added: WHEN A FIX MAKES THE NUMBER WORSE, SAY SO AND
-PUT IT BACK. Twice in session 29 the obvious fix measured worse than the bug.
+rather than what the source says it should do; go and count the real event log
+instead of reasoning about it; A MEASUREMENT AT ONE SEED IS NOT A MEASUREMENT;
+and when a fix makes the number worse, say so and put it back.
+⚠ s31 added two: WHEN A VISUAL IS WRONG, INSTRUMENT THE PIPELINE, NOT THE API
+(the companion's ladder tested perfect at every width while the thing on the
+page sat at rung 0 -- because the POSE was wrong, not the rung). And THE COUNT
+IS NOT THE VERDICT: I read "9 packages ok" and committed a red suite.
 Do NOT drive Terminal.app (osascript, System Events) without asking me first.
 ```
 
-## ▶ NEXT (session 30 left it here)
+## ▶ NEXT (session 31 left it here)
 
-**0. ⏳ HIS LOOK IS THE WHOLE QUEUE NOW, AND IT IS MEASURED THAT HE HAS NOT TAKEN IT.** Three days of
-work — the companion round AND the shooting star — is committed, green and **installed** (inode
-85156875, stamped `417414e`), and **nothing on this machine is running it.**
-⚠ **Checked 2026-09-13: FOUR scapes up, NONE holding the installed binary.** Three `xscapes claude`
-(up 3d 6h, 2d 2h, 19h) hold inodes **84245880 / 84730008 / one older**; installed is **85156875**.
-So the tide-as-default (s27), the near crab + scattered sky + droplet cue (s28), the cat companion
-round (s29) and the shooting star (s30) have **never reached a screen**.
-**Restart a scape and look.** Nothing else in the product is waiting on me.
-
+**0. ⏰ THE DEADLINE IS THE QUEUE. Commons closes 09-17 and the live page is still September 8.**
+Publishing is his call and one command:
 ```
-# PUSHED: origin/main is a5acda7, nothing unpushed.
-xscapes claude                              # already installed; just restart
-go version -m ~/.local/bin/xscapes | grep vcs.revision    # the binary names its own commit
-lsof -p <pid> -a -d txt | grep xscapes                    # which binary a running scape holds
+go run . -site site && sh site/publish.sh     # force-pushes gh-pages, one file
+gh auth switch --user donlucasx && git push origin main   # 9 commits waiting
 ```
-⚠ **WHICH SCAPES ARE HIS, settled by `lsof -a -d cwd` and NOT by the process name** — the check whose
-absence caused the s25 retraction:
-- **HIS, all three, one per project he works in** — exactly the pattern s25 established: pid 24108
-  `~/Documents/claude/Validators` · pid 74228 `~/Documents/claude/tyastie` · pid 25316
-  `~/Documents/claude/xscapes`. ⚠ **The xscapes one may be hosting the session you are reading this
-  in**, so "restart a scape" there means restarting his current session. Leave all three alone.
-- **LEFTOVER TEST RUNS, safe to kill** — pid 51733 (up 2d 22h) and pid 64720 (up 2d 21h). Three
-  independent signals, not one: they run from a **temp `go-build` path** (`/var/folders/…/exe/xscapes`)
-  rather than an installed binary, they are `-live -session s28smoke` / `s28verify`, and their cwd is
-  the repo. ~0.3–0.6% CPU each. **Still ask before killing.**
-⚠ **Install via a NEW inode** (`rm` then build, or `go build -o`): macOS SIGKILLs a binary
-overwritten in place after it has run.
-⚠ **A running scape keeps the OLD binary** (that is what the new inode buys). Restart or you
-re-photograph the old picture.
+⚠ `gh auth`'s active account is host-global and flips back on its own. Switch immediately before
+every push. The account is **donlucasx** (CLAUDE.md said `donlucas`, which does not exist; corrected).
 
-**What to look for, because the fall is easy to miss:** it fires when the star COUNT rises, which
-today is **every closed turn** — so one falls at the end of every answer. Half a second, six columns,
-three rows, away from the moon. At 12 fps that is six frames.
+**1. ⭐⭐ HIS OPEN QUESTION, and it is the biggest lever left.** Verbatim: *"is this a winning
+structure to communicate what xscapes is, how it works and why would people care for it? How does it
+fit on the hackathon? what is the problem it solves? What are the features it offers? all in a very
+digestible, eye cathing way?"*
+⇒ **My assessment, given and NOT yet ruled on: no, not yet.** The page is an excellent demo and a
+weak argument. Against the rubric: the **problem is never stated** (30% Waiting Experience answers a
+question the page never asks) · **Repeatability (15%) is absent** -- nothing says why you would still
+want it in a month · **Fit (20%) is implied, never said** ("same window as the agent, no tab, no app,
+no account" is the highest-scoring sentence available and is not on the page). Roughly 45% of the
+rubric is carried by copy that does not exist yet.
+⇒ **The nine-beat structure proposed:** splash → **the problem** (a spinner beside the scape, which
+is the pitch and is itself an ASCII moment) → what it is, running → **what it buys you** (leave the
+room; never miss a failure; see the context run out before it compacts) → how to read it → **how you
+get it**, three steps → **it is a layer, not a screen** (absorbs the companion and scapes sections
+into one extensibility argument, and it is the judges' own "waiting layer" thesis) → **why it is
+still good in a month** → footer. Shorter overall, because every beat has a job.
 
-**1. ✅ THE SHOOTING STAR IS BUILT AND INSTALLED** (`f5ebade`). "The fall", arm A3, exactly as ruled:
-the star itself travels 6 columns and 3 rows into its place, 0.50 s, linear, no tail.
-⇒ `internal/scape/arrival.go` is the path and the constants · `Activity.Arriving` / `ArrivalPhase` ·
-the rising edge is in `reduce.Apply` and the phase is wall-clock age off `StarFall` (500 ms).
-⇒ Three tests: `internal/scape/arrival_test.go` (30,132 swept arrivals, the path's own guarantees and
-the no-skip cadence), `internal/reduce/starfall_test.go` (the edge, the clock, reset, a falling
-count), `starfall_live_test.go` (174 arrivals read back off COMPOSED frames — the one that answers
-the balloon).
-⚠ **The claim I wrote into the source before counting it was WRONG**: away-from-the-moon does NOT
-make the disc and readout guards dead. Disc fires 90 times, **all on the flip**; readout fires 108
-times **on the primary direction**. Both mutation-tested red. Numbers live in `arrival.go`.
-✅ **HIS RULING, 2026-09-12: "leave it as is."** 40x12 keeps its 38.0% and a refused track keeps
-falling back to the pre-feature look. **There is no size floor and this is closed** — do not
-re-open it or offer one again.
-⏭ **And the fall has no ASSET.** `demoState` flies it now, so `go run . -site site` CAN render it —
-but the clip would need to catch a phase boundary (t = 8.0, 16.0, 24.0 in the cycle).
+**2. HIS IDEA, NOT BUILT:** *"each 'section' could have different animated ascii backgrounds (or
+elements), all very subtle. They dont HAVE to be b&w, as long as colors are not taking away from what
+we are communicating."* This is also the answer to the dividers, which have now failed three times
+(dotted rules → animated sea strip → four-scape strips). His last word: *"I like how you are using
+ascii to frame the terminal gifs. Not so much the dividers. We need to break the mold."* Section
+headers are currently drawn box rules, which he likes as a device but which is not an answer to this.
 
-**2. HIS, OPEN:**
-- **The rotating eye repeats 24.3% of the time** — four-way random does that. He answered every item
-  around this one and not this one, so it is NOT decided by silence. Options are rendered on
-  `assets/frames/s29-decisions.html`: pure random (built) · never-twice-running (0%) · shuffled bag
-  (6.1%). One line either way.
-- **Andale Mono and the Commons publish**, untouched since s27. ⏰ **Commons closes 09-17.**
-- **The site has not been started** and it is his item (b) from 09-11. ⚠ **MEASURED 2026-09-13, and
-  one figure here was stale:**
-  - **The live page is up (HTTP 200, 74 KB) and 47 COMMITS BEHIND**, published **2026-09-08 01:12**
-    from gh-pages `16502ea`. It DOES show the crab — 7 mentions of "crablet" against 1 stray
-    "kitten", so s24's rebuild held. What it predates is every visible feature since; **"the fall"
-    appears 0 times.**
-  - **`go install ...@latest` serves v0.3.0, 61 commits behind** — ~~52~~, corrected. That is the
-    command printed on the README *and* on the live page, so a judge who installs it gets a build
-    from before the tide.
-  - **`~/Desktop/xscapes-commons/` is the CAT page**, confirmed with word-boundary counts rather than
-    substrings: cat 2–4 per file, **crab 0, crablet 0**. Pasting it ships the wrong animal.
-  ⚠ Nothing in the repo can render the NEAR crab into a clip — `Approach` has one non-test caller,
-  the live TUI — so `gifs.go` needs one line before the best feature can have an asset. ⚠ His last
-  word on Commons itself is a HOLD: *"once we are ready, I will let you know when."*
+**3. THE LAST COLUMN OF THE BALANCE FIX.** His rule: *"the left margin between edge and text should
+match the far right margin between edge and companion."* The near pose is at 3 columns against a sand
+margin of 2 -- it was 6. Closing the last column needs the COMPANION to be told the margin it is
+being asked for, so `DrawnBox` keeps telling the truth.
+⚠ **Do NOT shift catX in drawScene.** Tried in s31 and it broke three of his locked guarantees at
+once (`TestTheSandNeverWritesUnderTheCompanionInEitherComposition`,
+`TestNoSubagentStandsInTheCompanionsDrawnBox`, `TestTheSandKeepsClearOfTheCompanionAndStillHasRoom`)
+because the sand, the litter and the tests all locate the companion through DrawnBox. Moving the
+animal is the companion's job or nobody's.
 
-**3. Open defects, measured, NOT fixed:**
-- ⚠ **Two stars still touch, and I was wrong TWICE about why.** His ruling: *"dont let em touch"*.
-  (a) The bar has no headroom — a vertical neighbour is exactly `starHardSep` — but making the test
-  strict measured **WORSE**, 10 pairs → 12, because a rejected dart falls through to `roomiestCell`.
-  (b) The sky is not too small: at 40x12 the band is 3 rows of 40 columns and **eight** stars still
-  touch three times. **The cause is in the placement and is not found.** Likely direction, UNMEASURED:
-  `constellationCells` keeps stars off the disc's columns and the disc may be eating most of a
-  three-row band. `star_touch_test.go` characterises it at **54 pairs** worst and fails either way.
-- ⚠ **The tide's churn spike is still there, and the obvious fix is worse.** A fractional depth
-  churns **53.62% every frame** against ~64% on crossing frames only; `depth` scales the whole
-  gradient so there is no small change. Fixing it means anchoring the backdrop to something that is
-  not the tide. The swell's reference IS fractional now — it paints nothing.
-- ⚠ **`hyFloor` at 12 rows: FIXED.** ⚠ **`-mirror=false` pace direction: FIXED.** ⚠ **`emit` rejects
-  unknown kinds: FIXED.** ⚠ **The cat's mid-stride: FIXED.**
-- ⚠ **30x8 draws 21 of 32 stars.** Below the floor; untouched.
-- ⚠ **A junk `done` event is in `~/.config/xscapes/run/d6d42f888818.jsonl`** — I wrote it testing
-  `emit` and the removal was blocked as a destructive write. One line, his call:
-  `grep -v '"ts":1789243988792.*"src":"manual"' d6d42f888818.jsonl > t && mv t d6d42f888818.jsonl`
-- ✅ **The scrollback merge is CLOSED ON HIS WORD**, 09-12: *"The scrollback issue seems resolved."*
-  Not a measurement, and the evidence window is long gone. Reopen if it recurs.
+**4. NOT BUILT, and both are his asks:**
+- **Animate the rainy window.** The scapes live in `notes/scapestudy`, a separate `main` package the
+  site generator cannot import, so they are checked-in stills in `site/scapes/`. Animating means
+  moving the painters into an internal package. ~half a day.
+- **A third scape: forest/mountain with the owl.** New art, and the real question is the design one:
+  with no sea, what carries the work? My proposal, unruled: **wind through the treeline** (how many
+  trees bend and how far), with snow on the ridge as the accumulator.
 
-**4. Cleanup carried:** the chosen art now exists TWICE — in `internal/companion/bitmaps_poses.go`
-(shipped) and in the root study files (`catalts_picks.go`, `catalts_art.go`, `cattop_art.go`). Point
-the study pages at the shipped art and delete the duplicates before they drift.
+**5. Smaller, all open:**
+- **The typed prompt** -- a fake Claude prompt in the hero the visitor types into. The "wow" item.
+- **Touch scrub.** The hero scrubs on pointer drag; on a phone it does nothing.
+- **The silent local clock.** The hero still opens at the visitor's hour, it just no longer says so
+  (his note: a timelapse cannot also be "your time"). Keep silent, or drop the behaviour?
+- **The dead GIF pipeline.** 5.1MB of GIFs, 25 frame pages and `site/make-gifs.py` are unused by the
+  page now -- it loads nothing beside itself. Delete?
+- **Section order.** "Pick your companion" and "more than one shore" are their own sections rather
+  than part of the five-state legend; his earlier ask was features sorted by UX relevance.
+- **The protocol section copy** -- he has not read it.
+- **`assets/deck/`** -- still his parked draft. Same treatment, or leave it?
 
-**5. ⚠ THE DISK IS THE ONE THING THAT COULD STOP WORK, and it is NOT xscapes' fault.** Measured
-2026-09-13: **17 GiB free of 1.8 TiB, 100% used** — it was 111 GiB at s27. `~/Documents` is **299 GB**
-and `~/Library/Caches` **45 GB**; xscapes owns only **3.1 GB of traces** plus 18 MB of run logs.
-⇒ **The one xscapes-side recovery worth offering is HIS CALL and irreversible:**
-`~/.config/xscapes/traces/20260908-005450.bin` is **2.8 GB of the 3.1** and s26 said KEEP it, because
-it holds the only full recording of the strikethrough occurrence and is what a future re-check would
-compare against. **That defect is now CLOSED on his word (09-12)**, so the trace's only purpose is
-gone — but closing-on-his-word is not a measurement, and deleting it forecloses reopening. Ask.
+**6. Closed this session, do not reopen:** the tide's step is exempted by name and mutation-proven ·
+the litter-in-the-water card (the tide FIXED it) · the art duplication · the 2.8GB trace (he deleted
+it; 3.1G → 258M, disk 17 → 25 GiB free) · the junk `done` event · the two leftover test scapes ·
+v0.4.0 tagged and pushed and served by the proxy · the rotating eye stays pure random (his 1A,
+overriding my recommendation).
 
-**6. Status report, 2026-09-13:** every figure in this file's §0/§2 was re-verified against the repo,
-the running processes, the installed binary and a live fetch. Published as an artifact for him:
-https://claude.ai/code/artifact/5c43c9c0-80cd-42c0-9031-f1ab68dc3bae
-⇒ **It found a real defect**: `internal/companion/crab_near.go`'s header said `OFF BY DEFAULT` while
-`nearDefault = 2` sat thirty lines below it, so the come-closer pose had been ON for two days while
-its own file denied it. Fixed in `a5acda7`. **Checking the notes against the code is how that
-surfaced** — and the test it names, `TestNothingMovesWithTheNearPoseUnset`, pins rung 0, so its name
-is now a misnomer even though what it guards is right.
+## Where the page's machinery lives (session 31)
+
+- `site/template.html` -- the page. Markers `{{cover}}`, `{{covermobile}}`, `{{fxjs}}`, `{{fxcss}}`,
+  `{{scaperain}}`, `{{scapeaq}}` are filled by `sitePage` in `site.go`.
+- `siteframes.go` -- which animations are embedded and how much they cost.
+  `TestWhatTheEmbeddedFramesCost` prints every clip and FAILS over 900KB gzipped.
+- `gifs.go` -- `gifScene` grew `pal`, `cube`, `fps`, `rows`, `animal`. ⚠ `cube` is a bool and not a
+  `term.Profile` because Profile256 is that type's ZERO VALUE, which would have taken every clip off
+  truecolor silently.
+- `site/scapes/*.html` -- stills from `notes/scapestudy`, checked in. ⚠ They are NOT in `site/anim/`,
+  which `.gitignore` excludes; there they would be invisible to a fresh checkout.
+- Frames carry their own font stack (Menlo), NOT the page's. Cell backgrounds only tile at
+  line-height 1, and at that line-height JetBrains Mono's descenders are clipped by the row below.
+- The LOCKUP is Geist Mono 700 and carries no shadow; both are locked in `assets/brand/README.md`.
+  The page's grid face is not the identity's face.
 
 ## Instruments built in session 28 (do not re-derive these)
 
