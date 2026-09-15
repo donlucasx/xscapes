@@ -137,7 +137,7 @@ ul.feats li::before{content:"\00A0";position:absolute;left:0;top:.28em;width:1ch
 ul.feats b{color:var(--i)}
 .clip img{display:block;width:100%;height:auto;border:1px solid var(--ln);border-radius:6px}
 .foot{margin-top:70px;color:var(--d);font-size:13px;border-top:1px solid var(--ln);padding-top:18px}
-/* THE WAIT: Claude Code's own idle screen, redrawn in the page's face. It is
+/* THE PROBLEM: Claude Code's own idle screen, redrawn in the page's face. It is
    the one frame on the page that is not the renderer, and the empty rows are
    the point: this is everything the terminal tells you while it works. */
 .wait pre{margin:0;padding:calc(var(--lh)*.5) 2ch calc(var(--lh)*.75);white-space:pre;overflow-x:auto;color:var(--dd);font-size:13.5px;line-height:var(--lh)}
@@ -171,8 +171,8 @@ ul.feats.lead li{font-size:15px}
 
 <main>
 
-<div class="sec" data-title="The wait"><div class="boxtop" aria-hidden="true"></div></div>
-<section id="wait">
+<div class="sec" data-title="The problem"><div class="boxtop" aria-hidden="true"></div></div>
+<section id="problem">
 <div class="win wait" data-title="claude"><div class="boxtop" aria-hidden="true"></div>
   <div class="stage"><pre><span class="pr">&gt;</span> refactor the auth module and run the tests
 
