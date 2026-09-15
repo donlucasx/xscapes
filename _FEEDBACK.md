@@ -3214,3 +3214,29 @@ noticed that on the 'rainy window' the rain is falling upwards"* ⇒ the pattern
 moves a drop UP a row a frame; the still had carried the sign for ten days. Fixed and MEASURED: 212 of 224
 streaks reappear one row lower in the next frame, 33 higher. ⚠ **A still cannot show a sign error in a
 rate. The moment a channel moves, look at which way.**
+
+## Session 33 (2026-09-15) — the open items, prompted through with options; his rulings
+
+He asked to be *"prompt[ed] through any/all open items or existing gaps, w options."* Thirteen items,
+three rounds. Verbatim where he wrote, the option label where he picked one:
+- **Publish + push:** *Publish + push now.* (nothing from s32 was live; gh-pages was the 09-14 build)
+- **Commons entry (the proxy Worker, unverified):** *"lets make sure xscapes and site are polished before
+  we move onto this, later today"*
+- **The three scapes shown as clips with no line saying only the shore ships:** *Label now, build after
+  09-17.* ⇒ one truthful line goes on the page; the owl's five states and the vista as a real
+  `scape.Scape` wait until after the deadline.
+- **Per-section subtle animated ASCII backgrounds (his idea):** *One subtle pass now.* — over my
+  recommendation to wait; his call, and it is the answer to the dividers.
+- **The balance fix's last column (near pose 3 vs sand 2):** *Leave at 3 vs 2.*
+- **The typed prompt:** *Skip for the deadline.*
+- **Touch scrub:** *Add it now.*
+- **The silent local clock:** *"should be mentioned as a feature, wherever we are highlighting the most
+  important features (context meter, sound cues, etc)"* ⇒ a line in *While you wait*, not a hero caption.
+- **Owlets, egg or chick:** *Egg, as on the page now.* ("B for the subs" = the sheet's second row; closed.)
+- **The dead GIF pipeline (14 MB site/anim + make-gifs.py):** *Keep for now.*
+- **The deck:** *"is the deck different than the site?"* ⇒ answered: a 10-slide pitch, unpublished
+  (404), unlinked, on the old copy. Then: *"once we are done w the site, we ll update it"*.
+- **The aquarium (the one still clip):** *Animate it now.*
+⇒ Order of work: publish + push · label the scapes · the clock line · touch scrub · animate the aquarium ·
+the backgrounds pass · republish · the deck on the nine beats · Commons later today. After 09-17: the vista
+as a real scape.
