@@ -20,7 +20,7 @@ a pass over every element's colour through the day (SetBGSolid in the
 canvas so the resolver never draws a line across a mound; the lake kept 25
 luma above the meadow; the mound lighter; the far range further into the
 sky; TestTheElementsStayApart). COMMITTED at his word as five commits, each
-building, vetting and testing alone; NOT PUSHED; the site NOT rebuilt or
+building, vetting and testing alone; PUSHED at his word; the site NOT rebuilt or
 published (the study clip is byte-identical still; the live vista differs
 from it on purpose). Installed from the clean tree. Three review pages hold
 the locked record. NEXT: his next look live; his word on push and publish;
@@ -55,7 +55,7 @@ Do NOT drive Terminal.app (osascript, System Events) without asking me first.
 
 **State:** HEAD = the record commit on top of five workstream commits (`canvas: a solid cell` · `The owl's
 motion round` · `The vista's sky and ground` · `The live vista` · `Session 36`), each exported and built,
-vetted and tested alone. **NOT PUSHED** (`origin/main` = `f875b43`, eleven commits behind now). The site
+vetted and tested alone. **PUSHED 2026-09-16 at his word: `origin/main` = `e593ef4`, verified with `git ls-remote`.** The site
 is NOT rebuilt or published; `TestTheStudyVistaIsUnchanged` holds, so the page's vista clip is the block
 and today's tone while the live vista is the arc and T4 (deliberate: every live-only change is gated on
 `live != nil`). Installed from the clean tree. Three review pages, all on their original links:
@@ -66,7 +66,7 @@ https://claude.ai/artifact/KRLx7t9KgsLsc9cvKKwTBv, superseded).
 
 **0. His next look, live.** Restart a scape: the vista runs the balloon ground, the five locked motions,
 the litter by turns with its flights, the arc gauge, T4, and the seams pass. Take his notes.
-**1. His word on: push** (`gh auth switch --user donlucasx && git push origin main`) · **publish** (the site
+**1. His word on: publish** (the site
 would need `go run . -site site && sh site/publish.sh`; its vista clip is the study's and would stay so).
 **2. The one open card:** done's wings. D4 was picked with the big wings; working's are the small ones.
 **3. Verbatim rulings and every measurement:** `_FEEDBACK.md` §Session 36 (thirteen notes).
