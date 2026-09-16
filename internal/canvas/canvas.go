@@ -46,6 +46,15 @@ func (l *Layer) Clear() {
 	}
 }
 
+// Erase takes back one cell's glyph, for a shape painted over a field of
+// glyphs that must not show through it (the vista's dust under the sun).
+func (l *Layer) Erase(x, y int) {
+	if x < 0 || y < 0 || x >= l.W || y >= l.H {
+		return
+	}
+	l.Cells[y*l.W+x].Set = false
+}
+
 func (l *Layer) Plot(x, y int, r rune, fg term.RGB, a float64) {
 	if x < 0 || y < 0 || x >= l.W || y >= l.H || a <= 0 {
 		return
@@ -75,6 +84,9 @@ type Canvas struct {
 
 	// quad is a background cell painted as four quarters; see quadRef.
 	quad []quadRef
+	// solid marks a plain cell painted as one colour on purpose (SetBGSolid):
+	// resolve never splits it to place an edge implied by its neighbours.
+	solid []bool
 
 	// half is a background cell painted as two colours, top and bottom, for
 	// a shape whose edge falls inside a row: the moon's tips. Unset where
@@ -118,7 +130,7 @@ type rampRef struct {
 
 // New builds a canvas with one layer per alpha given, ordered far to near.
 func New(w, h int, alphas ...float64) *Canvas {
-	c := &Canvas{W: w, H: h, BG: make([]term.RGB, w*h), ramp: make([]rampRef, w*h), half: make([]halfRef, w*h), quad: make([]quadRef, w*h)}
+	c := &Canvas{W: w, H: h, BG: make([]term.RGB, w*h), ramp: make([]rampRef, w*h), half: make([]halfRef, w*h), quad: make([]quadRef, w*h), solid: make([]bool, w*h)}
 	for _, a := range alphas {
 		c.Layers = append(c.Layers, NewLayer(w, h, a))
 	}
@@ -132,6 +144,7 @@ func (c *Canvas) Resize(w, h int) {
 	c.W, c.H = w, h
 	c.BG = make([]term.RGB, w*h)
 	c.ramp = make([]rampRef, w*h)
+	c.solid = make([]bool, w*h)
 	c.half = make([]halfRef, w*h)
 	c.quad = make([]quadRef, w*h)
 	for i, l := range c.Layers {
@@ -161,6 +174,21 @@ func (c *Canvas) SetBG(x, y int, col term.RGB) {
 	c.ramp[y*c.W+x] = rampRef{}
 	c.half[y*c.W+x] = halfRef{}
 	c.quad[y*c.W+x] = quadRef{}
+	c.solid[y*c.W+x] = false
+}
+
+// SetBGSolid paints a plain cell that is one colour BY INTENT: a mound, a
+// lake, a gauge's body, the writing's band. resolve leaves it alone where it
+// would otherwise split a plain cell to place an edge implied by its
+// neighbours (the branch that put a half-row of the band's colour across
+// the vista's mound at some hours and not others, 2026-09-16). Glyphs
+// over it behave as over any plain cell.
+func (c *Canvas) SetBGSolid(x, y int, col term.RGB) {
+	if x < 0 || y < 0 || x >= c.W || y >= c.H {
+		return
+	}
+	c.SetBG(x, y, col)
+	c.solid[y*c.W+x] = true
 }
 
 // SetBGQuad paints a cell as four quarters: the shape's colour where mask
@@ -190,6 +218,7 @@ func (c *Canvas) SetBGQuad(x, y int, shape, ground term.RGB, mask uint8) {
 	}
 	c.BG[i] = ground.Blend(shape, float64(n)/4)
 	c.half[i] = halfRef{}
+	c.solid[i] = false
 	c.quad[i] = quadRef{shape: shape, ground: ground, mask: mask, set: true}
 }
 
@@ -235,6 +264,7 @@ func (c *Canvas) SetBGHalves(x, y int, up, down term.RGB) {
 	onRamp := c.ramp[i].r != nil
 	c.BG[i] = up.Blend(down, 0.5)
 	c.quad[i] = quadRef{}
+	c.solid[i] = false
 	// The ramp binding stays when a half is plain sky, so resolve can ask
 	// the path for that half's tone.
 	c.half[i] = halfRef{up: up, down: down, set: true,
@@ -255,6 +285,7 @@ func (c *Canvas) SetBGRamp(x, y int, r *term.Ramp, t0, t1 float64) {
 	}
 	i := y*c.W + x
 	c.BG[i] = r.True((t0 + t1) / 2)
+	c.solid[y*c.W+x] = false
 	c.ramp[i] = rampRef{r: r, t0: t0, t1: t1}
 	// Every paint clears the other kinds of paint. This line was missing for
 	// ten hours and the moon's tips from the night stayed in the sky until
@@ -460,7 +491,7 @@ func (c *Canvas) resolve(x, y int, p term.Profile) resolved {
 	// His rulings that the disc and the shoreline STAY split are untouched:
 	// those split explicitly through SetBGHalves, which is the hf.set branch at
 	// the top and is not gated here.
-	if p == term.Profile256 && !set && term.Shading && !term.NoSplitCells {
+	if p == term.Profile256 && !set && term.Shading && !term.NoSplitCells && !c.solid[i] {
 		if up, down, ok := c.halves(x, y); ok {
 			ui, di := up.Index256Keeping(), down.Index256Keeping()
 			if ui != di {
