@@ -1211,6 +1211,16 @@ func (s *Shore) starPlaces(w, hy, top, bot, n int) [][2]int {
 		bestX, bestY, bestD := 0, 0, -1.0
 		for j := 0; j < starDarts; j++ {
 			cell := cells[int(HashF(i*1021+j, 101, s.Seed+31)*float64(len(cells)))%len(cells)]
+			// Never under the spend counter (TokensGround, the top-right
+			// corner): a dart that lands there is re-thrown with a salt, so
+			// every star that never landed there stays exactly where it was
+			// before the counter existed (the golden constellation holds).
+			for k := 1; k <= 8 && inTokensGround(w, cell); k++ {
+				cell = cells[int(HashF(i*1021+j, 101+k, s.Seed+31)*float64(len(cells)))%len(cells)]
+			}
+			if inTokensGround(w, cell) {
+				continue
+			}
 			x, y := cell[0], cell[1]
 			d := math.MaxFloat64
 			for _, p := range pts {
@@ -1235,7 +1245,7 @@ func (s *Shore) starPlaces(w, hy, top, bot, n int) [][2]int {
 			// sampling and take the best cell there IS. Deterministic, and it
 			// depends on the same thing every other branch depends on: the
 			// stars already placed.
-			bestX, bestY, bestD = s.roomiestCell(cells, pts)
+			bestX, bestY, bestD = s.roomiestCell(cellsOffTheCounter(w, cells), pts)
 			// roomiestCell takes the best cell there IS, which at a small
 			// enough sky is still a touching one. Nothing can be done about
 			// that -- thirty-two stars do not fit in three rows of thirty

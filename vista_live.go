@@ -6,6 +6,7 @@ import (
 	"github.com/donlucasx/xscapes/internal/canvas"
 	"github.com/donlucasx/xscapes/internal/companion"
 	"github.com/donlucasx/xscapes/internal/reduce"
+	"github.com/donlucasx/xscapes/internal/scape"
 	"github.com/donlucasx/xscapes/internal/scenes"
 	"github.com/donlucasx/xscapes/internal/term"
 )
@@ -50,6 +51,12 @@ var (
 func drawVista(c *canvas.Canvas, v *scenes.Vista, lay layout, st reduce.State, t float64) {
 	owlX, owlY, grassY, bandTop := v.Layout()
 	drawVistaReadout(c, v, st.Act.ContextUsed)
+	// The spend counter, unless the owl's box reaches the counter's row:
+	// under the vista's 16-row floor the owl sits in the sky's top-right
+	// corner and would be drawn over it.
+	if owlY > scape.TokensRow {
+		drawTokens(c, st.Act.Tokens)
+	}
 	// The litter first, then the owl over it: an owlet's flight starts and
 	// ends behind its parent. The litter sits beside the owl, around the
 	// fire, or both (scenes.OwletPlace), each owlet flying in from the owl

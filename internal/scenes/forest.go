@@ -949,6 +949,11 @@ func vistaStars(c *canvas.Canvas, lay vistaLayout, p scape.Palette, seed int64, 
 		if x >= lay.moonX-1 && x <= lay.moonX+3 {
 			x = (x + 5) % (c.W - 2)
 		}
+		// And off the spend counter's cells in the top-right corner: a star
+		// under the number would drop the count (scape.TokensGround).
+		if tx0, tx1, ty := scape.TokensGround(c.W); y == ty && x >= tx0 && x <= tx1 {
+			y = ty + 1
+		}
 		ink := vistaStarInk(c, x, y, p.Star)
 		if ownGround {
 			// A moving body (the arc) passes behind the stars. A star keeps

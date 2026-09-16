@@ -16,6 +16,16 @@ type Activity struct {
 	// exhausted one.
 	ContextUsed float64
 
+	// Tokens is the session's running spend, every token the agent's
+	// transcript records as processed (fresh input, cache writes, cache
+	// reads and output), and Window the model's context window as the
+	// agent reports it; zero means unknown and nothing is drawn. The spend is a total with no
+	// ceiling: it passes the window many times over in a long session, so
+	// the window is NOT its denominator (his question of 2026-09-16,
+	// "xxxx/1M?"); the window's fill is the moon's channel already.
+	Tokens int64
+	Window int
+
 	// TimeOfDay runs 0 at midnight, .25 dawn, .5 noon, .75 dusk. Midnight is
 	// the zero value on purpose: it is the look the scape was designed around,
 	// so forgetting to set this yields the good palette rather than a broken one.

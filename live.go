@@ -388,12 +388,40 @@ func drawReadout(c *canvas.Canvas, sh *scape.Shore, used float64) {
 	}
 }
 
+// drawTokens is the session's spend in the top-right corner, his ask of
+// 2026-09-16: "a simple number on the top right of the xscape". The same in
+// every scape (his re-brief: one readable device that translates across
+// xscapes), on the balloon's darkened ground so it reads on any sky, hidden
+// until the transcript has a figure. A total with no denominator: the
+// window it would be divided by is the moon's channel, and the spend passes
+// it many times over. Drawn before the balloon, which wins the corner on a
+// short frame.
+func drawTokens(c *canvas.Canvas, tokens int64) {
+	txt, x, y, ok := scape.TokensLabel(c.W, tokens)
+	if !ok || y >= c.H {
+		return
+	}
+	near := c.Near()
+	for i, r := range txt {
+		g := term.Lerp(c.BGAt(x+i, y), term.RGB{}, balloonShade)
+		c.SetBG(x+i, y, g)
+		if cell := near.Cells[y*near.W+x+i]; cell.Set && cell.R == '*' {
+			// A falling star's head passing under the counter keeps its
+			// cell for the frame or two it is there: the count is the
+			// checklist's channel and a letter is not.
+			continue
+		}
+		near.PlotOn(x+i, y, r, moonLabelDim, g, 1)
+	}
+}
+
 // drawScene paints one composed frame: the companion, its litter, the bubble
 // and the sand. The live loop and the mockup both go through here, so a change
 // to the composition cannot land in one and miss the other.
 func drawScene(c *canvas.Canvas, sh *scape.Shore, cat *companion.Cat, lay layout,
 	st reduce.State, t float64, seed int64, top int) {
 	drawReadout(c, sh, st.Act.ContextUsed)
+	drawTokens(c, st.Act.Tokens)
 
 	// The pace. dx is negative -- inward, toward the centre -- and the litter
 	// keeps to the far side of the reserved strip so the companion never walks

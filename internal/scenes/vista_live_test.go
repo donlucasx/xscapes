@@ -256,3 +256,25 @@ func TestTheFireIsTheWorkToo(t *testing.T) {
 	t.Logf("flames %d → %d, sparks %d → %d, the ground unchanged", flames(rest), flames(full), sparks(rest), sparks(full))
 }
 
+// TestNoVistaStarSitsUnderTheSpendCounter: the vista's stars keep off the
+// counter's cells in the top-right corner at every width and count, so the
+// number never covers one (the count is the checklist's channel).
+func TestNoVistaStarSitsUnderTheSpendCounter(t *testing.T) {
+	for _, g := range [][2]int{{40, 12}, {60, 20}, {80, 24}, {120, 14}, {125, 28}, {143, 27}, {125, 62}} {
+		for _, seed := range []int64{5, 7, 42} {
+			for _, n := range []int{1, 5, 12, 32, 64} {
+				c := canvas.New(g[0], g[1], canvas.AlphaFar, canvas.AlphaMid, canvas.AlphaNear)
+				v := NewVista(seed, false)
+				v.OwlX = g[0] - 16
+				v.Update(c, 3.0, scape.Activity{Working: true, Level: 0.3, ContextUsed: 0.2, TimeOfDay: 22.0 / 24, TodoDone: n, TodoTotal: n})
+				x0, x1, y := scape.TokensGround(g[0])
+				near := c.Near()
+				for x := x0; x <= x1 && x < g[0]; x++ {
+					if cell := near.Cells[y*near.W+x]; cell.Set && cell.R == '*' {
+						t.Errorf("%dx%d seed %d %d done: a star at (%d,%d) under the spend counter", g[0], g[1], seed, n, x, y)
+					}
+				}
+			}
+		}
+	}
+}

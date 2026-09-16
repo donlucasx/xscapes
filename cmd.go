@@ -185,6 +185,28 @@ type statuslineInput struct {
 	Session string `json:"session_id"`
 }
 
+// statuslineEvent turns a statusline payload into the context event, with the
+// model's window riding along. ⚠ NOT the spend: the payload's "total" token
+// fields are the tokens in the window from the most recent response (its
+// docs, read 2026-09-16), which is the moon's variable in another coat; the
+// session's spend is summed off the transcript (internal/spend). Not ok when
+// the payload has no reading.
+func statuslineEvent(in []byte) (event.Event, bool) {
+	var s statuslineInput
+	if json.Unmarshal(in, &s) != nil || s.Context.UsedPercentage == nil {
+		return event.Event{}, false
+	}
+	sess := s.Session
+	if sess == "" {
+		sess = event.SessionFromEnv()
+	}
+	f := *s.Context.UsedPercentage / 100
+	return event.Event{
+		Kind: event.Context, Session: sess, Src: "claude", Frac: &f,
+		Window: s.Context.WindowSize,
+	}, true
+}
+
 // runStatusline is a pass-through: it reads the statusline payload, emits the
 // context reading, then runs whatever statusline command the user already had
 // and forwards its output verbatim.
@@ -197,16 +219,8 @@ func runStatusline(args []string) {
 
 	in, _ := io.ReadAll(io.LimitReader(os.Stdin, 1<<20))
 
-	var s statuslineInput
-	if json.Unmarshal(in, &s) == nil && s.Context.UsedPercentage != nil {
-		sess := s.Session
-		if sess == "" {
-			sess = event.SessionFromEnv()
-		}
-		f := *s.Context.UsedPercentage / 100
-		_, _ = event.Emit(event.Event{
-			Kind: event.Context, Session: sess, Src: "claude", Frac: &f,
-		})
+	if e, ok := statuslineEvent(in); ok {
+		_, _ = event.Emit(e)
 	}
 
 	// Strip the `--` separator. Without this the chain execs "--" and the

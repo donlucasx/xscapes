@@ -153,6 +153,8 @@ type State struct {
 
 	// Session is who we are following, for the footer.
 	Session string
+	// Transcript is the agent's transcript path when an adapter named one.
+	Transcript string
 
 	// tail lets a renderer re-fit the sand to its own width.
 	tail *tail
@@ -203,6 +205,10 @@ type Reducer struct {
 
 	ctx    float64
 	ctxSet bool
+	// tokens is the session's spend and window the model's context window,
+	// both from the agent's status payload, zero until it reports.
+	tokens int64
+	window int
 
 	todoDone, todoOf int
 	// turnsDone is how many turns have closed this session, and tasksDone how
@@ -222,8 +228,11 @@ type Reducer struct {
 
 	tail    tail
 	session string
-	last    time.Time
-	count   int
+	// transcript is the agent's own transcript path, from the latest event
+	// that named one; the composer sums the spend off it.
+	transcript string
+	last       time.Time
+	count      int
 }
 
 func New(session string) *Reducer {
@@ -237,6 +246,9 @@ func New(session string) *Reducer {
 
 // Apply folds one event in.
 func (r *Reducer) Apply(e event.Event, now time.Time) {
+	if e.Transcript != "" {
+		r.transcript = e.Transcript
+	}
 	r.decay(now)
 	r.last = now
 	r.count++
@@ -393,6 +405,12 @@ func (r *Reducer) Apply(e event.Event, now time.Time) {
 	case event.Context:
 		if e.Frac != nil {
 			r.ctx, r.ctxSet = clamp01(*e.Frac), true
+		}
+		if e.Tokens > 0 {
+			r.tokens = e.Tokens
+		}
+		if e.Window > 0 {
+			r.window = e.Window
 		}
 
 	case event.Todo:
@@ -674,6 +692,8 @@ func (r *Reducer) State(now time.Time) State {
 			Working:     working,
 			Level:       clamp01(lvl),
 			ContextUsed: r.ctx,
+			Tokens:      r.tokens,
+			Window:      r.window,
 			TodoDone:    stars(r.todoDone, r.todoOf, r.turnsDone, r.tasksDone),
 			TodoTotal:   starTotal(r.todoOf),
 			// The fall, from WALL-CLOCK age. Strictly less than StarFall, so
@@ -688,6 +708,7 @@ func (r *Reducer) State(now time.Time) State {
 		Tail:        r.tail.lines(now),
 		tail:        &r.tail,
 		Session:     r.session,
+		Transcript:  r.transcript,
 		LastEvent:   r.last,
 		Events:      r.count,
 	}

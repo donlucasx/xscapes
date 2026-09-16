@@ -10,6 +10,7 @@ import (
 	"github.com/donlucasx/xscapes/internal/reduce"
 	"github.com/donlucasx/xscapes/internal/scape"
 	"github.com/donlucasx/xscapes/internal/scenes"
+	"github.com/donlucasx/xscapes/internal/spend"
 	"github.com/donlucasx/xscapes/internal/term"
 )
 
@@ -20,6 +21,11 @@ import (
 // scene assembled twice is a scene that drifts. Everything about what the
 // scape looks like lives here; the callers only decide where to put it.
 type frames struct {
+	// spend sums the tokens off the agent's transcript, polled every two
+	// seconds from state(); the counter in the top-right corner.
+	spend   *spend.Tally
+	spendAt time.Time
+
 	c        *canvas.Canvas
 	sh       *scape.Shore
 	cat      *companion.Cat
@@ -181,6 +187,19 @@ func (f *frames) state(now time.Time, t float64) reduce.State {
 		}
 	}
 	st := f.red.State(now)
+	// The spend, summed off the transcript every two seconds (his ask of
+	// 2026-09-16, drawTokens). An adapter that sends a figure of its own
+	// wins; the Claude adapter sends none, its payload has no such total.
+	if now.Sub(f.spendAt) >= 2*time.Second {
+		if f.spend == nil {
+			f.spend = spend.New()
+		}
+		f.spend.Poll(st.Transcript)
+		f.spendAt = now
+	}
+	if st.Act.Tokens == 0 && f.spend != nil {
+		st.Act.Tokens = f.spend.Total()
+	}
 	// Re-render the sand to the columns this layout actually leaves it, so a
 	// narrow pane loses whole pieces of a line rather than getting a path
 	// chopped mid-word. The vista's band runs the whole width.
@@ -243,14 +262,21 @@ func (f *frames) frame(now time.Time) string {
 	f.cat.Approach(dt, st.Pose == companion.NeedsYou)
 
 	f.refreshScape(now)
+	f.compose(st, t)
+	return f.c.Render(f.profile)
+}
+
+// compose paints one state at one time into f.c through the scape in use:
+// the vista or the shore, each through its own composer. The live frame
+// and the tests share it, so a test composes exactly what the loop draws.
+func (f *frames) compose(st reduce.State, t float64) {
 	if f.vista != nil {
 		f.vista.OwlX = f.lay.CatX
 		f.vista.Update(f.c, t, st.Act)
 		drawVista(f.c, f.vista, f.lay, st, t)
-		return f.c.Render(f.profile)
+		return
 	}
 	f.sh.Update(f.c, t, st.Act)
 	top := f.c.H - 2 - f.chh
 	drawScene(f.c, f.sh, f.cat, f.lay, st, t, f.seed, top)
-	return f.c.Render(f.profile)
 }

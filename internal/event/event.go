@@ -132,9 +132,20 @@ type Event struct {
 	N  int `json:"n,omitempty"`
 	Of int `json:"of,omitempty"`
 
+	// Tokens is the session's running spend (unused by the Claude adapter,
+	// whose spend is summed off the transcript; an adapter that knows its
+	// total may send it); Window is the model's context window in tokens.
+	// Both ride the Context event; zero means unknown.
+	Tokens int64 `json:"tokens,omitempty"`
+	Window int   `json:"window,omitempty"`
+
 	// Text is human-facing: the prompt, the error, the message that goes in
 	// the bubble. Truncated hard by the wire encoder.
 	Text string `json:"text,omitempty"`
+
+	// Transcript is the path of the agent's own transcript, when the adapter
+	// knows it: the spend counter is summed off it (internal/spend).
+	Transcript string `json:"transcript,omitempty"`
 
 	// Src names the adapter ("claude", "manual"). Cheap, and it is how you
 	// tell a hand-fired test event from a real one when a log looks wrong.

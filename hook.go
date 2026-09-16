@@ -21,11 +21,14 @@ import (
 // ships new hook events regularly; a missing field must produce a quieter
 // scene, never an error and never a crash inside the agent's turn.
 type hookPayload struct {
-	Event     string `json:"hook_event_name"`
-	Session   string `json:"session_id"`
-	CWD       string `json:"cwd"`
-	AgentID   string `json:"agent_id"`
-	AgentType string `json:"agent_type"`
+	Event   string `json:"hook_event_name"`
+	Session string `json:"session_id"`
+	CWD     string `json:"cwd"`
+	// Transcript is the session's JSONL, which every hook names; the spend
+	// counter is summed off it (internal/spend).
+	Transcript string `json:"transcript_path"`
+	AgentID    string `json:"agent_id"`
+	AgentType  string `json:"agent_type"`
 
 	ToolName  string          `json:"tool_name"`
 	ToolInput json.RawMessage `json:"tool_input"`
@@ -108,6 +111,9 @@ func salvage(b []byte, p *hookPayload) {
 	if p.Session == "" {
 		p.Session = str("session_id")
 	}
+	if p.Transcript == "" {
+		p.Transcript = str("transcript_path")
+	}
 	if p.ToolName == "" {
 		p.ToolName = str("tool_name")
 	}
@@ -187,6 +193,7 @@ func runHook(args []string) {
 	for _, e := range translate(p) {
 		e.Session = p.Session
 		e.Src = src
+		e.Transcript = p.Transcript
 		if e.Agent == "" {
 			e.Agent = p.AgentID
 		}
