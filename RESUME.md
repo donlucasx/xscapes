@@ -4,19 +4,25 @@
 
 ```
 cd ~/Documents/claude/xscapes/ and read CLAUDE.md (the brief, authoritative)
-and RESUME.md before responding. Session 32 (09-14 into 09-15) rebuilt the
-SUBMISSION PAGE as nine beats on his rulings, animated the rainy window,
-redrew the THIRD SCAPE (a mountain vista with the owl) from his references
-and drew the owl three rounds until he picked. HEAD af41078 + the wrap
-commit: tree clean, suite 10/10 + vet + fmt green, ~21 COMMITS UNPUSHED,
-and gh-pages still serves the 09-14 build -- NONE of session 32 is live.
-Page preview (private): https://claude.ai/artifact/GsALdkkvK48pL7cWm3SWcg
-Vista options page:     https://claude.ai/artifact/N5Cvri266YgbtsufPXhiGV
-Skim origin-chat.md only if you need the why; ignore ideas.md.
+and RESUME.md before responding. Session 33 (09-15) was HIS SITE SESSION:
+he prompted through thirteen open items with options, then reviewed the
+live page seven times and I built to each note. LIVE and pushed at HEAD
+6baa6ee + the wrap commit: the legend is the companion ALONE, cropped to
+one shared box on a floor rule, the ask cut by it as on the beach; the
+cast is crab/cat/owl/frog floating; the aquarium is a seamless loop; six
+per-section backdrops on a stated criterion; one reading measure (66ch)
+and three text sizes with one job each; section titles that say what
+they hold; seven named features; a synopsis as the deck; a drawn repo
+box. Suite 10/10 + vet + fmt green. A friend's "pond that fills with
+tokens" is CARDED in ideas.md (his ruling: "definitely card it").
+Skim origin-chat.md only if you need the why; ignore ideas.md unless he
+opens the pond.
 Tell me where we left off, then pick up from the NEXT queue.
 
-⏰ COMMONS CLOSES 2026-09-17. Publishing is two commands and is his call;
-the Commons entry is a proxy Worker (site/commons-brief.md), unverified.
+⏰ COMMONS CLOSES 2026-09-17. The entry is a proxy Worker
+(site/commons-brief.md, kit on his Desktop), UNVERIFIED: he said "later
+today" after the site is polished, and the session ended before it. The
+deck refresh waits on the same word ("once we are done w the site").
 
 Five things about how to work on this, all paid for:
 build the instrument before trusting the picture; measure the RENDERED frame
@@ -25,29 +31,60 @@ instead of reasoning about it; A MEASUREMENT AT ONE SEED IS NOT A MEASUREMENT;
 and when a fix makes the number worse, say so and put it back.
 ⚠ s31 added two: WHEN A VISUAL IS WRONG, INSTRUMENT THE PIPELINE, NOT THE API,
 and THE COUNT IS NOT THE VERDICT (read failures, never a tally).
-⚠ s32 added: LOOK AT THE RENDERED FRAME. Headless Chrome is at
-/Applications/Google Chrome.app and `go run ./notes/vistashots <dir>` makes
-frame pages to screenshot; every visual defect this session was seen that
-way and none in a text dump. And A STILL CANNOT SHOW A SIGN ERROR IN A RATE:
-the rain fell UPWARDS for ten days and nobody could tell until it moved.
+⚠ s32 added: LOOK AT THE RENDERED FRAME. `XSCAPES_CLIPSHOTS=<dir> go test
+-run TestClipShots .` writes every embedded clip as a frame page for headless
+Chrome (/Applications/Google Chrome.app); for the WHOLE page, `python3 -m
+http.server 8765` in site/ and Playwright (file:// is blocked there).
+⚠ s33 added: WRITE THE CRITERION WHERE THE VALUES LIVE. Six text measures
+and four text sizes had crept in with no rule anywhere; the fix was one
+token and a comment stating the job of each size. And CHAIN EDIT SCRIPTS
+WITH && BEFORE A PUBLISH: a python assert failed, the chain went on, and a
+misaligned box went live for four minutes.
 Do NOT drive Terminal.app (osascript, System Events) without asking me first.
 ```
 
-## ▶ NEXT (session 33, 2026-09-15, in progress)
+## ▶ NEXT (session 33 left it here, WRAPPED 2026-09-15)
 
-**Where it stands (checkpoint, mid-session):** HEAD `ce5b37c`, pushed, gh-pages = HEAD, suite 10/10 + vet
-+ fmt green. He prompted through thirteen open items (rulings verbatim in `_FEEDBACK.md` §Session 33) and
-the site batch that came out of them is LIVE: the clock as a feature · which scapes ship, said · touch
-scrub · the aquarium ANIMATED (seamless 8 s loop, the frog) · **the legend is the companion ALONE,
-floating on the page, no ground, no box** (his note: *"no background whatsoever"*) · **the cast: crab,
-cat, owl, frog** in *A layer, not a screen* · **six per-section animated backdrops** (his idea, one
-subtle pass, 12%). Instruments: `XSCAPES_CLIPSHOTS=<dir> go test -run TestClipShots .` writes every
-clip as a frame page for headless Chrome; Playwright against `python3 -m http.server` in `site/` for the
-whole page. ⏭ **Waiting on his look** at the backdrops' strength and the cast. Then: the deck on the
-nine beats (*"once we are done w the site, we'll update it"*) · Commons later today (*"lets make sure
-xscapes and site are polished before we move onto this"*). After 09-17: the owl's five states → the
-vista as a real scape. Closed at his word: balance column (leave) · typed prompt (skip) · owlets = egg ·
-GIF pipeline (keep for now).
+**State:** HEAD `6baa6ee` + the wrap commit, pushed, **gh-pages = HEAD** (live hash verified against
+`site/index.html` after every one of the session's seven publishes), suite 10/10 + vet + fmt green.
+Installed binary unchanged (`4336fbf`): nothing in the product's own code moved this session; it was all
+site, study and instruments. His thirteen rulings and every review note are verbatim in `_FEEDBACK.md`
+§Session 33.
+
+**0. ⏰ COMMONS, 09-17.** Unverified. His word: *"lets make sure xscapes and site are polished before we
+move onto this, later today"*; the session ended on the site. The kit (`~/Desktop/xscapes-commons/`,
+`site/commons-brief.md`) is a proxy Worker over https://donlucasx.github.io/xscapes/, so a republish reaches
+the entry with no Commons step once it exists. Fresh chat, Default · Quick, not Expert → paste `message.md`
+→ publish public → Your entry → Submit → screenshot. **Open on this.**
+
+**1. The deck on the nine beats**, his word: *"once we are done w the site, we ll update it"*. 10 slides,
+`assets/deck/` (HTML + PDF), on the old copy and unpublished (404). Rebuild from the page's copy and the
+portraits; link it from the footer. An hour or two.
+
+**2. His look at the last round** (published 6baa6ee, he had not replied): the three-size type system
+(deck 17 / body 15 / meta 13, criterion in the stylesheet) · the shorter synopsis · the four synthesized
+blocks (companion-states intro to one line; install intro; the protocol paragraph and the cast intro
+halved; the closing "one rule" paragraph CUT) · the drawn repo box under the install commands.
+
+**3. The pond** (`ideas.md` §The pond): cumulative token spend as a scape's fill. His ruling *"definitely
+card it. I think tracking total token usage is helpful ... keep discussing next session."* Open questions
+for that discussion: a level with no ceiling (log scale, or tip-over per unit) · whether a cost meter
+belongs in a calm scene · which scape (pond / aquarium tank / snow) · verify the statusline payload's
+field names for session totals before anything is built.
+
+**4. After 09-17, the product:** the owl's five states + owlets arriving/leaving → the vista as a real
+`scape.Scape` (half a day to a day). The vista is a page clip until then, and the page says so.
+
+**5. Closed this session at his word, do not reopen:** the balance column (leave at 3 vs 2) · the typed
+prompt (skip) · owlets = the egg · the GIF pipeline (keep for now) · the ask tab is LAST · no ground and no
+box under the companion, but a FLOOR rule · backdrops at 24% on the stated criterion.
+
+**How the page is built and looked at now:** `go run . -site site` builds `site/index.html` (one file,
+~480 KB gz); `sh site/publish.sh` force-pushes gh-pages; `gh auth switch --user donlucasx` before every
+push. `siteframes.go` holds every clip (`allFX`): the hero, the five legend portraits (`stateClips` +
+`legendCrop`), the four cast portraits, the three scene loops. `backdrops.go` holds the six section fields.
+`XSCAPES_CLIPSHOTS=<dir> go test -run TestClipShots .` renders clips as frame pages; the whole page is
+looked at through Playwright over `python3 -m http.server 8765` in `site/`.
 
 ## ▶ NEXT (session 32 left it here)
 

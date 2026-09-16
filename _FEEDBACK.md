@@ -3292,3 +3292,10 @@ about the agent...") becomes a synopsis: purpose, medium, features, in that orde
 thorough audit of how we are using fonts? its not BAD but im not sure I understand your formatting
 criteria. ---- indentify any other opportunities to synthesize the info on the site. -- do we need to
 include a link to the repository? if so, can we do it in some sort of ASCII fashion"*
+**A FRIEND'S IDEA AND HIS RULING, verbatim (2026-09-15, a Discord screenshot):** statik: *"im thinking the
+scene could hook into your token usage / so you could have something that shows an empty pond and it grows
+as it uses tokens etc"* · Lucas: *"it previews how much context youve used ... which is kinda the same,
+no?"* · statik: *"im thinking like animation style as it is 'working'"*. Discussed: context used is the
+moon; tokens CONSUMED (cumulative spend) is a new variable, a scape's fill, a level not a speed. His ruling:
+*"definitely card it. I think tracking total token usage is helpful. lets /wrap and keep discussing next
+session"* ⇒ carded in `ideas.md` §The pond.

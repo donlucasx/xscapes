@@ -2,6 +2,52 @@
 
 *(Renamed end to end on 2026-09-03: directory, env vars, state path and hook marker. Two names are kept on purpose and are not leftovers -- `internal/envx` still reads `ASCIISCAPES_*` and warns, and `install.go` still RECOGNISES the `# asciiscapes:v1` marker so the hooks it wrote before the rename can be found and removed.)*
 
+> **Session 33 (2026-09-15), WRAPPED. HIS SITE SESSION: thirteen rulings, seven review rounds, seven
+> publishes.** HEAD `6baa6ee` + the wrap commit, pushed, **gh-pages = HEAD, live hash verified after every
+> publish**, suite 10/10 + vet + fmt green. The product's own code did not move (installed binary still
+> `4336fbf`); everything is site, study and instruments. ⏰ **Commons closes 09-17 and the entry is STILL
+> UNVERIFIED**: his word was *"later today"* after the site is polished, and the session ended on the site.
+> **That is the first thing next session.** Then the deck (*"once we are done w the site"*).
+>
+> ⭐ **HE PROMPTED THROUGH EVERY OPEN ITEM WITH OPTIONS** (verbatim in `_FEEDBACK.md` §Session 33): publish now
+> · Commons later today · label the scapes now, build the vista after 09-17 · backdrops now · balance stays ·
+> typed prompt skipped · touch scrub now · the clock as a feature · owlets = egg · GIF pipeline kept · deck
+> after the site · aquarium animated. Then he reviewed the live page seven times and I built to each note.
+> ⭐⭐ **THE LEGEND IS THE COMPANION ALONE.** *"the companion by itself (instead of within the scene)"* → *"no
+> background whatsoever ... 'float' on the site"* → *"'it needs you' should fit the others, not expand the
+> section, hence cropping the companion when closer same way it happens on the terminal"* → *"an ascii frame
+> below ... so the cropped closeup does not look weird"* → *"move 'it needs you' to the far right"*. Built
+> exactly so: `portraitFrames` draws one animal on a ground the page writes as TRANSPARENT
+> (`HTMLPalette.Transparent`, a sentinel colour), the five states still folded from the session, one shared
+> crop (`legendCrop`, the union of the four resting-size states, 46x11) that cuts the ask's near pose where
+> the sand's edge cuts it, on a FLOOR (a window with only its bottom rule), the ask tab last.
+> ⭐ **THE CAST**: crab, cat, owl (`scenes.DrawOwlPicked`), frog (`scenes.DrawCandidate`), floating, a name
+> and a line under each; two ship, two are next, and the page says which.
+> ⭐ **THE AQUARIUM IS A SEAMLESS LOOP** (8 s, the frog): every motion closes on `AquariumLoop`; a fish the
+> level brings out fades in through alpha rather than popping.
+> ⭐ **SIX PER-SECTION BACKDROPS, ON A CRITERION** he made me state (*"whats the criteria? what is under
+> 'features'? grass?"*): each backdrop is THE THING ITS SECTION IS ABOUT, drawn so it reads as that thing
+> (a working sea of scattered `^~` read as grass; crests are RUNS along a row) · spinners under The problem
+> · the sea under Features · nothing under the floating companion · prompts under Install · rain under
+> Scapes · a night sky with a falling star under Different every session. 24% (*"too subtle"* at 12%).
+> Every field closes on its sixth frame, because a backdrop is noticed the moment it stutters.
+> ⭐ **THE TYPE AUDIT** (*"im not sure I understand your formatting criteria"*): running text was at FOUR sizes
+> across six styles and SIX measures, no rule anywhere. Now one measure (`--measure: 66ch`; Bringhurst
+> 45-75, Baymard 50-75, monospace toward the short end) and THREE sizes with one job each, stated in the
+> stylesheet: deck 17 once (the synopsis), body 15, meta 13. Section titles say what they hold (Features ·
+> Companion states · Install · Scapes and companions · Different every session); seven named features with
+> kickers, Activity + the log synthesized into one lead item; a shorter synopsis as the deck; four copy
+> blocks cut down; the repo as a drawn box.
+> ⚠ **TWO TRAPS PAID FOR**: a python edit script's assert failed and the shell chain went ON to publish a
+> misaligned box (chain with `&&`) · the first floating build gave the ask its full height, which he read as
+> the section jumping; the beach's crop was right all along.
+> ⭐ **THE POND IS CARDED** (`ideas.md`): a friend's *"empty pond that grows as it uses tokens"*. Context used
+> is the moon; tokens CONSUMED is a new variable, a scape's fill, a level not a speed, cheap to source from
+> the statusline payload. His ruling: *"definitely card it. I think tracking total token usage is helpful.
+> lets /wrap and keep discussing next session."*
+> ⏭ **NEXT: Commons (verify the Worker, submit) · the deck on the nine beats · his look at the last round ·
+> the pond discussion · after 09-17, the owl's five states → the vista as a real scape.**
+
 > **Session 32 (2026-09-14 into 09-15), WRAPPED.** HEAD `af41078` + the wrap commit, tree clean, suite
 > 10/10 + vet + fmt green. ⚠⚠ **~21 COMMITS UNPUSHED, and gh-pages still serves the 09-14 build: NONE of
 > this session is live.** ⏰ **Commons closes 09-17.** Publish = `go run . -site site && sh

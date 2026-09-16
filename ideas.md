@@ -48,6 +48,26 @@ Worth bringing back once the vocabulary is settled and taught:
 - Carries a lantern to the door; letting it in (Enter) is the notification.
 - Companion-first product framing (the Clippy move): product name = the pet's name.
 
+## The pond: cumulative spend as a scape (carded 2026-09-15, his ruling "definitely card it")
+A friend's idea (statik, Discord, 2026-09-15): *"the scene could hook into your token usage ... an empty pond
+and it grows as it uses tokens ... animation style as it is 'working'."* Two things hide in "token usage":
+context USED (the moon already; a pond of context would be a second channel for one variable, which the
+encoding rule forbids) and tokens CONSUMED, the session's running total across compactions and subagents,
+which only grows and is the nearest thing to cost. xscapes shows neither spend nor cost today, and it is a
+real question while waiting. Lucas: *"I think tracking total token usage is helpful."*
+- **A scape, not a shore feature.** The shore's motion slot is the sea and its accumulator is the stars; a
+  second fill on the beach competes with the sea for the eye. It belongs in a scape whose accumulator slot
+  IS a fill: a pond, the aquarium's tank, snow against the cabin. Same variable, a different picture per
+  scape, which is what the six slots are for.
+- **A level, never a speed.** His "grows while it works" is right and the rule agrees: the pond's LEVEL reads
+  in a screenshot; a faster ripple does not.
+- **Cheap to source, unverified:** the moon's number comes from Claude Code's statusline payload
+  (`cmd.go`, `runStatusline`), and the same payload carries session totals (token counts and a cost figure).
+  Verify the field names on a real payload before building.
+- **The design question:** a total with no ceiling has nothing to fill toward. Log scale, or fill once per
+  unit and tip over. Decide before drawing.
+- **Taste question, his:** a cost meter inside a scene whose point is calm reads as anxiety, not progress.
+
 ## Interaction
 - Catch a firefly, whistle for wind (hold key, trees bend), throw a stone into the pond.
 - Micro-status on tap.
