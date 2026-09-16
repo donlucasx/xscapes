@@ -20,8 +20,9 @@
 > the sky, `TestTheElementsStayApart`. ⚠ **Two live defects since s35 found by the round**: the vista never
 > cleared its layers (his 10:10 sky was minutes of debris) and the dust showed through the moon. **COMMITTED
 > as five workstream commits, each built/vetted/tested alone; PUSHED at his word (`origin/main` = `e593ef4`); the site NOT rebuilt or published
-> (the study clip is byte-identical; the live vista differs by design). Installed clean. NEXT: his next
-> look live · publish at his word · done's wings, the one open card.**
+> (the study clip is byte-identical; the live vista differs by design). Installed clean. WRAPPED at his word *"lets test it first
+> before anything else"*: he restarts a scape. NEXT: his notes from that look · publish at his word ·
+> done's wings, the one open card.**
 
 > **Session 35 (2026-09-16), WRAPPED. THE WALKTHROUGH, THEN EVERY OPEN CARD CLOSED IN ONE AFTERNOON.** Opened on a
 > status check (all of s34 held; this window's scape runs the three-cue binary). Every open item on the

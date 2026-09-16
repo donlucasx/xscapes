@@ -23,9 +23,10 @@ sky; TestTheElementsStayApart). COMMITTED at his word as five commits, each
 building, vetting and testing alone; PUSHED at his word; the site NOT rebuilt or
 published (the study clip is byte-identical still; the live vista differs
 from it on purpose). Installed from the clean tree. Three review pages hold
-the locked record. NEXT: his next look live; his word on push and publish;
-D4's wings (big, as he picked it, or the working owl's small ones) is the
-one open card.
+the locked record. WRAPPED at his word: "lets test it first before anything
+else", so he restarts a scape to see the day's work live. NEXT: his notes
+from that look; publish at his word; D4's wings (big, as he picked it, or
+the working owl's small ones) is the one open card.
 
 Six things about how to work on this, all paid for:
 build the instrument before trusting the picture; measure the RENDERED frame
@@ -64,8 +65,10 @@ https://claude.ai/artifact/EgRNj7JE1gsLrVYb82AeZF · the tones https://claude.ai
 (also the five faces https://claude.ai/artifact/HKSGKiZdqtzQgvGos6J38C and the sun/moon life cycle
 https://claude.ai/artifact/KRLx7t9KgsLsc9cvKKwTBv, superseded).
 
-**0. His next look, live.** Restart a scape: the vista runs the balloon ground, the five locked motions,
-the litter by turns with its flights, the arc gauge, T4, and the seams pass. Take his notes.
+**0. His next look, live.** He wrapped to restart a scape: the vista runs the balloon ground, the five
+locked motions, the litter by turns with its flights, the arc gauge, T4, and the seams pass. ⚠ At the
+wrap his window's scape (pid 19222) and the tyastie one still held OLD inodes; the installed binary is
+`e593ef4`'s code (the two commits after it are docs). Take his notes.
 **1. His word on: publish** (the site
 would need `go run . -site site && sh site/publish.sh`; its vista clip is the study's and would stay so).
 **2. The one open card:** done's wings. D4 was picked with the big wings; working's are the small ones.

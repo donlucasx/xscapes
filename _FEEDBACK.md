@@ -3707,3 +3707,10 @@ foreground, background, the lake, the mountains, grass, etc"*
   and the mound: zero split glyphs over the day. Night seams stay low (10–20): night is dark.
 - Four hours looked at (08:30, 12:36, 17:00, 22:00). All three pages rebuilt and republished; reinstalled.
   Suite 12/12 + vet + fmt green.
+
+**His word to land it:** *"ok, commit!"* ⇒ five workstream commits + the record, each exported and
+built/vetted/tested alone (the first split had the owl commit depending on the painter's; two vista
+tests moved to `vista_live_test.go` and the five redone). *"push"* ⇒ `gh auth switch --user donlucasx
+&& git push origin main`, origin/main = c06434b, read back with ls-remote. Then *"ok, lets test it first
+before anything else. lets /wrap"* ⇒ WRAPPED 2026-09-16 ~13:00 PDT; he restarts a scape to see the day's
+work live. Nothing published.
