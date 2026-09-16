@@ -79,7 +79,7 @@ func TestOwlLocked(t *testing.T) {
 		{"resting", "peek: one eye opens, looks the other way, closes, 1.2 s in 10", reduce.State{Act: act(0, false), Pose: companion.Resting}},
 		{"working", "looks the other way, looks back, blinks, then the hop and flutter on both wings, 3.2 s in 10; the blink every 7 s stays", reduce.State{Act: act(0.65, true), Pose: companion.Working, Tail: tail}},
 		{"needs you", "double blink every 4 s, and every other time the near wing waves with it", reduce.State{Act: act(0.1, false), Pose: companion.NeedsYou, Bubble: "allow Bash?", BubbleAsk: true, Tail: tail}},
-		{"done", "flap and bounce: wings out with each of two hops, every 5 s", reduce.State{Act: act(0.05, false), Pose: companion.Done, Bubble: "done", Tail: tail}},
+		{"done", "flap and bounce: the small wings out with each of two hops, every 5 s (your afternoon ruling: small wings for both)", reduce.State{Act: act(0.05, false), Pose: companion.Done, Bubble: "done", Tail: tail}},
 		{"worried", "squint with brows: the eyes a white band a cell tall with the pupil in it, worried brows raised toward the middle, held; the pupils dart every 3 s", reduce.State{Act: act(1.0, true), Pose: companion.Worried, Tail: tail}},
 	}
 	b.WriteString(`<section><h2>the five faces, locked</h2><div class="cands">`)
@@ -154,14 +154,13 @@ code{font-size:13px;color:var(--acc)}
 </style>
 <main>
 <h1>The owl, locked</h1>
-<p class="lede">Your rulings of 2026-09-16 on the owl and its litter, as the installed vista draws them. One clip each. Every period is compressed to eight seconds here, one loop, so each event shows once and the needs-you wave shows on its second blink.</p>
+<p class="lede">Your rulings of 2026-09-16 on the owl and its litter, as the installed vista draws them. Done's flap is on the small wings now, your ruling of the afternoon; nothing about the owl is open. One clip each. Every period is compressed to eight seconds here, one loop, so each event shows once and the needs-you wave shows on its second blink.</p>
 <div class="bar"><button type="button" id="play">Pause</button><input type="range" id="sl" min="0" max="` + fmt.Sprint(n-1) + `" value="0" aria-label="frame"><span class="fr" id="fr"></span></div>
 ` + b.String() + `
 <section><h2>still open</h2><ul>
 <li><b>Working and needs-you, rebuilt to your notes:</b> the looks-blink-flutter sequence and the wave on every other double blink. Your look.</li>
 <li><b>The litter by turns, now actually by turns.</b> The pick had not reached the code when you looked; it has.</li>
 <li><b>The sun and moon: the arc, locked,</b> bright when fresh and dimming as the window spends. <a href="https://claude.ai/artifact/EgRNj7JE1gsLrVYb82AeZF">Your look at the ramp</a>.</li>
-<li><b>Done's wings.</b> D4 keeps the big wings you picked it with; the working owl's are the small ones. Say the word if done should match.</li>
 </ul></section>
 <p class="foot">Made from the tree: <code>XSCAPES_OWLLOCKED=&lt;file&gt; go test -run TestOwlLocked .</code> · 125x28, seed 7, 10:10, the 256-colour cube. The candidates he passed over stay in <code>owl_anim.go</code>; the round page is superseded by this one.</p>
 </main>

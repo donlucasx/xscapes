@@ -298,13 +298,13 @@ var OwlMotions = map[companion.State][]OwlMotion{
 				}
 				return OwlMod{}
 			}},
-		{Name: "flap and bounce", Note: "wings out with each of two hops", Period: 5,
+		{Name: "flap and bounce", Note: "the small wings out with each of two hops", Period: 5,
 			At: func(u float64) OwlMod {
 				if in(u, 0, 0.25) || in(u, 0.45, 0.7) {
-					return OwlMod{Hop: 1, Wings: 1}
+					return OwlMod{Hop: 1, Wings: 3}
 				}
 				if in(u, 0.25, 0.35) || in(u, 0.7, 0.8) {
-					return OwlMod{Wings: 1}
+					return OwlMod{Wings: 3}
 				}
 				return OwlMod{}
 			}},
@@ -401,11 +401,17 @@ var OwlMotions = map[companion.State][]OwlMotion{
 // double blink (N2) · done = bounce (D1), then D4 an hour later.
 // Second round, same day: working = hop and flutter (W6, both wings) · done
 // = flap and bounce (D4) · worried = squint with brows (X6).
-// Third round: working = looks, blink, flutter (W8) · needs you = double
-// blink with a one-wing wave every other time (N3).
+// Third round: working = looks, blink, flutter (index 7; the record calls
+// it W8 and the pick was written as 8, which is "long hop": found by a
+// parallel session's audit, and TestThePicksAreByName holds every pick by
+// name now) · needs you = double blink with a one-wing wave every other
+// time (N3).
+// After his first look live, the afternoon of the same day: "small wings
+// for both", so done's flap (D4) beats the working owl's small wings and
+// no picked motion needs the 14-column art (TestThePickedOwlNeverGrows).
 var OwlMotionPick = map[companion.State]int{
 	companion.Resting:  2,
-	companion.Working:  8,
+	companion.Working:  7, // "looks, blink, flutter"; 8 was "long hop", an off-by-one a parallel audit caught 2026-09-16
 	companion.NeedsYou: 3,
 	companion.Done:     4,
 	companion.Worried:  6,
@@ -447,7 +453,9 @@ func stateLids(st companion.State) Lids {
 }
 
 // The wings. Kinds 1 and 2 are overlays on a 14-wide art whose body sits
-// in columns 1..12: the big wings of the first round. Kinds 3 to 6 are his
+// in columns 1..12: the big wings of the first round, which no picked motion
+// uses since his "small wings for both" (2026-09-16); they stay for the
+// candidates he passed over. Kinds 3 to 6 are his
 // "wings should be smaller": overlays on the body's own 12 columns, in the
 // margins the barn owl's art leaves at columns 0-1 and 10-11, so the owl's
 // box never grows. 5 and 6 are the near wing alone, for a wave.
