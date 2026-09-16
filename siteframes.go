@@ -154,8 +154,18 @@ func sceneFrames(cl fxClip) ([]string, error) {
 	return out, nil
 }
 
-// portraitFrames renders a portrait: the companion alone on a flat ground.
-func portraitFrames(cl fxClip) ([]string, error) {
+// portraitFrames renders a portrait: the companion alone on a transparent
+// ground, CROPPED to the animal's own bounding box.
+//
+// His note of 2026-09-15 on the first floating build: "the first one is 'it
+// needs you' and it stands out because it comes closer. Should the bounding
+// box/crop be the same as the session? so the character reads same as it
+// will? and also so the rest of the 'states' have less negative space around
+// them." So the frame is the ink's own box, one cell of air around it, the
+// union over every frame of the clip so the picture does not jump as it
+// breathes -- and every state plays at the same cell size, so the ask is
+// twice the resting crab the way it is on the beach.
+func portraitFrames(cl fxClip) (frames []string, cols, rows int, err error) {
 	p := cl.port
 	prof := term.ProfileTrueColor
 	if !truecolorFX {
@@ -163,7 +173,7 @@ func portraitFrames(cl fxClip) ([]string, error) {
 	}
 	n := int(cl.sc.secs * float64(cl.sc.rate()))
 	if n <= 0 {
-		return nil, fmt.Errorf("%s: no frames", cl.key)
+		return nil, 0, 0, fmt.Errorf("%s: no frames", cl.key)
 	}
 	// A session, when the clip carries one, decides the pose and the balloon.
 	var run *sessionRun
@@ -180,7 +190,9 @@ func portraitFrames(cl fxClip) ([]string, error) {
 	if ground == (term.RGB{}) {
 		ground = portraitGround
 	}
-	out := make([]string, 0, n)
+	// Every frame is kept as a canvas until the crop is known.
+	cs := make([]*canvas.Canvas, 0, n)
+	x0, y0, x1, y1 := p.cols, p.rows, 0, 0
 	for i := 0; i < n; i++ {
 		pose, bubble, ask := p.pose, "", false
 		t := float64(i) / float64(cl.sc.rate())
@@ -221,9 +233,36 @@ func portraitFrames(cl fxClip) ([]string, error) {
 				(&companion.Sprite{Rows: rows, Body: col, Opaque: true}).Draw(c.Near(), bx, p.y-len(rows))
 			}
 		}
-		out = append(out, c.HTMLFragmentClassed(GIFPx, prof, cl.sc.pal))
+		cs = append(cs, c)
+		ax0, ay0, ax1, ay1 := inkBox(c)
+		x0, y0, x1, y1 = min(x0, ax0), min(y0, ay0), max(x1, ax1), max(y1, ay1)
 	}
-	return out, nil
+	if x1 <= x0 || y1 <= y0 {
+		return nil, 0, 0, fmt.Errorf("%s: nothing drawn", cl.key)
+	}
+	x0, y0, x1, y1 = max(x0-1, 0), max(y0-1, 0), min(x1+1, p.cols), min(y1+1, p.rows)
+	frames = make([]string, 0, n)
+	for _, c := range cs {
+		frames = append(frames, c.HTMLFragmentCropClassed(x0, y0, x1, y1, GIFPx, prof, cl.sc.pal))
+	}
+	return frames, x1 - x0, y1 - y0, nil
+}
+
+// inkBox is the smallest cell rectangle holding every glyph on the canvas,
+// as x0, y0 inclusive and x1, y1 exclusive. A cleared rim around a sprite is
+// spaces, so it falls outside and the margin added by the caller is honest.
+func inkBox(c *canvas.Canvas) (x0, y0, x1, y1 int) {
+	x0, y0, x1, y1 = c.W, c.H, 0, 0
+	for y, row := range strings.Split(c.RenderPlain(), "\n") {
+		for x, r := range []rune(row) {
+			if r == ' ' {
+				continue
+			}
+			x0, y0 = min(x0, x), min(y0, y)
+			x1, y1 = max(x1, x+1), max(y1, y+1)
+		}
+	}
+	return
 }
 
 // portraitBubble lays a balloon over a centred companion: the box is centred
@@ -272,8 +311,8 @@ func framesOf(seed int64, cl fxClip) (frames []string, cols, rows, fps int, err 
 		return frames, 80, 24, cl.fps, err
 	}
 	if cl.port != nil {
-		frames, err = portraitFrames(cl)
-		return frames, cl.port.cols, cl.port.rows, cl.sc.rate(), err
+		frames, cols, rows, err = portraitFrames(cl)
+		return frames, cols, rows, cl.sc.rate(), err
 	}
 	frames, err = gifFrames(seed, cl.sc)
 	return frames, cl.sc.colsOf(), cl.sc.rowsOf(), cl.sc.rate(), err

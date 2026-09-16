@@ -62,7 +62,7 @@ p{max-width:var(--measure);margin:0 0 var(--lh)}
 @keyframes step{0%{opacity:1}16.6%{opacity:0}100%{opacity:0}}
 .cover .lockup{position:relative;font-size:clamp(64px,13vw,150px)}
 .cover .line{position:relative;color:var(--dd);margin:10px 0 0;font-size:clamp(13px,1.6vw,17px);letter-spacing:.02em;text-align:center}
-.cover .scrolltip{position:absolute;bottom:26px;color:var(--d);font-size:12px;letter-spacing:.1em}
+.cover .scrolltip{position:absolute;bottom:22px;color:var(--d);font-size:12px;letter-spacing:.1em;white-space:pre;line-height:1.1;text-align:center;font-family:var(--mono)}
 
 /* the reading rail: how far down the page you are, drawn the way the scape
    draws anything -- in cells. */
@@ -81,11 +81,11 @@ main section>*{position:relative;z-index:1}
   mask-image:linear-gradient(to bottom,transparent,#000 14%,#000 86%,transparent)}
 .bgfx pre{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);margin:0;font:700 14px/1 var(--mono);
   letter-spacing:0;white-space:pre;opacity:0;animation:step 4.2s steps(1) infinite}
+.bgfx.spin pre{color:var(--warm)}
 .bgfx.sea pre{color:var(--acc)}
-.bgfx.star pre{color:#f2e6c8}
+.bgfx.term pre{color:#b9c2cc}
 .bgfx.rain pre{color:#9fb4c8}
-.bgfx.grass pre{color:#9cc49a}
-.bgfx.water pre{color:#8fd3d8}
+.bgfx.star pre{color:#f2e6c8}
 @media (prefers-reduced-motion:reduce){.bgfx pre{animation:none}.bgfx pre:first-child{opacity:1}}
 .rail{position:fixed;top:50%;right:14px;transform:translateY(-50%);z-index:30;font-size:11px;line-height:1.05;
   color:var(--ln);white-space:pre;-webkit-user-select:none;user-select:none;pointer-events:none}
@@ -153,7 +153,7 @@ h3{font-size:14px;font-weight:700;margin:0 0 4px}
 /* A portrait has no ground: the animal sits on the page (his note of
    2026-09-15), so its stage is transparent, the frame is centred in it, and
    the cell can be snapped to whole pixels with nothing showing beside it. */
-.stage.port{background:transparent;overflow:visible}
+.stage.port{background:transparent;overflow:visible;display:flex;align-items:center;justify-content:center}
 .stage.port .fx{margin:0 auto}
 .cast .cap{text-align:center;margin-top:4px}
 .cast+.cmd{margin-top:var(--lh)}
@@ -164,6 +164,7 @@ h3{font-size:14px;font-weight:700;margin:0 0 4px}
 ul.feats{list-style:none;padding:0;margin:22px 0 0;display:grid;gap:11px;max-width:var(--measure)}
 ul.feats li small{display:block;font-size:11px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--warm);margin:0 0 4px}
 ul.feats.grid{max-width:none;grid-template-columns:repeat(2,minmax(0,1fr));gap:calc(var(--lh)*1.2) 4ch}
+ul.feats.grid li.span{grid-column:1/-1;max-width:var(--measure)}
 @media (max-width:720px){ul.feats.grid{grid-template-columns:1fr}}
 ul.feats li{padding-left:26px;position:relative;color:var(--dd);font-size:14px}
 /* The marker is the brand's own cell -- a block cursor in reverse video --
@@ -197,14 +198,14 @@ ul.feats.lead li{font-size:15px}
 <div class="sea m">{{covermobile}}</div>
 <div class="lockup"><span class="blk">x</span>scapes</div>
 <p class="line">a thinking screen for terminal agents</p>
-<div class="scrolltip">&#8595;</div>
+<div class="scrolltip" id="scrolltip">v</div>
 </section>
 
 <main>
 
 <div class="sec" data-title="The problem"><div class="boxtop" aria-hidden="true"></div></div>
 <section id="problem">
-<div class="bgfx sea" aria-hidden="true">{{bg:problem}}</div>
+<div class="bgfx spin" aria-hidden="true">{{bg:problem}}</div>
 <div class="win wait" data-title="claude"><div class="boxtop" aria-hidden="true"></div>
   <div class="stage"><pre><span class="pr">&gt;</span> refactor the auth module and run the tests
 
@@ -234,9 +235,8 @@ ul.feats.lead li{font-size:15px}
 <section>
 <div class="bgfx sea" aria-hidden="true">{{bg:wait}}</div>
 <ul class="feats lead grid">
+<li class="span"><small>Activity</small><b>See how hard it is working, and what it just did.</b> The sea says how much: how many swells are travelling and how tall, whitecaps once it is flat out, flat water when it is waiting on you. The sand says what: every tool call and the file it touched, the newest brightest, the older lines fading as the tide takes them.</li>
 <li><small>Notifications</small><b>Leave the room.</b> A solid balloon and one sound when it needs an answer, a dotted balloon and a different sound when it is done. Silent while it works, so the two you hear are the two that matter.</li>
-<li><small>Activity</small><b>See how hard it is working.</b> The sea: how many swells are travelling and how tall, whitecaps once it is flat out. Flat water means it is waiting on you.</li>
-<li><small>Activity log</small><b>See what it just did.</b> Every tool call and the file it touched, written in the sand, the newest brightest and the older lines fading as the tide takes them.</li>
 <li><small>Subagents</small><b>Count the helpers.</b> A crablet on the sand for each subagent running; when its job is done it walks into the water.</li>
 <li><small>Failures</small><b>Never miss a failed command.</b> It shows on the companion's face, claws down and amber eyes, until your next prompt.</li>
 <li><small>Context meter</small><b>See the context running out before it compacts.</b> The moon thins and sinks as the context fills, and from 40% used what is left is written under it as a number.</li>
@@ -247,7 +247,6 @@ ul.feats.lead li{font-size:15px}
 
 <div class="sec" data-title="Companion states"><div class="boxtop" aria-hidden="true"></div></div>
 <section>
-<div class="bgfx star" aria-hidden="true">{{bg:glance}}</div>
 <p class="sub">The companion on its own, in its five states. Press one. This is everything the animal itself says; the sea, the sand and the moon carry the rest, and between them you never have to read the screen.</p>
 <div class="tabs" role="tablist" id="st-tabs"></div>
 <div class="stage port" aria-hidden="true"><div class="fx st-fx" id="st-fx"></div></div>
@@ -256,7 +255,7 @@ ul.feats.lead li{font-size:15px}
 
 <div class="sec" data-title="Install"><div class="boxtop" aria-hidden="true"></div></div>
 <section>
-<div class="bgfx rain" aria-hidden="true">{{bg:get}}</div>
+<div class="bgfx term" aria-hidden="true">{{bg:get}}</div>
 <p class="sub wide">Three commands. No app, no tab, no account, no tmux. It runs in the same window as the agent, which is the point: you never look away from the work to see the work.</p>
 <div class="cmd" data-title="install"><span class="pr">$</span> go install github.com/donlucasx/xscapes@latest
 <span class="pr">$</span> xscapes install claude --apply   <span class="c"># writes its hooks, after a backup</span>
@@ -266,7 +265,7 @@ ul.feats.lead li{font-size:15px}
 
 <div class="sec" data-title="Scapes and companions"><div class="boxtop" aria-hidden="true"></div></div>
 <section>
-<div class="bgfx grass" aria-hidden="true">{{bg:layer}}</div>
+<div class="bgfx rain" aria-hidden="true">{{bg:layer}}</div>
 <p class="sub wide">The shoreline is the first scape, not the product. Underneath it is a small event protocol &mdash; session, prompt, tool, error, needs input, done, compact &mdash; and a thin adapter for each agent: Claude Code arrives wired through its own hooks, and anything else that runs in a terminal is hosted the same way. Any landscape that provides six things carries all of it unchanged: a light, a sky, something that moves with the work, a surface, somewhere the work piles up, and someone living in it. The shoreline is what ships today; the three below are drawn and next.</p>
 <p class="sub wide">Four companions so far, each drawn for its scape. Hero the crab ships as the default; the cat came first and is one command away, and a running scape picks the change up on its next frame. The owl and the frog come with the vista and the aquarium.</p>
 <div class="cast">
@@ -286,7 +285,7 @@ ul.feats.lead li{font-size:15px}
 
 <div class="sec" data-title="Different every session"><div class="boxtop" aria-hidden="true"></div></div>
 <section>
-<div class="bgfx water" aria-hidden="true">{{bg:month}}</div>
+<div class="bgfx star" aria-hidden="true">{{bg:month}}</div>
 <p class="sub wide">It is not a loop. The sea is your agent's work and the sand is its last few actions, so no two sessions draw the same picture, and the sky runs on your clock. It asks nothing of you: no keys, no score, nothing to feed. And the agent's own output reaches your terminal byte for byte, so it can never get in the way of the work it is drawing.</p>
 </section>
 
@@ -461,6 +460,14 @@ ul.feats.lead li{font-size:15px}
   window.addEventListener("resize", refit);
   requestAnimationFrame(refit);
   if(document.fonts && document.fonts.ready){ document.fonts.ready.then(refit); }
+
+  // ---- the splash arrow, in ASCII: a chevron drips down three rows ---------
+  var tip = document.getElementById("scrolltip");
+  if(tip && !reduce){
+    var drips = ["v\n.\n.", ":\nv\n.", ":\n:\nv", ".\n.\n.", ".\n.\n."], d = 0;
+    tip.textContent = drips[0];
+    setInterval(function(){ d = (d + 1) % drips.length; tip.textContent = drips[d]; }, 360);
+  } else if(tip){ tip.textContent = "v\n.\n."; }
 
   // ---- the wait: the spinner turns and the clock counts ------------------
   var spin = document.getElementById("spin"), spinT = document.getElementById("spin-t");

@@ -20,7 +20,7 @@ import (
 //
 // Each backdrop is six frames of plain text, stacked as <pre> layers and
 // cycled by the cover's own step animation (0.7 s a frame, 4.2 s a loop), at
-// 7% opacity in one colour behind the section's content. Every field is
+// low opacity in one colour behind the section's content. Every field is
 // written so that its motion CLOSES on the sixth frame -- a wave whose phase
 // is k/6 of a turn, rain whose pattern repeats every 24 rows at 4 rows a
 // frame -- because a loop that jumps is the one thing a subtle layer must not
@@ -54,49 +54,60 @@ func wave(x, y, k int, lambda, tilt float64) float64 {
 	return math.Sin(2*math.Pi*(float64(x)/lambda+float64(k)/bdFrames) + float64(y)*tilt)
 }
 
+// THE CRITERION, his question of 2026-09-15 ("Placement - whats the criteria?
+// what is under 'features'? grass?"): each backdrop is THE THING ITS SECTION
+// IS ABOUT, drawn so that it reads as that thing at a glance -- the first
+// pass scattered single marks, and a working sea of scattered ^ and ~ read as
+// grass. A section whose content already floats on the page (the companion
+// states) gets none, and that alternation is what separates the sections.
 var backdrops = []backdrop{
-	// The problem: water with almost nothing on it, the way the sea sits while
-	// the agent thinks and nothing has happened yet.
-	{"problem", "sea", func(x, y, k int, seed int64) rune {
-		if h(x, y, seed) > 0.045 {
+	// The problem: the wait itself. The spinner Claude Code turns while you
+	// look at nothing, scattered across the section and turning.
+	{"problem", "spin", func(x, y, k int, seed int64) rune {
+		if h(x, y, seed) > 0.006 {
 			return ' '
 		}
-		switch v := wave(x, y, k, 46, 0.35); {
-		case v > 0.55:
-			return '~'
-		case v > -0.1:
-			return '-'
-		}
-		return '.'
+		ph := int(h(x, y, seed+10) * bdFrames)
+		return []rune("✻✳✶✽✢·")[(k+ph)%bdFrames]
 	}},
-	// While you wait: the same sea, working -- denser, shorter swells, crests.
+	// Features: the sea, the product's own picture. Crests are RUNS of glyphs
+	// along a row, not scattered marks -- that is what reads as water -- on
+	// some rows and not others, travelling.
 	{"wait", "sea", func(x, y, k int, seed int64) rune {
-		if h(x, y, seed+1) > 0.11 {
+		if h(0, y, seed+1) > 0.42 {
 			return ' '
 		}
-		switch v := wave(x, y, k, 28, 0.5); {
-		case v > 0.82:
-			return '^'
-		case v > 0.35:
+		// Each row's own phase, so crests do not line up into columns.
+		v := math.Sin(2*math.Pi*(float64(x)/22+float64(k)/bdFrames) + h(1, y, seed+11)*2*math.Pi)
+		switch {
+		case v > 0.78:
+			return '≈'
+		case v > 0.45:
 			return '~'
-		case v > -0.3:
+		case v > 0.25:
 			return '-'
 		}
-		return '.'
+		return ' '
 	}},
-	// Read it at a glance: the constellation, each star on its own twinkle.
-	{"glance", "star", func(x, y, k int, seed int64) rune {
-		if h(x, y, seed+2) > 0.012 {
+	// Install: the terminal. Prompts, and a cursor that blinks on each.
+	{"get", "term", func(x, y, k int, seed int64) rune {
+		if y%4 != 1 {
 			return ' '
 		}
-		ph := int(h(x, y, seed+3) * bdFrames)
-		return []rune("·.+*+.")[(k+ph)%bdFrames]
+		if h(x, y, seed+4) < 0.012 {
+			return '$'
+		}
+		if h(x-2, y, seed+4) < 0.012 && k%2 == 0 {
+			return '▌'
+		}
+		return ' '
 	}},
-	// How you get it: rain, four rows a frame through a 24-row pattern, so
-	// six frames are one period and the streaks fall without a seam.
-	{"get", "rain", func(x, y, k int, seed int64) rune {
+	// Scapes and companions: rain, which is the rainy window's whole slot,
+	// four rows a frame through a 24-row pattern, so six frames are one
+	// period and the streaks fall without a seam.
+	{"layer", "rain", func(x, y, k int, seed int64) rune {
 		yy := ((y-4*k)%24 + 24) % 24
-		v := h(x, yy, seed+4)
+		v := h(x, yy, seed+5)
 		switch {
 		case v < 0.018:
 			return '|'
@@ -107,40 +118,25 @@ var backdrops = []backdrop{
 		}
 		return ' '
 	}},
-	// A layer, not a screen: the meadow in the wind. A gust runs through the
-	// grass and every blade leans with it.
-	{"layer", "grass", func(x, y, k int, seed int64) rune {
-		if h(x, y, seed+5) > 0.16 {
+	// Different every session: a night sky, no two loops of it the same to
+	// look at -- each star on its own twinkle, and now and then one falls:
+	// three cells down and along over three frames, then gone.
+	{"month", "star", func(x, y, k int, seed int64) rune {
+		// The falls: one per 25-row band, from a hashed start, frames 0-2.
+		band := y / 25
+		sx := 10 + int(h(band, 0, seed+8)*(bdCols-30))
+		sy := band*25 + 3 + int(h(band, 1, seed+8)*12)
+		if k < 3 && x == sx+2*k && y == sy+k {
+			return '*'
+		}
+		if k < 3 && k > 0 && x == sx+2*k-2 && y == sy+k-1 {
+			return '·'
+		}
+		if h(x, y, seed+2) > 0.012 {
 			return ' '
 		}
-		switch v := wave(x, y, k, 60, 0.15); {
-		case v > 0.45:
-			return ','
-		case v < -0.45:
-			return '`'
-		}
-		return '\''
-	}},
-	// Still good in a month: the aquarium's bubbles, two rows a frame through
-	// a 12-row pattern, and a fish or two crossing.
-	{"month", "water", func(x, y, k int, seed int64) rune {
-		// The fish: five cells a frame over a 30-cell period, so six frames
-		// bring each one back to where it started.
-		fx := ((x-5*k)%30 + 30) % 30
-		if y%17 == 6 && h(0, y, seed+7) < 0.5 && fx < 3 {
-			return []rune("><>")[fx]
-		}
-		yy := ((y+2*k)%12 + 12) % 12
-		v := h(x, yy, seed+6)
-		switch {
-		case v < 0.006:
-			return 'O'
-		case v < 0.016:
-			return 'o'
-		case v < 0.03:
-			return '.'
-		}
-		return ' '
+		ph := int(h(x, y, seed+3) * bdFrames)
+		return []rune("·.+*+.")[(k+ph)%bdFrames]
 	}},
 }
 

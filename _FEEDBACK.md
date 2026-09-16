@@ -3261,3 +3261,14 @@ item, 'Sound cues' (or whatever you think defines the feature best). Above 'see 
 each item there. Are we missing any important feature that should be there? d) review all section titles
 to make sure they are very clear about what they are about"* (+ a screenshot of The problem section: the
 paragraph wrapping at ~50 characters under a rule and a window that span the full column.)
+**HIS NOTES ON THE SECOND ROUND, verbatim (2026-09-15 evening):** *"1. they are cute and subtle, but not
+sure if they are always 'adding' to the experience. Should they help separate sections? reinforce visually
+each session? Ok if not super intentional but rn theres a couple things that dont super make sense.
+Placement- whats the criteria? what is under 'features'? grass? what is under 'scapes and companions'? c)
+anything we can synthesize? --- lastly, I like the arrow down you added on the splash page, can we animate
+it on ASCII somehow? ---- under 'companion states', the first one is 'it needs you' and it stands out
+because it comes closer. Should the bounding box/crop be the same as the session? so the character reads
+same as it will? and also so the rest of the 'states' have less negative space around them"*
+⇒ The fields were not legible as what they were (a working sea read as grass). Criterion adopted: each
+backdrop is THE THING THE SECTION IS ABOUT, drawn so it reads as that thing at a glance, and a section
+whose content already floats gets none, so the alternation itself separates sections.
