@@ -136,7 +136,10 @@ func (f *frames) state(now time.Time, t float64) reduce.State {
 		}
 		return demoState(t, f.ctxUsed, tod)
 	}
-	for draining := true; draining; {
+	// A reducer with no bus is fed by the launcher itself: the generic
+	// adapter (internal/watch) applies what it synthesised before each
+	// frame, so there is nothing here to drain.
+	for draining := f.bus != nil; draining; {
 		select {
 		case e := <-f.bus.C:
 			f.red.Apply(e, now)

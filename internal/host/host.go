@@ -63,6 +63,13 @@ type Host struct {
 	// The launcher picks them by TERM_PROGRAM (RulesFor); the zero value is
 	// the xterm-like set.
 	Rules Rules
+	// OnOutput sees every chunk the agent writes to its pty, and OnInput every
+	// chunk the user types, before either is forwarded. Both are optional and
+	// both are called from the host's own read goroutines, so a receiver
+	// locks. They exist for the generic adapter (internal/watch), which is
+	// how a program with no hooks still drives the scape.
+	OnOutput func(b []byte)
+	OnInput  func(b []byte)
 
 	// model is the host's own copy of the screen when History is on: every
 	// byte sent to the terminal is fed through it, so the rows that leave the
@@ -346,6 +353,9 @@ func (h *Host) Run() error {
 		for {
 			n, err := p.master.Read(buf)
 			if n > 0 {
+				if h.OnOutput != nil {
+					h.OnOutput(buf[:n])
+				}
 				h.write(string(f.Filter(buf[:n])))
 			}
 			if err != nil {
@@ -680,6 +690,9 @@ func (h *Host) forwardKeys(in io.Reader, master io.Writer, cpr chan<- int, waitD
 		for {
 			n, err := in.Read(buf)
 			if n > 0 {
+				if h.OnInput != nil {
+					h.OnInput(buf[:n])
+				}
 				reads <- append([]byte(nil), buf[:n]...)
 			}
 			if err != nil {

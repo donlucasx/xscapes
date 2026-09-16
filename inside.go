@@ -11,6 +11,7 @@ import (
 	"github.com/donlucasx/xscapes/internal/event"
 	"github.com/donlucasx/xscapes/internal/host"
 	"github.com/donlucasx/xscapes/internal/reduce"
+	"github.com/donlucasx/xscapes/internal/watch"
 )
 
 // runInside runs the agent INSIDE the scape rather than beside it.
@@ -58,6 +59,7 @@ func runInside(args []string, agent string) {
 	alt := fs.Bool("alt", true, "run on the alternate screen: resize-proof, but the agent's output does not go to your terminal's scrollback")
 	appleTerminal := os.Getenv("TERM_PROGRAM") == "Apple_Terminal"
 	history := fs.Bool("history", appleTerminal, "mirror rows that leave the agent's band into the terminal's own scrollback; in Terminal.app, which drops them at exit, the transcript and the final screen are printed again after the session (default: on in Terminal.app)")
+	watchMode := fs.String("watch", "auto", "drive the scape from the program's own output when it has no hooks: auto (until an agent's hooks announce a session), on (always, hooks ignored), off (hooks only; the demo cycles until they bind)")
 	fs.Usage = func() {
 		if agent != "" {
 			fmt.Fprintf(os.Stderr, `xscapes claude [flags] [%s arguments ...]
@@ -92,6 +94,11 @@ With no command, runs claude.
 		fmt.Printf("agent    rows 1-%d   %s\n", agentRows, strings.Join(argv, " "))
 		fmt.Printf("screen   %s\n", map[bool]string{true: "alternate (resize-proof)", false: "main (scrollback kept; resize displaces the agent)"}[*alt])
 		fmt.Printf("history  %s\n", map[bool]string{true: "rows leaving the band are mirrored into the terminal's scrollback; replayed on exit", false: "off"}[*history && *alt])
+		fmt.Printf("watch    %s\n", map[string]string{
+			"auto": "the program's own output drives the scape until an agent's hooks announce a session",
+			"on":   "the program's own output drives the scape; hooks are ignored",
+			"off":  "hooks only",
+		}[*watchMode])
 		if scapeRows > 0 {
 			fmt.Printf("scape    rows %d-%d\n", agentRows+1, rows)
 		} else {
@@ -119,6 +126,27 @@ With no command, runs claude.
 	}()
 	var nextBind time.Time
 
+	// The generic adapter. Until an agent's hooks announce a session, and
+	// for a program that has none at all, the scape follows the program's
+	// own traffic: output is work, Enter is a prompt, quiet after work is
+	// done. See internal/watch for what it can and cannot say.
+	switch *watchMode {
+	case "auto", "on", "off":
+	default:
+		fmt.Fprintf(os.Stderr, "xscapes: -watch must be auto, on or off, not %q\n", *watchMode)
+		os.Exit(2)
+	}
+	var synth *watch.Synth
+	var synthRed *reduce.Reducer
+	if *watchMode != "off" {
+		synth = watch.New(watch.Options{})
+		synthRed = reduce.New("watch")
+		fr.follow(nil, synthRed)
+	}
+	// unbound says the scape is not yet following a real session's hooks:
+	// either nothing at all, or the generic adapter, which hooks outrank.
+	unbound := func() bool { return fr.red == nil || fr.red == synthRed }
+
 	h := &host.Host{
 		Cmd:       exec.Command(argv[0], argv[1:]...),
 		Size:      termSize,
@@ -128,15 +156,31 @@ With no command, runs claude.
 		History:   *history && *alt,
 		Replay:    *history && *alt && appleTerminal,
 		Rules:     host.RulesFor(os.Getenv("TERM_PROGRAM")),
+		OnOutput: func(b []byte) {
+			if synth != nil {
+				synth.Output(b)
+			}
+		},
+		OnInput: func(b []byte) {
+			if synth != nil {
+				synth.Input(b)
+			}
+		},
 		Paint: func(cols, rows int) []string {
 			now := time.Now()
 			if w, hh := fr.size(); w != cols || hh != rows {
 				fr.resize(cols, rows)
 			}
+			if synth != nil && fr.red == synthRed {
+				for _, e := range synth.Step(now) {
+					synthRed.Apply(e, now)
+				}
+			}
 			// Bind to the hosted agent once its hooks announce it. Polled
 			// here rather than before starting it: the agent cannot name
-			// itself until it is up.
-			if !fr.following() && now.After(nextBind) {
+			// itself until it is up. Hooks outrank the generic adapter,
+			// unless -watch=on says otherwise.
+			if *watchMode != "on" && unbound() && now.After(nextBind) {
 				nextBind = now.Add(time.Second)
 				if cur := event.Current(); cur != "" && cur != stale {
 					if b, err := event.Listen(cur); err == nil {
