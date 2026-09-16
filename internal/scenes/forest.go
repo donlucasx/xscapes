@@ -619,8 +619,19 @@ func paintVistaL(c *canvas.Canvas, lay vistaLayout, tod, t, level float64, seed 
 		nearTop[u] -= int(math.Round(3.0 * ridged(float64(u), seed+53, 1.7)))
 		// Whole cells behind the owl's head: the treeline dips to a flat
 		// top under it, or its tufts are lost to the trees' quarter-cells.
+		// Live, a dip and never a raise: at a short height the head sits
+		// above the trees, and setting the top outright built a tower of
+		// treeline up to it, the black square behind the owl in his 120x30
+		// window (2026-09-16); TestTheTreelineIsNeverRaisedBehindTheOwl
+		// measures it on the frame. The study keeps the outright top: at
+		// 80x24 a column or two of the span is raised a little under the
+		// owl, and the page's clip is held byte-identical (vista_unchanged).
 		if OwlPlace == 0 && u >= 2*owlX-2 && u < 2*(owlX+12)+2 {
-			nearTop[u] = 2 * (owlY)
+			if live != nil {
+				nearTop[u] = max(nearTop[u], 2*owlY)
+			} else {
+				nearTop[u] = 2 * owlY
+			}
 		}
 	}
 	paintRange(c, nearTop, nearCol, c.H, nil)

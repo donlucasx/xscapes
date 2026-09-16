@@ -1,6 +1,7 @@
 package scenes
 
 import (
+	"fmt"
 	"math"
 	"testing"
 
@@ -140,3 +141,56 @@ func TestTheArcIsAGauge(t *testing.T) {
 		}
 	}
 }
+
+// TestTheTreelineIsNeverRaisedBehindTheOwl: the near treeline may dip to a
+// flat top behind the owl's head (whole cells under the ears), but it is
+// never RAISED to it. His screenshot at a 120x30 window, 2026-09-16: a
+// black square behind the owl, gone as the window grew. The painter set the
+// treeline's top to the owl's head row across the box; in the 80x24 study
+// that is a dip in a taller treeline, and live at a short height, where the
+// head sits above the trees, the same line built a tower of treeline up to
+// it. Measured on the rendered frame at 10:10: the treeline's top row in
+// each column of the box, against the same column with the owl placed far
+// away, so the natural silhouette is read off the painter itself.
+func TestTheTreelineIsNeverRaisedBehindTheOwl(t *testing.T) {
+	const tod = 0.424
+	act := scape.Activity{Working: true, Level: 0.5, ContextUsed: 0.45, TimeOfDay: tod}
+	luma := func(c term.RGB) int { return (299*int(c.R) + 587*int(c.G) + 114*int(c.B)) / 1000 }
+	// The treeline at 10:10 is grey 48 (luma 48); the sky's top is luma 71
+	// and everything else above the band is brighter.
+	const treeline = 60
+	top := func(c *canvas.Canvas, x, until int) int {
+		for y := 0; y < until && y < c.H; y++ {
+			if _, _, bg := c.ResolveAt(x, y, term.Profile256); luma(bg) < treeline {
+				return y
+			}
+		}
+		return until
+	}
+	worst, worstAt := 0, ""
+	for _, g := range [][2]int{{120, 11}, {120, 13}, {120, 14}, {120, 16}, {133, 20}, {131, 24}, {125, 28}, {121, 33}, {60, 20}, {80, 24}} {
+		w, h := g[0], g[1]
+		a := canvas.New(w, h, canvas.AlphaFar, canvas.AlphaMid, canvas.AlphaNear)
+		v := NewVista(7, false)
+		v.OwlX = w - 16
+		v.Update(a, 3.0, act)
+		owlX, owlY, _, bandTop := v.Layout()
+		b := canvas.New(w, h, canvas.AlphaFar, canvas.AlphaMid, canvas.AlphaNear)
+		far := NewVista(7, false)
+		far.OwlX = 4
+		far.Update(b, 3.0, act)
+		until := min(bandTop, owlY+7)
+		for x := owlX - 1; x <= owlX+12 && x < w; x++ {
+			natural, got := top(b, x, until), top(a, x, until)
+			if got < natural {
+				if natural-got > worst {
+					worst, worstAt = natural-got, fmt.Sprintf("%dx%d column %d: treeline top row %d, natural %d", w, h, x, got, natural)
+				}
+			}
+		}
+	}
+	if worst > 0 {
+		t.Fatalf("the treeline is raised behind the owl by up to %d rows: %s", worst, worstAt)
+	}
+}
+
