@@ -3358,3 +3358,93 @@ counter (110 left). The Submit button is a picker he has to open himself.
 - *"push"* ⇒ `origin/main` = HEAD (`0ca810b` then the wrap).
 - *"lets /wrap for now"* ⇒ wrapped 2026-09-16 ~09:10 PDT. His unlisted *"things Id love to update about
   xscapes and its website"* is the open thread for the next session.
+
+## Session 35 (2026-09-16) — the open items, prompted through with options; his rulings
+
+- *"I want to do some tweaks to xscapes and the site, but first, lets run through any/all open items. Prompt
+  me through each w options to address them"* ⇒ twelve items from RESUME (s31–s34 queues), the s28 leftovers
+  in memory, the brief's Open questions and Milestone 2, in four rounds. Verbatim where he wrote, the option
+  label where he picked one:
+- **Tag v0.4.1** (`go install @latest` served v0.4.0, 53 commits behind, the OLD droplet cue): *Tag now.* ⇒
+  tagged at HEAD `f875b43` and pushed as donlucasx the same minute.
+- **The done drop** (Plink assumed for *"drop (done)"*): *Play them now, then I'll rule* ⇒ ask, done, worried
+  played twice each off the installed files ⇒ **"Keep Plink, all three closed."**
+- **The brief's Open questions 2, 3, 6** (answered in practice, still listed): *Close them with the answers.*
+- **The tyastie scape on the old binary:** *Noted, I'll restart it when convenient.*
+- **The deck** (old copy, 404, unlinked): *Drop it; the page is the entry.* Files stay, nothing removed.
+- **His look at the 09-15 publish** (type system, synopsis, synthesized blocks, repo box): *"fine as is for
+  now. I have other notes and we ll eventually have to update the site"*
+- **The GIF pipeline:** *"are these gifs we ve made and not using anymore? are they in a folder I can browse
+  through?"* ⇒ opened `site/anim` in Finder; then *Keep, stop publishing them.* ⚠ My premise was wrong and
+  corrected to him: `publish.sh` has copied ONLY `site/index.html` since 09-14, so nothing was being
+  published. Resolves to KEEP, nothing to change.
+- **The typed prompt:** *"discard"* ⇒ CLOSED, off the list.
+- **The vista as a real scape:** *Later, behind your tweaks.*
+- **Carded items:** *"I think items 2 and here are the same- thats what I meant w 'scene soundscapes',
+  basically their own alert sounds. I would defer this until we have additional xscapes fully finished. For
+  #1 (token usage), I want to come up with an idea that is very easy to read and can translate across
+  xscapes."* ⇒ soundscapes = per-scape alert sounds, deferred until more scapes are finished; the pond stays
+  carded with a NEW brief: a token-usage readout that is very easy to read and works in every scape.
+- **The s28 leftovers:** *"Star magnitude, -mirror=false column -1, widen the range for star magnitude. IDK
+  what item 2 is about but address it- lmk what to expect and how to test it"*
+- **Milestone 2:** *"Generic process adapter, Kimi / Hermes adapters, not sure what item 3 is about?"* (item
+  3 = per-repo seed + plant-a-tree; explained, ruling pending).
+- **Per-repo seed + plant-a-tree, explained:** *"Neither, disregard. I think having the same seed for all
+  will help me cater a better and more consistent experience. Unless Im missing anything here? -- also dont
+  care for planting a tree on the beach at this time"* ⇒ both CLOSED. Answered: he is not missing anything;
+  one seed is what makes every user's beach the same picture as the page, and a project is already told
+  apart by its window.
+- **`-mirror=false` column −1:** asked as open off a stale memory line; the code says it was FIXED in s29
+  (`live.go` `compose`: the unmirrored layout reserves the pace span and drawScene flips the sign) and
+  `near_mirror_test.go` sweeps 3,780 unmirrored frames at both facings. CLOSED, nothing to do; told him.
+- **Star magnitude, measured before touching** (`go run ./notes/s28-magday`, his 114x64): 19 stars render in
+  5 distinct tones at midnight (7-8 at dusk), dimmest luma 158 against brightest 207, a spread of 49. The
+  design target was six tones at night. "Widen the range" is queued behind his tweaks; ⚠ s28 measured the
+  cube holding only TWO tones between the legibility floor and opaque, so the ceiling is the palette.
+⇒ Order of work after the walkthrough: HIS TWEAKS LIST (still unlisted) · star magnitude · the generic
+process adapter · the vista as a real scape · Kimi/Hermes adapters. Deferred until more scapes are finished:
+per-scape alert sounds. Carded with a new brief: token usage, easy to read, the same in every scape.
+
+## Session 35 (2026-09-16), continued — *"close any/all open cards before we dive into further notes"*
+
+⇒ Read as: build the four wanted items now, before his tweaks list. All four built the same afternoon,
+test-first, every visual one looked at in a headless-Chrome screenshot, nothing committed (his word).
+- **Star magnitude, widened.** `notes/s35-magsweep`: floors 0.70..0.30 x 3 seeds x 3 geometries x 4 hours,
+  read off the frame. Count holds at 19 at every floor (starInk lifts any star that fails the bar, so the
+  contrast bar could not be the criterion). The criterion is the faintest star over the brightest dust
+  speck: 0.70 → +54/+40 luma (0h/22h), 0.60 → +35/+16, 0.50 → +14/+4, 0.40 → −5/−0. **0.60 shipped**:
+  tones at midnight 4..5 → 5..8, spread 40 → 64. `TestStarMagnitudeIsWideAndStillCounts` fails at 0.70
+  (too few tones) and at 0.40 (dust outshines a star). The s28 ambient golden re-captured: every cell
+  where it was, only the inks moved with the floor.
+- **The generic adapter** (`internal/watch`, the brief's Adapter 2, verbatim "busy = alive + output
+  activity; done = prompt back"): Enter is a prompt; each second of continuous output is one tool event
+  (a COUNT, never a byte rate); a burst ≥ 1.5 s followed by 4 s of quiet is a done, with the last printed
+  line (escapes stripped) on the sand. It cannot tell a question from a finish: the ask cue never rings
+  from it, and it says so. Wired into `xscapes inside` as `-watch=auto|on|off` (auto: until an agent's
+  hooks announce a session; hooks outrank it). Two byte taps on the host (`OnOutput`, `OnInput`).
+- **Kimi Code CLI and Hermes Agent adapters.** Surveyed on this machine by a read-only subagent: Kimi's
+  hook schema is embedded TypeScript in its 180 MB compiled binary (`hooks` array in config.toml, event
+  names = Claude Code's + StopFailure/Interrupt/TurnStarted/…, JSON on stdin, `tool_call_id`,
+  `agent_name`); Hermes's is `hooks:` in config.yaml (snake_case events, JSON on stdin with `extra`,
+  `pre_llm_call`/`post_llm_call` ONCE PER TURN per hooks.md, first-use consent per (event, command)).
+  Built: `xscapes hook <Event> [agent]` (Src per agent, Kimi's spellings folded in, Hermes's events and
+  tool names in translate/classify; Hermes's `subagent_stop` is announced as start+end so the dwell shows
+  it), `xscapes install kimi|hermes` as marker-delimited TEXT blocks (no TOML/YAML round-trip), plan by
+  default, `--apply` writes, uninstall removes exactly the block; Hermes's `hooks_auto_accept` untouched
+  (the user's switch). Validated by the agents' own tools in the tests: `kimi doctor config <tmp>` OK,
+  `HERMES_HOME=<tmp> hermes hooks list` lists all ten. ⚠ Neither agent has been RUN inside a scape yet.
+- **The vista as a real scape** (`scenes.Vista`, `xscapes scape vista`, `XSCAPES_SCAPE`, polled so a
+  running scape switches). The study painter parametrised by a layout; **byte-identical at 80x24**
+  (`TestTheStudyVistaIsUnchanged`, a sha256 over 288 frames, caught one drifted row during the refactor).
+  Wind = level; moon sinks with context + readout; todo stars on a golden-ratio sequence with the shore's
+  contrast lift; the tail on the band under the meadow (whole width); the barn owl's FIVE FACES (lids
+  down · open with a 7 s blink · WIDE for the ask · `^ ^` done · amber slits worried), pairwise distinct
+  by test; owlets on the grass for subagents, kept out of the fire. Floor 16 rows.
+  ⚠ Seen in the first screenshot and fixed: the ask balloon lost its a, o and w to the near ridge's
+  quarter-cells (the canvas rule: a glyph over quarters loses); the balloon's cells are made whole first.
+  ⚠ Seen at 60x20 and fixed: owlets' feet on the writing when the meadow is four rows; anchored to the
+  band. Not built, stated in the code: the owl walking up; owlets leaving; a disc moon with phase.
+- The site copy: the shoreline AND the vista ship; three companions ship; the owl's caption. Rebuilt
+  locally, **NOT published** (a republish changes the entry during judging; his word).
+- README: Adapters 2/3/4, `xscapes scape`, the install lines. CLAUDE.md: Milestone 2 and the adapter
+  and scapes sections say what is built.

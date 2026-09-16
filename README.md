@@ -146,18 +146,34 @@ picks up the session. Settings are read from `XSCAPES_*`; the pre-rename
 The payload schema was read out of the Claude Code binary rather than guessed;
 see `notes/claude-hooks-verified.md`.
 
-**Adapter 2** is specified and not built yet: for agents with no hooks, watch
-the process instead, where alive plus output means busy and the prompt coming
-back means done.
+**Adapter 2: any program**, with no hooks at all. `xscapes inside <command>`
+watches the program's own traffic: its output is work, Enter is a prompt, and
+quiet after work is done (the "prompt back" nudge, with the done cue). It
+cannot know a question from a finish, so the ask cue never rings from it, and
+it names no tools; the sand carries the last line the program printed. It is
+on by default until an agent's hooks announce a session, and `-watch=on|off`
+forces it either way.
 
-Writing one means emitting the events above. Nothing in the engine knows what
-Claude Code is.
+**Adapter 3: Kimi Code CLI**, via its shell hooks. `xscapes install kimi`
+appends the hooks to `~/.kimi-code/config.toml` as a marked block; Kimi's
+event names are Claude Code's, read off its own binary.
+
+**Adapter 4: Hermes Agent**, via its shell hooks. `xscapes install hermes`
+merges them into `~/.hermes/config.yaml`. Hermes asks for consent the first
+time each hook fires; `hermes hooks doctor` answers once for all of them.
+
+Every installer prints a plan and writes only with `--apply`; every
+uninstall removes exactly what it wrote. Writing another adapter means
+emitting the events above. Nothing in the engine knows what any agent is.
 
 ## Everything else
 
 ```sh
 xscapes companion crab     # choose the animal: crab (default) or cat
+xscapes scape vista        # choose the scape: shore (default) or vista; a running scape switches
 xscapes inside <command>   # host any command inside the scape, not just claude
+xscapes install kimi       # Kimi Code CLI hooks (a plan; --apply writes)
+xscapes install hermes     # Hermes Agent hooks (a plan; --apply writes)
 xscapes claude -beside     # the older side by side layout, in tmux
 xscapes claude -scape 24   # give the shoreline more rows (default: two fifths)
 xscapes claude -fps 8      # slow the scape down
@@ -168,6 +184,7 @@ xscapes -info              # colour profile, size, which sound player
 xscapes notify             # hear the three knocks
 xscapes replay session.jsonl   # feed a recorded session back through the engine
 XSCAPES_COMPANION=cat …    # override the companion for one run, without saving it
+XSCAPES_SCAPE=vista …      # override the scape for one run, without saving it
 XSCAPES_SILENT=1 …         # mute
 ```
 

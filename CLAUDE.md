@@ -2,6 +2,26 @@
 
 *(Renamed end to end on 2026-09-03: directory, env vars, state path and hook marker. Two names are kept on purpose and are not leftovers -- `internal/envx` still reads `ASCIISCAPES_*` and warns, and `install.go` still RECOGNISES the `# asciiscapes:v1` marker so the hooks it wrote before the rename can be found and removed.)*
 
+> **Session 35 (2026-09-16). THE WALKTHROUGH, THEN EVERY OPEN CARD CLOSED IN ONE AFTERNOON.** Opened on a
+> status check (all of s34 held; this window's scape runs the three-cue binary). Every open item on the
+> record was prompted through with options and ruled (verbatim in `_FEEDBACK.md` §Session 35): **v0.4.1
+> TAGGED AND PUSHED** at his word · the three cues heard and KEPT · the deck DROPPED (the page is the
+> entry) · the typed prompt, per-repo seed and plant-a-tree CLOSED · the GIF folder stays (it was never
+> published after 09-14; my premise was wrong) · `-mirror=false` column −1 was FIXED in s29 (a stale memory
+> line). Then *"close any/all open cards before we dive into further notes"* ⇒ **FOUR CARDS BUILT, test-first,
+> every visual one screenshotted: ⭐ star magnitude 0.70 → 0.60** on a sweep (the faintest star must stay
+> a cube step above the brightest dust; 0.50 loses that at 22h) · ⭐ **the generic adapter** (`internal/watch`:
+> output is work, Enter is a prompt, quiet after work is done; the ask never rings from it, by design;
+> `xscapes inside -watch`) · ⭐ **Kimi and Hermes adapters** (`xscapes install kimi|hermes`, marker-delimited
+> text blocks, validated by `kimi doctor` and `hermes hooks list`; Kimi's hook schema read off its compiled
+> binary, Hermes's off its checkout; **neither run live yet**) · ⭐⭐ **THE VISTA IS A REAL SCAPE**
+> (`xscapes scape vista`, a running scape switches; the study painter parametrised by a layout and
+> byte-identical at 80x24 under a sha256 guard; the owl's FIVE FACES; owlets; the moon sinks; todo stars;
+> the tail on the band). ⚠ Two defects seen in screenshots and fixed: the ask balloon eaten by the
+> treeline's quarter-cells (letters made whole first) · owlets' feet on the writing at 60x20 (anchored to
+> the band). **COMMITTED at his word as four commits (`0359924` · `00738f6` · `97b6a5b` · `c9fcc6b`) plus
+> the record; NOT PUSHED; the site rebuilt and NOT published (judging Sep 17–20). NEXT: his tweaks list.**
+
 > **Session 34 (2026-09-15 evening into 09-16), WRAPPED ~09:10 PDT. ⭐ THE CUE IS THREE SOUNDS NOW, HIS PICKS,
 > AND ⭐⭐ THE COMMONS ENTRY IS SUBMITTED.** HEAD = the wrap commit, pushed, tree clean. Opened on a
 > status report checked against git, the live page, the suite and the processes: everything the record
@@ -1074,10 +1094,11 @@ pane, where 80% used to leave a single row.
 - Two layers: a tiny event protocol + thin adapters. Engine listens on a Unix socket with a JSON-lines file fallback. Adapters translate each agent into the protocol.
 - Events: `session_start`, `prompt`, `tool` (with kind: read|write|edit|search|shell|web|subagent|todo|mcp), `error`, `test_pass`, `test_fail`, `compact`, `needs_input`, `done`, `session_end`.
 - Adapter 1: Claude Code hooks (SessionStart/End, UserPromptSubmit, PreToolUse/PostToolUse, Notification, Stop, SubagentStop, PreCompact). Lucas already has a Stop/Notification hook that beeps — reuse it as the first adapter and replace the beep.
-- Adapter 2: generic "watch this process" fallback (busy = alive + output activity; done = prompt back). Test targets: Claude Code, Kimi, Hermes. Verify what hooks Kimi/Hermes expose before writing adapters.
+- Adapter 2: generic "watch this process" fallback (busy = alive + output activity; done = prompt back). **BUILT 2026-09-16 (s35), `internal/watch`, on by default in `xscapes inside` until hooks bind; `-watch=on|off`.** It cannot tell a question from a finish, so only the done cue rings from it.
+- Adapters 3 and 4, **BUILT 2026-09-16 (s35)**: Kimi Code CLI (`xscapes install kimi`, `[[hooks]]` tables in `~/.kimi-code/config.toml`; its events are Claude Code's, read off its binary) and Hermes Agent (`xscapes install hermes`, a `hooks:` mapping in `~/.hermes/config.yaml`; `pre_llm_call`/`post_llm_call` fire once per turn and are the prompt and the done; consent is the user's, `hermes hooks doctor`). Both surveyed on this machine, both installers validated by the agents' own tools in the tests; neither agent has yet been RUN inside a scape.
 - Coarse output parsing is acceptable for agents without hooks.
 
-**Scapes (three for v1, each with exactly one toy)**
+**Scapes** &mdash; **TWO SHIP since 2026-09-16 (s35): the shore (default) and the mountain vista with the owl** (`xscapes scape vista`, `XSCAPES_SCAPE`, a running scape switches on its next frame). The vista is the study painter parametrised by a layout (byte-identical to the page's clip at 80x24, guarded by a fingerprint test): the wind is the work, the fire is the night light, the moon sinks with the context, finished todos are stars, the tail is written on the band under the meadow, the barn owl has five faces (lids down · open with a blink · WIDE for the ask · `^ ^` for done · amber slits when worried) and owlets are subagents. Not built: the owl walking up to the screen; owlets leaving; a disc moon with a phase (the vista's moon is the study's 3x2 block). Floor 16 rows. The rainy window and the aquarium are drawn and next. *(The original v1 list, for the record:)*
 - Shore: waves (layered sine + foam), stars, moon, sand. Toy: skip a stone.
 - Campsite: campfire (Doom-fire algorithm) foreground, night sky, tent. Toy: log on the fire.
 - Rainy window: rain streaks, blurred city lights, lightning. Companion-less scape — weather delivers the notification. Toy: wipe fog off the glass.
@@ -1121,11 +1142,11 @@ pane, where 80% used to leave a single row.
 
 ## Open questions
 1. ~~Name~~ **ANSWERED 2026-09-01: `xscapes`.**
-2. Companion: cat or bird (decide from rendered frames).
-3. Which of the three scapes survive.
+2. ~~Companion: cat or bird (decide from rendered frames).~~ **Answered in practice, closed in the brief 2026-09-16: the CRAB is the default (his pick from rendered silhouettes, 2026-09-07) and the cat is the alternate (`xscapes companion cat`). No bird was ever drawn; the owl SHIPS with the vista since 2026-09-16 and the frog is drawn for the aquarium.**
+3. ~~Which of the three scapes survive.~~ **Answered, closed in the brief 2026-09-16: the shore is the one that ships. The campsite was superseded by the mountain vista with the owl (his pick, 2026-09-15). The vista became the second shipped scape on 2026-09-16 (s35, `xscapes scape vista`); the rainy window and the aquarium are drawn and on the page as clips, labelled as next.**
 4. ~~Must the build happen on Commons' platform?~~ **Answered 2026-08-30: no.** Token leaderboard only, absent from the rubric.
 5. ~~Does the Commons "Code" tab have a sandbox/terminal?~~ **Chat-only as far as tested.** GitHub account is linked; repo import untested.
-6. Per-model credit rates on Commons, and how 150/day reconciles with 600/month.
+6. ~~Per-model credit rates on Commons, and how 150/day reconciles with 600/month.~~ **Moot 2026-09-16: the entry is submitted (a 5-credit proxy Worker on Default · Quick) and nothing else on Commons needs credits. The builder read "110 left today" on 09-16.**
 
 ## Milestone 1 (target: ~Sep 1, submittable) — status 2026-09-01
 1. ✅ Go module, 80×24 canvas, layer/alpha renderer with truecolor→256 fallback. (No bubbletea; stdlib only.)
@@ -1141,8 +1162,8 @@ pane, where 80% used to leave a single row.
 8. ✅ README + MIT LICENSE written 2026-09-01; every command in it verified by running it.
    Published 2026-09-01 at github.com/donlucasx/xscapes; clone-and-build verified from the public repo.
 
-## Milestone 2
-Campsite + rainy window, weather mapping, plant-a-tree, per-repo seed, generic process adapter, Kimi/Hermes tests, bird companion, demo video.
+## Milestone 2 — re-ruled 2026-09-16 (session 35)
+**Wanted:** the generic process adapter (busy = alive + output, done = prompt back) · Kimi/Hermes adapters (verify their hooks first) · the vista as a real scape (the owl's five states, owlets for subagents), behind his tweaks. **Closed at his word:** plant-a-tree · per-repo seed (*"having the same seed for all will help me cater a better and more consistent experience"*) · the demo video (s21) · the typed prompt on the site. **Superseded:** the campsite, by the mountain vista (his pick, 09-15); the rainy window and the aquarium are drawn and on the page. **Deferred:** weather (`ideas.md`) · per-scape alert sounds, until more scapes are finished. The bird companion was never drawn; the owl and the frog are the next companions.
 
 ## Working style
 - Direct, honest tradeoffs over optimism. Verbatim-ready commands.

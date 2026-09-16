@@ -38,6 +38,35 @@ says publish/submit; he presses those himself.
 Do NOT drive Terminal.app (osascript, System Events) without asking me first.
 ```
 
+## ▶ NEXT (session 35, 2026-09-16: every open card CLOSED, uncommitted; his tweaks are next)
+
+**State:** **COMMITTED at his word ("proceed and commit"), four commits, one per card: `0359924` magnitude ·
+`00738f6` the generic adapter · `97b6a5b` Kimi + Hermes · `c9fcc6b` the vista**, each checked to build and
+vet on its own, plus this record commit. **NOT PUSHED** (`origin/main` = `f875b43`; v0.4.1 tagged and pushed
+earlier). The site is rebuilt in the record commit and NOT published. **Suite 12/12 + vet + fmt green** (a twelfth package, `internal/watch`); **INSTALLED as a new inode from the
+clean tree after the record commit** (see the session's last message for the stamp). The site is rebuilt locally and NOT published. This window's
+scape runs the three-cue binary (the OLD one for today's work); the tyastie scape is older still.
+
+**0. HIS TWEAKS to xscapes and the site.** Still unlisted; the walkthrough and the cards were his
+condition for starting. Site changes: `go run . -site site && sh site/publish.sh` (⚠ a republish changes
+the Commons entry inside 10 min, and judging is Sep 17–20). Product changes: reinstall from a CLEAN tree
+(`go build -o` a new inode) so the stamp is honest.
+**1. His word on: push** (`gh auth switch --user donlucasx && git push origin main`) · **publish** (the site says the vista ships; the live page still says three are next) · **restart**
+this window's scape on the new binary · `xscapes scape vista` to see it live · `xscapes install kimi --apply`
+and `hermes --apply` when he wants them (plans printed; `hermes hooks doctor` once for consent).
+**2. Built this session, all green, all looked at (screenshots in the session's scratchpad):**
+- **Star magnitude 0.70 → 0.60** (`notes/s35-magsweep`, criterion in `shore.go`, test fails both ways).
+- **The generic adapter** `internal/watch` + `xscapes inside -watch=auto|on|off` (default auto).
+- **`xscapes install kimi|hermes`** (`install_agents.go`), `xscapes hook <Event> [agent]`; validated by
+  `kimi doctor` and `hermes hooks list` in the tests. ⚠ Not yet RUN with either agent live.
+- **`xscapes scape vista`**: the vista as a scape (`internal/scenes/vista.go`, `vista_live.go`,
+  `scape_pref.go`); the owl's five faces (`DrawOwlPose`); owlets; the study clip byte-identical.
+**3. Open on the vista, for his look:** the moon is the study's 3x2 block (a disc with phase is the
+shore's; a follow-up) · the owl does not walk up (the ask is wide eyes + balloon) · owlets do not fly off ·
+`-mirror=false` puts the owl left and the litter has no room (stated, not fixed).
+**4. Then the s34/s33 queues below:** the deck is DROPPED (his word) · the pond re-briefed (token usage,
+easy to read, every scape) · per-scape sounds deferred until more scapes are finished.
+
 ## ▶ NEXT (session 34 left it here, WRAPPED 2026-09-16 ~09:10 PDT)
 
 **State:** HEAD `5cd6199` (the three cues, the study, the docs, the kit) + checkpoint + wrap, tree clean, PUSHED,
