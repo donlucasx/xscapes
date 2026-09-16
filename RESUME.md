@@ -45,10 +45,10 @@ Do NOT drive Terminal.app (osascript, System Events) without asking me first.
 
 ## ▶ NEXT (session 34, 2026-09-15 evening, IN PROGRESS)
 
-**State:** working tree DIRTY, uncommitted: the three-cue change (`internal/notify`, `frames.go`, `cmd.go`,
-tests), the picked WAVs in `internal/notify/sounds/`, the study in `notes/s34-sound/`, README + site copy +
-the brief, this file, `_FEEDBACK.md` §Session 34. Suite 10/10 + vet + fmt green. Installed (new inode,
-`vcs.modified=true` because the tree is dirty). Site rebuilt for the one copy line, NOT published.
+**State:** HEAD `5cd6199` (the three cues, the study, the docs, the kit) + this checkpoint, tree clean,
+suite 10/10 + vet + fmt green. **Published** (gh-pages `75b8724`, live hash == `site/index.html`, the
+three-sound line live) and **installed clean** (stamp `5cd6199`, modified=false). ⚠ **NOT PUSHED**: he said
+commit, not push. The Commons entry proxies gh-pages and picks the new page up inside 10 minutes.
 
 **0. ⭐⭐ COMMONS: ENTRY SUBMITTED 2026-09-16 ~08:45 PDT, https://xscapes.vibe.commonsmade.com** (proxy of
 gh-pages; verified byte-identical but for the platform's injected analytics script; other paths 404). Space
@@ -56,11 +56,13 @@ chat: https://commonsmade.com/chat/d3629738-9ca8-462c-bbc0-a6a9a4636e84 . **Twea
 gh-pages** (`go run . -site site && sh site/publish.sh`), no Commons step, ≤10 min; the build itself is
 changeable until Sep 17 23:59 UTC. ⚠ After the deadline the entry still serves the LIVE gh-pages, so do not
 break gh-pages during judging (Sep 17–20).
-**1. Commit the cue change** (his word), then rebuild + install so the stamp is a clean SHA; then his ear
-on it live: a scape started on the new binary rings the bird on the next ask. If *"drop (done)"* meant
-another drop, swap `internal/notify/sounds/done.wav` for the file in `notes/s34-sound/` and re-run the
-suite (`TestTheThreeCuesAreDifferentSounds` guards the pair).
-**2. Publish** the site copy line (three sounds) with the next publish; it is one sentence in *Features*.
+**1. Push main** at his word (`gh auth switch --user donlucasx && git push origin main`; ~3 commits). Then his
+ear on the cues live: a scape started on the new binary rings the bird on the next ask. If *"drop (done)"*
+meant another drop, swap `internal/notify/sounds/done.wav` for the file in `notes/s34-sound/` and re-run
+the suite (`TestTheThreeCuesAreDifferentSounds` guards the pair).
+**2. The things he still wants to update on xscapes and the site** (his words 09-16: *"Still got some things
+Id love to update"*), unlisted yet; every site change is `go run . -site site && sh site/publish.sh` and
+reaches the entry with no Commons step.
 **3. Tag v0.4.1** so `go install @latest` serves the near-pose balance and the new cues (49+ commits behind).
 **4. Carded at his word:** scene-specific soundscapes (one voice per scape; the six candidates already sort
 into shore / aquarium / vista). Also from the status report: per-project transposition for a user running

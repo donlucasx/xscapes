@@ -19,10 +19,12 @@
 > knocker takes the pose's worry and colours ONLY a finish (a question stays a question), three files
 > embedded, `xscapes notify worried`, the system rung borrows Basso. ⚠ *"drop (done)"* read as PLINK's
 > done (the single drop, row 2); one file swap if he meant Cistern, Drip-and-answer or Pebble. Suite
-> 10/10 + vet + fmt green; site copy rebuilt (NOT published); installed with a new inode from the dirty
-> tree. ⚠ **Running scapes on the old binary play the NEW ask and done by path** (same file names,
-> rewritten by the new binary's first start) and never the worried one, until restarted. UNCOMMITTED
-> at the harness rule: say "commit" and it lands as one commit.
+> 10/10 + vet + fmt green. ⭐ **COMMITTED `5cd6199` at his word ("publish and commit"), PUBLISHED (gh-pages
+> `75b8724` = site: 5cd6199, live hash verified, the three-sound line is live) and INSTALLED from the clean
+> tree (inode 86059199, stamp `5cd6199`, modified=false).** ⚠ `origin/main` is still `3ea1a69`: he said
+> commit, not push; `gh auth switch --user donlucasx && git push origin main` is one command away. ⚠ Running
+> scapes on the old binary play the NEW ask and done by path (same file names) and never the worried one,
+> until restarted.
 > ⭐⭐ **THE ENTRY IS SUBMITTED, 2026-09-16 ~08:45 PDT: https://xscapes.vibe.commonsmade.com** (the hackathon
 > home reads *"xscapes · ENTRY SUBMITTED."*). Driven in his logged-in Chrome: fresh chat, Default · Quick, the
 > kit's `message.md` set into the box by JS (a typed newline would have sent it), Start building; the agent
