@@ -4,23 +4,28 @@
 
 ```
 cd ~/Documents/claude/xscapes/ and read CLAUDE.md (the brief, authoritative)
-and RESUME.md before responding. Session 35 (2026-09-16) opened on a status
-check, then PROMPTED THROUGH EVERY OPEN ITEM WITH OPTIONS and he ruled on all
-of them (v0.4.1 tagged and pushed; the three cues kept; the deck dropped; the
-typed prompt, per-repo seed and plant-a-tree closed). Then "close any/all open
-cards before we dive into further notes": FOUR CARDS BUILT, test-first, every
-visual one screenshotted, committed at his word as one commit each: star
-magnitude 0.70 -> 0.60 on a sweep; the generic adapter (internal/watch,
-`xscapes inside -watch`); Kimi and Hermes adapters (`xscapes install
-kimi|hermes`, validated by the agents' own tools, neither RUN live yet); and
-THE VISTA AS A REAL SCAPE (`xscapes scape vista`; the owl's five faces;
-owlets; the page's clip byte-identical under a sha256 guard). Installed clean.
-NOT PUSHED (six commits ahead of origin/main). The site is rebuilt and NOT
-published: a republish changes the Commons entry, and judging is Sep 17-20.
-His scape preference file is set to VISTA, so the next scape he starts opens
-on it: HE WRAPPED TO RESTART AND TEST THE VISTA FIRST. Open on that: his
-notes on the vista live. Then his tweaks list for xscapes and the site, which
-is still unlisted. Tell me where we left off, then ask what he saw.
+and RESUME.md before responding. Session 36 (2026-09-16) was HIS FIRST LOOK
+AT THE VISTA LIVE: thirteen notes, every one built to and ruled on. The
+balloon and the readout bring their own ground (the ink had been the
+mountain's own grey); the vista clears its layers every frame (it never
+had, and the wind's debris piled up for minutes); the owl's motions in three
+rounds, LOCKED: resting = peek, working = looks-blink-flutter on two small
+wings, needs you = double blink with the near wing waving every other time,
+done = flap and bounce, worried = squint with brows; the litter = L6 (one
+owlet at a time, still half the time), placement = by turns (P3), flights in
+and out behind the owl on a three-leg path; the context body = THE ARC (S5),
+a two-colour gauge in front of the far ranges, setting behind the near
+ridge; the daytime tone = DEEP AND COOL (T4) with a mauve stop through dusk;
+a pass over every element's colour through the day (SetBGSolid in the
+canvas so the resolver never draws a line across a mound; the lake kept 25
+luma above the meadow; the mound lighter; the far range further into the
+sky; TestTheElementsStayApart). COMMITTED at his word as five commits, each
+building, vetting and testing alone; NOT PUSHED; the site NOT rebuilt or
+published (the study clip is byte-identical still; the live vista differs
+from it on purpose). Installed from the clean tree. Three review pages hold
+the locked record. NEXT: his next look live; his word on push and publish;
+D4's wings (big, as he picked it, or the working owl's small ones) is the
+one open card.
 
 Six things about how to work on this, all paid for:
 build the instrument before trusting the picture; measure the RENDERED frame
@@ -45,6 +50,35 @@ asked as open items and had to be retracted the same turn). Commit only at
 his word; stage by explicit path, never `git add -A`.
 Do NOT drive Terminal.app (osascript, System Events) without asking me first.
 ```
+
+## ▶ NEXT (session 36, 2026-09-16, WRAPPED at his word "commit!": thirteen notes, all built and ruled)
+
+**State:** HEAD = the record commit on top of five workstream commits (`canvas: a solid cell` · `The owl's
+motion round` · `The vista's sky and ground` · `The live vista` · `Session 36`), each exported and built,
+vetted and tested alone. **NOT PUSHED** (`origin/main` = `f875b43`, eleven commits behind now). The site
+is NOT rebuilt or published; `TestTheStudyVistaIsUnchanged` holds, so the page's vista clip is the block
+and today's tone while the live vista is the arc and T4 (deliberate: every live-only change is gated on
+`live != nil`). Installed from the clean tree. Three review pages, all on their original links:
+the owl locked https://claude.ai/artifact/UhESwiSW19yZAwP3pCBXjc · the arc gauge
+https://claude.ai/artifact/EgRNj7JE1gsLrVYb82AeZF · the tones https://claude.ai/artifact/CTT4Pn5GaUw87Gq4bNiLNS
+(also the five faces https://claude.ai/artifact/HKSGKiZdqtzQgvGos6J38C and the sun/moon life cycle
+https://claude.ai/artifact/KRLx7t9KgsLsc9cvKKwTBv, superseded).
+
+**0. His next look, live.** Restart a scape: the vista runs the balloon ground, the five locked motions,
+the litter by turns with its flights, the arc gauge, T4, and the seams pass. Take his notes.
+**1. His word on: push** (`gh auth switch --user donlucasx && git push origin main`) · **publish** (the site
+would need `go run . -site site && sh site/publish.sh`; its vista clip is the study's and would stay so).
+**2. The one open card:** done's wings. D4 was picked with the big wings; working's are the small ones.
+**3. Verbatim rulings and every measurement:** `_FEEDBACK.md` §Session 36 (thirteen notes).
+**4. Instruments this session, all env-gated page generators:** `XSCAPES_OWLSHEET`, `XSCAPES_OWLROUND`,
+`XSCAPES_OWLLOCKED`, `XSCAPES_MOONLIFE`, `XSCAPES_SUNSTUDY`, `XSCAPES_TONES` (`go test -run Test<Name> .`).
+Headless Chrome screenshots of frame pages found every defect; the round page at 96 frames was 13 MB,
+48 is the size.
+**5. Lessons paid for (also in memory):** a test that checks RUNES proves nothing about ink on its own
+colour · assert every scripted edit (two silent no-ops shipped the old thing under the new name) · the
+canvas's implied split is off on Terminal.app and on everywhere else, so the page shows lines his
+terminal never will · two equal halves eat a plain glyph (the band's writing vanished) · the study
+painter and the live painter are now two looks, gated, and the guard is what keeps them honest.
 
 ## ▶ NEXT (session 35, 2026-09-16, WRAPPED ~afternoon PDT: every open card CLOSED and committed; he restarts to test the vista)
 

@@ -2,6 +2,27 @@
 
 *(Renamed end to end on 2026-09-03: directory, env vars, state path and hook marker. Two names are kept on purpose and are not leftovers -- `internal/envx` still reads `ASCIISCAPES_*` and warns, and `install.go` still RECOGNISES the `# asciiscapes:v1` marker so the hooks it wrote before the rename can be found and removed.)*
 
+> **Session 36 (2026-09-16), WRAPPED at his word "commit!". HIS FIRST LOOK AT THE VISTA LIVE: THIRTEEN
+> NOTES, EVERY ONE BUILT TO AND RULED ON THE SAME DAY.** Opened on the resume; his first screenshot had
+> the balloon's letters missing. Measured, not inferred: the runes were all there and the INK was the
+> mountain's own grey (fg == bg on 12 of 135 glyphs at 80x24); the balloon and the readout bring a
+> darkened ground now, 100-luma floor tests. Then, in order, each on a review page he ruled from:
+> ⭐ **THE OWL IS LOCKED** (`OwlMotionPick`): resting = peek · working = looks, blink, flutter on two
+> small wings · needs you = double blink with the near wing waving every other time · done = flap and
+> bounce · worried = squint with brows; **the litter** = L6 (one owlet at a time in its own window, still
+> at least half the time), **placement by turns** (one beside the owl, one at the fire), **flights** in
+> from behind the owl and back on a three-leg path swept against every sitter. ⭐ **THE SUN AND MOON =
+> THE ARC** (S5 of seven): a day's path, in front of the far ranges, setting behind the near ridge, drawn
+> as a **two-colour gauge** (full over empty, the level dropping). ⭐ **THE DAYTIME TONE = T4, deep and
+> cool**, with a mauve stop through dusk and dawn. ⭐ **A pass over every element through the day**:
+> `canvas.SetBGSolid` (the resolver's implied split, off on Terminal.app and on on every page, drew lines
+> across the mound), the lake kept 25 luma above the meadow, the mound lighter, the far range further into
+> the sky, `TestTheElementsStayApart`. ⚠ **Two live defects since s35 found by the round**: the vista never
+> cleared its layers (his 10:10 sky was minutes of debris) and the dust showed through the moon. **COMMITTED
+> as five workstream commits, each built/vetted/tested alone; NOT PUSHED; the site NOT rebuilt or published
+> (the study clip is byte-identical; the live vista differs by design). Installed clean. NEXT: his next
+> look live · push and publish at his word · done's wings, the one open card.**
+
 > **Session 35 (2026-09-16), WRAPPED. THE WALKTHROUGH, THEN EVERY OPEN CARD CLOSED IN ONE AFTERNOON.** Opened on a
 > status check (all of s34 held; this window's scape runs the three-cue binary). Every open item on the
 > record was prompted through with options and ruled (verbatim in `_FEEDBACK.md` §Session 35): **v0.4.1
