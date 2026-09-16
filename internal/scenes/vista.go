@@ -34,11 +34,21 @@ type Vista struct {
 	// stands where the crab stands and the litter and the balloon use the
 	// shore's own arithmetic. Zero takes the study's place.
 	OwlX int
-	lay  vistaLayout
-	lit  float64
+	// MoonStyle is how the context body is drawn, an index into MoonStyles;
+	// 0 is the study's block. Set from the pick when he rules.
+	MoonStyle int
+	// Flock is the litter's memory of arrivals, for the flight in.
+	Flock OwletFlock
+	lay   vistaLayout
+	lit   float64
 }
 
-func NewVista(seed int64, ascii bool) *Vista { return &Vista{Seed: seed, Ascii: ascii} }
+// FireX is the fire's column after the last Update.
+func (v *Vista) FireX() int { return v.lay.fireX }
+
+// NewVista is the live vista: the context body on the arc (MoonStyle 5,
+// his pick of 2026-09-16). The study's clip on the page keeps the block.
+func NewVista(seed int64, ascii bool) *Vista { return &Vista{Seed: seed, Ascii: ascii, MoonStyle: 5} }
 
 // VistaMinRows is the height under which the owl no longer fits between the
 // sky and the writing and overlaps the sky. The scene still draws; it is
@@ -50,11 +60,19 @@ func (v *Vista) Name() string { return "vista" }
 // Update paints the whole frame but the owl and the writing, which the live
 // composer draws over it with the reducer's pose and tail.
 func (v *Vista) Update(c *canvas.Canvas, t float64, act scape.Activity) {
+	// Every glyph layer is cleared first, as the shore's Update does. The
+	// vista's did not (s35), and nothing showed it until an owlet FLEW:
+	// the flight left a trail of owlets along its arc, one per frame, on
+	// the placement page (his screenshot, 2026-09-16 11:46). Live it means
+	// that whatever the wind carried through the air stayed where each
+	// frame put it: TestTheVistaClearsBetweenFrames measures the sky's
+	// glyph count over sixty frames and holds it to one frame's worth.
+	c.Clear()
 	v.lay = vistaLayoutFor(c.W, c.H, v.OwlX)
 	v.lit = lit(scape.PaletteAt(act.TimeOfDay))
 	paintVistaL(c, v.lay, act.TimeOfDay, t, act.Level, v.Seed, false, &vistaLive{
 		ContextUsed: act.ContextUsed, TodoDone: act.TodoDone,
-		SkipOwl: true, SkipBand: true,
+		SkipOwl: true, SkipBand: true, MoonStyle: v.MoonStyle,
 	})
 }
 
@@ -73,9 +91,15 @@ func (v *Vista) BandTop() int { return v.lay.bandTop }
 // BandColor is the writing's ground, for the sand's ink to be sampled from.
 func (v *Vista) BandColor() term.RGB { return v.lay.bandColor(v.lit) }
 
-// MoonAt is the moon's cell, for the context readout to sit under.
+// MoonAt is the body's cell, for the context readout to sit under: the
+// block's top-left, or for a disc the cell whose readout row is the row
+// under the disc's bottom, centred on the disc.
 func (v *Vista) MoonAt(ctxUsed float64) (x, y int) {
-	return v.lay.moonX, v.lay.moonRow(ctxUsed)
+	if v.MoonStyle == 0 {
+		return v.lay.moonX, v.lay.moonRow(ctxUsed)
+	}
+	cx, cy, r := v.lay.moonCenter(v.MoonStyle, ctxUsed)
+	return int(cx) - 1, int(cy+r-0.5) - 1
 }
 
 // vistaLayoutFor scales the 80x24 layout to a window. The band keeps the

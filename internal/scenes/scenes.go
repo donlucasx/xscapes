@@ -54,10 +54,31 @@ func fill(c *canvas.Canvas, x0, y0, x1, y1 int, col rgb) {
 	for y := y0; y <= y1; y++ {
 		for x := x0; x <= x1; x++ {
 			if x >= 0 && y >= 0 && x < c.W && y < c.H {
-				c.SetBG(x, y, col)
+				setSolid(c, x, y, col)
 			}
 		}
 	}
+}
+
+// solidCells, while set, makes every solid cell the painters lay down a
+// SOLID cell (canvas.SetBGSolid) instead of a plain background. The canvas
+// splits a plain cell on its own wherever split cells are allowed (every
+// terminal but Terminal.app, and every page), putting a half-row of a
+// neighbour's colour into it to place an edge it infers -- right for the
+// shore's sky and sea, which are ramps, and wrong for a mound, a lake or
+// the band, where it drew a line across a solid shape at some hours and
+// not others (his crop of the mound, 2026-09-16 12:38). A solid cell is
+// never split, and a glyph over it is drawn as over any plain cell (two
+// equal halves, the first fix, ate the band's writing). The live vista
+// sets it for the length of a frame; the study's clip keeps its bytes.
+var solidCells bool
+
+func setSolid(c *canvas.Canvas, x, y int, col rgb) {
+	if solidCells {
+		c.SetBGSolid(x, y, col)
+		return
+	}
+	c.SetBG(x, y, col)
 }
 
 // vramp paints one ramp top to bottom through the palette, as the shore

@@ -144,7 +144,7 @@ func paintRange(c *canvas.Canvas, top []int, col term.RGB, until int, tint func(
 				continue
 			}
 			if mask == 0b1111 {
-				c.SetBG(x, y, shape)
+				setSolid(c, x, y, shape)
 				continue
 			}
 			c.SetBGQuad(x, y, shape, c.BGAt(x, y), mask)
@@ -188,7 +188,7 @@ func pineSilhouette(c *canvas.Canvas, cu, tip, base int, col term.RGB, seed int6
 				continue
 			}
 			if mask == 0b1111 {
-				c.SetBG(x, y, col)
+				setSolid(c, x, y, col)
 			} else {
 				c.SetBGQuad(x, y, col, c.BGAt(x, y), mask)
 			}
@@ -243,6 +243,242 @@ type vistaLive struct {
 	// The live scene draws its own owl (with a pose) and its own writing
 	// (the real activity tail), so the painter leaves both slots bare.
 	SkipOwl, SkipBand bool
+	// MoonStyle is how the context body is drawn (see MoonStyles); 0 is
+	// the study's block.
+	MoonStyle int
+}
+
+// THE CONTEXT BODY, SEVEN WAYS (s36, 2026-09-16). His ask: "explore further
+// visual approaches for the vista sun/moon and how it can visually
+// represent the context being used up over time". Each style is one way
+// the sun by day, the moon by night, says how much of the window is gone.
+// Style 0 is the study's 3x2 block sinking, and the page's clip guard
+// holds on it. The rest draw a disc at quarter-cell resolution, the
+// massif's own method, so the round edge costs nothing new.
+var MoonStyles = []struct{ Name, Note string }{
+	{"block", "today: the study's 3x2 block, sinking from row 1 to just above the far range"},
+	{"disc, phase", "the shore's reading on the vista's method: a round disc sinking, full when fresh and new when spent; by day the sun wanes as a crescent, by night the unlit face is painted"},
+	{"sun going down", "a round disc sinking as it reddens: pale when fresh, deep orange when spent; the moon by night goes amber"},
+	{"sets behind the range", "a round disc that sinks all the way into the far range and is gone at 100%: the ridge takes it, the readout stays"},
+	{"shrinks", "a disc that stays high and loses its size: radius 2.4 rows when fresh, 0.6 when spent; size is the channel, not height"},
+	{"the arc", "a day's path: low on the left when fresh, overhead at 40%, setting behind the near ridge on the right when spent; and a gauge: two colours, full and empty, the full level dropping from the top as the window spends -- bright yellow over muted yellow by day, light grey over dark grey by night"},
+	{"eaten from below", "a disc that stays high while a shadow rises through it from the bottom, the way an eclipse takes a moon; gone at 100%"},
+	// Round two, on his lean toward the arc: the same path, a different body.
+	{"the arc, soft", "the arc with a soft body: no hard edge, each cell of the rim takes the sky in proportion to how much of it the disc covers"},
+	{"the arc, rays", "the arc with a sun that has rays by day, in its own colour, clipped by the range as it sets; by night a moon in a faint halo"},
+	{"the arc, big and soft", "the soft body at a larger radius, 2.8 rows, so the sun is the biggest thing in the sky"},
+}
+
+// arcStyle says whether a style travels the arc.
+func arcStyle(style int) bool { return style == 5 || style >= 7 }
+
+// moonCenter is the body's centre column, centre row and radius in rows
+// for a style and a context; the block's is its own (moonRow).
+func (lay vistaLayout) moonCenter(style int, ctx float64) (cx, cy, r float64) {
+	base := float64(lay.farBase/2) - 0.5 // the far range's base row
+	cx = float64(lay.moonX) + 1.5
+	switch style {
+	case 3:
+		return cx, 1.5 + ctx*(base+2.5-1.5), 2.0
+	case 4:
+		return cx, 3.0, 2.4 - 1.8*ctx
+	case 5, 7, 8, 9:
+		// Low on the left when fresh, overhead at 40%, and at 100% behind
+		// the near ridge: its base is the lake's top row, and the body's
+		// centre ends a row above it, so the ridge and the lake take it.
+		a := math.Pi * (0.15 + 0.85*ctx)
+		w := float64(lay.W)
+		r = 2.0
+		if style == 7 {
+			r = 2.2
+		}
+		if style == 9 {
+			r = 2.8
+		}
+		// The apex centre sits at row 2.5, so a two-row disc keeps its top
+		// half-row inside the frame (at 1.5 the frame's edge clipped it).
+		end := float64(lay.lakeTop) - 0.5
+		return 0.08*w + 0.62*w*ctx, 2.5 + (1-math.Sin(a))*(end-2.5), r
+	case 6:
+		return cx, 3.0, 2.0
+	}
+	return cx, float64(lay.moonRow(ctx)) + 1.0, 2.0
+}
+
+// paintVistaDisc draws styles 1..6: a disc sampled four quarters a cell,
+// a second disc for a terminator where the style has one, the unlit face
+// painted by night and left to the sky by day (the sun wanes as a crescent,
+// his ruling of 2026-09-06).
+func paintVistaDisc(c *canvas.Canvas, lay vistaLayout, p scape.Palette, style int, ctx float64, farTop []int) {
+	cx, cy, r := lay.moonCenter(style, ctx)
+	night := p.StarVis > 0.6
+	body := p.Moon
+	dark := term.RGB{R: 80, G: 80, B: 96}
+	fill, level := false, 0.0
+	if style == 5 {
+		// HIS RULINGS, 2026-09-16: "bright when full and opaque as context
+		// depletes (bright yellow to muted/darker yellow, or lighter grey to
+		// darker grey)", then, of the first cut's blend, "should be 2
+		// colors, one for full one for empty, currently looks buggy". So a
+		// GAUGE: the full colour fills the bottom of the disc to a level
+		// that is the context left, the empty colour the rest, two flat
+		// colours and a horizontal line between them that drops as the
+		// window spends. Both are cube entries. The level is the second
+		// cue on the same variable, as phase is beside altitude on the shore.
+		body, dark = term.RGB{R: 255, G: 255, B: 135}, term.RGB{R: 175, G: 135, B: 95}
+		if night {
+			body, dark = term.RGB{R: 238, G: 238, B: 238}, term.RGB{R: 118, G: 118, B: 118}
+		}
+		fill, level = true, r*(1-2*(1-ctx)) // rows below the centre where full begins
+	}
+	if style == 7 || style == 9 {
+		// Soft: sixteen samples a cell, the cell's colour the sky and the
+		// body in proportion. No quarters, so no steps on the rim, at the
+		// cost of mixed tones on the rim that the cube rounds as it can.
+		for y := int(cy-r) - 1; y <= int(cy+r)+1; y++ {
+			for x := int(cx-2*r) - 1; x <= int(cx+2*r)+1; x++ {
+				if x < 0 || y < 0 || x >= c.W || y >= c.H {
+					continue
+				}
+				in := 0
+				for j := 0; j < 4; j++ {
+					for i := 0; i < 4; i++ {
+						px, py := float64(x)+(float64(i)+0.5)/4-cx, float64(y)+(float64(j)+0.5)/4-cy
+						if (px/2)*(px/2)+py*py < r*r {
+							in++
+						}
+					}
+				}
+				if in > 0 {
+					c.SetBG(x, y, term.Lerp(c.BGAt(x, y), body, p.MoonVis*float64(in)/16))
+				}
+			}
+		}
+		return
+	}
+	if style == 8 {
+		defer func() {
+			// Rays by day, a halo by night, drawn only above the far range
+			// so a setting sun's rays do not poke through the rock.
+			above := func(x, y int) bool {
+				return x >= 0 && y >= 0 && x < c.W && y < c.H && (farTop == nil || 2*y < farTop[min(2*x, len(farTop)-1)])
+			}
+			ix, iy := int(cx), int(cy)
+			if !night {
+				rays := []struct {
+					dx, dy int
+					g      rune
+				}{{0, -int(r) - 1, '|'}, {0, int(r) + 1, '|'}, {-int(2*r) - 2, 0, '-'}, {-int(2*r) - 1, 0, '-'}, {int(2*r) + 1, 0, '-'}, {int(2*r) + 2, 0, '-'},
+					{-int(2*r) - 1, -int(r), '\\'}, {int(2*r) + 1, -int(r), '/'}, {-int(2*r) - 1, int(r), '/'}, {int(2*r) + 1, int(r), '\\'}}
+				for _, ry := range rays {
+					if x, y := ix+ry.dx, iy+ry.dy; above(x, y) {
+						c.Near().PlotOn(x, y, ry.g, term.Lerp(c.BGAt(x, y), body, p.MoonVis), c.BGAt(x, y), 1)
+					}
+				}
+				return
+			}
+			for y := int(cy-r) - 2; y <= int(cy+r)+2; y++ {
+				for x := int(cx-2*r) - 3; x <= int(cx+2*r)+3; x++ {
+					px, py := float64(x)+0.5-cx, float64(y)+0.5-cy
+					d := math.Sqrt((px/2)*(px/2) + py*py)
+					if d >= r && d < r+1.0 && above(x, y) {
+						c.SetBG(x, y, term.Lerp(c.BGAt(x, y), body, 0.22*p.MoonVis))
+					}
+				}
+			}
+		}()
+	}
+	if style == 2 {
+		target := term.RGB{R: 235, G: 95, B: 40}
+		if night {
+			target = term.RGB{R: 165, G: 85, B: 55}
+		}
+		body = term.Lerp(p.Moon, target, ctx)
+	}
+	shadow, sx, sy := false, 0.0, 0.0
+	switch style {
+	case 1:
+		shadow, sx = true, 4*r*(1-ctx) // the disc is 4r cells wide
+	case 6:
+		shadow, sy = true, 2*r*(1-ctx)
+	}
+	samples := [4]struct {
+		dx, dy float64
+		bit    uint8
+	}{{-0.25, -0.25, 8}, {0.25, -0.25, 4}, {-0.25, 0.25, 2}, {0.25, 0.25, 1}}
+	pop := func(m uint8) int { return int(m&1) + int(m>>1&1) + int(m>>2&1) + int(m>>3&1) }
+	for y := int(cy-r) - 1; y <= int(cy+r)+1; y++ {
+		for x := int(cx-2*r) - 1; x <= int(cx+2*r)+1; x++ {
+			if x < 0 || y < 0 || x >= c.W || y >= c.H {
+				continue
+			}
+			var lit, unlit uint8
+			for _, s := range samples {
+				px, py := float64(x)+0.5+s.dx-cx, float64(y)+0.5+s.dy-cy
+				if (px/2)*(px/2)+py*py >= r*r {
+					continue
+				}
+				if fill {
+					if py >= level {
+						lit |= s.bit
+					} else {
+						unlit |= s.bit
+					}
+					continue
+				}
+				qx, qy := px-sx, py-sy
+				if shadow && (qx/2)*(qx/2)+qy*qy < r*r {
+					if night {
+						unlit |= s.bit
+					}
+					continue
+				}
+				lit |= s.bit
+			}
+			if lit == 0 && unlit == 0 {
+				continue
+			}
+			// The sky's dust was plotted before the body; a speck showing
+			// through the sun's face was the shore's report of 2026-09-06.
+			c.Far().Erase(x, y)
+			c.Mid().Erase(x, y)
+			ground := c.BGAt(x, y)
+			litCol := term.Lerp(ground, body, p.MoonVis)
+			darkCol := term.Lerp(ground, dark, p.MoonVis)
+			if fill {
+				// Two FLAT colours: the sky does not bleed into a gauge.
+				litCol, darkCol = body, dark
+			}
+			sky := 4 - pop(lit) - pop(unlit)
+			// A flat cell of the body is painted SOLID rather than plain: a
+			// plain cell next to a different colour takes an implied edge from
+			// its neighbours where split cells are allowed (every terminal but
+			// Terminal.app, and every page), and the empty colour's top row
+			// came out grey-topped on the page.
+			flat := func(col term.RGB) { c.SetBGSolid(x, y, col) }
+			switch {
+			case lit == 15:
+				flat(litCol)
+			case unlit == 15:
+				flat(darkCol)
+			case lit == 0:
+				c.SetBGQuad(x, y, darkCol, ground, unlit)
+			case unlit == 0:
+				c.SetBGQuad(x, y, litCol, ground, lit)
+			case pop(unlit) >= sky:
+				// Both colours are the body's. A quad keeps the sky ramp it
+				// was painted over and draws its ground in the ramp's tone
+				// (right for the massif, whose ground IS sky), so the cell
+				// is made whole first to drop the ramp: without that, the
+				// row where the level crosses came out as a stripe of sky
+				// between the two colours (his crop, 2026-09-16 12:17).
+				c.SetBG(x, y, darkCol)
+				c.SetBGQuad(x, y, litCol, darkCol, lit)
+			default:
+				c.SetBGQuad(x, y, litCol, ground, lit)
+			}
+		}
+	}
 }
 
 // moonRow is where the moon sits for a context: row 1 fresh, sinking toward
@@ -259,7 +495,15 @@ func paintVistaL(c *canvas.Canvas, lay vistaLayout, tod, t, level float64, seed 
 	farBase, midBase, nearBase := lay.farBase, lay.midBase, lay.nearBase
 	lakeTop, meadowTop, bandTop := lay.lakeTop, lay.meadowTop, lay.bandTop
 	owlX, owlY := lay.owlX, lay.owlY
-	p := scape.PaletteAt(tod)
+	// The tone is the live scape's; the study's clip on the page keeps
+	// today's colours, and its guard holds on them.
+	tonePick := 0
+	if live != nil {
+		tonePick = VistaTonePick
+		solidCells = true
+		defer func() { solidCells = false }()
+	}
+	p, tone := applyTone(scape.PaletteAt(tod), tod, tonePick)
 	l := lit(p)
 	glow := glowAt(tod)
 	warm := term.RGB{R: 255, G: 135, B: 95}
@@ -270,36 +514,8 @@ func paintVistaL(c *canvas.Canvas, lay vistaLayout, tod, t, level float64, seed 
 	// frame stretches them rather than repeating them.
 	sx := float64(c.W) / 80
 
-	// The sky, its stars, the moon or the sun.
-	vramp(c, 0, 0, c.W-1, lakeTop-1, p.SkyTop, p.SkyHorizon)
-	for y := 0; y < lakeTop-4; y++ {
-		for x := 0; x < c.W; x++ {
-			if scape.HashF(x, y, seed) < 0.05*p.StarVis {
-				plot(far, x, y, '.', p.Star, 0.6*p.StarVis)
-			}
-		}
-	}
-	moonY := 1
-	if live != nil {
-		moonY = lay.moonRow(live.ContextUsed)
-	}
-	if p.MoonVis > 0.05 {
-		for y := moonY; y <= moonY+1; y++ {
-			for x := lay.moonX; x <= lay.moonX+2; x++ {
-				c.SetBG(x, y, term.Lerp(c.BGAt(x, y), p.Moon, p.MoonVis))
-			}
-		}
-	}
-	if live != nil && live.TodoDone > 0 {
-		vistaStars(c, lay, p, seed, live.TodoDone)
-	}
-
-	// Three ranges. Rock is grey at night and warm stone by day; each farther
-	// range is pulled toward the sky, which is what distance does.
-	rock := term.Lerp(grey(3), term.RGB{R: 150, G: 138, B: 118}, l)
-	farCol := term.Lerp(rock, p.SkyHorizon, 0.58)
-	midCol := term.Lerp(rock, p.SkyHorizon, 0.22)
-	nearCol := term.Lerp(grey(1), term.RGB{R: 34, G: 62, B: 36}, l)
+	// The ranges' skylines, fixed before the sky is painted: the sun's rays
+	// (style 8) stop at the far range.
 	W2 := c.W * 2
 	farTop := make([]int, W2)
 	midTop := make([]int, W2)
@@ -309,6 +525,70 @@ func paintVistaL(c *canvas.Canvas, lay vistaLayout, tod, t, level float64, seed 
 		midTop[u] = skyline(u, midBase, 25, seed+23, 0.047, 84*sx, 56*sx)
 		nearTop[u] = skyline(u, nearBase, 6, seed+31, 0.19, 60*sx, 160*sx)
 	}
+
+	// The sky, its stars, the moon or the sun. A tone with a warm middle
+	// stop paints the sky as two ramps meeting halfway.
+	if tonePick != 0 && tone.WarmMid != (term.RGB{}) {
+		mid := tone.skyMid(p.SkyTop, p.SkyHorizon)
+		half := (lakeTop - 1) / 2
+		vramp(c, 0, 0, c.W-1, half, p.SkyTop, mid)
+		vramp(c, 0, half+1, c.W-1, lakeTop-1, mid, p.SkyHorizon)
+	} else {
+		vramp(c, 0, 0, c.W-1, lakeTop-1, p.SkyTop, p.SkyHorizon)
+	}
+	for y := 0; y < lakeTop-4; y++ {
+		for x := 0; x < c.W; x++ {
+			if scape.HashF(x, y, seed) < 0.05*p.StarVis {
+				plot(far, x, y, '.', p.Star, 0.6*p.StarVis)
+			}
+		}
+	}
+	moonY, style, ctx := 1, 0, 0.0
+	if live != nil {
+		moonY, style, ctx = lay.moonRow(live.ContextUsed), live.MoonStyle, live.ContextUsed
+	}
+	// The body and the stars. A body on the arc is painted AFTER the far
+	// and mid ranges and before the near ridge: the mid range's tallest
+	// peak reaches the top rows of the sky, and a sun cut by it while
+	// overhead read as a defect (his crop, 2026-09-16 12:07); it sets
+	// behind the near ridge instead. The stars go on after the body so the
+	// count never drops behind it.
+	bodyAndStars := func() {
+		if p.MoonVis > 0.05 && style == 0 {
+			for y := moonY; y <= moonY+1; y++ {
+				for x := lay.moonX; x <= lay.moonX+2; x++ {
+					c.SetBG(x, y, term.Lerp(c.BGAt(x, y), p.Moon, p.MoonVis))
+				}
+			}
+		} else if p.MoonVis > 0.05 {
+			paintVistaDisc(c, lay, p, style, ctx, farTop)
+		}
+		if live != nil && live.TodoDone > 0 {
+			vistaStars(c, lay, p, seed, live.TodoDone, style != 0)
+		}
+	}
+	if !arcStyle(style) {
+		bodyAndStars()
+	}
+
+	// Three ranges. Rock is grey at night and warm stone by day; each farther
+	// range is pulled toward the sky, which is what distance does.
+	rock := term.Lerp(grey(3), term.RGB{R: 150, G: 138, B: 118}, l)
+	// THE SEAMS, measured over a day at 125x28 (s36, his ask that every
+	// element "stay consistent and legible throughout"): the far range's
+	// rock sat within 1-10 luma of the mid range's all day, so it went
+	// further into the sky (0.58 → 0.70); the lake's colour fell on the
+	// meadow's luma from 08:00 to 10:00 (0.3 luma apart, one hue from the
+	// other) and jumped 44 at 11:00 on a cube step, so it is kept at least
+	// lakeApart luma above the meadow's top green; the mound's day grey was
+	// 10 luma off the meadow, so its day end is grey 13 rather than 9.
+	farInto := 0.58
+	if live != nil {
+		farInto = 0.70
+	}
+	farCol := term.Lerp(rock, p.SkyHorizon, farInto)
+	midCol := term.Lerp(rock, p.SkyHorizon, 0.22)
+	nearCol := term.Lerp(grey(1), term.RGB{R: 34, G: 62, B: 36}, l)
 	paintRange(c, farTop, term.Lerp(farCol, warm, 0.22*glow), c.H, nil)
 	snow := term.Lerp(term.Lerp(grey(15), grey(23), l), warm, 0.45*glow)
 	midLit := term.Lerp(midCol, warm, 0.6*glow)
@@ -330,6 +610,9 @@ func paintVistaL(c *canvas.Canvas, lay vistaLayout, tod, t, level float64, seed 
 		}
 		return term.RGB{}, false
 	})
+	if arcStyle(style) {
+		bodyAndStars()
+	}
 	// The near ridge, with its treeline: a second skyline on top, at a
 	// frequency of about one tree every two cells, so the tips are tips.
 	for u := 0; u < W2; u++ {
@@ -345,17 +628,25 @@ func paintVistaL(c *canvas.Canvas, lay vistaLayout, tod, t, level float64, seed 
 	// The lake reflects the whole sky, darker, with the moon's light on it
 	// by night.
 	lake := term.Lerp(term.Lerp(p.SkyHorizon, p.SkyTop, 0.5), grey(0), 0.3)
+	if live != nil {
+		lake = keepApart(lake, term.Lerp(grey(2), tone.MeadowTop, math.Pow(l, 1.6)), p.SkyHorizon, lakeApart)
+	}
 	fill(c, 0, lakeTop, c.W-1, meadowTop-1, lake)
 	if p.MoonVis > 0.05 && p.StarVis > 0.3 {
-		for x := lay.moonX - 1; x <= lay.moonX+3; x++ {
+		mx0, mx1 := lay.moonX-1, lay.moonX+3
+		if style != 0 {
+			cx, _, r := lay.moonCenter(style, ctx)
+			mx0, mx1 = int(cx-2*r), int(cx+2*r)
+		}
+		for x := max(0, mx0); x <= mx1 && x < c.W; x++ {
 			c.SetBG(x, lakeTop, term.Lerp(lake, p.Moon, 0.3*p.MoonVis*p.StarVis))
 		}
 	}
 	// The meadow: olive by day, dark by night, darker toward us, and it
 	// goes dim before the sky does.
 	lm := math.Pow(l, 1.6)
-	mTop := term.Lerp(grey(2), cube(95, 135, 0), lm)
-	mBot := term.Lerp(grey(1), cube(95, 95, 0), lm)
+	mTop := term.Lerp(grey(2), tone.MeadowTop, lm)
+	mBot := term.Lerp(grey(1), tone.MeadowBot, lm)
 	vramp(c, 0, meadowTop, c.W-1, bandTop-1, mTop, mBot)
 	// The near shore wanders, and rises into a headland under the owl so
 	// the lake is a body of water in the valley and not a stripe across it.
@@ -397,12 +688,22 @@ func paintVistaL(c *canvas.Canvas, lay vistaLayout, tod, t, level float64, seed 
 	if fireIsWork {
 		R = 4.0 + 9.0*level
 	}
-	// Firelight on the meadow by night.
-	for y := lakeTop; y < bandTop; y++ {
+	// Firelight on the meadow by night. Live, it comes up with the dark
+	// (from StarVis 0.5 to 0.8) and is not painted by day at all: the
+	// painting drops the meadow's ramp binding on every cell it touches,
+	// and a cell quantised on its own instead of along the ramp's path
+	// lands on a different entry -- by day and at dusk, a dark patch the
+	// size of the firelight around the fire (his crop, 2026-09-16 12:31).
+	// The study keeps its own arithmetic.
+	night := 1.0
+	if live != nil {
+		night = math.Max(0, math.Min(1, (p.StarVis-0.5)/0.3))
+	}
+	for y := lakeTop; y < bandTop && night > 0; y++ {
 		for x := 0; x < c.W; x++ {
 			d := math.Hypot(float64(x-cx)/2, float64(y-base))
 			if d < R {
-				a := (1 - d/R) * (0.5*math.Pow(1-l, 2) + 0.04)
+				a := (1 - d/R) * (0.5*math.Pow(1-l, 2) + 0.04) * night
 				c.SetBG(x, y, term.Lerp(c.BGAt(x, y), cube(135, 95, 0), a))
 			}
 		}
@@ -484,7 +785,7 @@ func paintVistaL(c *canvas.Canvas, lay vistaLayout, tod, t, level float64, seed 
 	// The scrub. Upright is a tuft; bent is a stroke. In the wind the
 	// FRACTION bent is the work, with a flutter at the margin so the meadow
 	// moves without the fraction changing.
-	scrub := term.Lerp(grey(7), cube(135, 175, 0), lm)
+	scrub := term.Lerp(grey(7), tone.Scrub, lm)
 	for y := meadowTop; y < bandTop; y++ {
 		for x := 0; x < c.W; x++ {
 			if OwlPlace == 0 && x >= owlX-2 && y >= bandTop-2 {
@@ -577,7 +878,11 @@ func paintVistaL(c *canvas.Canvas, lay vistaLayout, tod, t, level float64, seed 
 				}
 			}
 		}
-		paintRange(c, mound, greyBetween(5, 9, l), bandTop, nil)
+		moundDay := 9
+		if live != nil {
+			moundDay = 13
+		}
+		paintRange(c, mound, greyBetween(5, moundDay, l), bandTop, nil)
 		if live == nil || !live.SkipOwl {
 			owlAt(c, owlX, owlY, meadowTop+1)
 		}
@@ -600,7 +905,7 @@ func (lay vistaLayout) bandColor(l float64) term.RGB {
 // learned in s27: index order piles the first few into one corner). The ink
 // is lifted toward white until it clears the sky by the shore's own bar, so
 // the count survives the day.
-func vistaStars(c *canvas.Canvas, lay vistaLayout, p scape.Palette, seed int64, n int) {
+func vistaStars(c *canvas.Canvas, lay vistaLayout, p scape.Palette, seed int64, n int, ownGround bool) {
 	rows := lay.lakeTop - 6
 	if rows < 2 || c.W < 8 {
 		return
@@ -616,6 +921,14 @@ func vistaStars(c *canvas.Canvas, lay vistaLayout, p scape.Palette, seed int64, 
 			x = (x + 5) % (c.W - 2)
 		}
 		ink := vistaStarInk(c, x, y, p.Star)
+		if ownGround {
+			// A moving body (the arc) passes behind the stars. A star keeps
+			// its cell with its own ground, so the disc's quarter-cells cannot
+			// eat it: the count is the channel and must not drop while the
+			// sun goes by (the s28 lesson, "stars appearing and disappearing").
+			near.PlotOn(x, y, '*', ink, c.BGAt(x, y), 1)
+			continue
+		}
 		near.Plot(x, y, '*', ink, 1)
 	}
 }
@@ -635,4 +948,23 @@ func vistaStarInk(c *canvas.Canvas, x, y int, star term.RGB) term.RGB {
 		}
 	}
 	return ink
+}
+
+// lakeApart is the least luma the lake sits above the meadow by day.
+const lakeApart = 25.0
+
+// keepApart moves col toward toward until it is at least gap luma from
+// other, or returns it fully moved if that is not enough.
+func keepApart(col, other, toward term.RGB, gap float64) term.RGB {
+	luma := func(c term.RGB) float64 { return 0.30*float64(c.R) + 0.59*float64(c.G) + 0.11*float64(c.B) }
+	if math.Abs(luma(col)-luma(other)) >= gap {
+		return col
+	}
+	for k := 0.1; k <= 1.0; k += 0.1 {
+		try := term.Lerp(col, toward, k)
+		if math.Abs(luma(try)-luma(other)) >= gap {
+			return try
+		}
+	}
+	return toward
 }
