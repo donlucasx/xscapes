@@ -2,7 +2,8 @@
 
 *(Renamed end to end on 2026-09-03: directory, env vars, state path and hook marker. Two names are kept on purpose and are not leftovers -- `internal/envx` still reads `ASCIISCAPES_*` and warns, and `install.go` still RECOGNISES the `# asciiscapes:v1` marker so the hooks it wrote before the rename can be found and removed.)*
 
-> **Session 34 (2026-09-15 evening), IN PROGRESS. ⭐ THE CUE IS THREE SOUNDS NOW, HIS PICKS.** Opened on a
+> **Session 34 (2026-09-15 evening into 09-16), WRAPPED ~09:10 PDT. ⭐ THE CUE IS THREE SOUNDS NOW, HIS PICKS,
+> AND ⭐⭐ THE COMMONS ENTRY IS SUBMITTED.** HEAD = the wrap commit, pushed, tree clean. Opened on a
 > status report checked against git, the live page, the suite and the processes: everything the record
 > claimed held (gh-pages = repo, both running scapes on the installed binary), and **Commons measures
 > ABSENT** (`xscapes.vibe.commonsmade.com` is a 404; closes 09-17). Then *"I dont love the sound that

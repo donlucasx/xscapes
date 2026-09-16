@@ -3352,3 +3352,9 @@ counter (110 left). The Submit button is a picker he has to open himself.
   from outside: 5,864,638 bytes = gh-pages 5,864,585 + one injected `/__commons/analytics.js` line (served
   200 by the platform); `/index.html` same; `/nothing` 404; `cache-control: public, max-age=600`. The build
   cost 5 credits on Default · Quick; the agent found and deleted the platform's own "first shot" template.
+- *"publish and commit"* ⇒ committed `5cd6199` (one commit: cues, study, docs, kit) + `3523d23` (checkpoint);
+  gh-pages `75b8724` = site: 5cd6199, live hash verified on the third try; binary reinstalled from the clean
+  tree (stamp `5cd6199`, modified=false); the Commons entry served the new page on the next fetch.
+- *"push"* ⇒ `origin/main` = HEAD (`0ca810b` then the wrap).
+- *"lets /wrap for now"* ⇒ wrapped 2026-09-16 ~09:10 PDT. His unlisted *"things Id love to update about
+  xscapes and its website"* is the open thread for the next session.

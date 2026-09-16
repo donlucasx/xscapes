@@ -4,48 +4,43 @@
 
 ```
 cd ~/Documents/claude/xscapes/ and read CLAUDE.md (the brief, authoritative)
-and RESUME.md before responding. Session 33 (09-15) was HIS SITE SESSION:
-he prompted through thirteen open items with options, then reviewed the
-live page seven times and I built to each note. LIVE and pushed at HEAD
-6baa6ee + the wrap commit: the legend is the companion ALONE, cropped to
-one shared box on a floor rule, the ask cut by it as on the beach; the
-cast is crab/cat/owl/frog floating; the aquarium is a seamless loop; six
-per-section backdrops on a stated criterion; one reading measure (66ch)
-and three text sizes with one job each; section titles that say what
-they hold; seven named features; a synopsis as the deck; a drawn repo
-box. Suite 10/10 + vet + fmt green. A friend's "pond that fills with
-tokens" is CARDED in ideas.md (his ruling: "definitely card it").
-Skim origin-chat.md only if you need the why; ignore ideas.md unless he
-opens the pond.
-Tell me where we left off, then pick up from the NEXT queue.
+and RESUME.md before responding. Session 34 (09-15 evening into 09-16) SHIPPED
+THE CUE AS THREE SOUNDS, his picks from six drafted candidates: a bird for the
+ask, one drop into still water for done, the bird falling for a finish that
+left something broken (a new kind, notify.Worried, 15% of his real finishes).
+Then THE COMMONS ENTRY WAS SUBMITTED: https://xscapes.vibe.commonsmade.com is
+a Worker proxy of the gh-pages page, built in his logged-in Chrome, published
+and entered by him; a gh-pages republish reaches it inside 10 minutes with no
+Commons step, and it keeps serving the LIVE page through judging (Sep 17-20),
+so do not break gh-pages. HEAD is pushed, gh-pages = repo, binary installed
+clean at 5cd6199, suite 10/10 + vet + fmt green.
+Tell me where we left off, then pick up from the NEXT queue. The open thread is
+his unlisted "things Id love to update about xscapes and its website"; ask for
+the list first.
 
-⏰ COMMONS CLOSES 2026-09-17. The entry is a proxy Worker
-(site/commons-brief.md, kit on his Desktop), UNVERIFIED: he said "later
-today" after the site is polished, and the session ended before it. The
-deck refresh waits on the same word ("once we are done w the site").
-
-Five things about how to work on this, all paid for:
+Six things about how to work on this, all paid for:
 build the instrument before trusting the picture; measure the RENDERED frame
-rather than what the source says it should do; go and count the real event log
-instead of reasoning about it; A MEASUREMENT AT ONE SEED IS NOT A MEASUREMENT;
-and when a fix makes the number worse, say so and put it back.
-⚠ s31 added two: WHEN A VISUAL IS WRONG, INSTRUMENT THE PIPELINE, NOT THE API,
-and THE COUNT IS NOT THE VERDICT (read failures, never a tally).
-⚠ s32 added: LOOK AT THE RENDERED FRAME. `XSCAPES_CLIPSHOTS=<dir> go test
--run TestClipShots .` writes every embedded clip as a frame page for headless
-Chrome (/Applications/Google Chrome.app); for the WHOLE page, `python3 -m
-http.server 8765` in site/ and Playwright (file:// is blocked there).
-⚠ s33 added: WRITE THE CRITERION WHERE THE VALUES LIVE. Six text measures
-and four text sizes had crept in with no rule anywhere; the fix was one
-token and a comment stating the job of each size. And CHAIN EDIT SCRIPTS
-WITH && BEFORE A PUBLISH: a python assert failed, the chain went on, and a
-misaligned box went live for four minutes.
+(or the SHIPPED BYTES: the s28 "droplet" glided DOWN, which nobody saw until
+the file itself was pitch-tracked) rather than what the source says it should
+do; go and count the real event log instead of reasoning about it; A
+MEASUREMENT AT ONE SEED IS NOT A MEASUREMENT; when a fix makes the number
+worse, say so and put it back; and THE COUNT IS NOT THE VERDICT.
+⚠ s31: WHEN A VISUAL IS WRONG, INSTRUMENT THE PIPELINE, NOT THE API.
+⚠ s32: LOOK AT THE RENDERED FRAME. `XSCAPES_CLIPSHOTS=<dir> go test -run
+TestClipShots .` writes every embedded clip as a frame page for headless Chrome
+(/Applications/Google Chrome.app); for the WHOLE page, `python3 -m http.server
+8765` in site/ and Playwright.
+⚠ s33: WRITE THE CRITERION WHERE THE VALUES LIVE, and CHAIN EDIT SCRIPTS WITH
+&& BEFORE A PUBLISH.
+⚠ s34: in the Commons builder a typed newline SENDS; set the box by JS. And
+the browser is his logged-in Chrome (claude-in-chrome), read-only unless he
+says publish/submit; he presses those himself.
 Do NOT drive Terminal.app (osascript, System Events) without asking me first.
 ```
 
-## ▶ NEXT (session 34, 2026-09-15 evening, IN PROGRESS)
+## ▶ NEXT (session 34 left it here, WRAPPED 2026-09-16 ~09:10 PDT)
 
-**State:** HEAD `5cd6199` (the three cues, the study, the docs, the kit) + this checkpoint, tree clean,
+**State:** HEAD `5cd6199` (the three cues, the study, the docs, the kit) + checkpoint + wrap, tree clean, PUSHED,
 suite 10/10 + vet + fmt green. **Published** (gh-pages `75b8724`, live hash == `site/index.html`, the
 three-sound line live), **installed clean** (stamp `5cd6199`, modified=false) and **PUSHED** (`origin/main`
 = `3523d23`). The Commons entry proxies gh-pages and already serves the new page.
@@ -56,7 +51,7 @@ chat: https://commonsmade.com/chat/d3629738-9ca8-462c-bbc0-a6a9a4636e84 . **Twea
 gh-pages** (`go run . -site site && sh site/publish.sh`), no Commons step, ≤10 min; the build itself is
 changeable until Sep 17 23:59 UTC. ⚠ After the deadline the entry still serves the LIVE gh-pages, so do not
 break gh-pages during judging (Sep 17–20).
-**1. His ear on the cues live:** a scape started on the new binary rings the bird on the next ask. If *"drop (done)"*
+**1. His ear on the cues live** (both running scapes, pids 59083 tyastie and 96934 xscapes, still hold the OLD binary; a restart brings the worried cue): a scape started on the new binary rings the bird on the next ask. If *"drop (done)"*
 meant another drop, swap `internal/notify/sounds/done.wav` for the file in `notes/s34-sound/` and re-run
 the suite (`TestTheThreeCuesAreDifferentSounds` guards the pair).
 **2. The things he still wants to update on xscapes and the site** (his words 09-16: *"Still got some things
