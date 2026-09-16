@@ -940,12 +940,32 @@ const todoStarContrast = 55.0
 // Every star used to be the same tone, which is a thing skies do not do and
 // dashboards do: a row of identical asterisks reads as UI.
 //
-// starDimmest is 0.70 and it is measured, not picked. At 0.85, where the alpha
-// used to sit, thirty-two stars carry THREE distinct tones at night; at 0.70
-// they carry six, and the faintest still reads +133 luma above its own ground
-// against a bar of 40. Lower buys more tones and starts to cost the count,
-// which is the one thing this channel may not spend.
-const starDimmest = 0.70
+// starDimmest is 0.60 and it is measured, not picked -- twice. At 0.85, where
+// the alpha used to sit, thirty-two stars carried THREE distinct tones at
+// night; 0.70 bought six and shipped in s28. His 2026-09-16 ruling, "widen the
+// range for star magnitude", was answered by notes/s35-magsweep: the product
+// rendered at floors 0.70 .. 0.30, three seeds x three geometries x four hours,
+// reading the constellation off the FRAME.
+//
+// What a lower floor costs is the COUNT, the one thing this channel may not
+// spend: a star dimmer than the ambient dust stops reading as a star. So the
+// criterion is the faintest lit star against the brightest dust speck in the
+// same sky, at the hours magnitude is visible at all (dusk and dawn lift every
+// star to near-white to clear the contrast bar, and the floor is moot there):
+//
+//	floor   tones at midnight   luma spread   faintest star over brightest dust
+//	0.70        4..5               40             +54 (0h)  +40 (22h)
+//	0.60        5..8               64             +35 (0h)  +16 (22h)   <- shipped
+//	0.50        5..9               75             +14 (0h)   +4 (22h)
+//	0.40        7..12             104              -5 (0h)   -0 (22h)   count spent
+//
+// 0.60 is the widest floor that keeps the faintest star at least one cube step
+// (10 luma) above the brightest speck at BOTH night hours; 0.50 loses that at
+// 22h. The contrast bar itself never moves: starInk lifts any star that fails
+// it, so the rendered contrast reads 56+ at every floor, which is why the bar
+// could not be the criterion. TestStarMagnitudeIsWideAndStillCounts holds
+// this, and fails at 0.70 (too few tones) and at 0.40 (dust outshines a star).
+var starDimmest = 0.60
 
 func starMagnitude(i int, seed int64) float64 {
 	return starDimmest + HashF(i, 53, seed+43)*(1-starDimmest)

@@ -44,3 +44,9 @@ func (s *Shore) StarInkAt(c *canvas.Canvas, x, y int, mag float64) StarInk {
 // alpha as a constant 0.85 -- a floor shore.go had already deleted -- and its
 // render differs from the product's for 25 of 32 stars at midnight.
 func StarMagnitudeAt(i int, seed int64) float64 { return starMagnitude(i, seed) }
+
+// SetStarDimmest moves the constellation's alpha floor and returns the old
+// value, for a sweep that has to render the product at several floors and
+// read the tones off the frame. notes/s35-magsweep is the caller; the scene
+// never moves it.
+func SetStarDimmest(v float64) (was float64) { was, starDimmest = starDimmest, v; return was }
