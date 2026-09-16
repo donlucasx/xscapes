@@ -154,6 +154,8 @@ h3{font-size:14px;font-weight:700;margin:0 0 4px}
    2026-09-15), so its stage is transparent, the frame is centred in it, and
    the cell can be snapped to whole pixels with nothing showing beside it. */
 .stage.port{background:transparent;overflow:visible;display:flex;align-items:center;justify-content:center}
+.win.floor .stage.port{overflow:hidden;padding-top:calc(var(--lh)*.5)}
+.win.floor .stage.port .fx{padding-bottom:0}
 .stage.port .fx{margin:0 auto}
 .cast .cap{text-align:center;margin-top:4px}
 .cast+.cmd{margin-top:var(--lh)}
@@ -249,7 +251,7 @@ ul.feats.lead li{font-size:15px}
 <section>
 <p class="sub">The companion on its own, in its five states. Press one. This is everything the animal itself says; the sea, the sand and the moon carry the rest, and between them you never have to read the screen.</p>
 <div class="tabs" role="tablist" id="st-tabs"></div>
-<div class="stage port" aria-hidden="true"><div class="fx st-fx" id="st-fx"></div></div>
+<div class="win floor"><div class="stage port" aria-hidden="true"><div class="fx st-fx" id="st-fx"></div></div><div class="boxbot" aria-hidden="true"></div></div>
 <p class="reads" id="st-note"></p>
 </section>
 
@@ -366,8 +368,13 @@ ul.feats.lead li{font-size:15px}
   // joined at line heights over 110%, which is why it is JetBrains Mono.
   function drawBox(win){
     var top = win.querySelector(".boxtop"), bot = win.querySelector(".boxbot");
-    if(!top) return;
-    var n = Math.max(14, Math.floor(win.clientWidth / chWidth(top)));
+    if(!top && !bot) return;
+    var n = Math.max(14, Math.floor(win.clientWidth / chWidth(top || bot)));
+    // A FLOOR: a window with only its bottom rule. The companion states sit
+    // on one, his note of 2026-09-15, so the ask's close-up, cut by the
+    // shared box the way the sand's edge cuts it on the beach, has an edge
+    // to be cut by rather than looking cropped by mistake.
+    if(!top){ bot.textContent = "└" + new Array(Math.max(2, n - 2) + 1).join("─") + "┘"; return; }
     var title = (win.getAttribute("data-title") || "").trim();
     var right = (win.getAttribute("data-right") || "").trim();
     var head = title ? "┌─ " + title + " " : "┌─";

@@ -93,6 +93,10 @@ type portrait struct {
 	// rung is re-centred on the frame (see portraitFrames), because a
 	// portrait has no scene for it to walk into.
 	x, y int
+	// crop, when set, is the cell rectangle every frame keeps (x0, y0, x1,
+	// y1) instead of the clip's own ink box. The legend shares one, so the
+	// ask does not change the section's size: see legendCrop.
+	crop *[4]int
 }
 
 // portraitGround is the colour under every portrait, and the page writes it
@@ -171,9 +175,29 @@ func portraitFrames(cl fxClip) (frames []string, cols, rows int, err error) {
 	if !truecolorFX {
 		prof = term.Profile256
 	}
+	cs, box, err := portraitCanvases(cl)
+	if err != nil {
+		return nil, 0, 0, err
+	}
+	x0, y0, x1, y1 := box[0], box[1], box[2], box[3]
+	if p.crop != nil {
+		x0, y0, x1, y1 = p.crop[0], p.crop[1], p.crop[2], p.crop[3]
+	}
+	frames = make([]string, 0, len(cs))
+	for _, c := range cs {
+		frames = append(frames, c.HTMLFragmentCropClassed(x0, y0, x1, y1, GIFPx, prof, cl.sc.pal))
+	}
+	return frames, x1 - x0, y1 - y0, nil
+}
+
+// portraitCanvases renders every frame of a portrait as a canvas and returns
+// them with the clip's own ink box (one cell of air, the union over the clip
+// so the picture does not jump as the animal breathes).
+func portraitCanvases(cl fxClip) (cs []*canvas.Canvas, box [4]int, err error) {
+	p := cl.port
 	n := int(cl.sc.secs * float64(cl.sc.rate()))
 	if n <= 0 {
-		return nil, 0, 0, fmt.Errorf("%s: no frames", cl.key)
+		return nil, box, fmt.Errorf("%s: no frames", cl.key)
 	}
 	// A session, when the clip carries one, decides the pose and the balloon.
 	var run *sessionRun
@@ -190,8 +214,7 @@ func portraitFrames(cl fxClip) (frames []string, cols, rows int, err error) {
 	if ground == (term.RGB{}) {
 		ground = portraitGround
 	}
-	// Every frame is kept as a canvas until the crop is known.
-	cs := make([]*canvas.Canvas, 0, n)
+	cs = make([]*canvas.Canvas, 0, n)
 	x0, y0, x1, y1 := p.cols, p.rows, 0, 0
 	for i := 0; i < n; i++ {
 		pose, bubble, ask := p.pose, "", false
@@ -238,14 +261,37 @@ func portraitFrames(cl fxClip) (frames []string, cols, rows int, err error) {
 		x0, y0, x1, y1 = min(x0, ax0), min(y0, ay0), max(x1, ax1), max(y1, ay1)
 	}
 	if x1 <= x0 || y1 <= y0 {
-		return nil, 0, 0, fmt.Errorf("%s: nothing drawn", cl.key)
+		return nil, box, fmt.Errorf("%s: nothing drawn", cl.key)
 	}
-	x0, y0, x1, y1 = max(x0-1, 0), max(y0-1, 0), min(x1+1, p.cols), min(y1+1, p.rows)
-	frames = make([]string, 0, n)
-	for _, c := range cs {
-		frames = append(frames, c.HTMLFragmentCropClassed(x0, y0, x1, y1, GIFPx, prof, cl.sc.pal))
+	box = [4]int{max(x0-1, 0), max(y0-1, 0), min(x1+1, p.cols), min(y1+1, p.rows)}
+	return cs, box, nil
+}
+
+// legendCrop gives the legend's five states ONE crop: the union of the four
+// states drawn at the shipped size, applied to all five.
+//
+// His note of 2026-09-15: "when clicking on 'it needs you' it should not
+// change the bounding box - currently it does - every other state occupies
+// less room. 'it needs you' should fit the others, not expand the section,
+// hence cropping the companion when closer same way it happens on the
+// terminal." On the beach the near pose grows DOWN from the companion's top
+// row and the sand's edge cuts its legs; here the shared box does the same
+// cutting, and the balloon keeps the rows above the animal it always had.
+func legendCrop(clips []fxClip) {
+	union := [4]int{1 << 30, 1 << 30, 0, 0}
+	for _, cl := range clips {
+		if cl.sc.beats != nil {
+			continue // the ask: the one the crop is FOR
+		}
+		_, b, err := portraitCanvases(cl)
+		if err != nil {
+			continue
+		}
+		union = [4]int{min(union[0], b[0]), min(union[1], b[1]), max(union[2], b[2]), max(union[3], b[3])}
 	}
-	return frames, x1 - x0, y1 - y0, nil
+	for i := range clips {
+		clips[i].port.crop = &union
+	}
 }
 
 // inkBox is the smallest cell rectangle holding every glyph on the canvas,
@@ -410,7 +456,7 @@ func stateClips(pal *canvas.HTMLPalette) []fxClip {
 		return fxClip{key: key, label: label, note: note, port: port(),
 			sc: gifScene{name: "st-" + key, at: at, tod: tod, secs: secs, fps: 6, pal: pal, cube: !truecolorFX}}
 	}
-	return []fxClip{
+	clips := []fxClip{
 		{key: "needs", label: "it needs you",
 			note: "A solid balloon and a chime, and the companion walks up the beach to ask -- three strides, twice its resting size, so the question is impossible to miss from across the room. It holds the pose until you come back.",
 			port: port(),
@@ -423,6 +469,8 @@ func stateClips(pal *canvas.HTMLPalette) []fxClip {
 		mk("done", "it finished", "A dotted balloon and a low note, both claws up, settled on the sand with one pincer shutting every few seconds.", 44, 0.96, 7),
 		mk("quiet", "it is waiting", "Eyes closed, breathing slow. Nothing is running and nothing is asked; the next prompt wakes it.", 72, 0.27, 4),
 	}
+	legendCrop(clips)
+	return clips
 }
 
 // castClips are every companion drawn so far, each by itself, working: the

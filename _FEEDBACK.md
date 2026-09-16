@@ -3272,3 +3272,11 @@ same as it will? and also so the rest of the 'states' have less negative space a
 ⇒ The fields were not legible as what they were (a working sea read as grass). Criterion adopted: each
 backdrop is THE THING THE SECTION IS ABOUT, drawn so it reads as that thing at a glance, and a section
 whose content already floats gets none, so the alternation itself separates sections.
+**HIS NOTE, verbatim (2026-09-15 evening):** *"companion states: when clicking on 'it needs you' it should
+not change the bounding box- currently it does- every other state occupies less room. 'it needs you' should
+fit the others, not expand the section, hence cropping the companion when closer same way it happens on the
+terminal"* ⇒ one crop for all five, the union of the four resting-size states; the ask's near pose is cut
+by it at the bottom, as the sand's edge cuts it on the beach.
+**HIS NOTE, verbatim, mid-build:** *"maybe it can have an ascii frame below same as this one [the hero
+window's bottom rule] to delineate that area, so the cropped closeup of the companion does not look weird"*
+⇒ the legend's stage gets the window's bottom rule and nothing else: a floor the cut legs stand on.
