@@ -3283,3 +3283,7 @@ window's bottom rule] to delineate that area, so the cropped closeup of the comp
 **HIS NOTE, verbatim:** *"ok, now move 'it needs you' to the far right so it doesnt stand out as the first
 option"* ⇒ tab order: it is working · something broke · it finished · it is waiting · it needs you; the
 page opens on "it is working".
+**HIS NOTE, verbatim (screenshot of the headline and the claim under it):** *"I think the paragraph below
+the 'Cozy ASCII scenes...' should sum up entirely what xscapes is and what it solves, in a very elocuent
+sinopsis. Should outline its purpose, medium and features"* ⇒ the claim ("Every character below is a fact
+about the agent...") becomes a synopsis: purpose, medium, features, in that order.
