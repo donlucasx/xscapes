@@ -3250,3 +3250,14 @@ and a four-companion row in *A layer, not a screen*.
 *"i meant no background whatsoever. The companion can b a tad smaller and 'float' on the site, within the
 'read it at a glance' section"* ⇒ no ground and no window box: the animal on the page's own ground, a
 little smaller. Applied to the cast too, for the same reason.
+**HIS NOTES ON THE LIVE BATCH, verbatim (2026-09-15 ~17:33):** *"1. they are too subtle rn. 2. ok for now
+--- other notes: a) analyze the text formatting throughout. What are best design practices here? do some
+research. Currently looks like the 'body' text has different width/margins than titles and dividers. Is
+this intentional? b) all the titles need more clear headlines. For example 'while you wait' should read
+'Xscapes features' or 'upgrade your terminal' or something that clearly suggests 'features'. c) for each
+feature within, we need clearer titles. Above 'leave the room' should read, like a small subtitle for that
+item, 'Sound cues' (or whatever you think defines the feature best). Above 'see the context running out
+...' should read 'Context meter' (or better if you know what s the actual name for that feature). Same for
+each item there. Are we missing any important feature that should be there? d) review all section titles
+to make sure they are very clear about what they are about"* (+ a screenshot of The problem section: the
+paragraph wrapping at ~50 characters under a rule and a window that span the full column.)
