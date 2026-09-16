@@ -3454,3 +3454,256 @@ test-first, every visual one looked at in a headless-Chrome screenshot, nothing 
   the clean tree (stamp `b7f8c87`, modified=false) · *"lets /wrap I want to restart the session and test the
   vista first"* ⇒ wrapped ~2026-09-16 afternoon. **His first look at the vista LIVE is the next thing; his
   tweaks list after it.** Not pushed, not published: both his word.
+
+## Session 36 (2026-09-16) — his first look at the vista live
+
+Opened on the resume: HEAD `c5e6de6`, six commits unpushed, the installed binary = HEAD's code, this
+window's scape (pid 19222, a minute old) on the installed inode with the preference file reading vista.
+
+**His notes, verbatim, with a screenshot of the vista at ~10:10:** *"ok, right away I see some issues w
+this scape: 1) prompt text gets lost/broken 2) the sun is kind of a rectanle right now. Does it operate
+the same as the shore, as a context meter? 3) can I see all the OWL states in a separate page so I can
+review its actions and animations? same for the sub agents"*
+
+- **(1) Measured, not inferred.** The existing composition test checked the balloon's RUNES and they were
+  all there, so it proved nothing about this. Rendered through the live path at 125x28, 124x30, 125x34
+  and 80x24 at his hour and read the resolved cells back with colours: the done knock's ink is grey 254
+  in the cube and the snow, haze and rock under the balloon are 254/246/247 on the same grey ramp. 9 of
+  135 balloon glyphs at 125x28 and 12 of 135 at 80x24 had fg == bg exactly (the letters missing from his
+  screenshot are the 80x24 pattern: `Whe## we left off, check## against th# tree`); the ask (yellow 222)
+  had 0-1. No single ink can work: snow and rock alternate cell by cell on one row. **Fix: the balloon
+  brings its own ground**, every cell it covers darkened toward black by `balloonShade` before the
+  letters go on. Test first (`TestTheBalloonIsLegibleOnTheRanges`: every glyph ≥ `balloonLegibleGap`
+  luma from its ground after quantisation, 12,744 glyph cells over 6 geometries x 6 hours x both balloons
+  x two texts; failed on the truth at gap 0.0), then the shade swept: 0.45 clears 80, 0.55 is the first
+  with none under 100 (min 110.2). **Shipped 0.55 / floor 100**, criterion written beside the values.
+  The shore's balloon is untouched. Looked at in headless Chrome: whole, both balloons, the massif
+  showing through the tint.
+- **(2) Answered from the code:** the vista's moon/sun is the study's 3x2 block; it sinks with the
+  context (`moonRow`) and carries the readout from 40% used with the shore's thresholds; it has no phase
+  and no disc. The disc with phase is the shore's painter (~350 lines inside `Shore`, half a day to
+  extract and share). Not built this turn; his call.
+- **(3) Built: the owl sheet** (`XSCAPES_OWLSHEET=<file> go test -run TestOwlSheet .`, `owlsheet_test.go`):
+  the five faces alone at 26 px and in the live composition at 125x28, one four-second loop at the
+  vista's own 6 fps, one slider; the owlets alone and at 1/2/3/5; a "not built" list. Published as an
+  artifact for his review. ⚠ First render put the owl on a black square: a sentinel ground off the cube
+  quantised to black before the palette could write it transparent; the site's clips are truecolor so
+  its (1,0,1) never met this. Magenta, a cube entry.
+
+**His second note, verbatim, after the owl sheet:** *"2. Show me on a separate page the entire life cycle
+of the sun and moon as context depletes   3. Owl: Resting: I like it, but every now and then it should
+open its eyes, and look to either side, and then close them again.   Working: I like it, but it should
+look the other way every now and then. Also it should do a lil bob or something else- needs a bit more
+life. Let's try some alternatives. Maybe it hops, opens its wings for moment and settles back down?
+needs you: Lets add an eye blink every now and then. Or double blink as if trying to get your attention.
+Done: needs some sort of action or movement too  Worried: can we try some alts?  Owlets: lets expand on
+the animations"*
+
+- **(2) Built: the sun and moon page** (`XSCAPES_MOONLIFE=<file> go test -run TestMoonLife .`,
+  `moonlife_test.go`): the vista's block and the shore's disc side by side at 10:10, 18:45 and 22:00, one
+  slider over context used in 5% steps, the mapping table read off the code (vista: row 1 → four rows
+  above the far range, a 3x2 block; shore: 0.22 → 0.84 of the horizon, full → new, the crescent sun by
+  day). https://claude.ai/artifact/KRLx7t9KgsLsc9cvKKwTBv
+- **(3) Built: the motion round** (`internal/scenes/owl_anim.go`; page `XSCAPES_OWLROUND=<file> go test
+  -run TestOwlRound .`): a motion is an `OwlMod` laid over the state's face on a clock (lids, look, one
+  eye, hop, wings out/up, body-only half-cell shifts with the face fixed). Candidates, 0 = today in every
+  row: resting R1 glance · R2 peek · R3 slow wake; working W1 look away · W2 bob · W3 hop (wings out,
+  a row up, settle) · W4 stretch (wings up) · W5 look and bob; needs-you N1 blink · N2 double blink · N3
+  double blink + hop; done D1 bounce · D2 flap · D3 wiggle · D4 flap and bounce; worried X1 dart · X2
+  shiver · X3 ruffled (wings held out) · X4 hunched; owlets L1 blink · L2 hop · L3 cheep · L4 wiggle · L5
+  all of it. Live wiring through `OwlMotionPick`/`OwletMotionPick`, empty = today, and
+  `TestTheMotionRoundStartsFromToday` proves the round's painter with no pick draws today's owl cell for
+  cell (every state, seven t's, the blink included) and today's litter. The one trade stated on the page:
+  a resting glance is, for that second, a screenshot of a working owl (R1 12%, R2 12%, R3 17% of the
+  period). https://claude.ai/artifact/UhESwiSW19yZAwP3pCBXjc
+- ⚠ Page cost: 96 frames a clip was 13.2 MB raw; one four-second loop from t = 5 (holds the working
+  blink at 7) is 6.6 MB, 149 KB gzipped.
+- Suite 12/12 + vet + fmt green after the wiring. Nothing committed, nothing installed: his word.
+
+**His third note, verbatim, on the round:** *"some notes on the companions: OWL  Resting: lets go with
+PEEK  working: can we try a longer hop, so it hops and flutters for a moment before landing again? Wings
+should be smaller. instead of look and bob, try a flutter and look  needs you: double blink  done: bounce
+worried: I want to see other alternatives for the eyes. These look tired. Maybe its a squint action, maybe
+another alt of the squint with a wave (only one wing wave)   Owlets  I like L1, L2, L3, L4- all of it
+basically. Whats the best criteria to implement these.   Also, will owlets only stand next to the main
+agent? Any other opportunities to populate the xscape?"* And mid-turn: *"would like to explore further
+visual approaches for the vista sun/moon and how it can visually represent the context being used up over
+time"*. Earlier: *"i cant play the animations on the page you made for the sun/moon"* (it had a slider and no
+play control; a play button that sweeps the context on a loop was added, v2).
+
+- **PICKED in code** (`OwlMotionPick`): resting = peek (R2) · needs you = double blink (N2) · done = bounce
+  (D1). Not installed.
+- **Working, round 2** (small wings in the body's own margins, no box growth; a `flutter` beats small-out
+  and small-up five times a second): W5 flutter and look · W6 hop and flutter (up a row, wings beating
+  most of a second) · W7 long hop (the same with a look the other way while up). W3/W4 now use the small
+  wings. W5 look-and-bob replaced at his word.
+- **Worried, round 2, the squint family**: `LidsSquint` (a white band a cell tall across the two rows, the
+  pupil in it, U+2584 only) · X5 squint + dart · X6 squint + worried brows (raised toward the middle) · X7
+  squint + the near wing waves (kinds 5/6, one wing) · X8 brows + wave · X9 squint + shiver. Round 1's
+  X1–X4 stay on the record and off the page.
+- **The litter, L6 "the litter's life", PICKED** under a four-rule criterion written in the code: one owlet
+  at a time (the period cut into n windows) · every owlet one act a period, rotating hop/cheep/wiggle by
+  (k + cycle) · the litter still at least half the time at any count (period stretches to 1.2 s × n past
+  five) · blinks free. Page: https://claude.ai/artifact/UhESwiSW19yZAwP3pCBXjc (v2, picks marked).
+- **The sun and moon, seven ways** (`XSCAPES_SUNSTUDY=<file> go test -run TestSunStudy .`,
+  `scenes.MoonStyles`, `Vista.MoonStyle`, discs sampled four quarters a cell): S0 block (today) · S1 disc
+  with phase · S2 sun going down (reddens) · S3 sets behind the range · S4 shrinks · S5 the arc · S6 eaten
+  from below. The study guard holds on S0. https://claude.ai/artifact/EgRNj7JE1gsLrVYb82AeZF
+- Suite 12/12 + vet + fmt green. Nothing committed, nothing installed: his word.
+
+**His fourth note, verbatim:** *"OWL  Working: hop and flutter, but with BOTH wings  Done: lets go with d4
+worried: lets go with x6   Placement. Could owlets fly around? Maybe gather around the fire?"* And mid-turn:
+*"regarding the sun and moon. I think the current rectangle approach is not great, but i dont love the disc
+neither. leaning towards s5, the arc."*
+
+- ⚠ **"BOTH wings" was my bug**: the small-wing overlays put the right wing at columns 8-9, inside the
+  body, where the overlay rule paints nothing; the margins are 0-1 and 10-11. Fixed;
+  `TestTheSmallWingsAreTwo` fails on the old columns.
+- **PICKED in code:** working = hop and flutter (W6) · done = flap and bounce (D4, the big wings he saw) ·
+  worried = squint with brows (X6). With resting = peek, needs you = double blink, the litter = L6. **INSTALLED
+  from the tree as a new inode (86160862, stamp c5e6de6 modified=true, uncommitted)**; his running scapes hold
+  the old inode until restarted.
+- **Flight and placement, built:** not "around" (an owlet in the air is motion, the wind's channel, and a
+  wheeling litter cannot be counted at a glance); the flight is the EVENT: an owlet flies in from the owl's
+  mound over 1.5 s when its subagent starts (`OwletFlock` remembers arrivals from a count that only says
+  how many) and flies back on the reducer's `KittenExits` progress. `OwletPlace` 0 beside the owl (live),
+  1 around the fire (both sides, nearest first, facing it) — on the page as P0/P1 with a scripted count.
+  `TestTheFlockComesAndGoes`.
+- **The arc, three bodies** on his lean: S7 soft (16 samples a cell, no quad steps, mixed rim tones the
+  cube rounds) · S8 rays by day clipped at the far range (the skylines are now computed before the sky),
+  a faint halo by night · S9 big and soft (r 2.8). Page v2 shows S0, S1, S5, S7, S8, S9.
+- Suite 12/12 + vet + fmt green.
+
+**His fifth note, a screenshot of the placement clips:** *"not sure these are working as intended
+(placement)"* — a dozen owlets strung along the flight's arc.
+- ⭐ **A LIVE DEFECT SINCE THE VISTA SHIPPED (s35), found by the flight.** `Shore.Update` clears the canvas
+  first; `Vista.Update` never did, so every glyph a frame plotted stayed until something overwrote the cell.
+  Nothing moved on the vista until an owlet flew, so nothing showed it; live, the wind's debris in the air
+  accumulated. Measured (`TestTheVistaClearsBetweenFrames`): **60 frames on one vista left 459 sky glyphs
+  against 22 in one frame; a flight left 1,437 stale cells after one frame.** With `c.Clear()` at the top
+  of `Vista.Update`: one frame's worth, zero stale. ⚠ His 10:10 screenshot's green ticks across the whole
+  sky were very likely this, not the wind; not re-measured on that frame.
+- Page rebuilt (v4), binary reinstalled (inode 86173393, modified=true). Suite 12/12 + vet + fmt green.
+
+**His sixth note, a screenshot:** *"still some issues w the owlets overlapping the main owl. Im thinking id
+like to explore both placements, simultaneously"*
+- The flight started INSIDE the owl's box and the flock was drawn AFTER the owl, so the newcomer painted
+  over the parent's face. Now the flock is drawn first and a flight starts and ends behind the owl (it
+  comes out from behind its parent and goes back behind it); a farther spot takes a longer flight
+  (`flyTime` = 1 s + cells/50). `TestTheFlockComesAndGoes` checks a flying owlet never shows through the
+  owl's ink; the margin column it emerges through is the emergence.
+- **Both at once, two ways** (`OwletPlaces`): P2 the nest then the fire (the first two beside the owl, the
+  rest around the fire) · P3 by turns (one beside the owl, one at the fire). On the page with a count to
+  five and one departure; looked at frame by frame at t = 5.0/5.5/6.2/7.3/8.6 for all four.
+- Reinstalled (new inode). Suite 12/12 + vet + fmt green.
+
+**His seventh note:** *"i like P3, but there is still an overlap issue when an owlet goes over another"* and
+mid-turn *"also, lock in all the previous decisions we made w regards to the owl behavior and only keep
+pending decisions on the page"*.
+- **P3 PICKED** (`OwletPlace = 3`, by turns). The overlap was the PATH: a low arc crossed the nest at the
+  litter's own height. Now three legs: straight up behind the owl to the owl's top row (five above the
+  grass), across at that row, straight down onto the spot; flyers drawn over sitters, the owl over all.
+  `TestAFlightClearsTheLitter` sweeps every arrival (u in 0.01 steps) against every sitter for all four
+  placements and litters of 2..6 at 125x28 and 80x24: zero crossings.
+- ⭐ **THE OWL IS LOCKED, 2026-09-16:** resting = peek · working = hop and flutter (both wings, small) · needs
+  you = double blink · done = flap and bounce (big wings) · worried = squint with brows · the litter = the
+  litter's life (L6) · placement = by turns (P3) · flights in and out behind the owl. All in code
+  (`OwlMotionPick`, `OwletMotionPick`, `OwletPlace`), installed (new inode). The round page is replaced at
+  its URL by "The owl, locked" (`XSCAPES_OWLLOCKED=<file> go test -run TestOwlLocked .`): one clip per
+  ruling, and the open list: the flights for his look · the sun body (arc page) · D4's wings.
+
+**His eighth note, verbatim:** *"OWL - working: it should look both ways between fluttering. So looks,
+blink, flutter, etc - needs you: should wave with one wing every other blink. --- the litter example gif
+does not show turns, only owlets landing next the owl. -- flights look good. ----- SUN & MOON: lets go with
+S5 the arc; but star should be bright when full and opaque as context depletets (bright yellow to
+muted/darker yellow, or lighter grey to darker grey as context depletes)"*
+- ⚠ **"does not show turns" was my bug**: the `OwletPlace = 3` edit matched nothing (the comment line it
+  anchored on was split differently) and I had not asserted it, so the page AND the installed binary
+  were still P0. Fixed with an asserted edit. Lesson: assert every replace; a silent no-op ships the old
+  thing under the new name.
+- **Working = looks, blink, flutter (W8)**: looks the other way 0.7 s, back 0.6, blink 0.2, then the hop
+  and flutter on both small wings; 3.2 s in 10. **Needs you = double blink, wave (N3)**: the double blink
+  every 4 s, the near wing waving with every other one (period 8). Both PICKED in code; the locked page's
+  loop is 8 s so the wave shows.
+- **SUN & MOON LOCKED: S5 the arc** (`NewVista` sets MoonStyle 5; the study clip keeps the block), with
+  his ramp: by day (255,240,140) → (165,140,70), by night (240,240,245) → (120,120,130) over context.
+  `TestTheArcDimsAsTheWindowSpends` (centre cell ≥ 20 luma brighter fresh than spent, day and night).
+  The stars keep their cells as the body passes (PlotOn, own ground) so the count never drops; the
+  lake's light follows the body by night. Sun page = the arc alone.
+- Flights: *"look good"* — LOCKED. Reinstalled (new inode). Suite 12/12 + vet + fmt green.
+
+**His ninth note, two crops of the sun page:** *"percentage below the sun/moon gets lost on the mountains
+(same color text)"* · *"also, the sun is not clearly being filled/emptied- should be 2 colors, one for full
+one for empty, currently looks buggy throughout"*
+- **The readout** now brings the balloon's ground (`balloonShade`) and uses the balloon's cool ink for the
+  quiet number (the shore's dim grey read 40 luma over the darkened snow); the warm ink stays.
+  `TestTheReadoutIsLegibleOnTheRanges`: 5 geometries x 6 hours x 9 contexts, worst gap 114.6 ≥ 100.
+- **The arc is a GAUGE:** two flat cube colours, full (255,255,135) over empty (175,135,95) by day, (238,
+  238,238) over (118,118,118) by night, the full level dropping from the top as the window spends; no sky
+  bleed (the MoonVis blend made "one colour" two tones by row). `TestTheArcIsAGauge` reads the centre
+  column at 0/50/95%.
+- **Paint order:** an arc body is painted after the far and mid ranges and before the near ridge (his crop
+  showed the mid range's tallest peak cutting the sun while overhead); it sets behind the near ridge and
+  the lake at 100%; the stars go on after it. Apex centre row 2.5 (1.5 clipped the top half-row).
+- Stills at 0/30/50/70/90/100% by day and night looked at. Reinstalled (new inode). Suite 12/12 + vet + fmt.
+
+**His tenth note, a crop:** *"theres an issue on the animation where as the gauge progresses theres a gap
+between colors"* — a stripe of sky on the row where the level crossed a cell.
+- Cause, in the canvas: a quad cell KEEPS the sky ramp it was painted over and draws its ground in the
+  ramp's tone (right for the massif, whose ground is sky). A gauge cell with the empty colour as ground got
+  sky. Fix: the cell is made whole first (SetBG drops the ramp), then quartered. A second artifact found by
+  the same test on the page: a flat body cell next to another colour took the canvas's implied edge
+  (the plain-background split, gated only by NoSplitCells, i.e. off on Terminal.app and on everywhere
+  else) and came out grey-topped; flat body cells are painted as two equal halves now.
+  `TestTheArcIsAGauge` also asserts every fully-inside cell of the centre column resolves to the two
+  colours only, at every 5% to 80% (past that the near ridge rightly covers the body), day and night.
+- Close-ups at every 10% by day and night looked at: clean. Reinstalled. Suite 12/12 + vet + fmt.
+
+**His eleventh note, mid-turn:** *"also, can we pick more pleasant tones for the daytime cycle"* — a tones
+round for the vista's day, next.
+- **Tones round built** (`internal/scenes/vista_tones.go`, `VistaTones`, `VistaTonePick` = 0 today; page
+  `XSCAPES_TONES=<file> go test -run TestTonesPage .`): a tone = day zenith + three horizons (mid-morning,
+  noon, mid-afternoon) + the meadow's two greens + the scrub, cube entries, applied by day only
+  (`dayWeight`: full 09:00–15:00, zero at the dawn/dusk keyframes) so dawn, dusk and night are untouched;
+  the ranges and the lake follow the sky. T1 soft alpine · T2 pastel · T3 warm · T4 deep and cool. ⚠ Seen
+  in the stills: at 14:00 today's sky is a grey haze (the ramp from a blue zenith to the shore's warm
+  afternoon horizon runs through grey); the cool tones keep a cool horizon until dusk now.
+
+**His twelfth note:** *"leaning to T4. Note that as the hours pass by, the colors transitioning can look a
+bit glitchy at times"* (a crop at 17:30: grey rows across the sky, a grey-olive meadow with a dark patch
+around the fire).
+- **T4 LOCKED** (`VistaTonePick = 4`, deep and cool). The study clip keeps tone 0 (the tone applies only
+  when `live != nil`), so its guard holds.
+- The 17:30 frame is the shore's dusk keyframe (the tone fades out by then). Two of its faults were ours:
+  (a) the sky ramp from a blue zenith to the orange horizon crosses grey on the cube path -- T4 now has
+  `WarmMid` (95,95,135), a mauve stop the sky passes through halfway when the horizon is warm (red over
+  blue), so dawn and dusk go blue → mauve → peach/orange and the day stays two-stop; (b) the firelight on
+  the meadow used SetBG on every cell within its radius, which drops the meadow's ramp binding, and a cell
+  quantised alone lands on a different entry than the ramp's path: the dark patch. Live, the firelight now
+  comes up with the dark (StarVis 0.5 → 0.8) and is not painted by day. The rest is the cube: rows re-round
+  as the hour moves and the bands crawl; inherent, stated on the page.
+- Day sweep 05:30–20:00 on T4 looked at. Page = T0 + T4. Reinstalled. Suite 12/12 + vet + fmt green.
+
+**His thirteenth note, a crop of the stump:** *"do another pass at how all the elements of the xscape
+change colors. The stump is solid but at times there are lines crossing it that are not clear why. look at
+the rest of the elements and ensure they stay consistent and legible throughout- the trees on the
+foreground, background, the lake, the mountains, grass, etc"*
+- **The line across the mound** was the canvas's implied split (a plain cell next to a different colour
+  takes a half-row of it where split cells are allowed: every terminal but Terminal.app, and every
+  page), on the mound's bottom row against the band, at some hours and not others as the quantised
+  halves fell. Read off the resolved cells at his hour: `▀ 98,98,98 / 95,95,0` across the mound's last
+  row. **Fix in the canvas: `SetBGSolid`** marks a cell one colour by intent and resolve never splits it;
+  the live vista paints every fill, range interior and pine cell solid (`solidCells`, on for a live
+  frame only, so the study clip keeps its bytes); the gauge's flat cells too. ⚠ The first cut used two
+  equal halves instead, and the halves path EATS a plain glyph: the band's writing vanished at 80x24
+  (`TestTheVistaComposesEveryStateAtEveryWidth` caught it). Also the sun's face: the sky's dust specks
+  were showing through it at night; the body erases the far and mid layers under itself.
+- **Every seam measured over a day, half-hourly** (`TestTheElementsStayApart`, means per element):
+  lake/meadow was 0.3 luma apart 08:00–10:00 (one hue from the other) and jumped 44 at 11:00 on a cube
+  step → the lake is kept ≥ 25 luma above the meadow's green by day (`keepApart`, toward the horizon):
+  now 31–53. meadow/mound was 11 at dawn/dusk and 21 by day → the mound's day grey 9 → 13: now 41–61.
+  far/mid rock sat 1–10 apart → the far range goes 0.70 into the sky (was 0.58): 12–43 by day, 0.2 at
+  06:00 when the alpenglow lights both alike (stated, not held). near ridge/lake 18 → 50–66. The band
+  and the mound: zero split glyphs over the day. Night seams stay low (10–20): night is dark.
+- Four hours looked at (08:30, 12:36, 17:00, 22:00). All three pages rebuilt and republished; reinstalled.
+  Suite 12/12 + vet + fmt green.
