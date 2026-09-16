@@ -37,7 +37,7 @@ func TestTheEmbeddedCuesAreRealWavs(t *testing.T) {
 	for _, c := range []struct {
 		name string
 		b    []byte
-	}{{"ask", askWAV}, {"done", doneWAV}} {
+	}{{"ask", askWAV}, {"done", doneWAV}, {"worried", worriedWAV}} {
 		if len(c.b) == 0 {
 			t.Fatalf("%s cue is empty", c.name)
 		}
@@ -65,32 +65,43 @@ func TestTheEmbeddedCuesAreRealWavs(t *testing.T) {
 	}
 }
 
-// Ask rises and done falls on purpose. It is the same rule Bubble and
-// DoneBubble follow on screen -- "shape carries the done/needs_input
-// distinction wherever colour cannot" -- and a user listening from another
-// pane has nothing BUT the shape.
-func TestAskAndDoneAreDifferentSounds(t *testing.T) {
-	if bytes.Equal(askWAV, doneWAV) {
-		t.Fatal("the two embedded cues are the same bytes")
+// The three knocks are three different sounds, on purpose: a user listening
+// from another pane has nothing BUT the sound to tell a question from a
+// finish, and a finish from one that left something broken.
+func TestTheThreeCuesAreDifferentSounds(t *testing.T) {
+	cues := []struct {
+		kind Kind
+		b    []byte
+	}{{Ask, askWAV}, {Done, doneWAV}, {Worried, worriedWAV}}
+	for i := range cues {
+		for j := i + 1; j < len(cues); j++ {
+			if bytes.Equal(cues[i].b, cues[j].b) {
+				t.Errorf("%v and %v are the same embedded bytes", cues[i].kind, cues[j].kind)
+			}
+		}
 	}
 	t.Setenv("XSCAPES_HOME", t.TempDir())
 	p := New()
 	if p.Silent() || p.bell {
 		t.Skipf("no file player on this machine (%s)", p.Describe())
 	}
-	a, d := p.args[Ask], p.args[Done]
-	if len(a) == 0 || len(d) == 0 {
-		t.Fatalf("a sounding player has no arguments: ask=%v done=%v", a, d)
-	}
-	if a[len(a)-1] == d[len(d)-1] {
-		t.Errorf("ask and done both play %q", a[len(a)-1])
+	files := map[string]Kind{}
+	for _, c := range cues {
+		a := p.args[c.kind]
+		if len(a) == 0 {
+			t.Fatalf("a sounding player has no arguments for %v", c.kind)
+		}
+		if other, dup := files[a[len(a)-1]]; dup {
+			t.Errorf("%v and %v both play %q", c.kind, other, a[len(a)-1])
+		}
+		files[a[len(a)-1]] = c.kind
 	}
 }
 
-// The shipped default is the droplet, not the borrowed system chime. This is
+// The shipped default is our own cues, not the borrowed system chime. This is
 // the whole point of the change, so it gets its own assertion rather than
 // being implied by the ladder's order.
-func TestTheDropletIsTheDefaultWhenHomeIsWritable(t *testing.T) {
+func TestTheShippedCuesAreTheDefaultWhenHomeIsWritable(t *testing.T) {
 	dir := t.TempDir()
 	t.Setenv("XSCAPES_HOME", dir)
 	p := New()
@@ -98,14 +109,16 @@ func TestTheDropletIsTheDefaultWhenHomeIsWritable(t *testing.T) {
 		t.Skip("no afplay/paplay on this machine; the droplet rung is unreachable by design")
 	}
 	if p.source != ourCue {
-		t.Fatalf("player is %q, want the embedded droplet", p.Describe())
+		t.Fatalf("player is %q, want the embedded cues", p.Describe())
 	}
-	got, err := os.ReadFile(filepath.Join(dir, "sounds", "ask.wav"))
-	if err != nil {
-		t.Fatalf("ask cue not on disk: %v", err)
-	}
-	if !bytes.Equal(got, askWAV) {
-		t.Error("the materialised ask cue is not the embedded bytes")
+	for name, want := range map[string][]byte{"ask.wav": askWAV, "done.wav": doneWAV, "worried.wav": worriedWAV} {
+		got, err := os.ReadFile(filepath.Join(dir, "sounds", name))
+		if err != nil {
+			t.Fatalf("%s not on disk: %v", name, err)
+		}
+		if !bytes.Equal(got, want) {
+			t.Errorf("the materialised %s is not the embedded bytes", name)
+		}
 	}
 }
 
@@ -192,9 +205,9 @@ func TestAMaterialisationFailureFallsBackToSystemSounds(t *testing.T) {
 		t.Fatal("an unwritable home silenced the notification entirely")
 	}
 	if p.source == ourCue {
-		t.Fatal("claims to play the embedded droplet with nowhere to write it")
+		t.Fatal("claims to play the embedded cues with nowhere to write it")
 	}
-	_, _, haveSystem := systemCue()
+	_, _, _, haveSystem := systemCue()
 	switch {
 	case playerBin() != "" && haveSystem:
 		if p.source != systemCueName() {
@@ -216,7 +229,7 @@ func TestDescribeNamesTheRungItIsOn(t *testing.T) {
 		t.Skip("no afplay/paplay on this machine; only the bell rung is reachable")
 	}
 
-	t.Run("droplet", func(t *testing.T) {
+	t.Run("shipped", func(t *testing.T) {
 		t.Setenv("XSCAPES_HOME", t.TempDir())
 		if got := New().Describe(); !strings.Contains(got, ourCue) {
 			t.Errorf("Describe = %q, want it to name %q", got, ourCue)
@@ -224,7 +237,7 @@ func TestDescribeNamesTheRungItIsOn(t *testing.T) {
 	})
 
 	t.Run("system", func(t *testing.T) {
-		if _, _, ok := systemCue(); !ok {
+		if _, _, _, ok := systemCue(); !ok {
 			t.Skip("no system sounds on this machine")
 		}
 		blocked := filepath.Join(t.TempDir(), "not-a-directory")
@@ -237,7 +250,7 @@ func TestDescribeNamesTheRungItIsOn(t *testing.T) {
 			t.Errorf("Describe = %q, want it to name %q", got, systemCueName())
 		}
 		if strings.Contains(got, ourCue) {
-			t.Errorf("Describe = %q, but the droplet is not what will play", got)
+			t.Errorf("Describe = %q, but the shipped cues are not what will play", got)
 		}
 	})
 }

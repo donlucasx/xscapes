@@ -1,0 +1,98 @@
+[
+ {
+  "key": "plink",
+  "name": "Plink",
+  "what": "One drop into still water. A tick, then the bubble's ring climbing and dying inside a fifth of a second.",
+  "differs": "Ask is small and bright and clearly climbs. Done is a heavier drop, lower, with the water's own thump under it.",
+  "ask": {
+   "file": "plink-ask.wav",
+   "ms": 204,
+   "rms_db": -20.2
+  },
+  "done": {
+   "file": "plink-done.wav",
+   "ms": 274,
+   "rms_db": -21.5
+  }
+ },
+ {
+  "key": "cave",
+  "name": "Cistern",
+  "what": "The same drop inside a stone cistern: a short, damped tail says the room is small and wet.",
+  "differs": "Same pair as Plink, an octave lower and in a room. The longest of the water options.",
+  "ask": {
+   "file": "cave-ask.wav",
+   "ms": 524,
+   "rms_db": -23.8
+  },
+  "done": {
+   "file": "cave-done.wav",
+   "ms": 604,
+   "rms_db": -24.3
+  }
+ },
+ {
+  "key": "twin",
+  "name": "Drip and answer",
+  "what": "Two drops, the second answering the first. Drips come in pairs, and a pair reads as a cue rather than a ping.",
+  "differs": "Ask: the second drop is higher, so the pair rises. Done: the second is lower and heavier, so the pair falls and lands.",
+  "ask": {
+   "file": "twin-ask.wav",
+   "ms": 334,
+   "rms_db": -20.4
+  },
+  "done": {
+   "file": "twin-done.wav",
+   "ms": 424,
+   "rms_db": -21.6
+  }
+ },
+ {
+  "key": "bloop",
+  "name": "Pebble",
+  "what": "A pebble into deep water. A bigger bubble rings lower and longer, and the splash has more body.",
+  "differs": "Ask climbs a full octave. Done barely climbs and sits on a low thump: something went in and the water closed over it.",
+  "ask": {
+   "file": "bloop-ask.wav",
+   "ms": 306,
+   "rms_db": -20.2
+  },
+  "done": {
+   "file": "bloop-done.wav",
+   "ms": 387,
+   "rms_db": -21.1
+  }
+ },
+ {
+  "key": "bamboo",
+  "name": "Bamboo",
+  "what": "A hollow wooden knock, the deer-scarer in a garden. Not water: the one dry option, and the least likely to wear out.",
+  "differs": "Ask is one knock, high. Done is a lower knock and the arm rocking back, softer.",
+  "ask": {
+   "file": "bamboo-ask.wav",
+   "ms": 161,
+   "rms_db": -21.1
+  },
+  "done": {
+   "file": "bamboo-done.wav",
+   "ms": 271,
+   "rms_db": -21.5
+  }
+ },
+ {
+  "key": "bird",
+  "name": "Bird",
+  "what": "A small whistle, two notes. The most 'alive' of the six and the riskiest: a voice in the room every time the agent asks.",
+  "differs": "Ask: two notes rising, tu-wee. Done: two notes falling, wee-oo.",
+  "ask": {
+   "file": "bird-ask.wav",
+   "ms": 198,
+   "rms_db": -18.5
+  },
+  "done": {
+   "file": "bird-done.wav",
+   "ms": 258,
+   "rms_db": -18.0
+  }
+ }
+]

@@ -6,18 +6,28 @@
 // sound is not decoration -- it is the only channel that reaches a user who has
 // turned away, which is exactly the user this project exists for.
 //
-// Two sounds, because the brief locks done and needs_input as distinct cues and
-// a distinction that exists only on screen is no distinction to someone looking
-// elsewhere. They are picked from the same family so the pair still reads as
-// one scape's voice: a rising drop when the agent is BLOCKED on you, a falling
-// one when it has finished and you can come back whenever.
+// Three sounds, and the number is deliberate. The brief locks done and
+// needs_input as distinct cues, because a distinction that exists only on
+// screen is no distinction to someone looking elsewhere; the third is his
+// ruling of 2026-09-15, a finish that left something BROKEN, which in his own
+// log is 58 of 381 finishes (15%). It changes whether you come now rather
+// than later, and that is the only thing a sound is for. Nothing else makes
+// a sound: errors while working, compaction, subagents, session start and
+// end are all visible when you come back, and a cue only beats the terminal
+// bell by being rare.
+//
+// The voice is the shore's: a small bird for the ask (two notes rising, a
+// question), one drop into still water for a clean finish, the bird's falling
+// call for a finish that left something standing. His picks of 2026-09-15
+// from notes/s34-sound; the s28 "droplet" they replace was a sine whose pitch
+// glided DOWN, which is a drop in name only. Scene-specific soundscapes are
+// carded for when there is more than one scape.
 //
 // The cues SHIP WITH XSCAPES (his ask, 2026-09-11: "a fun sound that users can
 // identify w xscapes"). They used to be Glass.aiff and Submarine.aiff, which
 // work perfectly well and are the reason this changed: a sound every Mac has
 // played for twenty years belongs to the OS and cannot belong to a product.
-// See sounds.go for the embedding, and notes/s28-sound for where they came
-// from.
+// See sounds.go for the embedding.
 package notify
 
 import (
@@ -27,7 +37,7 @@ import (
 	"github.com/donlucasx/xscapes/internal/envx"
 )
 
-// Kind is which of the two knocks happened.
+// Kind is which of the three knocks happened.
 type Kind int
 
 const (
@@ -35,11 +45,17 @@ const (
 	Ask Kind = iota
 	// Done: the turn finished. Nothing is waiting on you.
 	Done
+	// Worried: the turn finished with a main-thread failure still standing.
+	// The same moment as Done, in the companion's worried state.
+	Worried
 )
 
 func (k Kind) String() string {
-	if k == Ask {
+	switch k {
+	case Ask:
 		return "ask"
+	case Worried:
+		return "worried"
 	}
 	return "done"
 }
@@ -62,8 +78,8 @@ type Player struct {
 // The pre-rename XSCAPES_SILENT still works; see internal/envx.
 const SilentEnv = "XSCAPES_SILENT"
 
-// ourCue is what Describe calls the shipped droplet pair.
-const ourCue = "xscapes droplet"
+// ourCue is what Describe calls the shipped cues.
+const ourCue = "xscapes cues"
 
 // New picks a player for this machine. Sound is on by default -- ambient audio
 // is the thing the brief keeps off, not the notification.
@@ -71,10 +87,10 @@ const ourCue = "xscapes droplet"
 // Three rungs, in this order, and each exists for a reason the one below it
 // cannot cover:
 //
-//  1. the EMBEDDED DROPLET, when it can be written to disk and something can
-//     play it. This is the cue that is xscapes', and the only rung that makes
-//     the sound identifiable.
-//  2. the SYSTEM SOUNDS it played until 2026-09-11. Reached when the droplet
+//  1. the EMBEDDED CUES, when they can be written to disk and something can
+//     play them. These are the sounds that are xscapes', and the only rung
+//     that makes them identifiable.
+//  2. the SYSTEM SOUNDS it played until 2026-09-11. Reached when the cues
 //     cannot be materialised -- a read-only home, a full disk, no HOME at all.
 //     Borrowed and anonymous, but it is a real sound at the right moment.
 //  3. the TERMINAL BELL. Reached when there is no player binary to run at all.
@@ -92,19 +108,20 @@ func New() *Player {
 	if cmd == "" {
 		return &Player{bell: true}
 	}
-	if ask, done, ok := materialiseCues(); ok {
-		return filePlayer(cmd, ourCue, ask, done)
+	if ask, done, worried, ok := materialiseCues(); ok {
+		return filePlayer(cmd, ourCue, ask, done, worried)
 	}
-	if ask, done, ok := systemCue(); ok {
-		return filePlayer(cmd, systemCueName(), ask, done)
+	if ask, done, worried, ok := systemCue(); ok {
+		return filePlayer(cmd, systemCueName(), ask, done, worried)
 	}
 	return &Player{bell: true}
 }
 
-func filePlayer(cmd, source, ask, done string) *Player {
+func filePlayer(cmd, source, ask, done, worried string) *Player {
 	return &Player{cmd: cmd, source: source, args: map[Kind][]string{
-		Ask:  {ask},
-		Done: {done},
+		Ask:     {ask},
+		Done:    {done},
+		Worried: {worried},
 	}}
 }
 
@@ -181,27 +198,37 @@ func firstFile(paths ...string) (string, bool) {
 // the companion's posture, so a pose-driven sound would go silent on the one
 // event the user has to answer. The pose says how the companion feels; the
 // bubble says what it needs.
+//
+// The one thing the pose IS consulted for is the finish: a finish while the
+// companion is still worried is the third knock. The worry only ever clears
+// on the next prompt, so it cannot flip under a held bubble and does not take
+// part in the edge detection.
 type Knocker struct {
 	started bool
 	text    string
 	ask     bool
 }
 
-// Knock reports which sound this frame earned, if any.
+// Knock reports which sound this frame earned, if any. worried is whether the
+// companion is in its worried pose on this frame; it colours a finish and
+// never a question, because a question is a question whatever else is broken.
 //
 // It stays quiet when nothing changed, which is what makes it safe to call
 // every frame, and it stays quiet on the FIRST frame it ever sees: a scape
 // attached to a session that is already waiting must not announce something
 // that happened before it existed.
-func (k *Knocker) Knock(bubble string, ask bool) (Kind, bool) {
+func (k *Knocker) Knock(bubble string, ask, worried bool) (Kind, bool) {
 	changed := bubble != "" && (bubble != k.text || ask != k.ask)
 	first := !k.started
 	k.started, k.text, k.ask = true, bubble, ask
 	if !changed || first {
 		return Done, false
 	}
-	if ask {
+	switch {
+	case ask:
 		return Ask, true
+	case worried:
+		return Worried, true
 	}
 	return Done, true
 }

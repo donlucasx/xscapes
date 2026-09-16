@@ -43,7 +43,9 @@ You are done when the app's URL renders the same as https://donlucasx.github.io/
 
 ## After the build (for Lucas, not for the agent)
 
-1. Open the app's URL. Check the three things above, then scroll to "Read it at a glance" and press a tab. Check it on the phone too.
-2. On the app's manage page: Publish, visibility public.
-3. commonsmade.com/hackathons, Open hackathon, Your entry, Submit, pick `xscapes`, confirm. Screenshot "Entry submitted."
-4. Entries close Sep 17. One build per builder, changeable until then. A republish of gh-pages (`go run . -site site && sh site/publish.sh`) reaches the entry within 10 minutes with no Commons step.
+DONE 2026-09-16: https://xscapes.vibe.commonsmade.com is published (public, source shared) and submitted; the hackathon home reads "xscapes · ENTRY SUBMITTED." What the flow actually was, for the record:
+
+1. Code, fresh chat on Default · Quick, paste this file's message, Send, then Start building. The platform first deploys its own "first shot" template; the agent deletes it and writes the proxy (it dropped `[assets]` so the Worker answers `/`). ~5 credits.
+2. Publish (top right of the preview). Visibility cannot be changed BEFORE the first publish; it reads Public after. Share source code: on.
+3. The app dock then offers "Enter into hackathon" (or: hackathon home, Your entry, Submit, pick xscapes).
+4. Verified from outside: the entry serves the gh-pages bytes plus one platform-injected `/__commons/analytics.js` line; `/index.html` the same; other paths 404; `cache-control: public, max-age=600`. So a republish of gh-pages (`go run . -site site && sh site/publish.sh`) reaches the entry within 10 minutes with no Commons step. Entries close Sep 17, 23:59 UTC; the build is changeable until then, and the entry keeps serving the LIVE page after.

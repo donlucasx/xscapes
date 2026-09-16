@@ -2,6 +2,39 @@
 
 *(Renamed end to end on 2026-09-03: directory, env vars, state path and hook marker. Two names are kept on purpose and are not leftovers -- `internal/envx` still reads `ASCIISCAPES_*` and warns, and `install.go` still RECOGNISES the `# asciiscapes:v1` marker so the hooks it wrote before the rename can be found and removed.)*
 
+> **Session 34 (2026-09-15 evening), IN PROGRESS. ⭐ THE CUE IS THREE SOUNDS NOW, HIS PICKS.** Opened on a
+> status report checked against git, the live page, the suite and the processes: everything the record
+> claimed held (gh-pages = repo, both running scapes on the installed binary), and **Commons measures
+> ABSENT** (`xscapes.vibe.commonsmade.com` is a 404; closes 09-17). Then *"I dont love the sound that
+> xscapes makes rn when it prompts the user ... more 'natural' or 'organic'? a water dropplet?"* ⇒ the
+> s28 "droplet" he picked was a sine gliding DOWN (read off the shipped bytes: 1000 → 584 Hz) with no
+> impact; a real drop is a tick, then a ring that CLIMBS as the bubble sinks from the surface. Six
+> candidates built from that anatomy (`notes/s34-sound/`, stdlib, same peak as shipped), verified on
+> the OUTPUT files (every water ask climbs, no clicks), on one page with the exact bytes embedded:
+> https://claude.ai/artifact/LSLQUHYWLPUxAA7YkvoM64. He asked how many cues exist and whether we need
+> more: two, and my answer was no third MOMENT, but one variant, a finish that leaves a failure
+> standing, **measured at 58 of 381 finishes (15%)** by folding the reducer's worried rule through his
+> log. ⭐ **HIS RULING, verbatim: *"ask: bird (ask) done: drop (done) done while still worried: bird
+> (done) - we can make scene specific soundscapes later"*.** Built test-first: `notify.Worried`, the
+> knocker takes the pose's worry and colours ONLY a finish (a question stays a question), three files
+> embedded, `xscapes notify worried`, the system rung borrows Basso. ⚠ *"drop (done)"* read as PLINK's
+> done (the single drop, row 2); one file swap if he meant Cistern, Drip-and-answer or Pebble. Suite
+> 10/10 + vet + fmt green; site copy rebuilt (NOT published); installed with a new inode from the dirty
+> tree. ⚠ **Running scapes on the old binary play the NEW ask and done by path** (same file names,
+> rewritten by the new binary's first start) and never the worried one, until restarted. UNCOMMITTED
+> at the harness rule: say "commit" and it lands as one commit.
+> ⭐⭐ **THE ENTRY IS SUBMITTED, 2026-09-16 ~08:45 PDT: https://xscapes.vibe.commonsmade.com** (the hackathon
+> home reads *"xscapes · ENTRY SUBMITTED."*). Driven in his logged-in Chrome: fresh chat, Default · Quick, the
+> kit's `message.md` set into the box by JS (a typed newline would have sent it), Start building; the agent
+> deleted the platform's own "first shot" template, dropped `[assets]` so the Worker sees `/`, wrote the
+> proxy (`cf.cacheTtl` 600), deployed. 5 credits. HE pressed Publish (visibility is locked until the first
+> publish and then reads Public; source shared at my word), then Enter into hackathon. **Measured from
+> outside: root and `/index.html` are the gh-pages bytes plus ONE injected line**, the platform's
+> `/__commons/analytics.js` (served 200 by the platform, not our 404), `cache-control: public, max-age=600`,
+> other paths 404. ⇒ **A gh-pages republish reaches the entry inside 10 minutes with no Commons step**, and
+> the build stays changeable until Sep 17, 23:59 UTC (16:59 PDT). ⚠ gh-pages still serves the two-sound
+> copy; the three-sound line is in the rebuilt local `site/index.html`, unpublished.
+
 > **Session 33 (2026-09-15), WRAPPED. HIS SITE SESSION: thirteen rulings, seven review rounds, seven
 > publishes.** HEAD `6baa6ee` + the wrap commit, pushed, **gh-pages = HEAD, live hash verified after every
 > publish**, suite 10/10 + vet + fmt green. The product's own code did not move (installed binary still
@@ -939,7 +972,7 @@ Judges **to be announced**. Their framing line, verbatim: *"The biggest opportun
 **No rule requires it.** What exists is a **token leaderboard** incentivising platform use; it is marketing, and it appears nowhere in the rubric. **Build the TUI here.** Use Commons only for genuinely web-shaped side pieces — the landing/submission page and a browser scape gallery for judges who will not install a binary — which feeds the leaderboard for free.
 
 - Commons free tier: **150 AI credits/day**, **600/month**, resets 8/31/2026. Wallet **$0 and stays $0** — paying to climb a leaderboard that isn't scored buys nothing. (Daily-vs-monthly interaction is contradictory; `BALANCES`/`USAGE`/`MODELS` panels hold the real per-model rates and are still unexpanded.)
-- Model for the web pieces: **Qwen3 Coder Next on Quick · $**, fed specs written here so it transcribes rather than designs. **Never Expert · $$$** (it pays premium to plan work already planned). Skip Superspeed · $$ (that buys latency, not quality). DeepSeek V4 Pro only if something truly needs reasoning.
+- Model for the web pieces: **Default · Quick · $**, fed specs written here so it transcribes rather than designs. **Never Expert · $$$** (it pays premium to plan work already planned). Skip Superspeed · $$ (that buys latency, not quality). DeepSeek V4 Pro only if something truly needs reasoning. *(Re-read 2026-09-16 in the builder: the picker is Default · Quick · $ / Superspeed · $$ / Expert · $$$, then GPT-5.6 Luna, DeepSeek V4 Flash, Qwen3.7 Flash, Qwen3.7 Plus, DeepSeek V4 Pro. "Qwen3 Coder Next" is gone. Credits read "110 left today". DeepSeek V4 Pro cannot view images.)*
 - Code mode is chat-based (`/chat/new`); no sandbox or terminal observed. GitHub `donlucasx` is connected to the account.
 
 ### Demo video
@@ -961,7 +994,7 @@ only if nothing else needs it.
 | context remaining | **moon** phase *and* altitude; numeric readout of what is LEFT under the moon from **40% used** (his ruling 2026-09-05), warm &ldquo;NN% left&rdquo; from 85%. **The disc's edge is the HUE RIM** (the outer ring one tone darker in its own hue; his pick 2026-09-05 from "The Moon, Four Ways" over the quad edge, the shadowless sun and the night halo, which stay as study switches) | done &mdash; the readout was decided in s6 and marked done, but was never in the live scene until 2026-09-05 (`drawReadout`, `ReadoutFrom`) |
 | time of day | **sky colour**, real wall clock | done |
 | weather | **deferred, not rejected** &mdash; no rain, clouds, fog or sync in v1; the thinking is parked in `ideas.md` | deferred 2026-08-30 |
-| needs you | **bubble**, rare: needs_input, error, done. Nothing else | done — distinct cues shipped 2026-08-31: ask = warm SOLID box + alert pose; done = cool DOTTED knock + content `^ ^` pose, bounded by DoneHold |
+| needs you | **bubble**, rare: needs_input, error, done. Nothing else | done — distinct cues shipped 2026-08-31: ask = warm SOLID box + alert pose; done = cool DOTTED knock + content `^ ^` pose, bounded by DoneHold **Sound: THREE cues, his ruling 2026-09-15** &mdash; ask = a bird, two notes rising; done = one drop into still water; a finish while the companion is still WORRIED = the bird falling (58 of his 381 recorded finishes, 15%, end that way). Nothing else sounds. |
 | companion identity | **coat + face**: cream/slate/sage/mauve/charcoal, nose, toes, inner-shadow ears, whiskers | done — **cream, as shipped (his pick 2026-09-05)**; the other coats stay as built options |
 | what it is doing now | **text written in the sand**, newest brightest, older fading as the tide takes them | done — anchored to the waterline, degrades by dropping whole pieces when narrow. **The lower beach falls away to black (`DefaultSandFade` = 1.0, locked 2026-09-01)**: contrast on the newest line 132→204 at midday, 148→204 at night, and equal at every hour, so legibility stops depending on the clock. Ink is sampled from the PAINTED background per row, never the palette's nominal sand. |
 | todos completed | **star count** | done 2026-09-02 &mdash; a constellation in the upper sky, `*` for each finished todo. ~~`&#8728;` for each outstanding one, so it reads *n of N*~~ &mdash; **the ring is GONE (his ruling 2026-09-05: "discard the ring altogether, it's not clear what it means")**; the sky says *n*. Position is fixed by index and seed so a star lights where it always was. Held at a visibility floor like the moon: a completed todo is a fact about the AGENT and `StarVis` is 0 at noon. ⚠ **TodoWrite has been called ZERO times in the whole recorded history** &mdash; 13,682 tool events &mdash; so today it only lights from `xscapes emit todo` or the demo cycle. |
@@ -1074,8 +1107,8 @@ pane, where 80% used to leave a single row.
 - One keypress, zero commitment, never competes with the agent for attention.
 
 **Notification**
-- Distinct cues for `done` vs `needs_input`. Companion delivers it where present; weather (lightning/ember pop/foam) where not.
-- One on-theme sound per scape (bell, bird, thunder) via `afplay`/`paplay`. Silent during work; ambient audio is off by default and optional.
+- Distinct cues for `done` vs `needs_input`, **and a THIRD for a finish that left a main-thread failure standing** (his ruling 2026-09-15: *"done while still worried: bird (done)"*; measured first, 58 of 381 finishes in his log). Nothing else sounds: errors while working, compaction, subagents, session start/end are visible when you come back, and a cue only beats the bell by being rare. Companion delivers it where present; weather (lightning/ember pop/foam) where not.
+- One on-theme sound per scape (bell, bird, thunder) via `afplay`/`paplay`. Silent during work; ambient audio is off by default and optional. **The shore's voice since 2026-09-15** (`notes/s34-sound/make.py`, his picks from six): a bird for the ask, a single drop for done, the bird falling for worried. The s28 droplet it replaces glided DOWN with no impact; a real drop is a tick then a ring that CLIMBS. *"we can make scene specific soundscapes later"* &mdash; carded, one voice per scape when there is more than one.
 - Keypress on notification focuses the agent pane (tmux `select-pane`). Fallback when pane hidden: tmux `display-message` + OS notification.
 - One-line status on tap ("in auth/ for 3 min").
 

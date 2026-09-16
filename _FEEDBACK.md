@@ -3299,3 +3299,56 @@ no?"* · statik: *"im thinking like animation style as it is 'working'"*. Discus
 moon; tokens CONSUMED (cumulative spend) is a new variable, a scape's fill, a level not a speed. His ruling:
 *"definitely card it. I think tracking total token usage is helpful. lets /wrap and keep discussing next
 session"* ⇒ carded in `ideas.md` §The pond.
+
+## Session 34 (2026-09-15) — the cue, again
+
+- *"I dont love the sound that xscapes makes rn when it prompts the user. Can we change it for something
+  that sounds more 'natural' or 'organic'? a water dropplet? can draft a few sample sounds I can test and
+  compare on a quick html"*
+
+⇒ The shipped cue IS the s28 "droplet" he picked, so the s28 pick did not survive living with it. Read off
+the shipped bytes, not the script: the ask's pitch runs **1000 → 584 Hz, DOWN**, and there is no impact.
+A real drop is a tick and then a ring that CLIMBS (the bubble the impact pinched off sinks away from the
+surface, which raises its resonance). So the sine was a drop in name only.
+⇒ Six candidates synthesised from that anatomy (`notes/s34-sound/make.py`, stdlib, same peak as the
+shipped pair): Plink · Cistern (the same drop in a small stone room) · Drip and answer (a rising pair for
+ask, a falling pair for done) · Pebble (a big bubble, low) · Bamboo (a hollow knock, the one dry option)
+· Bird (a two-note whistle, the risky one). Each with an ask and a done that differ in SHAPE, the s28
+rule. Verified on the OUTPUT files: every water ask climbs, every done sits lower, no clicks (max
+sample jump 0.04–0.08, same as shipped). Comparison page, the exact WAV bytes embedded: see the
+artifact link in the session record. Nothing shipped; his pick is the gate.
+
+- *"how many different sound prompts do we have? can we / do we need to add any more?"*
+⇒ Counted from the code: TWO (ask, done). Ask ← permission prompt, worker permission prompt, agent question,
+elicitation dialog; done ← Stop, agent_completed. Silent by design: errors, compaction, subagents, session
+start/end, the 60 s idle nag. From his log (136 sessions, 465 h): asks 0.14/h, dones 0.82/h. My answer: no
+third MOMENT; one variant worth it, a finish with a main-thread failure still standing, **58 of 381 (15%)**.
+- ⭐ **HIS RULING, verbatim:** *"ask: bird (ask) done: drop (done) done while still worried: bird (done) - we
+  can make scene specific soundscapes later"*
+⇒ BUILT the same evening, test-first: `notify.Worried` (the done knock in the worried state; a question
+stays a question), `Knocker.Knock(bubble, ask, worried)`, three embedded WAVs, `xscapes notify worried`,
+Basso as the borrowed rung. ⚠ *"drop (done)"* read as PLINK's done, the single drop (row 2 on the page);
+Cistern, Drip-and-answer and Pebble are also drops, so this is one file swap if he meant another.
+Soundscapes per scape: carded in RESUME ▶ NEXT 4.
+
+- *"ok. I think u should playwright into the commonsmade hackathon page and re analyze again how to better
+  submit. Looks like u need to 'start a project' from their AI prompt platform, build it there and 'publish'
+  it. Whats our best bet here"* (2026-09-16, just after midnight)
+⇒ Browsed in HIS logged-in Chrome (the builder is login-gated), read only: no Submit, no Publish, no message
+sent. Findings in RESUME ▶ NEXT (s34) and the reply. Two projects already exist in his account: "ASCII
+Directory" (his own research build, 14 h old) and "CommonsMade Hackathon Submission Guide" (1 week old, the
+kit's first run produced a guide instead of an app, which is why the brief forbids one). Entries close
+**Sep 17, 23:59 UTC** (= 16:59 PDT on the 17th). The chat has a FILE attachment control and a per-day credit
+counter (110 left). The Submit button is a picker he has to open himself.
+
+- *"ok. Still got some things Id love to update about xscapes and its website. But we are close to deadline.
+  Shall we try and drive the build now on commonsmade so we can have an active submissions and try tweak
+  later? can we even do that later?"* ⇒ yes and yes: the entry proxies gh-pages, so a republish reaches it
+  with no Commons step; Commons says the build is changeable until the deadline.
+- *"gonna do it myself, should I 'share source code'?"* ⇒ yes: a ten-line proxy with nothing in it but the
+  page URL, the product is public MIT already, and a hidden source on a proxy reads as hiding something.
+- *"it doesnt let me change visibility"* ⇒ visibility is set BY the first publish; it read Public after.
+- *"its done https://xscapes.vibe.commonsmade.com"* ⇒ **ENTRY SUBMITTED 2026-09-16 ~08:45 PDT.** Verified
+  from outside: 5,864,638 bytes = gh-pages 5,864,585 + one injected `/__commons/analytics.js` line (served
+  200 by the platform); `/index.html` same; `/nothing` 404; `cache-control: public, max-age=600`. The build
+  cost 5 credits on Default · Quick; the agent found and deleted the platform's own "first shot" template.

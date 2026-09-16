@@ -75,7 +75,7 @@ func usage(w io.Writer) {
   xscapes uninstall claude
   xscapes emit <kind>     send one event by hand (for testing)
   xscapes replay <file>   feed a recorded event log to a running scape
-  xscapes notify [kind]   play the knock sounds (ask, done, or both)
+  xscapes notify [kind]   play the knock sounds (ask, done, worried, or all three)
   xscapes hook [Event]    adapter; reads a Claude Code hook payload on stdin
   xscapes statusline      adapter for the context moon; chains to your statusline
 
@@ -233,15 +233,17 @@ func runNotify(args []string) {
 	p := notify.New()
 	fmt.Printf("player: %s\n", p.Describe())
 
-	kinds := []notify.Kind{notify.Ask, notify.Done}
+	kinds := []notify.Kind{notify.Ask, notify.Done, notify.Worried}
 	if len(args) > 0 {
 		switch args[0] {
 		case "ask", "needs_input":
 			kinds = []notify.Kind{notify.Ask}
 		case "done", "finish":
 			kinds = []notify.Kind{notify.Done}
+		case "worried", "broken":
+			kinds = []notify.Kind{notify.Worried}
 		default:
-			fmt.Fprintf(os.Stderr, "xscapes notify: unknown kind %q (ask, done)\n", args[0])
+			fmt.Fprintf(os.Stderr, "xscapes notify: unknown kind %q (ask, done, worried)\n", args[0])
 			os.Exit(2)
 		}
 	}

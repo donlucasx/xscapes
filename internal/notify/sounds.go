@@ -10,8 +10,10 @@ import (
 	"github.com/donlucasx/xscapes/internal/event"
 )
 
-// The two cues xscapes ships with, synthesised by notes/s28-sound/make.py and
-// picked by Lucas on 2026-09-11 from four auditioned families.
+// The three cues xscapes ships with, synthesised by notes/s34-sound/make.py
+// and picked by Lucas on 2026-09-15 from six auditioned families (they
+// replace the s28 droplet pair, which he lived with for four days and did not
+// love).
 //
 // They are EMBEDDED rather than installed beside the binary because "single
 // static binary" is a locked decision in the brief, and because a cue that can
@@ -19,15 +21,21 @@ import (
 // the knock would vanish with nothing said. Embedded bytes cannot be half
 // there.
 //
-// Ask RISES and done FALLS, which is the same distinction Bubble and
-// DoneBubble draw on screen -- shape, not pitch, so the pair stays readable
-// through a laptop speaker the way the bubbles stay readable without colour.
+// The three differ in SHAPE, not only pitch, which is the same distinction
+// Bubble and DoneBubble draw on screen, so they stay readable through a laptop
+// speaker the way the bubbles stay readable without colour: the ask is a bird,
+// two notes rising; a clean finish is one drop into still water, a tick and a
+// ring that climbs and dies; a finish that left something broken is the same
+// bird, two notes falling.
 //
 //go:embed sounds/ask.wav
 var askWAV []byte
 
 //go:embed sounds/done.wav
 var doneWAV []byte
+
+//go:embed sounds/worried.wav
+var worriedWAV []byte
 
 // maxCueBytes is what a cue is allowed to add to the binary.
 //
@@ -55,31 +63,35 @@ func cueDir() (string, error) {
 	return filepath.Join(h, "sounds"), nil
 }
 
-// materialiseCues writes both embedded cues out and returns their paths.
+// materialiseCues writes the embedded cues out and returns their paths.
 //
 // ok is false for any reason at all -- no home, an unwritable directory, a
 // full disk. The caller falls to the next rung rather than going silent, which
 // is the whole point of doing this at New() time: a failure here is discovered
 // once, at startup, and never inside Play.
-func materialiseCues() (ask, done string, ok bool) {
+func materialiseCues() (ask, done, worried string, ok bool) {
 	dir, err := cueDir()
 	if err != nil {
-		return "", "", false
+		return "", "", "", false
 	}
 	// 0700 for the same reason the run directory is: everything under Home()
 	// is this user's session state and nothing here is meant to be shared.
 	if err := os.MkdirAll(dir, 0o700); err != nil {
-		return "", "", false
+		return "", "", "", false
 	}
 	a, err := placeCue(filepath.Join(dir, "ask.wav"), askWAV)
 	if err != nil {
-		return "", "", false
+		return "", "", "", false
 	}
 	d, err := placeCue(filepath.Join(dir, "done.wav"), doneWAV)
 	if err != nil {
-		return "", "", false
+		return "", "", "", false
 	}
-	return a, d, true
+	w, err := placeCue(filepath.Join(dir, "worried.wav"), worriedWAV)
+	if err != nil {
+		return "", "", "", false
+	}
+	return a, d, w, true
 }
 
 // placeCue makes path hold want, writing only if it does not already.
@@ -137,14 +149,16 @@ func cueIsCurrent(path string, want []byte) bool {
 // systemCue names the sounds the OS already has: the rung xscapes played
 // before it had a voice of its own.
 //
-// They are kept as the fallback and not as the default for the reason the
-// droplet exists at all -- Glass has been every Mac's notification for twenty
+// They are kept as the fallback and not as the default for the reason our
+// own cues exist at all -- Glass has been every Mac's notification for twenty
 // years, so it cannot be xscapes' -- but a borrowed sound that plays beats an
 // own sound that cannot be written.
 //
 // Verified present rather than assumed: a missing file makes afplay exit
-// non-zero and the knock is silently lost.
-func systemCue() (ask, done string, ok bool) {
+// non-zero and the knock is silently lost. The worried knock borrows the OS's
+// own error sound where there is one and falls back to the done sound where
+// there is not, so this rung is never the reason a finish goes silent.
+func systemCue() (ask, done, worried string, ok bool) {
 	switch runtime.GOOS {
 	case "darwin":
 		a, okA := firstFile(
@@ -155,7 +169,14 @@ func systemCue() (ask, done string, ok bool) {
 			"/System/Library/Sounds/Submarine.aiff",
 			"/System/Library/Sounds/Purr.aiff",
 		)
-		return a, d, okA && okD
+		w, okW := firstFile(
+			"/System/Library/Sounds/Basso.aiff",
+			"/System/Library/Sounds/Sosumi.aiff",
+		)
+		if !okW {
+			w = d
+		}
+		return a, d, w, okA && okD
 	case "linux":
 		a, okA := firstFile(
 			"/usr/share/sounds/freedesktop/stereo/message.oga",
@@ -165,15 +186,22 @@ func systemCue() (ask, done string, ok bool) {
 			"/usr/share/sounds/freedesktop/stereo/complete.oga",
 			"/usr/share/sounds/freedesktop/stereo/message.oga",
 		)
-		return a, d, okA && okD
+		w, okW := firstFile(
+			"/usr/share/sounds/freedesktop/stereo/dialog-error.oga",
+			"/usr/share/sounds/freedesktop/stereo/bell.oga",
+		)
+		if !okW {
+			w = d
+		}
+		return a, d, w, okA && okD
 	}
-	return "", "", false
+	return "", "", "", false
 }
 
 // playerBin is the command that can open a file and make a noise with it.
 //
 // Both of them handle WAV as well as the platform's own format, which is what
-// lets one binary serve both the embedded droplet and the system sounds.
+// lets one binary serve both the embedded cues and the system sounds.
 func playerBin() string {
 	switch runtime.GOOS {
 	case "darwin":

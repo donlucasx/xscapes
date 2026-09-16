@@ -173,7 +173,10 @@ func (f *frames) frame(now time.Time) string {
 	t := now.Sub(f.start).Seconds()
 	st := f.state(now, t)
 	if f.red != nil {
-		if k, ring := f.knocker.Knock(st.Bubble, st.BubbleAsk); ring {
+		// The pose is consulted for one thing only: a finish while the
+		// companion is still worried is the third knock (his ruling of
+		// 2026-09-15). The ask and the edge detection stay keyed off the bubble.
+		if k, ring := f.knocker.Knock(st.Bubble, st.BubbleAsk, st.Pose == companion.Worried); ring {
 			f.player.Play(k)
 		}
 	}

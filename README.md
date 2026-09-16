@@ -115,7 +115,10 @@ have to ask which of two meanings a change is carrying.
 The two knocks are deliberately different in shape as well as colour, so they
 survive a screenshot and a colourblind reading, and they carry different sounds,
 so they survive you looking at another pane. "I finished" and "I am blocked on
-you" are not the same message and should never look the same.
+you" are not the same message and should never look the same. A third sound,
+and only a third, marks a finish that left something broken: the companion is
+still worried when the turn ends, so the done knock plays its worried voice.
+Nothing else makes a sound.
 
 ## The protocol
 
@@ -162,7 +165,7 @@ xscapes claude -history=false  # do not mirror the transcript into the terminal'
 xscapes claude -alt=false  # run on the main screen, at the cost below
 xscapes -live              # the scape in this terminal, Ctrl-C to quit
 xscapes -info              # colour profile, size, which sound player
-xscapes notify             # hear both knocks
+xscapes notify             # hear the three knocks
 xscapes replay session.jsonl   # feed a recorded session back through the engine
 XSCAPES_COMPANION=cat …    # override the companion for one run, without saving it
 XSCAPES_SILENT=1 …         # mute
