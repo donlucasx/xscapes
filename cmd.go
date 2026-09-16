@@ -72,7 +72,9 @@ func usage(w io.Writer) {
   xscapes -live           run the scape in this terminal
 
   xscapes install claude  add the hooks to Claude Code (prints a plan; --apply to write)
-  xscapes uninstall claude
+  xscapes install kimi    the same for Kimi Code CLI (~/.kimi-code/config.toml)
+  xscapes install hermes  the same for Hermes Agent (~/.hermes/config.yaml)
+  xscapes uninstall claude|kimi|hermes
   xscapes emit <kind>     send one event by hand (for testing)
   xscapes replay <file>   feed a recorded event log to a running scape
   xscapes notify [kind]   play the knock sounds (ask, done, worried, or all three)

@@ -110,7 +110,11 @@ func runInstall(args []string) {
 	// would silently ignore --settings and plan against the real file. Strip
 	// the word first. (Found exactly that way: the plan named ~/.claude even
 	// though --settings pointed at a copy.)
-	args = takeTarget(args)
+	agent, args := takeTarget(args)
+	if agent != "claude" {
+		runInstallAgent(agent, args)
+		return
+	}
 	fs.Parse(args)
 
 	path, err := settingsPath(*target)
@@ -172,7 +176,11 @@ func runUninstall(args []string) {
 		apply  = fs.Bool("apply", false, "actually write the file (default: print the plan)")
 		target = fs.String("settings", "", "settings file (default: ~/.claude/settings.json)")
 	)
-	args = takeTarget(args)
+	agent, args := takeTarget(args)
+	if agent != "claude" {
+		runUninstallAgent(agent, args)
+		return
+	}
 	fs.Parse(args)
 
 	path, err := settingsPath(*target)
@@ -201,16 +209,19 @@ func runUninstall(args []string) {
 	fmt.Println("Removed.")
 }
 
-// takeTarget consumes a leading `claude` so the flags after it still parse.
-func takeTarget(args []string) []string {
+// takeTarget consumes the leading agent word so the flags after it still
+// parse, and says which agent it was. claude is the default and the only one
+// this file handles; kimi and hermes live in install_agents.go.
+func takeTarget(args []string) (string, []string) {
 	if len(args) > 0 && !strings.HasPrefix(args[0], "-") {
-		if args[0] != "claude" {
-			fmt.Fprintf(os.Stderr, "xscapes: only `claude` is supported, got %q\n", args[0])
-			os.Exit(2)
+		switch args[0] {
+		case "claude", "kimi", "hermes":
+			return args[0], args[1:]
 		}
-		return args[1:]
+		fmt.Fprintf(os.Stderr, "xscapes: the target must be claude, kimi or hermes, got %q\n", args[0])
+		os.Exit(2)
 	}
-	return args
+	return "claude", args
 }
 
 func settingsPath(override string) (string, error) {

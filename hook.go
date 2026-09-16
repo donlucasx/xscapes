@@ -32,6 +32,16 @@ type hookPayload struct {
 	ToolUseID string          `json:"tool_use_id"`
 	DurationM int64           `json:"duration_ms"`
 
+	// Kimi Code CLI (0.39) sends the same event names as Claude Code with
+	// two keys spelled differently: the call id and the subagent's name.
+	// Read off the binary's embedded source, not observed (s35).
+	ToolCallID string `json:"tool_call_id"`
+	AgentName  string `json:"agent_name"`
+
+	// Hermes Agent (0.14) sends snake_case events of its own, and carries
+	// everything past the tool fields under "extra" (agent/shell_hooks.py).
+	Extra json.RawMessage `json:"extra"`
+
 	NotificationType string `json:"notification_type"`
 	Message          string `json:"message"`
 
@@ -153,19 +163,60 @@ func runHook(args []string) {
 		// not parse still produces the right kind of event.
 		p.Event = args[0]
 	}
+	// `xscapes hook <Event> [agent]`: the installer writes which agent's
+	// hooks these are, because Kimi's event names are Claude Code's.
+	src := "claude"
+	if len(args) > 1 && args[1] != "" {
+		src = args[1]
+	}
 	if p.Session == "" {
 		p.Session = event.SessionFromEnv()
+	}
+	// Kimi spells two keys differently; fold them in so translate reads one
+	// shape.
+	if p.ToolUseID == "" {
+		p.ToolUseID = p.ToolCallID
+	}
+	if p.AgentID == "" && p.AgentName != "" {
+		p.AgentID = p.AgentName
+	}
+	if p.AgentType == "" {
+		p.AgentType = p.AgentName
 	}
 
 	for _, e := range translate(p) {
 		e.Session = p.Session
-		e.Src = "claude"
-		e.Agent = p.AgentID
+		e.Src = src
+		if e.Agent == "" {
+			e.Agent = p.AgentID
+		}
 		if e.AgentType == "" {
 			e.AgentType = p.AgentType
 		}
 		_, _ = event.Emit(e)
 	}
+}
+
+// hermesExtra is what Hermes puts under "extra": every keyword argument the
+// hook was fired with, minus the tool fields. Names from
+// website/docs/user-guide/features/hooks.md in the installed checkout (0.14).
+type hermesExtra struct {
+	UserMessage       string `json:"user_message"`
+	AssistantResponse string `json:"assistant_response"`
+	DurationMS        int64  `json:"duration_ms"`
+	ChildRole         string `json:"child_role"`
+	ChildStatus       string `json:"child_status"`
+	ChildSessionID    string `json:"child_session_id"`
+	Command           string `json:"command"`
+	Reason            string `json:"reason"`
+}
+
+func (p hookPayload) hermes() hermesExtra {
+	var x hermesExtra
+	if len(p.Extra) > 0 {
+		_ = json.Unmarshal(p.Extra, &x)
+	}
+	return x
 }
 
 // translate maps one hook payload to protocol events.
@@ -260,6 +311,55 @@ func translate(p hookPayload) []event.Event {
 
 	case "PreCompact":
 		return []event.Event{{Kind: event.Compact, Text: p.Trigger}}
+
+	// Kimi Code CLI. Its event list is Claude Code's plus a few; the ones
+	// that mean something here:
+	case "StopFailure":
+		// The turn ended in a failure of the agent itself (a provider error,
+		// a model that would not answer): the companion worries, and the
+		// sand says why. Interrupt is the user pressing escape and stays
+		// silent, as PostToolUseFailure's is_interrupt does.
+		return []event.Event{{Kind: event.Error, Detail: firstLine(p.Error)}}
+
+	// Hermes Agent. pre_llm_call and post_llm_call fire ONCE PER TURN
+	// (hooks.md: "before the tool-calling loop" / "after the tool-calling
+	// loop completes"), which is what makes them the prompt and the done.
+	case "on_session_start":
+		_ = event.SetCurrent(p.Session)
+		return []event.Event{{Kind: event.SessionStart, Text: "startup"}}
+	case "on_session_reset":
+		_ = event.SetCurrent(p.Session)
+		return []event.Event{{Kind: event.SessionStart, Text: "clear"}}
+	case "on_session_end", "on_session_finalize":
+		return []event.Event{{Kind: event.SessionEnd}}
+	case "pre_llm_call":
+		return []event.Event{{Kind: event.Prompt, Text: firstLine(p.hermes().UserMessage)}}
+	case "post_llm_call":
+		return []event.Event{{Kind: event.Done, Text: firstLine(p.hermes().AssistantResponse)}}
+	case "pre_tool_call":
+		op, target := classify(p.ToolName, p.ToolInput)
+		return []event.Event{{Kind: event.ToolStart, Op: op, Tool: p.ToolName, Target: target}}
+	case "post_tool_call":
+		op, target := classify(p.ToolName, p.ToolInput)
+		return []event.Event{{Kind: event.ToolEnd, Op: op, Tool: p.ToolName, Target: target, MS: p.hermes().DurationMS}}
+	case "pre_approval_request":
+		op, target := classify(p.ToolName, p.ToolInput)
+		return []event.Event{{Kind: event.NeedsInput, Op: op, Tool: p.ToolName, Target: target, Text: "allow " + p.ToolName + "?"}}
+	case "subagent_stop":
+		// Hermes has no subagent START event, only this. A litter that
+		// never gets a start never shows, so the stop is announced as a
+		// start and an end together: the reducer's dwell (KittenDwell)
+		// keeps the arrival on screen for a minute, which is the same
+		// treatment a subagent that lived seven seconds gets from Claude.
+		x := p.hermes()
+		id := x.ChildSessionID
+		if id == "" {
+			id = x.ChildRole
+		}
+		return []event.Event{
+			{Kind: event.SubStart, Op: event.OpSub, Agent: id, AgentType: x.ChildRole},
+			{Kind: event.SubEnd, Op: event.OpSub, Agent: id, AgentType: x.ChildRole},
+		}
 	}
 	return nil
 }
@@ -372,6 +472,29 @@ func classify(tool string, raw json.RawMessage) (event.Op, string) {
 	}
 	if strings.HasPrefix(tool, "mcp__") {
 		return event.OpMCP, strings.TrimPrefix(tool, "mcp__")
+	}
+	// Hermes Agent's tools (tools/*.py in the installed checkout). The
+	// input key names are inferred from the tool names, unverified against a
+	// live payload; a miss costs the subject, never the verb.
+	switch tool {
+	case "read_file":
+		return event.OpRead, subject()
+	case "write_file":
+		return event.OpWrite, subject()
+	case "patch":
+		return event.OpEdit, subject()
+	case "search_files", "session_search":
+		return event.OpSearch, subject()
+	case "terminal", "process":
+		return event.OpShell, program(in.Command)
+	case "web_search", "x_search":
+		return event.OpWeb, trimTo(in.Query, 40)
+	case "web_extract":
+		return event.OpWeb, safeURL(in.URL)
+	case "delegate_task", "mixture_of_agents":
+		return event.OpSub, firstLine(in.Description)
+	case "todo":
+		return event.OpTodo, ""
 	}
 	return event.OpOther, subject()
 }
