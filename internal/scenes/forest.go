@@ -246,6 +246,10 @@ type vistaLive struct {
 	// MoonStyle is how the context body is drawn (see MoonStyles); 0 is
 	// the study's block.
 	MoonStyle int
+	// FireWork makes the fire the work as well as the wind: height, sparks
+	// and smoke with the level; the light stays the night's. His word of
+	// 2026-09-16; the study's clips keep their single channel each.
+	FireWork bool
 }
 
 // THE CONTEXT BODY, SEVEN WAYS (s36, 2026-09-16). His ask: "explore further
@@ -689,10 +693,21 @@ func paintVistaL(c *canvas.Canvas, lay vistaLayout, tod, t, level float64, seed 
 
 	// The fire, on the meadow.
 	cx, base := lay.fireX, meadowTop+3
+	// The work, two ways. The study's pair drew the wind OR the fire, and
+	// his pick of 2026-09-14 was the wind; live since 2026-09-16 it is BOTH,
+	// his word ("how hard its working is represented by the wind + fire"):
+	// the fire's height, its sparks and its smoke's thickness climb with
+	// the level while the wind leans everything. What stays the night's is
+	// the LIGHT: the firelight's reach never follows the work, because light
+	// is the world's channel; only the study's fire-only variant lets it
+	// grow, which is the cost that lost it. TestTheFireIsTheWorkToo.
+	wind := !fireIsWork
+	fire := fireIsWork || (live != nil && live.FireWork)
 	H, lean := 3, 0.0
-	if fireIsWork {
+	if fire {
 		H = 2 + int(math.Round(level*4))
-	} else {
+	}
+	if wind {
 		lean = level * 2.6
 	}
 	R := 7.0
@@ -719,9 +734,11 @@ func paintVistaL(c *canvas.Canvas, lay vistaLayout, tod, t, level float64, seed 
 			}
 		}
 	}
-	for x := cx - 2; x <= cx+2; x++ {
-		plot(near, x, base+1, '=', cube(95, 95, 0), 1)
+	logStyle := 0
+	if live != nil {
+		logStyle = LogPick
 	}
+	paintLogs(near, cx, base+1, bandTop, l, logStyle)
 	tipRow := base - (H - 1)
 	for r := 0; r < H; r++ {
 		y := base - r
@@ -753,9 +770,10 @@ func paintVistaL(c *canvas.Canvas, lay vistaLayout, tod, t, level float64, seed 
 	}
 	// Smoke: a column that leans with the wind, or thickens with the fire.
 	smokeLean, smokeDensity := 0.25, 0.55
-	if fireIsWork {
+	if fire {
 		smokeDensity = 0.2 + 0.6*level
-	} else {
+	}
+	if wind {
 		smokeLean = 0.2 + 1.3*level
 	}
 	smokeCol := term.Lerp(grey(15), grey(19), l)
@@ -778,7 +796,7 @@ func paintVistaL(c *canvas.Canvas, lay vistaLayout, tod, t, level float64, seed 
 			}
 		}
 	}
-	if fireIsWork {
+	if fire {
 		// Sparks rise one row a frame through a 24-row pattern, so they close.
 		spread := 1.0 + 5.0*level
 		for y := 3; y < tipRow; y++ {
@@ -807,7 +825,7 @@ func paintVistaL(c *canvas.Canvas, lay vistaLayout, tod, t, level float64, seed 
 				continue
 			}
 			g := '"'
-			if !fireIsWork {
+			if wind {
 				ph := scape.HashF(x, y, seed+91) * 2 * math.Pi
 				bent := scape.HashF(x, y, seed+92)+0.18*math.Sin(2*math.Pi*t/2+ph) < level*0.95
 				if bent {
@@ -822,7 +840,7 @@ func paintVistaL(c *canvas.Canvas, lay vistaLayout, tod, t, level float64, seed 
 	}
 	// What the wind carries, blown right at twenty columns a second through
 	// a pattern the frame's width, so the loop closes.
-	if !fireIsWork {
+	if wind {
 		d := 0.004 + 0.05*level
 		shift := int(math.Round(t * 20))
 		leaf := term.Lerp(grey(10), cube(135, 175, 0), l)
@@ -978,4 +996,72 @@ func keepApart(col, other, toward term.RGB, gap float64) term.RGB {
 		}
 	}
 	return toward
+}
+
+// THE LOGS, SIX WAYS (s37, 2026-09-16). His note after the campfire page:
+// "can we polish the 'logs' underneath the firepit too". Style 0 is today's
+// fuel, five olive cells; the study's clip is held on it. The rest are one
+// or two rows under the fire, cube entries, drawn at the fire's base and
+// read off the live frame on the campfire page. LogPick is his pick; the
+// live vista draws it, the study painter never does.
+var LogStyles = []struct{ Name, Note string }{
+	{"today", "five cells of olive, the grass's own colour"},
+	{"one log", "a log seen from the side, seven cells: rounded pale ends, a bark-brown body"},
+	{"two logs", "two logs stacked, the lower one wider and darker, the upper in tan"},
+	{"a log with embers", "the one log, its middle three cells glowing ember-orange under the flames"},
+	{"a ring of stones", "a stone at each end of the log, the firepit's rim seen edge-on"},
+	{"logs in a stone rim", "the one log, and a row of five stones in front of it on the row below"},
+}
+
+// LogPick is the style the live vista draws; 0 is today's. HIS PICK,
+// 2026-09-16: "lets try L5", the log with a row of stones in front.
+var LogPick = 5
+
+// paintLogs draws the fuel under the fire in one style, at row (the fire's
+// base plus one) and, for the two-row styles, the row under it when that row
+// is still meadow. l is the light, for the stones' grey.
+func paintLogs(near *canvas.Layer, cx, row, bandTop int, l float64, style int) {
+	bark := cube(135, 95, 0)
+	tan := cube(175, 135, 95)
+	pale := cube(215, 175, 135)
+	ember := cube(215, 95, 0)
+	stone := greyBetween(6, 11, l)
+	log := func(y, x0, x1 int, body rgb) {
+		plot(near, x0, y, '(', pale, 1)
+		for x := x0 + 1; x < x1; x++ {
+			plot(near, x, y, '=', body, 1)
+		}
+		plot(near, x1, y, ')', pale, 1)
+	}
+	switch style {
+	case 1:
+		log(row, cx-3, cx+3, bark)
+	case 2:
+		log(row, cx-3, cx+3, tan)
+		if row+1 < bandTop {
+			log(row+1, cx-4, cx+4, bark)
+		}
+	case 3:
+		log(row, cx-3, cx+3, bark)
+		for x := cx - 1; x <= cx+1; x++ {
+			plot(near, x, row, '=', ember, 1)
+		}
+	case 4:
+		plot(near, cx-3, row, 'o', stone, 1)
+		for x := cx - 2; x <= cx+2; x++ {
+			plot(near, x, row, '=', bark, 1)
+		}
+		plot(near, cx+3, row, 'o', stone, 1)
+	case 5:
+		log(row, cx-3, cx+3, bark)
+		if row+1 < bandTop {
+			for x := cx - 4; x <= cx+4; x += 2 {
+				plot(near, x, row+1, 'o', stone, 1)
+			}
+		}
+	default:
+		for x := cx - 2; x <= cx+2; x++ {
+			plot(near, x, row, '=', cube(95, 95, 0), 1)
+		}
+	}
 }

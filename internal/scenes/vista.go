@@ -16,7 +16,9 @@ import (
 //	             meadow at night, fixed, so it says nothing about the agent
 //	sky          the real sky over three ranges; the moon sinks with the
 //	             context, as on the shore
-//	motion       THE WIND: how far the smoke and the flames lean, what
+//	motion       THE WIND AND THE FIRE (both since 2026-09-16, his word;
+//	             the wind alone was the 09-14 pick): how far the smoke and
+//	             the flames lean, how tall the fire, its sparks, what
 //	             fraction of the scrub lies flat, what is in the air --
 //	             coverage and position, never rate
 //	surface      rock, snow, the lake, the meadow
@@ -72,7 +74,7 @@ func (v *Vista) Update(c *canvas.Canvas, t float64, act scape.Activity) {
 	v.lit = lit(scape.PaletteAt(act.TimeOfDay))
 	paintVistaL(c, v.lay, act.TimeOfDay, t, act.Level, v.Seed, false, &vistaLive{
 		ContextUsed: act.ContextUsed, TodoDone: act.TodoDone,
-		SkipOwl: true, SkipBand: true, MoonStyle: v.MoonStyle,
+		SkipOwl: true, SkipBand: true, MoonStyle: v.MoonStyle, FireWork: true,
 	})
 }
 

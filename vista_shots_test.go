@@ -114,9 +114,13 @@ func TestTheVistaComposesEveryStateAtEveryWidth(t *testing.T) {
 					t.Errorf("%dx%d %.2f %s: only %d cells of the owl's box changed by drawing it at (%d,%d)", g[0], g[1], hr, vs.name, owlCells, owlX, owlY)
 				}
 				// The writing: its letters are on rows >= bandTop only.
+				fireX := f.vista.FireX()
 				for y := 0; y < g[1]; y++ {
 					for x := 0; x < g[0]; x++ {
 						r, _, _ := f.c.ResolveAt(x, y, term.Profile256)
+						if r == 'o' && x >= fireX-4 && x <= fireX+4 {
+							continue // the firepit's stones (his pick L5, 2026-09-16): 'o' on the row under the fire
+						}
 						if y < bandTop && (r == 'o' || r == 'w') && x > 30 && x < owlX-8 && y > bandTop-3 {
 							// letters of the sample above the band would be a leak; the
 							// scrub uses '"' ',' '_' and the fire '^' '*' ')'.

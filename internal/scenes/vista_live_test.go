@@ -194,3 +194,65 @@ func TestTheTreelineIsNeverRaisedBehindTheOwl(t *testing.T) {
 	}
 }
 
+// TestTheFireIsTheWorkToo: live, the work is the wind AND the fire, his
+// word of 2026-09-16 ("how hard its working is represented by the wind +
+// fire (both)"): at full stretch the fire has more flame cells and more
+// sparks than at rest. And the light stays the night's: the ground of every
+// cell above the band is the same at rest and at full stretch, so a busy
+// agent does not brighten the meadow (the cost that lost the fire-only
+// variant on 09-14, kept out on purpose).
+func TestTheFireIsTheWorkToo(t *testing.T) {
+	const W, H = 125, 28
+	const night = 22.0 / 24
+	frame := func(level float64) (*canvas.Canvas, *Vista) {
+		c := canvas.New(W, H, canvas.AlphaFar, canvas.AlphaMid, canvas.AlphaNear)
+		v := NewVista(7, false)
+		v.OwlX = W - 16
+		v.Update(c, 3.0, scape.Activity{Working: true, Level: level, ContextUsed: 0.45, TimeOfDay: night})
+		return c, v
+	}
+	rest, v := frame(0)
+	full, _ := frame(1)
+	fireX := v.FireX()
+	_, _, _, bandTop := v.Layout()
+	flameInk := map[term.RGB]bool{cube(255, 95, 0): true, cube(255, 175, 0): true, cube(255, 215, 135): true}
+	flames := func(c *canvas.Canvas) int {
+		n := 0
+		near := c.Near()
+		for y := 0; y < bandTop; y++ {
+			for x := fireX - 8; x <= fireX+8; x++ {
+				if cell := near.Cells[y*W+x]; cell.Set && cell.R != ' ' && flameInk[cell.FG] {
+					n++
+				}
+			}
+		}
+		return n
+	}
+	sparks := func(c *canvas.Canvas) int {
+		n := 0
+		mid := c.Layers[1]
+		for y := 0; y < bandTop; y++ {
+			for x := fireX - 8; x <= fireX+8; x++ {
+				if cell := mid.Cells[y*W+x]; cell.Set && cell.R == '.' && cell.FG == cube(255, 215, 135) {
+					n++
+				}
+			}
+		}
+		return n
+	}
+	if flames(full) <= flames(rest) {
+		t.Errorf("flame cells at full stretch %d, at rest %d; the fire must climb with the work", flames(full), flames(rest))
+	}
+	if sparks(full) <= sparks(rest) {
+		t.Errorf("sparks at full stretch %d, at rest %d; the fire must throw more at full stretch", sparks(full), sparks(rest))
+	}
+	for y := 0; y < bandTop; y++ {
+		for x := 0; x < W; x++ {
+			if rest.BGAt(x, y) != full.BGAt(x, y) {
+				t.Fatalf("the ground at (%d,%d) is %v at rest and %v at full stretch: the light must be the night's, not the work's", x, y, rest.BGAt(x, y), full.BGAt(x, y))
+			}
+		}
+	}
+	t.Logf("flames %d → %d, sparks %d → %d, the ground unchanged", flames(rest), flames(full), sparks(rest), sparks(full))
+}
+
