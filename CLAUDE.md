@@ -21,8 +21,8 @@
 > done (the single drop, row 2); one file swap if he meant Cistern, Drip-and-answer or Pebble. Suite
 > 10/10 + vet + fmt green. ⭐ **COMMITTED `5cd6199` at his word ("publish and commit"), PUBLISHED (gh-pages
 > `75b8724` = site: 5cd6199, live hash verified, the three-sound line is live) and INSTALLED from the clean
-> tree (inode 86059199, stamp `5cd6199`, modified=false).** ⚠ `origin/main` is still `3ea1a69`: he said
-> commit, not push; `gh auth switch --user donlucasx && git push origin main` is one command away. ⚠ Running
+> tree (inode 86059199, stamp `5cd6199`, modified=false). PUSHED at his word: `origin/main` = `3523d23`
+> (+ this note).** ⚠ Running
 > scapes on the old binary play the NEW ask and done by path (same file names) and never the worried one,
 > until restarted.
 > ⭐⭐ **THE ENTRY IS SUBMITTED, 2026-09-16 ~08:45 PDT: https://xscapes.vibe.commonsmade.com** (the hackathon
