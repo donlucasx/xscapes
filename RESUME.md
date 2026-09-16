@@ -4,50 +4,61 @@
 
 ```
 cd ~/Documents/claude/xscapes/ and read CLAUDE.md (the brief, authoritative)
-and RESUME.md before responding. Session 34 (09-15 evening into 09-16) SHIPPED
-THE CUE AS THREE SOUNDS, his picks from six drafted candidates: a bird for the
-ask, one drop into still water for done, the bird falling for a finish that
-left something broken (a new kind, notify.Worried, 15% of his real finishes).
-Then THE COMMONS ENTRY WAS SUBMITTED: https://xscapes.vibe.commonsmade.com is
-a Worker proxy of the gh-pages page, built in his logged-in Chrome, published
-and entered by him; a gh-pages republish reaches it inside 10 minutes with no
-Commons step, and it keeps serving the LIVE page through judging (Sep 17-20),
-so do not break gh-pages. HEAD is pushed, gh-pages = repo, binary installed
-clean at 5cd6199, suite 10/10 + vet + fmt green.
-Tell me where we left off, then pick up from the NEXT queue. The open thread is
-his unlisted "things Id love to update about xscapes and its website"; ask for
-the list first.
+and RESUME.md before responding. Session 35 (2026-09-16) opened on a status
+check, then PROMPTED THROUGH EVERY OPEN ITEM WITH OPTIONS and he ruled on all
+of them (v0.4.1 tagged and pushed; the three cues kept; the deck dropped; the
+typed prompt, per-repo seed and plant-a-tree closed). Then "close any/all open
+cards before we dive into further notes": FOUR CARDS BUILT, test-first, every
+visual one screenshotted, committed at his word as one commit each: star
+magnitude 0.70 -> 0.60 on a sweep; the generic adapter (internal/watch,
+`xscapes inside -watch`); Kimi and Hermes adapters (`xscapes install
+kimi|hermes`, validated by the agents' own tools, neither RUN live yet); and
+THE VISTA AS A REAL SCAPE (`xscapes scape vista`; the owl's five faces;
+owlets; the page's clip byte-identical under a sha256 guard). Installed clean.
+NOT PUSHED (six commits ahead of origin/main). The site is rebuilt and NOT
+published: a republish changes the Commons entry, and judging is Sep 17-20.
+His scape preference file is set to VISTA, so the next scape he starts opens
+on it: HE WRAPPED TO RESTART AND TEST THE VISTA FIRST. Open on that: his
+notes on the vista live. Then his tweaks list for xscapes and the site, which
+is still unlisted. Tell me where we left off, then ask what he saw.
 
 Six things about how to work on this, all paid for:
 build the instrument before trusting the picture; measure the RENDERED frame
-(or the SHIPPED BYTES: the s28 "droplet" glided DOWN, which nobody saw until
-the file itself was pitch-tracked) rather than what the source says it should
-do; go and count the real event log instead of reasoning about it; A
-MEASUREMENT AT ONE SEED IS NOT A MEASUREMENT; when a fix makes the number
-worse, say so and put it back; and THE COUNT IS NOT THE VERDICT.
+(or the SHIPPED BYTES) rather than what the source says it should do; go and
+count the real event log instead of reasoning about it; A MEASUREMENT AT ONE
+SEED IS NOT A MEASUREMENT; when a fix makes the number worse, say so and put
+it back; and THE COUNT IS NOT THE VERDICT.
 ⚠ s31: WHEN A VISUAL IS WRONG, INSTRUMENT THE PIPELINE, NOT THE API.
-⚠ s32: LOOK AT THE RENDERED FRAME. `XSCAPES_CLIPSHOTS=<dir> go test -run
-TestClipShots .` writes every embedded clip as a frame page for headless Chrome
-(/Applications/Google Chrome.app); for the WHOLE page, `python3 -m http.server
+⚠ s32: LOOK AT THE RENDERED FRAME. `XSCAPES_VISTASHOTS=<dir> go test -run
+TestVistaShots .` writes the LIVE vista composition as frame pages (every
+state, three hours, five geometries); `XSCAPES_CLIPSHOTS=<dir> go test -run
+TestClipShots .` does the page's clips; headless Chrome is at
+/Applications/Google Chrome.app; for the WHOLE page, `python3 -m http.server
 8765` in site/ and Playwright.
 ⚠ s33: WRITE THE CRITERION WHERE THE VALUES LIVE, and CHAIN EDIT SCRIPTS WITH
 && BEFORE A PUBLISH.
-⚠ s34: in the Commons builder a typed newline SENDS; set the box by JS. And
-the browser is his logged-in Chrome (claude-in-chrome), read-only unless he
-says publish/submit; he presses those himself.
+⚠ s34: in the Commons builder a typed newline SENDS; set the box by JS. The
+browser is his logged-in Chrome (claude-in-chrome), read-only unless he says
+publish/submit; he presses those himself.
+⚠ s35: CHECK THE CODE BEFORE ASKING ABOUT A MEMORY LINE (two stale ones were
+asked as open items and had to be retracted the same turn). Commit only at
+his word; stage by explicit path, never `git add -A`.
 Do NOT drive Terminal.app (osascript, System Events) without asking me first.
 ```
 
-## ▶ NEXT (session 35, 2026-09-16: every open card CLOSED, uncommitted; his tweaks are next)
+## ▶ NEXT (session 35, 2026-09-16, WRAPPED ~afternoon PDT: every open card CLOSED and committed; he restarts to test the vista)
 
 **State:** **COMMITTED at his word ("proceed and commit"), four commits, one per card: `0359924` magnitude ·
 `00738f6` the generic adapter · `97b6a5b` Kimi + Hermes · `c9fcc6b` the vista**, each checked to build and
-vet on its own, plus this record commit. **NOT PUSHED** (`origin/main` = `f875b43`; v0.4.1 tagged and pushed
-earlier). The site is rebuilt in the record commit and NOT published. **Suite 12/12 + vet + fmt green** (a twelfth package, `internal/watch`); **INSTALLED as a new inode from the
-clean tree after the record commit** (see the session's last message for the stamp). The site is rebuilt locally and NOT published. This window's
+vet on its own, plus the record commit `b7f8c87` and the wrap commit. **NOT PUSHED** (`origin/main` =
+`f875b43`; v0.4.1 tagged and pushed earlier). The site is rebuilt in the record commit and NOT published. **Suite 12/12 + vet + fmt green** (a twelfth package, `internal/watch`); **INSTALLED as a new inode from the
+clean tree after the record commit** (inode 86101537, stamp `b7f8c87`, modified=false). The site is rebuilt locally and NOT published. This window's
 scape runs the three-cue binary (the OLD one for today's work); the tyastie scape is older still.
 
-**0. HIS TWEAKS to xscapes and the site.** Still unlisted; the walkthrough and the cards were his
+**0. HIS FIRST LOOK AT THE VISTA, LIVE.** The preference file is set to vista (he set it); a scape started on
+the installed binary opens on it. Take his notes (the moon block, the owl's faces, the litter, the band, the
+wind) and build to them the way the crab's rounds went: draw, he rules. `xscapes scape shore` is the way back.
+**0b. HIS TWEAKS to xscapes and the site.** Still unlisted; the walkthrough and the cards were his
 condition for starting. Site changes: `go run . -site site && sh site/publish.sh` (⚠ a republish changes
 the Commons entry inside 10 min, and judging is Sep 17–20). Product changes: reinstall from a CLEAN tree
 (`go build -o` a new inode) so the stamp is honest.

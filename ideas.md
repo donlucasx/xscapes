@@ -67,6 +67,9 @@ real question while waiting. Lucas: *"I think tracking total token usage is help
 - **The design question:** a total with no ceiling has nothing to fill toward. Log scale, or fill once per
   unit and tip over. Decide before drawing.
 - **Taste question, his:** a cost meter inside a scene whose point is calm reads as anxiety, not progress.
+- **RE-BRIEFED 2026-09-16 (s35), his words:** *"For #1 (token usage), I want to come up with an idea that is
+  very easy to read and can translate across xscapes."* ⇒ not a pond in one scape: one readable device for
+  token usage that every scape can carry, the way the moon carries context. Nothing designed yet.
 
 ## Interaction
 - Catch a firefly, whistle for wind (hold key, trees bend), throw a stone into the pond.

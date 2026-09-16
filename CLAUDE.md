@@ -2,7 +2,7 @@
 
 *(Renamed end to end on 2026-09-03: directory, env vars, state path and hook marker. Two names are kept on purpose and are not leftovers -- `internal/envx` still reads `ASCIISCAPES_*` and warns, and `install.go` still RECOGNISES the `# asciiscapes:v1` marker so the hooks it wrote before the rename can be found and removed.)*
 
-> **Session 35 (2026-09-16). THE WALKTHROUGH, THEN EVERY OPEN CARD CLOSED IN ONE AFTERNOON.** Opened on a
+> **Session 35 (2026-09-16), WRAPPED. THE WALKTHROUGH, THEN EVERY OPEN CARD CLOSED IN ONE AFTERNOON.** Opened on a
 > status check (all of s34 held; this window's scape runs the three-cue binary). Every open item on the
 > record was prompted through with options and ruled (verbatim in `_FEEDBACK.md` §Session 35): **v0.4.1
 > TAGGED AND PUSHED** at his word · the three cues heard and KEPT · the deck DROPPED (the page is the
@@ -20,7 +20,9 @@
 > the tail on the band). ⚠ Two defects seen in screenshots and fixed: the ask balloon eaten by the
 > treeline's quarter-cells (letters made whole first) · owlets' feet on the writing at 60x20 (anchored to
 > the band). **COMMITTED at his word as four commits (`0359924` · `00738f6` · `97b6a5b` · `c9fcc6b`) plus
-> the record; NOT PUSHED; the site rebuilt and NOT published (judging Sep 17–20). NEXT: his tweaks list.**
+> the record `b7f8c87` and the wrap; INSTALLED CLEAN (stamp `b7f8c87`); NOT PUSHED; the site rebuilt and
+> NOT published (judging Sep 17–20). WRAPPED at his word: *"I want to restart the session and test the vista
+> first"*; his scape preference is set to vista. NEXT: his look at the vista live, then his tweaks list.**
 
 > **Session 34 (2026-09-15 evening into 09-16), WRAPPED ~09:10 PDT. ⭐ THE CUE IS THREE SOUNDS NOW, HIS PICKS,
 > AND ⭐⭐ THE COMMONS ENTRY IS SUBMITTED.** HEAD = the wrap commit, pushed, tree clean. Opened on a

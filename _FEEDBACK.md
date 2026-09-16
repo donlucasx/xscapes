@@ -3448,3 +3448,9 @@ test-first, every visual one looked at in a headless-Chrome screenshot, nothing 
   locally, **NOT published** (a republish changes the entry during judging; his word).
 - README: Adapters 2/3/4, `xscapes scape`, the install lines. CLAUDE.md: Milestone 2 and the adapter
   and scapes sections say what is built.
+- *"xscapes scape vista"* (typed to me; he declined my running it and set it himself: the preference file
+  read vista on the next check) · *"proceed and commit"* ⇒ five commits, one per card + the record
+  (`0359924` `00738f6` `97b6a5b` `c9fcc6b` `b7f8c87`), each checked to build and vet alone; reinstalled from
+  the clean tree (stamp `b7f8c87`, modified=false) · *"lets /wrap I want to restart the session and test the
+  vista first"* ⇒ wrapped ~2026-09-16 afternoon. **His first look at the vista LIVE is the next thing; his
+  tweaks list after it.** Not pushed, not published: both his word.
