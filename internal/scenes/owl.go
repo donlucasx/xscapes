@@ -1,6 +1,7 @@
 package scenes
 
 import (
+	"math"
 	"strings"
 
 	"github.com/donlucasx/xscapes/internal/canvas"
@@ -394,4 +395,111 @@ func paintBranch(c *canvas.Canvas, col term.RGB, seed int64, top0 int) {
 			plot(mid, tx, top0/2+2, '\'', col, 1)
 		}
 	}
+}
+
+// THE OWL'S FIVE STATES (s35, 2026-09-16), drawn to the same vocabulary the
+// crab and the cat use: the FACE is the channel. An owl is still, so nothing
+// here breathes or wags; what moves is the eyes, which are two 2x2 blocks on a
+// pale heart -- the biggest feature on the animal and the one a glance lands
+// on. Each state is a different set of eye cells, so no two states share a
+// screenshot:
+//
+//	resting    both lids down: a dark line across the top of each eye
+//	working    open, the pupil out, one blink every seven seconds (the
+//	           crab's pincer shuts on the same clock: idle motion, no meaning)
+//	needs-you  WIDE: each eye a cell wider, the pupil centred, the ask
+//	done       content: the eyes shut upward, '^ ^'
+//	worried    amber slits: the lower row only, in the beak's colour
+//
+// ⚠ Not built: the crab's walk up to the screen. The owl asks with its eyes
+// and the balloon; a bigger owl is a design round he has not had.
+func DrawOwlPose(c *canvas.Canvas, x, y int, t float64, st companion.State) {
+	pick := OwlPick
+	if pick < 0 || pick >= len(OwlAlts) {
+		pick = 0
+	}
+	alt := &OwlAlts[pick]
+	DrawOwl(c, alt, OwlCoat, x, y)
+	near := c.Near()
+	eyes := [2]int{alt.eyeL, alt.eyeR}
+	lidsDown := func() {
+		for _, ex := range eyes {
+			for r := 0; r < alt.eyeH; r++ {
+				for k := 0; k < alt.eyeW; k++ {
+					g := ' '
+					if r == 0 {
+						g = '-'
+					}
+					near.PlotOn(x+ex+k, y+alt.eyeRow+r, g, owlDark, owlLight, 1)
+				}
+			}
+		}
+	}
+	switch st {
+	case companion.Resting:
+		lidsDown()
+	case companion.Working:
+		if math.Mod(t, 7) < 0.25 {
+			lidsDown()
+		}
+	case companion.NeedsYou:
+		for i, ex := range eyes {
+			x0 := ex - 1 // the left eye grows outward (left), the right eye outward (right)
+			if i == 1 {
+				x0 = ex
+			}
+			for r := 0; r < alt.eyeH; r++ {
+				for k := 0; k < alt.eyeW+1; k++ {
+					near.PlotOn(x+x0+k, y+alt.eyeRow+r, ' ', owlWhite, owlWhite, 1)
+				}
+				near.PlotOn(x+x0+1, y+alt.eyeRow+r, ' ', owlDark, owlDark, 1)
+			}
+			near.PlotOn(x+x0+1, y+alt.eyeRow, '˙', owlWhite, owlDark, 1)
+		}
+	case companion.Done:
+		for _, ex := range eyes {
+			for r := 0; r < alt.eyeH; r++ {
+				for k := 0; k < alt.eyeW; k++ {
+					g := ' '
+					if r == 0 {
+						g = '^'
+					}
+					near.PlotOn(x+ex+k, y+alt.eyeRow+r, g, owlDark, owlLight, 1)
+				}
+			}
+		}
+	case companion.Worried:
+		for _, ex := range eyes {
+			for k := 0; k < alt.eyeW; k++ {
+				near.PlotOn(x+ex+k, y+alt.eyeRow, ' ', owlLight, owlLight, 1)
+				near.PlotOn(x+ex+k, y+alt.eyeRow+1, ' ', owlBeak, owlBeak, 1)
+			}
+			near.PlotOn(x+ex+alt.pupil, y+alt.eyeRow+1, ' ', owlDark, owlDark, 1)
+		}
+	}
+}
+
+// OwlHeadCol is the column of the owl's face centre inside its 12-wide box,
+// where the balloon's pointer aims.
+const OwlHeadCol = 5
+
+// OwletW is the litter's pitch: an owlet is six cells wide and they sit a
+// cell apart.
+const OwletW = 7
+
+// DrawOwlets draws n owlets on the grass to the left of the owl at x, the
+// first nearest the owl, and stops at minX so the litter never stands in the
+// fire. Returns how many fit; the count is the channel, so a frame too narrow
+// for the litter shows fewer rather than piling them.
+func DrawOwlets(c *canvas.Canvas, x, grassY, n, minX int) int {
+	drawn := 0
+	for k := 1; k <= n; k++ {
+		ox := x - OwletW*k
+		if ox < minX || ox < 0 {
+			break
+		}
+		DrawOwlet(c, OwlCoat, ox, grassY, k%2 == 1)
+		drawn++
+	}
+	return drawn
 }

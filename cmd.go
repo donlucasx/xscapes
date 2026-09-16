@@ -49,6 +49,8 @@ func dispatch(args []string) bool {
 		runTune(args[1:])
 	case "companion":
 		os.Exit(cmdCompanion(args[1:]))
+	case "scape":
+		os.Exit(cmdScape(args[1:]))
 	case "help", "-h", "--help":
 		usage(os.Stderr)
 	default:
@@ -67,6 +69,7 @@ func usage(w io.Writer) {
   xscapes shades          one frame three ways, to judge the 256 smoothing here
   xscapes tune            fold real recordings through the reducer and report
   xscapes companion       show or set the companion (cat, crab)
+  xscapes scape           show or set the scape (shore, vista); a running scape switches live
   xscapes inside <cmd>    host any command inside the scape
   xscapes                 render one frame
   xscapes -live           run the scape in this terminal

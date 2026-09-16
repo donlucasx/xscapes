@@ -9,6 +9,7 @@ import (
 	"github.com/donlucasx/xscapes/internal/notify"
 	"github.com/donlucasx/xscapes/internal/reduce"
 	"github.com/donlucasx/xscapes/internal/scape"
+	"github.com/donlucasx/xscapes/internal/scenes"
 	"github.com/donlucasx/xscapes/internal/term"
 )
 
@@ -48,6 +49,15 @@ type frames struct {
 	// compaction would otherwise advance the walk by the wrong amount. Zero on
 	// the first frame, which yields dt = 0 and no movement.
 	lastFrame time.Time
+
+	// The scape. sh is always built -- the shore is the default and the
+	// demo, the site and the mockups draw it -- and vista is set while the
+	// preference names it (refreshScape). ascii is kept so a switch can
+	// build the vista the same way the shore was.
+	vista          *scenes.Vista
+	scapeName      string
+	ascii          bool
+	nextScapeCheck time.Time
 }
 
 // companionPoll is how often a running scape re-reads the saved companion.
@@ -95,10 +105,33 @@ func newFrames(w, h int, seed int64, ascii, mirror bool, ctxUsed, tod float64) *
 	ccw, chh := cat.Size()
 	lay := compose(w, ccw, mirror)
 	sh.MoonX = lay.MoonX
-	return &frames{
+	f := &frames{
 		c: c, sh: sh, cat: cat, lay: lay, ccw: ccw, chh: chh,
 		mirror: mirror, profile: term.DetectProfile(), seed: seed,
 		player: notify.New(), ctxUsed: ctxUsed, tod: tod, start: time.Now(),
+		ascii: ascii, scapeName: ScapeShore,
+	}
+	f.refreshScape(time.Time{})
+	return f
+}
+
+// refreshScape re-reads the scape preference on the companion's clock, so
+// `xscapes scape vista` reaches a running scape without a restart -- the
+// same defect the companion switch had until 2026-09-08, not repeated.
+func (f *frames) refreshScape(now time.Time) {
+	if !now.IsZero() && now.Before(f.nextScapeCheck) {
+		return
+	}
+	f.nextScapeCheck = now.Add(companionPoll)
+	name := scapePref()
+	if name == f.scapeName && (name == ScapeShore || f.vista != nil) {
+		return
+	}
+	f.scapeName = name
+	if name == ScapeVista {
+		f.vista = scenes.NewVista(f.seed, f.ascii)
+	} else {
+		f.vista = nil
 	}
 }
 
@@ -150,8 +183,12 @@ func (f *frames) state(now time.Time, t float64) reduce.State {
 	st := f.red.State(now)
 	// Re-render the sand to the columns this layout actually leaves it, so a
 	// narrow pane loses whole pieces of a line rather than getting a path
-	// chopped mid-word.
-	st.Tail = st.FitTail(now, f.lay.SandTo-f.lay.SandFrom)
+	// chopped mid-word. The vista's band runs the whole width.
+	budget := f.lay.SandTo - f.lay.SandFrom
+	if f.vista != nil {
+		budget = f.c.W - 4
+	}
+	st.Tail = st.FitTail(now, budget)
 	// The sky is the world: time of day is the wall clock, never anything the
 	// agent did.
 	st.Act.TimeOfDay = timeOfDay(now)
@@ -205,6 +242,13 @@ func (f *frames) frame(now time.Time) string {
 	f.lastFrame = now
 	f.cat.Approach(dt, st.Pose == companion.NeedsYou)
 
+	f.refreshScape(now)
+	if f.vista != nil {
+		f.vista.OwlX = f.lay.CatX
+		f.vista.Update(f.c, t, st.Act)
+		drawVista(f.c, f.vista, f.lay, st, t)
+		return f.c.Render(f.profile)
+	}
 	f.sh.Update(f.c, t, st.Act)
 	top := f.c.H - 2 - f.chh
 	drawScene(f.c, f.sh, f.cat, f.lay, st, t, f.seed, top)

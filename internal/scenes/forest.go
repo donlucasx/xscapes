@@ -55,18 +55,37 @@ var Forest = []Scene{
 // LoopSecs is the loop every forest painter closes on.
 const LoopSecs = 4.0
 
-// The owl's cell, top-left of its 12x7 box: rows 12..18, on the mound.
+// The owl's cell, top-left of its 12x7 box: rows 12..18, on the mound. The
+// study's values; the live scape places it where the composition puts the
+// companion (vista.go).
 const owlX, owlY = 64, 12
 
-// The vista's rows, at 80x24. Sub-rows are twice these.
-const (
-	farBase   = 22 // sub-row the far range stands on (row 11)
-	midBase   = 26 // the massif (row 13)
-	nearBase  = 28 // the dark near ridge with its treeline (row 14)
-	lakeTop   = 14 // rows 14..15
-	meadowTop = 16 // rows 16..20
-	bandTop   = 21 // the writing
-)
+// vistaLayout is where the vista's parts sit for one frame size. The study
+// and the page clips use vista80, the 80x24 the scene was drawn at; the live
+// scape derives one from the window (vistaLayoutFor). Every row that was a
+// constant is here, so a wider or taller frame moves the parts and never
+// the drawing.
+type vistaLayout struct {
+	W, H int
+	// Sub-rows (twice the row) the three ranges stand on.
+	farBase, midBase, nearBase int
+	// Rows: the lake's first row, the meadow's first row, the writing's.
+	lakeTop, meadowTop, bandTop int
+	// The owl's box, top-left; the fire's column; the moon's column.
+	owlX, owlY, fireX, moonX int
+	// Where the treeline dips under the owl's head is 2*owlY (whole cells
+	// behind the eyes); it is a sub-row here so a taller frame can lower it.
+}
+
+// vista80 is the layout the vista was drawn at. The numbers ARE the old
+// constants: farBase 22 is row 11, the massif on row 13, the near ridge on
+// row 14, the lake rows 14..15, the meadow 16..20, the writing from 21.
+func vista80() vistaLayout {
+	return vistaLayout{W: 80, H: 24,
+		farBase: 22, midBase: 26, nearBase: 28,
+		lakeTop: 14, meadowTop: 16, bandTop: 21,
+		owlX: owlX, owlY: owlY, fireX: 30, moonX: 12}
+}
 
 // ridged is a skyline: layered sines folded at zero so every crossing is a
 // summit, phases from the seed, sharpened so the valleys stay low. 0..1.
@@ -180,7 +199,7 @@ func pineSilhouette(c *canvas.Canvas, cu, tip, base int, col term.RGB, seed int6
 // owlAt draws the picked owl (owl.go) facing left, with its litter: on the
 // branch the owlets sit along the limb beside it; on the mound they sit on
 // the meadow to its left, where the crablets sit on the sand.
-func owlAt(c *canvas.Canvas, x, y int) {
+func owlAt(c *canvas.Canvas, x, y, grassY int) {
 	pick := OwlPick
 	if pick < 0 || pick >= len(OwlAlts) {
 		pick = 0
@@ -193,7 +212,7 @@ func owlAt(c *canvas.Canvas, x, y int) {
 		case 4:
 			DrawOwlet(c, OwlCoat, x-2-6*k, 14, k%2 == 1) // standing on the top rail
 		default:
-			DrawOwlet(c, OwlCoat, x-7*k, meadowTop+1, k%2 == 1) // on the grass
+			DrawOwlet(c, OwlCoat, x-7*k, grassY, k%2 == 1) // on the grass
 		}
 	}
 }
@@ -209,6 +228,37 @@ func glowAt(tod float64) float64 {
 }
 
 func paintVista(c *canvas.Canvas, tod, t, level float64, seed int64, fireIsWork bool) {
+	paintVistaL(c, vista80(), tod, t, level, seed, fireIsWork, nil)
+}
+
+// vistaLive is what the live scape adds to the study painter: the parts that
+// come from the agent rather than from the clock and the work level. Nil is
+// the study: the moon high, no checklist, the owl and the sample writing
+// drawn by the painter itself.
+type vistaLive struct {
+	// ContextUsed sets the moon's altitude, as it does on the shore.
+	ContextUsed float64
+	// TodoDone lights that many stars in the sky.
+	TodoDone int
+	// The live scene draws its own owl (with a pose) and its own writing
+	// (the real activity tail), so the painter leaves both slots bare.
+	SkipOwl, SkipBand bool
+}
+
+// moonRow is where the moon sits for a context: row 1 fresh, sinking toward
+// the far range as the window fills, never into it.
+func (lay vistaLayout) moonRow(ctxUsed float64) int {
+	lo, hi := 1, lay.farBase/2-4
+	if hi <= lo {
+		return lo
+	}
+	return lo + int(math.Round(ctxUsed*float64(hi-lo)))
+}
+
+func paintVistaL(c *canvas.Canvas, lay vistaLayout, tod, t, level float64, seed int64, fireIsWork bool, live *vistaLive) {
+	farBase, midBase, nearBase := lay.farBase, lay.midBase, lay.nearBase
+	lakeTop, meadowTop, bandTop := lay.lakeTop, lay.meadowTop, lay.bandTop
+	owlX, owlY := lay.owlX, lay.owlY
 	p := scape.PaletteAt(tod)
 	l := lit(p)
 	glow := glowAt(tod)
@@ -216,22 +266,32 @@ func paintVista(c *canvas.Canvas, tod, t, level float64, seed int64, fireIsWork 
 	t = loopPhase(t)
 	frame := int(math.Round(t * 6))
 	far, mid, near := c.Far(), c.Mid(), c.Near()
+	// The ranges' skylines were placed in sub-columns at 80 wide; a wider
+	// frame stretches them rather than repeating them.
+	sx := float64(c.W) / 80
 
 	// The sky, its stars, the moon or the sun.
 	vramp(c, 0, 0, c.W-1, lakeTop-1, p.SkyTop, p.SkyHorizon)
-	for y := 0; y < 10; y++ {
+	for y := 0; y < lakeTop-4; y++ {
 		for x := 0; x < c.W; x++ {
 			if scape.HashF(x, y, seed) < 0.05*p.StarVis {
 				plot(far, x, y, '.', p.Star, 0.6*p.StarVis)
 			}
 		}
 	}
+	moonY := 1
+	if live != nil {
+		moonY = lay.moonRow(live.ContextUsed)
+	}
 	if p.MoonVis > 0.05 {
-		for y := 1; y <= 2; y++ {
-			for x := 12; x <= 14; x++ {
+		for y := moonY; y <= moonY+1; y++ {
+			for x := lay.moonX; x <= lay.moonX+2; x++ {
 				c.SetBG(x, y, term.Lerp(c.BGAt(x, y), p.Moon, p.MoonVis))
 			}
 		}
+	}
+	if live != nil && live.TodoDone > 0 {
+		vistaStars(c, lay, p, seed, live.TodoDone)
 	}
 
 	// Three ranges. Rock is grey at night and warm stone by day; each farther
@@ -245,9 +305,9 @@ func paintVista(c *canvas.Canvas, tod, t, level float64, seed int64, fireIsWork 
 	midTop := make([]int, W2)
 	nearTop := make([]int, W2)
 	for u := 0; u < W2; u++ {
-		farTop[u] = skyline(u, farBase, 11, seed+11, 0.061, 40, 90)
-		midTop[u] = skyline(u, midBase, 25, seed+23, 0.047, 84, 56)
-		nearTop[u] = skyline(u, nearBase, 6, seed+31, 0.19, 60, 160)
+		farTop[u] = skyline(u, farBase, 11, seed+11, 0.061, 40*sx, 90*sx)
+		midTop[u] = skyline(u, midBase, 25, seed+23, 0.047, 84*sx, 56*sx)
+		nearTop[u] = skyline(u, nearBase, 6, seed+31, 0.19, 60*sx, 160*sx)
 	}
 	paintRange(c, farTop, term.Lerp(farCol, warm, 0.22*glow), c.H, nil)
 	snow := term.Lerp(term.Lerp(grey(15), grey(23), l), warm, 0.45*glow)
@@ -287,7 +347,7 @@ func paintVista(c *canvas.Canvas, tod, t, level float64, seed int64, fireIsWork 
 	lake := term.Lerp(term.Lerp(p.SkyHorizon, p.SkyTop, 0.5), grey(0), 0.3)
 	fill(c, 0, lakeTop, c.W-1, meadowTop-1, lake)
 	if p.MoonVis > 0.05 && p.StarVis > 0.3 {
-		for x := 11; x <= 15; x++ {
+		for x := lay.moonX - 1; x <= lay.moonX+3; x++ {
 			c.SetBG(x, lakeTop, term.Lerp(lake, p.Moon, 0.3*p.MoonVis*p.StarVis))
 		}
 	}
@@ -302,9 +362,9 @@ func paintVista(c *canvas.Canvas, tod, t, level float64, seed int64, fireIsWork 
 	shore := make([]int, W2)
 	for u := 0; u < W2; u++ {
 		fu := float64(u)
-		sh := 2*lakeTop + 2 + 1.6*(1+math.Sin(fu*0.06+1.1)) + (scape.HashF(u, 4, seed+63)-0.5)*0.9
-		if fu > 112 {
-			sh -= (fu - 112) / 6 // the headland
+		sh := float64(2*lakeTop+2) + 1.6*(1+math.Sin(fu*0.06+1.1)) + (scape.HashF(u, 4, seed+63)-0.5)*0.9
+		if head := float64(2*owlX - 16); fu > head {
+			sh -= (fu - head) / 6 // the headland, rising under the owl
 		}
 		// ⚠ Whole cells under the owl. A plain glyph (Plot, not PlotOn) over
 		// a cell whose background is QUARTERS loses to the quarters, by the
@@ -326,7 +386,7 @@ func paintVista(c *canvas.Canvas, tod, t, level float64, seed int64, fireIsWork 
 	pineSilhouette(c, 23, 19, 41, pineCol, seed+62)
 
 	// The fire, on the meadow.
-	cx, base := 30, meadowTop+3
+	cx, base := lay.fireX, meadowTop+3
 	H, lean := 3, 0.0
 	if fireIsWork {
 		H = 2 + int(math.Round(level*4))
@@ -427,8 +487,8 @@ func paintVista(c *canvas.Canvas, tod, t, level float64, seed int64, fireIsWork 
 	scrub := term.Lerp(grey(7), cube(135, 175, 0), lm)
 	for y := meadowTop; y < bandTop; y++ {
 		for x := 0; x < c.W; x++ {
-			if OwlPlace == 0 && x >= 62 && y >= meadowTop+3 {
-				continue // the owl's boulder
+			if OwlPlace == 0 && x >= owlX-2 && y >= bandTop-2 {
+				continue // the owl's boulder (its flat top keeps its scrub)
 			}
 			h := scape.HashF(x, y, seed+90)
 			if h > 0.28 {
@@ -475,12 +535,12 @@ func paintVista(c *canvas.Canvas, tod, t, level float64, seed int64, fireIsWork 
 	switch OwlPlace {
 	case 1:
 		paintBranch(c, pineCol, seed, branchTop)
-		owlAt(c, owlX, branchOwlY)
+		owlAt(c, owlX, branchOwlY, meadowTop+1)
 	case 2:
 		// A lower limb, its perch on row 13, so it crosses the lake and
 		// reads against the water.
 		paintBranch(c, pineCol, seed, 26)
-		owlAt(c, owlX, 6)
+		owlAt(c, owlX, 6, meadowTop+1)
 	case 3:
 		// A stump in the meadow, the owl's own width: the pale cut face on
 		// top with the owl standing on it, so the face shows around its
@@ -488,37 +548,91 @@ func paintVista(c *canvas.Canvas, tod, t, level float64, seed int64, fireIsWork 
 		// on the post: "does not read great" -- it was two cells of the
 		// treeline's colour on a meadow nearly as dark.
 		bark := greyBetween(6, 11, l)
-		fill(c, owlX, 19, owlX+11, bandTop-1, bark)
+		fill(c, owlX, bandTop-2, owlX+11, bandTop-1, bark)
 		for _, bx := range []int{owlX + 2, owlX + 6, owlX + 9} {
-			plot(near, bx, 19, '|', greyBetween(4, 8, l), 1)
-			plot(near, bx+1, 20, '|', greyBetween(4, 8, l), 1)
+			plot(near, bx, bandTop-2, '|', greyBetween(4, 8, l), 1)
+			plot(near, bx+1, bandTop-1, '|', greyBetween(4, 8, l), 1)
 		}
-		fill(c, owlX, 18, owlX+11, 18, term.RGB{R: 215, G: 175, B: 135})
-		owlAt(c, owlX, owlY)
+		fill(c, owlX, bandTop-3, owlX+11, bandTop-3, term.RGB{R: 215, G: 175, B: 135})
+		owlAt(c, owlX, owlY, meadowTop+1)
 	case 4:
 		// A fence from the right edge in weathered grey: two posts and two
 		// rails, the owl on the end post, the owlets standing on the top
 		// rail.
 		fence := greyBetween(9, 13, l)
 		for _, px := range []int{owlX + 4, owlX + 13} {
-			fill(c, px, 16, px+1, bandTop-1, fence)
+			fill(c, px, meadowTop, px+1, bandTop-1, fence)
 		}
-		fill(c, 50, 17, c.W-1, 17, fence)
-		fill(c, 50, 19, c.W-1, 19, fence)
-		owlAt(c, owlX, 10)
+		fill(c, owlX-14, meadowTop+1, c.W-1, meadowTop+1, fence)
+		fill(c, owlX-14, meadowTop+3, c.W-1, meadowTop+3, fence)
+		owlAt(c, owlX, 10, meadowTop+1)
 	default:
 		mound := make([]int, W2)
 		for u := 0; u < W2; u++ {
 			mound[u] = 999
-			if d := float64(u-138) / 16; d > -1 && d < 1 {
+			if d := float64(u-(2*owlX+10)) / 16; d > -1 && d < 1 {
 				mound[u] = 2*bandTop - int(math.Round(5*math.Sqrt(1-d*d)))
 				if math.Abs(d) < 0.78 {
-					mound[u] = 2 * (bandTop - 3) // row 18 whole, the feet on it
+					mound[u] = 2 * (bandTop - 3) // the flat top, the feet on it
 				}
 			}
 		}
 		paintRange(c, mound, greyBetween(5, 9, l), bandTop, nil)
-		owlAt(c, owlX, owlY)
+		if live == nil || !live.SkipOwl {
+			owlAt(c, owlX, owlY, meadowTop+1)
+		}
 	}
-	writeBand(c, bandTop, term.Lerp(grey(2), cube(95, 95, 0), l))
+	if live == nil || !live.SkipBand {
+		writeBand(c, bandTop, term.Lerp(grey(2), cube(95, 95, 0), l))
+	} else {
+		fill(c, 0, bandTop, c.W-1, c.H-1, lay.bandColor(l))
+	}
+}
+
+// bandColor is the writing's ground: the meadow's dark end.
+func (lay vistaLayout) bandColor(l float64) term.RGB {
+	return term.Lerp(grey(2), cube(95, 95, 0), l)
+}
+
+// vistaStars is the checklist in the vista's sky: one star per finished
+// todo, at a place fixed by its index and the seed so a star lights where it
+// always was, across the sky on a golden-ratio sequence (what the shore
+// learned in s27: index order piles the first few into one corner). The ink
+// is lifted toward white until it clears the sky by the shore's own bar, so
+// the count survives the day.
+func vistaStars(c *canvas.Canvas, lay vistaLayout, p scape.Palette, seed int64, n int) {
+	rows := lay.lakeTop - 6
+	if rows < 2 || c.W < 8 {
+		return
+	}
+	near := c.Near()
+	const phi = 0.6180339887
+	for i := 0; i < n && i < 64; i++ {
+		fx := math.Mod(float64(i)*phi+scape.HashF(i, 7, seed), 1)
+		x := 2 + int(fx*float64(c.W-4))
+		y := 1 + int(scape.HashF(i, 9, seed)*float64(rows-1))
+		// Keep off the moon's column.
+		if x >= lay.moonX-1 && x <= lay.moonX+3 {
+			x = (x + 5) % (c.W - 2)
+		}
+		ink := vistaStarInk(c, x, y, p.Star)
+		near.Plot(x, y, '*', ink, 1)
+	}
+}
+
+// vistaStarInk lifts a star's ink toward white in eight steps until it reads
+// 55 luma over its ground, the shore's todoStarContrast; the last rung wins
+// if none does.
+func vistaStarInk(c *canvas.Canvas, x, y int, star term.RGB) term.RGB {
+	ground := c.BGAt(x, y)
+	white := term.RGB{R: 255, G: 255, B: 255}
+	ink := star
+	for step := 0; step <= 8; step++ {
+		ink = term.Lerp(star, white, float64(step)/8)
+		seen := term.Profile256.Quantise(ink, true)
+		if luma(seen)-luma(term.Profile256.Quantise(ground, false)) >= 55 {
+			return ink
+		}
+	}
+	return ink
 }
