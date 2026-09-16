@@ -3280,3 +3280,6 @@ by it at the bottom, as the sand's edge cuts it on the beach.
 **HIS NOTE, verbatim, mid-build:** *"maybe it can have an ascii frame below same as this one [the hero
 window's bottom rule] to delineate that area, so the cropped closeup of the companion does not look weird"*
 ⇒ the legend's stage gets the window's bottom rule and nothing else: a floor the cut legs stand on.
+**HIS NOTE, verbatim:** *"ok, now move 'it needs you' to the far right so it doesnt stand out as the first
+option"* ⇒ tab order: it is working · something broke · it finished · it is waiting · it needs you; the
+page opens on "it is working".

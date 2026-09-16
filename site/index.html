@@ -3892,7 +3892,9 @@ $
     var cols = parseInt(el.getAttribute("data-cols"), 10);
     fit(el, cols); fitted.push([el, cols]);
   });
-  switcher(["needs","working","broke","done","quiet"], "st-tabs", "st-fx", "st-note");
+  // The ask LAST, his note of 2026-09-15: first, it stood out as the
+  // default rather than as one state of five. The page opens on working.
+  switcher(["working","broke","done","quiet","needs"], "st-tabs", "st-fx", "st-note");
   drawAllBoxes();
 
   function refit(){ ADV = null; fitted.forEach(function(f){ fit(f[0], f[1]); }); drawAllBoxes(); }
