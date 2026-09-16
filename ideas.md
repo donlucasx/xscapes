@@ -61,9 +61,11 @@ real question while waiting. Lucas: *"I think tracking total token usage is help
   scape, which is what the six slots are for.
 - **A level, never a speed.** His "grows while it works" is right and the rule agrees: the pond's LEVEL reads
   in a screenshot; a faster ripple does not.
-- **Cheap to source, unverified:** the moon's number comes from Claude Code's statusline payload
-  (`cmd.go`, `runStatusline`), and the same payload carries session totals (token counts and a cost figure).
-  Verify the field names on a real payload before building.
+- ~~**Cheap to source, unverified:** ... the same payload carries session totals~~ **WRONG, settled
+  2026-09-16 (s37) off the docs:** the payload's `total_*_tokens` are the WINDOW's tokens from the last
+  response; its only running total is `cost.total_cost_usd`. The spend is summed off the transcript
+  (`internal/spend`, every assistant line's usage, once per message id). **BUILT as the counter top-right
+  in every scape** (his ask of the same day); the pond as a fill stays carded.
 - **The design question:** a total with no ceiling has nothing to fill toward. Log scale, or fill once per
   unit and tip over. Decide before drawing.
 - **Taste question, his:** a cost meter inside a scene whose point is calm reads as anxiety, not progress.

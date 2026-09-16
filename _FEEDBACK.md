@@ -3714,3 +3714,134 @@ tests moved to `vista_live_test.go` and the five redone). *"push"* ⇒ `gh auth 
 && git push origin main`, origin/main = c06434b, read back with ls-remote. Then *"ok, lets test it first
 before anything else. lets /wrap"* ⇒ WRAPPED 2026-09-16 ~13:00 PDT; he restarts a scape to see the day's
 work live. Nothing published.
+
+## Session 37 (2026-09-16, afternoon) — after the restart: the one open card, then his notes on the vista live
+
+Opened on *"resume work on xscapes"*: HEAD = origin/main = e5da174, tree clean, build/vet/fmt green; this
+window's scape (pid 48928, started 13:13) holds the installed binary (stamp e593ef4, HEAD's code), the
+preference file says vista; the tyastie scape still holds the older binary. The three open items were
+listed back: his notes, publish, done's wings.
+
+**His ruling on the open card, verbatim:** *"3. small wings for both"*
+- Done's flap and bounce (D4) takes the working owl's small wings (kind 3) instead of the big ones
+  (kind 1) it was picked with. No picked motion needs the 14-column art any more; the owl's box is one
+  width in every state.
+- **Built test-first:** `TestThePickedOwlNeverGrows` (every state, its picked motion swept at 0.05 s over
+  its period; nothing painted outside the 12-column box plus the one-cell rim, compared against the same
+  owl drawn with only the motion's hop). It failed on done with the big wings and passes with the small;
+  the mutation (kind 1 put back on D4) turns it red. ⚠ First bound was the bare box and it failed on
+  WORKING: `plotRim` clears a ring one cell around the ink, so a small wing in the margin column puts the
+  rim one column outside the box. Pre-existing, and the ring is the point; the bound is the rim.
+- D4's `Wings: 1` → `3` in both spans (hop+wings, wings alone); the note and the comments say why. The
+  locked page's done caption carries the ruling and its open list is empty of the owl.
+- **Looked at** (headless Chrome, a contact sheet of the page's own frames): frames 36–39 of the done clip
+  show the hop with the small wings out on both sides, the working flutter's art exactly; in the vista
+  the flap holds under the done knock. Suite 12/12 + vet + fmt green. Installed as a new inode (stamp
+  e5da174, modified=true: the tree is dirty until his word).
+- The locked page, rebuilt: https://claude.ai/artifact/UHB96YTm8QHMsFViHmfq7v . ⚠ A NEW link: replacing the
+  s36 page at its URL needs its 2.7 MB read back line by line first, which buys nothing; the old link stays
+  as the s36 state with one stale open item.
+
+**A parallel session's audit of s36, relayed by message:** `OwlMotionPick[Working] = 8` is "long hop"
+(round 2); the ruling, *"looks, blink, flutter"* (the 0.7 / 0.6 / 0.2 s then flutter sequence the s36
+record describes), is index 7. Verified by counting the list in source order. So the live vista, and the
+locked page's working clip under its own caption, drew "long hop" since the pick landed (commit 4a8e1cf).
+- **Fixed test-first:** `TestThePicksAreByName` asserts all five picks and the owlets' by NAME (it failed
+  on working only; the other four and L6 were right). Working → 7. The locked page regenerated; its working
+  clip is the sequence now.
+
+**His note, verbatim, with four screenshots (120x30 · 133x44 · 131x52 · 121x71):** *"yes, ive also spotted an
+issue that happens when the session is run on a tiny terminal window, there seems to be a black square
+behind the owl, but as you resize the window bigger it adapts and gets fixed"*
+- **Reproduced on frame pages** at 120 columns from 11 to 18 rows (the scape's share of a 30-row window is
+  in that range): a treeline-grey rectangle the owl's box plus its rim wide (columns owlX−1..owlX+12), from
+  the owl's top row down to the lake. **Present in the frame WITHOUT the owl** (Update alone), so it is the
+  painter's. At 120x14 the owl's rows are 2..8 and the treeline's natural top at those columns is rows 5-6.
+- **The cause** (`forest.go`, the near ridge): *"Whole cells behind the owl's head: the treeline dips to a
+  flat top under it"* — `nearTop[u] = 2*owlY` across the span. At 80x24 the trees stand above the head and
+  that is a dip; at a short height the head sits above the trees and the same line RAISES the treeline to
+  it: a tower, hidden only when the box happens to sit inside the ridge (his taller windows).
+- **Fix, live only:** `nearTop[u] = max(nearTop[u], 2*owlY)`, a dip and never a raise, gated on `live != nil`
+  because the unconditional form moved the study clip's hash (the study has a small raise of its own under
+  the owl at 80x24; kept byte-identical). `TestTheTreelineIsNeverRaisedBehindTheOwl` reads the treeline's
+  top row per column of the box off the rendered frame at 10:10 against the same column with the owl
+  placed far away (the natural silhouette off the painter itself), ten geometries; red before, green after.
+- Looked at: the tiny sizes re-rendered, the owl against the sky and the far ranges at every height.
+  Suite 12/12 + vet + fmt. Reinstalled (new inode, dirty stamp).
+
+**His ask, verbatim:** *"great. Can you show me on a separate page all the stages/animations of the firepit?"*
+- Built as an env-gated page like the owl's: `XSCAPES_FIREPAGE=<file> go test -run TestFirePage .`
+  (`firepage_test.go`). Read off `forest.go` first: in the shipped vista the fire is FIXED by his 09-14
+  ruling (the wind is the work, the fire the night's light), so it has no stages of its own; what moves is
+  the flicker (the pattern clock is 6 frames a second, the flames close on 24 = 4 s, the smoke on 12), the
+  lean with the level (flames 2.6 cells at the tip, smoke 0.2 + 1.3 cells a row), the firelight with the
+  dark (live: from StarVis 0.5 to 0.8, radius 7, toward 135,95,0) and the wind's debris. Sparks and the
+  fire's height belong only to the passed-over "fire is the work" variant.
+- Five sections, each with its own player: the wind at five levels side by side by night · the light from
+  17:00 to 23:00 by quarter hours with the painted fraction in the label · every one of the 24 flicker
+  frames as stills · the whole frame by night with two owlets · the passed-over variant at three levels,
+  labelled as the record only. Two crop rounds looked at (the first carried too much sky and wrapped).
+  Page: https://claude.ai/artifact/SsWPgPr9szhkjs18sZLxMf
+
+**His ask, verbatim, after the campfire page:** *"can we make it so how hard its working is represented by the
+wind + fire (both)?"*
+- Overrides the 09-14 pick (A, the wind alone) for the LIVE vista; the study's two clips stay as drawn. The
+  cost the 09-14 note named, "the fire is also the light, so a busy agent brightens the meadow", is kept
+  out on purpose: the fire's height, sparks and smoke thickness follow the level, the firelight's reach
+  does not (light is the world's channel).
+- **Built test-first:** `TestTheFireIsTheWorkToo` (live at 22:00, level 0 vs 1: more flame cells and more
+  sparks at full stretch; the ground of every cell above the band identical at both levels). Red before:
+  flames 7 → 7, sparks 0 → 0. Green after: **flames 4 → 21, sparks 0 → 7, the ground unchanged.**
+- `forest.go`: two locals, `wind := !fireIsWork` and `fire := fireIsWork || live.FireWork`; the height,
+  sparks and smoke density follow `fire`, the lean, the flat scrub and the debris follow `wind`; the
+  firelight's radius follows only the study's fire-only variant. `vistaLive.FireWork`, set by the live
+  Update. Both study clips byte-identical (the guard holds). The campfire page rewritten for it: the five
+  levels side by side, and a stills section of the five stages replaces the "not shipped" one.
+
+**His note, verbatim, mid-turn:** *"can we polish the 'logs' underneath the firepit too"*
+- Today's fuel is five `=` cells in olive (95,95,0), the grass's own colour. Six styles drawn as
+  candidates (`scenes.LogStyles`, `LogPick`, `paintLogs` in `forest.go`; the live vista draws the pick, the
+  study painter never does, so the clip's hash holds): L0 today · L1 one log `(=====)` with pale cut ends
+  and a bark body · L2 two logs stacked, the lower wider and darker · L3 the one log with an ember-orange
+  middle · L4 a stone at each end (the rim edge-on) · L5 the log with a row of five stones on the row
+  below (kept only while that row is meadow). On the campfire page as the last section, each at rest by
+  night, at full stretch by night and at noon working at half; looked at. **Waiting on his number.**
+- **His pick, verbatim:** *"lets try L5"* ⇒ `LogPick = 5` (the log with five stones on the row below).
+  ⚠ The composition guard (`TestTheVistaComposesEveryStateAtEveryWidth`) flagged the stones: an `o` above the
+  band reads as the writing leaking. The stones are named in it now (an `o` within 4 columns of the fire on
+  any row is the firepit); the leak check stands everywhere else. Suite green, page rebuilt, reinstalled.
+
+**His ask, verbatim:** *"can we add the token spent counter? Maybe it can be a simple number on the top right
+of the xscape? should we do it xxxx/1M? can xscapes automatically detect the max context window?"*
+- Sourced before answering: the statusline payload (already the moon's source, `cmd.go`) carries
+  `context_window.total_input_tokens`, `total_output_tokens` and `context_window_size` (verified in
+  `notes/claude-hooks-verified.md`); the window size is parsed today and unused. So: yes to the counter, yes
+  the window is detected, and NO to "/1M": the spend is a running total across compactions (a 200k-window
+  session spends millions), so a window as its denominator would read as a budget it is not. The window's
+  fill is the moon's channel already (the readout says "NN% left").
+- ⚠ **The premise above was half wrong, and the doc settled it** (code.claude.com/docs/en/statusline, read
+  2026-09-16): `total_input_tokens` / `total_output_tokens` are *"tokens currently in the context window,
+  from the most recent API response"* (input incl. cache reads and writes; output from that one response),
+  NOT session totals. The moon's variable in another coat. The payload's only running total is
+  `cost.total_cost_usd`. The ideas.md card's "the same payload carries session totals" was wrong.
+- **The source is the transcript** (`internal/spend`): every assistant line carries the API's usage; a
+  streamed message is written once per content block with the same usage (6 times, measured), so a response
+  counts once per (message id, request id); subagents' transcripts under `<session>/subagents/**` count too
+  (their own ids). All four fields count. **This session's own transcript: 22.77M tokens over 79 responses,
+  cache reads 97% of it** (an independent python count agreed), which is why "/1M" would mislead.
+- **Built:** `Event.Transcript` (from the hook payload's `transcript_path`) → `reduce.State.Transcript` →
+  the frame loop polls `spend.Tally` every 2 s (bytes past the last offset only) and fills `Act.Tokens`;
+  the statusline event carries only the WINDOW now (`context_window_size`, for later). `drawTokens` in the
+  composer, both scapes: top-right, row 1, one cell in, the balloon's darkened ground, the readout's dim ink;
+  "23M tokens" from 60 columns, the bare number from 40, nothing under the shore's floor. `scape.TokensGround`
+  keeps placed stars off it: the shore RE-THROWS only the darts that land there (every other star stays put:
+  the golden constellation holds), the vista moves such a star one row down.
+- **Measured before choosing:** blocking the corner for the falling star cost his flight floors (88.6 → 84.3%
+  overall); over the arrival sweep 2,232 of 26,694 flights (8.4%) cross the counter's cells on row 1, 1,314
+  (4.9%) on row 0. So the label YIELDS a cell to a star on it (≤ 2 frames of a swapped letter) and no
+  guarantee moves. The star-touch sweep at 30x8 went 54 → 56 with even four cells reserved: hence the floor.
+- Tests: `TestFormatTokens` (≤ 4 chars at every magnitude; 999,999 is "1.0M"), `TestNoPlacedStarSitsUnderTheSpendCounter`,
+  `TestNoVistaStarSitsUnderTheSpendCounter`, `TestTheSpendCounterSitsTopRightInEveryScape` (both scapes,
+  four sizes, four hours, ≥ 100 luma; hidden under the vista's floor where the owl's box holds the corner),
+  `TestTheTallyCountsEachResponseOnce`, `TestTheStatuslineCarriesTheWindow`. Looked at: both scapes at
+  125x28 / 80x24 / 60x20, night and noon, "23M tokens" in the corner.

@@ -71,7 +71,34 @@ wrap his window's scape (pid 19222) and the tyastie one still held OLD inodes; t
 `e593ef4`'s code (the two commits after it are docs). Take his notes.
 **1. His word on: publish** (the site
 would need `go run . -site site && sh site/publish.sh`; its vista clip is the study's and would stay so).
-**2. The one open card:** done's wings. D4 was picked with the big wings; working's are the small ones.
+**2. ~~The one open card: done's wings.~~ RULED 2026-09-16 afternoon (session 37): *"small wings for both"*;
+D4 beats the small wings, `TestThePickedOwlNeverGrows` holds the box, the locked page is republished at
+https://claude.ai/artifact/UHB96YTm8QHMsFViHmfq7v (the old link could not be replaced without reading its
+2.7 MB back; it stays as the s36 state). Built, looked at, installed (dirty stamp); NOT committed.**
+**2b. FIXED s37: a parallel session's audit found the Working pick off by one** (`OwlMotionPick[Working] = 8`
+is "long hop"; the ruling "looks, blink, flutter" is index 7; verified by counting). Working → 7;
+`TestThePicksAreByName` holds all five picks and the owlets' by name. The live vista had drawn "long hop"
+while working since the pick landed. Uncommitted.
+**2c. FIXED s37: his black square behind the owl on a tiny window** (four screenshots, 120x30 up). The near
+treeline's top was SET to the owl's head row across the box (a dip at 80x24, a tower at a short height).
+Live: `max(natural, head)`, never a raise; study untouched (its hash moved otherwise).
+`TestTheTreelineIsNeverRaisedBehindTheOwl` reads the frame. Uncommitted, installed (dirty stamp).
+**2d. The campfire page, his ask (s37):** https://claude.ai/artifact/SsWPgPr9szhkjs18sZLxMf , `XSCAPES_FIREPAGE=<file>
+go test -run TestFirePage .` (`firepage_test.go`, uncommitted). The fire is fixed by ruling; the page shows
+the flicker, the lean, the light with the dark, the smoke, the frame, and the passed-over variant.
+**2e. HIS WORD on it: *"the wind + fire (both)"*, BUILT s37:** live, the fire's height (2 → 6 rows), sparks and
+smoke density follow the level with the wind; the firelight's reach does not (light is the world's).
+`TestTheFireIsTheWorkToo` (flames 4 → 21, sparks 0 → 7, ground unchanged); both study clips byte-identical.
+The campfire page is rewritten for it (same link). Uncommitted.
+**2f. THE LOGS, his note (*"polish the 'logs' underneath the firepit too"*): six styles on the campfire page's
+last section (`scenes.LogStyles`, live-only). **HIS PICK: *"lets try L5"*** ⇒ `LogPick = 5`, the log with five
+stones on the row below; the composition guard names the stones (an `o` within 4 of the fire's column is
+the firepit, not the writing). Page rebuilt, reinstalled. Uncommitted.
+**2g. THE SPEND COUNTER, his ask (*"can we add the token spent counter? ... top right ... xxxx/1M? ... detect
+the max context window?"*), BUILT s37:** a number top-right in both scapes, summed off the TRANSCRIPT
+(`internal/spend`; the statusline's "totals" are the window's, per its docs), no denominator, the window
+detected and parked. Stars keep off it (re-thrown darts, the shore; a row down, the vista); a falling
+star shows through it. Verbatim and every measurement in `_FEEDBACK.md` §s37. Uncommitted.
 **3. Verbatim rulings and every measurement:** `_FEEDBACK.md` §Session 36 (thirteen notes).
 **4. Instruments this session, all env-gated page generators:** `XSCAPES_OWLSHEET`, `XSCAPES_OWLROUND`,
 `XSCAPES_OWLLOCKED`, `XSCAPES_MOONLIFE`, `XSCAPES_SUNSTUDY`, `XSCAPES_TONES` (`go test -run Test<Name> .`).
