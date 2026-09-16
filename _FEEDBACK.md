@@ -3287,3 +3287,8 @@ page opens on "it is working".
 the 'Cozy ASCII scenes...' should sum up entirely what xscapes is and what it solves, in a very elocuent
 sinopsis. Should outline its purpose, medium and features"* ⇒ the claim ("Every character below is a fact
 about the agent...") becomes a synopsis: purpose, medium, features, in that order.
+**HIS NOTES, verbatim (screenshot of The problem: the lead paragraph and the synopsis under the headline):**
+*"feels too long, and also why is that text a different format than the paragraph/body above it? do a
+thorough audit of how we are using fonts? its not BAD but im not sure I understand your formatting
+criteria. ---- indentify any other opportunities to synthesize the info on the site. -- do we need to
+include a link to the repository? if so, can we do it in some sort of ASCII fashion"*

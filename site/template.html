@@ -15,7 +15,14 @@
 /* the reading measure: one width for every run of text (Bringhurst 45-75
    characters, 66 the classic ideal; monospace reads best toward the short
    end). Rules and windows span the layout column, 94ch; text does not. */
---measure:66ch}
+--measure:66ch;
+/* THREE SIZES FOR TEXT, EACH WITH ONE JOB (his audit, 2026-09-15: running
+   text had four sizes and two paragraph styles side by side, and no stated
+   criterion). Deck: once, the synopsis under the headline. Body: every
+   other run of text, in --dd. Meta: what annotates a thing rather than
+   says it -- captions, commands, tabs, the footer -- in --d. Titles are
+   bold caps at two sizes (section 14, kicker 11) and are labels, not text. */
+--deck:17px;--body:15px;--meta:13px}
 *{box-sizing:border-box}
 html{scroll-behavior:smooth}
 html,body{margin:0;padding:0;background:var(--g);color:var(--i)}
@@ -28,7 +35,7 @@ body{overflow-x:hidden}
    tabular so a number cannot change a column, and JetBrains Mono is here
    because it keeps box-drawing joined at line heights above 110%, where most
    monospace faces come apart. */
-body{font-family:var(--mono);font-size:15px;line-height:var(--lh);
+body{font-family:var(--mono);font-size:var(--body);line-height:var(--lh);
   font-variant-numeric:tabular-nums lining-nums;-webkit-font-smoothing:antialiased}
 a{color:var(--acc);text-decoration:none;border-bottom:1px solid rgba(135,175,255,.35)}
 a:hover{border-bottom-color:var(--acc)}
@@ -97,7 +104,8 @@ h1{font-weight:700;font-size:clamp(23px,3.4vw,38px);line-height:1.22;letter-spac
 @keyframes bl{50%{opacity:0}}
 h2{font-size:15px;font-weight:700;letter-spacing:.11em;text-transform:uppercase;margin:0;white-space:nowrap}
 h3{font-size:14px;font-weight:700;margin:0 0 4px}
-.sub{color:var(--dd);font-size:clamp(14px,1.7vw,17px);margin:0 0 26px;max-width:var(--measure)}
+.sub{color:var(--dd);font-size:var(--body);margin:0 0 var(--lh);max-width:var(--measure)}
+.lead{color:var(--dd);font-size:var(--deck);margin:0 0 var(--lh);max-width:var(--measure)}
 .note{color:var(--d);font-size:13.5px}
 
 /* section headers as a prompt line, which is the page's one terminal ritual */
@@ -121,7 +129,7 @@ h3{font-size:14px;font-weight:700;margin:0 0 4px}
 .boxtop b{color:var(--i);font-weight:500}
 .boxtop i{color:var(--d);font-style:normal}
 .stage{overflow-x:auto;overflow-y:hidden;background:#000}
-.claim{color:var(--dd);border-left:2px solid var(--warm);padding-left:2ch;margin:0 0 var(--lh);max-width:var(--measure)}
+.claim{color:var(--dd);font-size:var(--body);margin:0 0 var(--lh);max-width:var(--measure)}
 /* Every row's descenders spill into the row below, where the next row's own
    background covers them. The LAST row has nothing below it, so without this
    the container cuts it. */
@@ -134,17 +142,17 @@ h3{font-size:14px;font-weight:700;margin:0 0 4px}
    the frames were authored and measured against. */
 .fx pre{margin:0;font-family:Menlo,"SF Mono","DejaVu Sans Mono",ui-monospace,monospace;line-height:1;letter-spacing:0;white-space:pre;display:block;font-size:inherit!important}
 .fx{font-size:10px}
-.cap{color:var(--d);font-size:13px;margin:12px 0 0;max-width:var(--measure)}
+.cap{color:var(--d);font-size:var(--meta);margin:12px 0 0;max-width:var(--measure)}
 
 /* the state switcher: one scene, five moments, because an encoding is learned
    by comparison and nine separate clips cannot make one */
 .tabs{display:flex;gap:7px;flex-wrap:wrap;margin:0 0 14px}
-.tab{font:inherit;font-size:12.5px;color:var(--dd);background:var(--s);border:1px solid var(--ln);
+.tab{font:inherit;font-size:var(--meta);color:var(--dd);background:var(--s);border:1px solid var(--ln);
   border-radius:5px;padding:6px 12px;cursor:pointer;white-space:nowrap}
 .tab:hover{border-color:var(--acc);color:var(--i)}
 .tab[aria-selected="true"]{background:var(--acc);border-color:var(--acc);color:#0d0d0d;font-weight:700}
 .tab:focus-visible{outline:2px solid var(--acc);outline-offset:2px}
-.reads{margin:13px 0 0;color:var(--dd);font-size:14px;max-width:var(--measure);min-height:3em}
+.reads{margin:13px 0 0;color:var(--dd);font-size:var(--body);max-width:var(--measure);min-height:3em}
 
 .grid2{display:grid;grid-template-columns:repeat(auto-fit,minmax(320px,1fr));gap:22px}
 .cast{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:14px}
@@ -160,7 +168,12 @@ h3{font-size:14px;font-weight:700;margin:0 0 4px}
 .cast .cap{text-align:center;margin-top:4px}
 .cast+.cmd{margin-top:var(--lh)}
 .cast+.cmd+.wide{margin-top:calc(var(--lh)*1.5)}
-.cmd{font-size:13px;background:var(--s);border:1px solid var(--ln);border-radius:2px;padding:calc(var(--lh)*.5) 2ch;margin:var(--lh) 0 0;overflow-x:auto;white-space:pre;line-height:1.75;color:var(--dd)}
+/* the repository, in the page's own furniture: a drawn box that inverts
+   when you point at it, like the mark. */
+.boxlink{display:inline-block;margin:var(--lh) 0 0;font-size:var(--meta);line-height:1.15;color:var(--dd);border:0;white-space:pre}
+.boxlink span{display:block}
+.boxlink:hover{color:var(--g);background:var(--i);border:0}
+.cmd{font-size:var(--meta);background:var(--s);border:1px solid var(--ln);border-radius:2px;padding:calc(var(--lh)*.5) 2ch;margin:var(--lh) 0 0;overflow-x:auto;white-space:pre;line-height:1.75;color:var(--dd)}
 .cmd .c{color:var(--d)}
 .cmd .pr{color:var(--warm)}
 ul.feats{list-style:none;padding:0;margin:22px 0 0;display:grid;gap:11px;max-width:var(--measure)}
@@ -168,13 +181,13 @@ ul.feats li small{display:block;font-size:11px;font-weight:700;letter-spacing:.1
 ul.feats.grid{max-width:none;grid-template-columns:repeat(2,minmax(0,1fr));gap:calc(var(--lh)*1.2) 4ch}
 ul.feats.grid li.span{grid-column:1/-1;max-width:var(--measure)}
 @media (max-width:720px){ul.feats.grid{grid-template-columns:1fr}}
-ul.feats li{padding-left:26px;position:relative;color:var(--dd);font-size:14px}
+ul.feats li{padding-left:26px;position:relative;color:var(--dd);font-size:var(--body)}
 /* The marker is the brand's own cell -- a block cursor in reverse video --
    rather than a bullet glyph borrowed from a word processor. */
 ul.feats li::before{content:"\00A0";position:absolute;left:0;top:.28em;width:1ch;height:1.05em;background:var(--warm)}
 ul.feats b{color:var(--i)}
 .clip img{display:block;width:100%;height:auto;border:1px solid var(--ln);border-radius:6px}
-.foot{margin-top:70px;color:var(--d);font-size:13px;border-top:1px solid var(--ln);padding-top:18px}
+.foot{margin-top:70px;color:var(--d);font-size:var(--meta);border-top:1px solid var(--ln);padding-top:18px}
 /* THE PROBLEM: Claude Code's own idle screen, redrawn in the page's face. It is
    the one frame on the page that is not the renderer, and the empty rows are
    the point: this is everything the terminal tells you while it works. */
@@ -184,7 +197,7 @@ ul.feats b{color:var(--i)}
 .wait .pr{color:var(--warm)}
 .after{margin-top:var(--lh)}
 ul.feats.lead{margin-top:0;gap:var(--lh)}
-ul.feats.lead li{font-size:15px}
+ul.feats.lead li{font-size:var(--body)}
 .grid2+.grid2,.grid2+.wide,.wide+.grid2{margin-top:calc(var(--lh)*1.5)}
 .sub.wide{max-width:var(--measure)}
 {{fxcss}}
@@ -224,7 +237,7 @@ ul.feats.lead li{font-size:15px}
 <section id="top">
 <h1>Cozy ASCII scenes that react to your agent while it works<span class="cur"></span></h1>
 
-<p class="claim">xscapes makes waiting on an AI agent something you can read from across the room. It is a small living scene drawn in text, in the same terminal window as the agent and under its transcript, and every part of it is a fact about what the agent is doing: the sea rises with the work, the sand keeps its last few actions, the moon shows how much context is left, and a companion animal raises a balloon and a sound when it needs you, and tells you when it is done. It wires into Claude Code through its own hooks and hosts anything else that runs in a terminal.</p>
+<p class="lead">A small living scene, drawn in text under your agent's transcript, that makes the wait readable from across the room. The sea rises with the work, the moon shows the context left, and a companion animal knocks when it needs you or is done. Claude Code out of the box; any other terminal agent with one command.</p>
 
 <div class="win" data-title="xscapes claude" data-right="a whole session, sped up"><div class="boxtop" aria-hidden="true"></div>
   <div class="stage" aria-hidden="true"><div class="fx" id="hero-fx"></div></div>
@@ -249,7 +262,7 @@ ul.feats.lead li{font-size:15px}
 
 <div class="sec" data-title="Companion states"><div class="boxtop" aria-hidden="true"></div></div>
 <section>
-<p class="sub">The companion on its own, in its five states. Press one. This is everything the animal itself says; the sea, the sand and the moon carry the rest, and between them you never have to read the screen.</p>
+<p class="sub">The companion on its own, in its five states. Press one.</p>
 <div class="tabs" role="tablist" id="st-tabs"></div>
 <div class="win floor"><div class="stage port" aria-hidden="true"><div class="fx st-fx" id="st-fx"></div></div><div class="boxbot" aria-hidden="true"></div></div>
 <p class="reads" id="st-note"></p>
@@ -258,18 +271,19 @@ ul.feats.lead li{font-size:15px}
 <div class="sec" data-title="Install"><div class="boxtop" aria-hidden="true"></div></div>
 <section>
 <div class="bgfx term" aria-hidden="true">{{bg:get}}</div>
-<p class="sub wide">Three commands. No app, no tab, no account, no tmux. It runs in the same window as the agent, which is the point: you never look away from the work to see the work.</p>
+<p class="sub wide">Three commands, no app, no tab, no tmux. It runs in the same window as the agent, so you never look away from the work to see the work.</p>
 <div class="cmd" data-title="install"><span class="pr">$</span> go install github.com/donlucasx/xscapes@latest
 <span class="pr">$</span> xscapes install claude --apply   <span class="c"># writes its hooks, after a backup</span>
 <span class="pr">$</span> xscapes claude                   <span class="c"># the agent on top, the scape underneath</span>
 <span class="pr">$</span> xscapes inside &lt;any command&gt;      <span class="c"># anything else, hosted the same way</span></div>
+<a class="boxlink" href="https://github.com/donlucasx/xscapes"><span aria-hidden="true">┌───────────────────────────────┐</span><span>│  github.com/donlucasx/xscapes  │</span><span aria-hidden="true">└───────────────────────────────┘</span></a>
 </section>
 
 <div class="sec" data-title="Scapes and companions"><div class="boxtop" aria-hidden="true"></div></div>
 <section>
 <div class="bgfx rain" aria-hidden="true">{{bg:layer}}</div>
-<p class="sub wide">The shoreline is the first scape, not the product. Underneath it is a small event protocol &mdash; session, prompt, tool, error, needs input, done, compact &mdash; and a thin adapter for each agent: Claude Code arrives wired through its own hooks, and anything else that runs in a terminal is hosted the same way. Any landscape that provides six things carries all of it unchanged: a light, a sky, something that moves with the work, a surface, somewhere the work piles up, and someone living in it. The shoreline is what ships today; the three below are drawn and next.</p>
-<p class="sub wide">Four companions so far, each drawn for its scape. Hero the crab ships as the default; the cat came first and is one command away, and a running scape picks the change up on its next frame. The owl and the frog come with the vista and the aquarium.</p>
+<p class="sub wide">The shoreline is the first scape, not the product. Underneath is a small event protocol and a thin adapter for each agent, and any landscape with a light, a sky, something that moves with the work, a surface, somewhere the work piles up and someone living in it carries all of it unchanged. The shoreline ships today; the three below are drawn and next.</p>
+<p class="sub wide">Four companions so far, each drawn for its scape. Two ship; a running scape picks a swap up on its next frame.</p>
 <div class="cast">
 <div><div class="stage port" aria-hidden="true"><div class="fx" data-clip="cast-crab"></div></div><p class="cap"><b>Hero the crab.</b> Ships as the default.</p></div>
 <div><div class="stage port" aria-hidden="true"><div class="fx" data-clip="cast-cat"></div></div><p class="cap"><b>The cat.</b> Came first. One command away.</p></div>
@@ -282,13 +296,12 @@ ul.feats.lead li{font-size:15px}
 <div><div class="win" data-title="the rainy window &middot; with the cat"><div class="boxtop" aria-hidden="true"></div><div class="stage" aria-hidden="true"><div class="fx" data-clip="rain"></div></div><div class="boxbot" aria-hidden="true"></div></div><p class="cap"><b>The rainy window, with the cat.</b> Rain on the glass is the work: watch it come down harder as the agent gets busy, then ease. The city behind it carries the hour.</p></div>
 <div><div class="win" data-title="the aquarium &middot; with the frog"><div class="boxtop" aria-hidden="true"></div><div class="stage" aria-hidden="true"><div class="fx" data-clip="aquarium"></div></div><div class="boxbot" aria-hidden="true"></div></div><p class="cap"><b>The aquarium, with the frog.</b> More fish come out as the work picks up, the tank's lamp is the light, and the gravel is where it settles.</p></div>
 </div>
-<p class="claim after">One rule holds it together: activity, subagents, finished work and context left each own their own part of the picture, and nothing shares a channel. That is why a glance is enough.</p>
 </section>
 
 <div class="sec" data-title="Different every session"><div class="boxtop" aria-hidden="true"></div></div>
 <section>
 <div class="bgfx star" aria-hidden="true">{{bg:month}}</div>
-<p class="sub wide">It is not a loop. The sea is your agent's work and the sand is its last few actions, so no two sessions draw the same picture, and the sky runs on your clock. It asks nothing of you: no keys, no score, nothing to feed. And the agent's own output reaches your terminal byte for byte, so it can never get in the way of the work it is drawing.</p>
+<p class="sub wide">It is not a loop. The sea is your agent's work, the sand is its last few actions and the sky is your clock, so no two sessions draw the same picture. It asks nothing of you, and the agent's own output reaches your terminal byte for byte, so it can never get in the way of the work it is drawing.</p>
 </section>
 
 <p class="foot">Every scene on this page is the real renderer folding the events a Claude Code session emits &mdash; text, not video, drawn by the same code that runs in your terminal. Nothing is posed. <a href="https://github.com/donlucasx/xscapes">github.com/donlucasx/xscapes</a> &middot; MIT</p>
