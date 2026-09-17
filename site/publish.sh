@@ -14,8 +14,11 @@ stage=$(mktemp -d)
 trap 'rm -rf "$stage"' EXIT
 # The page is ONE file now. Every animation is embedded as text rather than
 # screenshotted into a GIF, so there is nothing beside it to copy: 5.1MB of
-# clips became 355KB of markup, and anim/ is build scratch.
-cp site/index.html "$stage/"
+# clips became 355KB of markup, and anim/ is build scratch. The one thing
+# that travels with it is the share card, og.png, which the page's Open
+# Graph tags point at by absolute URL (a card scraper needs an image URL,
+# and the Commons proxy serves only the page).
+cp site/index.html site/og.png "$stage/"
 touch "$stage/.nojekyll"
 git -C "$stage" init -q -b gh-pages
 git -C "$stage" add -A

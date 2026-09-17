@@ -4098,3 +4098,9 @@ binary and the tyastie one an older one: **a restart is what shows the afternoon
 - *"very last line should read '...inside his xscape'. Add at the very bottom, centered, the xscapes logo (just the X
   with the cursor blinking)"* ⇒ the line reads "Built by donlucas, from inside his xscape."; under it, centred, the
   block-x alone at 34px in the lockup's face, blinking on the cursor's 1.15 s (none under reduced motion). Published.
+- *"any way we can have the https://xscapes.vibe.commonsmade.com/ link embed a thumbnail when shared? possibly of the
+  mountainscape"* ⇒ Open Graph + Twitter card tags in the page's head (the entry proxies the page byte for byte, so
+  they reach it); the image is the LIVE vista at dusk with the owl, two owlets, three stars and the band, rendered by
+  the real renderer at 80x25 cells / 25px to exactly 1200x630 (`ogimage_test.go`, `XSCAPES_OGPAGE=`, headless Chrome)
+  and shipped as `site/og.png` beside the page on gh-pages (publish.sh copies it), pointed at by absolute URL because
+  the Worker answers only the root. Published; the card's image verified fetchable from outside.
