@@ -31,3 +31,6 @@ site/anim/*.png
 # `go run ./notes/charstudy/crab`. Same rule as /assets/frames/*.html above:
 # the GENERATOR is the record, the render is not.
 /notes/charstudy/*.html
+
+# release binaries, built by site/release.sh and uploaded to GitHub; never committed
+/dist

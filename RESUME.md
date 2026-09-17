@@ -3,6 +3,24 @@
 **Copy-paste this prompt into a fresh session:**
 
 ```
+Session 40 (2026-09-17 afternoon), OPEN, waiting on his word. THE FIRST
+OUTSIDE INSTALL FAILED: his friend followed the page, `go install` put the
+binary in ~/go/bin, which no Mac has on PATH (measured: /etc/paths,
+/etc/paths.d, a bare login shell), and the site never said Go was needed
+either. OURS. BUILT, test-first, NOT committed, NOT live: ONE install line,
+`curl -fsSL https://donlucasx.github.io/xscapes/install.sh | sh`
+(site/install.sh: the release binary into ~/.local/bin, one rc line if
+needed, next commands printed with a path that works in the same window;
+go-install fallback; no-Go refusal), installsh_test.go (the real script,
+the real binary, a local server, both mutations red), site/release.sh
+(four cross-compiled binaries from a clean tagged tree → GitHub release,
+-n = build only), publish.sh ships install.sh, page + README rewritten,
+site rebuilt (diff vs live = the two lines), suite 13/13 green. @latest is
+v0.4.1, 35 behind, shore default, no release binaries yet. TO GO LIVE, in
+order: commit · tag v0.4.2 · sh site/release.sh v0.4.2 · gh auth switch
+--user donlucasx && git push origin main · sh site/publish.sh. Details:
+_FEEDBACK.md §Session 40. Then the s39 NEXT list below.
+
 Session 39 (2026-09-16 night into 09-17 afternoon), WRAPPED 15:30 PDT at
 his word, 90 minutes before the Commons deadline (Sep 17 23:59 UTC). HEAD
 == origin/main == f643ac9, tree clean, the live page == the build on both

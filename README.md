@@ -24,15 +24,24 @@ agent in its own tmux pane, the scape in the next one.
 
 ## Install
 
+One command, on a Mac or Linux, with or without Go:
+
 ```sh
-go install github.com/donlucasx/xscapes@latest
+curl -fsSL https://donlucasx.github.io/xscapes/install.sh | sh
 
 xscapes install claude          # prints a plan, writes nothing
 xscapes install claude --apply  # writes the hooks, after a backup
 ```
 
-That puts the binary in `$(go env GOPATH)/bin`. If that is not on your PATH,
-send it somewhere that is:
+The script puts the release binary in `~/.local/bin`. If that directory is
+not on your PATH it adds one line to your shell's rc file for every new
+terminal, and prints the next commands with a path that works in the
+current one. It is short; read it first if you like:
+[site/install.sh](site/install.sh).
+
+With Go you can build it yourself instead. `go install` on its own puts the
+binary in `~/go/bin`, which is on no Mac's PATH by default, so send it
+somewhere that is:
 
 ```sh
 GOBIN=~/.local/bin go install github.com/donlucasx/xscapes@latest

@@ -4108,3 +4108,41 @@ binary and the tyastie one an older one: **a restart is what shows the afternoon
   build; installed binary `76dbfb3` (the product's code has not moved since); everything of the day live on both
   addresses. Open, his: the app's description in the builder's Publish panel (the entry has no field of its own; the
   Chrome extension dropped before the panel was read); F1; the README; v0.4.2.
+
+## Session 40 — 2026-09-17 afternoon: the first outside install failed
+
+- *"resume work on xscapes. Sent this to my friend for testing, says he cannot install xscapes using the provided
+  command [screenshot of the thread, 15:37] is there an issue? or human error?"* The friend's terminal, verbatim:
+  `cd desktop/vibe` · `xscapes install claude --apply` · `zsh: command not found: xscapes`; his texts: *"Won't even
+  call to claude"* · *"Won't even let me install for claude"* · *"The prefix xscapes command doesn't work at all with
+  zsh"*.
+  ⇒ **OURS, measured.** `go install` drops the binary in `~/go/bin`, which is on no Mac's PATH by default (`/etc/paths`
+  and every file in `/etc/paths.d` checked; a bare login shell has neither `~/go/bin` nor `~/.local/bin`), and prints
+  one download line and nothing about where the binary went (the site's exact command run into a scratch GOBIN:
+  v0.4.1, exit 0). The site's block never said Go was required either. This machine never sees it because `.zshrc`
+  line 1 adds `~/.local/bin` and the install here is `GOBIN=~/.local/bin`. Whether the friend had Go at all is
+  unknown (his screenshot starts at a fresh login); both routes end in the same line. Also found: `@latest` is v0.4.1,
+  **35 commits behind**, with the SHORE as default and no spend counter, while the page says the vista ships default;
+  and there are NO release binaries.
+- *"can we fix it on our end so he doesnt have to do anything but simply re install it?"*
+  ⇒ **BUILT, test-first, NOT committed and NOT live: one install line, `curl -fsSL
+  https://donlucasx.github.io/xscapes/install.sh | sh`** (the shape of Claude Code's own installer, which the
+  friend has already run). `site/install.sh` downloads the release binary for the OS and chip into `~/.local/bin`
+  (Claude Code's own directory, so often on PATH already); if that directory is not on PATH it appends ONE line to
+  the shell's rc (zsh `.zshrc`; bash `.bash_profile` on a Mac because Terminal opens login shells, `.bashrc` on
+  Linux; fish `config.fish`), once, and prints the next commands with `~/.local/bin/` in front so they work in the
+  SAME window (a child process cannot change its parent's PATH; that is the one thing he still has to do: use the
+  printed line or open a new terminal). No binary for the platform → `GOBIN=~/.local/bin go install` if Go exists;
+  no Go → says `brew install go` and stops, with curl's own reason in the message. A rename into place, never a
+  copy over a running binary. `installsh_test.go` runs the real script under `/bin/sh` against a local server
+  serving the real binary: the download path, the rc line once across two runs, the full-path next step,
+  already-on-PATH (no rc edit, bare commands), bash's rc, the go fallback (a stub `go` records GOBIN and args), and
+  the no-Go refusal; both mutations tried turned it red. `site/release.sh [-n] vX.Y.Z` cross-compiles
+  darwin/linux × arm64/amd64 with cgo off (all four verified to build) from a CLEAN tree at the tag, refuses
+  otherwise, pushes the tag and creates the GitHub release (`gh auth switch --user donlucasx` inside, `--verify-tag`);
+  `dist/` ignored. `publish.sh` ships `install.sh` beside the page. Page and README rewritten (the go path kept as
+  the with-Go alternative, with the `~/go/bin` warning). Site rebuilt: the diff against the live page is exactly the
+  two intended lines; looked at on desktop and phone (the block scrolls sideways on a phone, the page's existing
+  rule). Suite 13/13 + vet + gofmt green. **TO GO LIVE, in this order: commit · tag v0.4.2 · `sh site/release.sh
+  v0.4.2` · `gh auth switch --user donlucasx && git push origin main` · `sh site/publish.sh`.** The release must
+  exist before the page, or the live script falls back to `go install`.
