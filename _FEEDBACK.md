@@ -4095,3 +4095,6 @@ binary and the tyastie one an older one: **a restart is what shows the afternoon
   animation when the user clicks on it"* ⇒ gap 4 lines (99px measured, was 37) · 9px cells (was 11) · THE PRESS: two
   thumps (`beat` .8 s to 1.32), the glow flares to 16px, and twelve sparks (♥ + ·, four of them bigger) fly 38-72px
   out from the centre and fade over .9 s, removed on animationend; none under reduced motion. Published.
+- *"very last line should read '...inside his xscape'. Add at the very bottom, centered, the xscapes logo (just the X
+  with the cursor blinking)"* ⇒ the line reads "Built by donlucas, from inside his xscape."; under it, centred, the
+  block-x alone at 34px in the lockup's face, blinking on the cursor's 1.15 s (none under reduced motion). Published.

@@ -213,6 +213,12 @@ h3{font-size:14px;font-weight:700;margin:0 0 4px}
 .lovetxt{color:var(--d);font-size:var(--meta)}
 .lovetxt b{color:var(--dd);font-weight:500}
 .by{color:var(--d);font-size:var(--meta);margin:var(--lh) auto 0;max-width:100%;text-align:center}
+/* the mark, last: the cursor alone, the x in its block, blinking at the
+   cursor's rate (his ask, 2026-09-17). Geist Mono 700, no shadow, as the
+   brand locks it. */
+.mark{text-align:center;margin:calc(var(--lh)*2) 0 0;font-size:34px}
+.mark .blk{animation:bl 1.15s steps(1) infinite}
+@media (prefers-reduced-motion:reduce){.mark .blk{animation:none}}
 @media (prefers-reduced-motion:reduce){.heart pre,.heart.beat pre{animation:none}.spark{display:none}}
 /* the repository, in the page's own furniture: a drawn box that inverts
    when you point at it, like the mark. */
@@ -380,7 +386,8 @@ ul.feats.lead li{font-size:var(--body)}
     ██████████    
       ██████      
         ██        </pre></button><span class="lovetxt" id="lovetxt">leave some love</span></div>
-<p class="by">Built by <a href="https://x.com/donlucas" target="_blank" rel="noopener">donlucas</a>, from inside its own scape.</p>
+<p class="by">Built by <a href="https://x.com/donlucas" target="_blank" rel="noopener">donlucas</a>, from inside his xscape.</p>
+<div class="mark" aria-hidden="true"><span class="lockup"><span class="blk">x</span></span></div>
 </main>
 
 <script>{{fxjs}}</script>
