@@ -4091,3 +4091,7 @@ binary and the tyastie one an older one: **a restart is what shows the afternoon
   vivid `#ff4d6d` at rest with a soft glow, a lub-dub every 1.8 s (`lubdub`, 7% then 4.5%), lighter under the pointer,
   `#ff3358` with a stronger glow once pressed, the press beat handing back to the pulse on animationend; no motion
   under prefers-reduced-motion. Looked at in three states; published.
+- *"leave a bigger gap between the very last section and the heart. Make the heart a tad smaller, expand upon the
+  animation when the user clicks on it"* ⇒ gap 4 lines (99px measured, was 37) · 9px cells (was 11) · THE PRESS: two
+  thumps (`beat` .8 s to 1.32), the glow flares to 16px, and twelve sparks (♥ + ·, four of them bigger) fly 38-72px
+  out from the centre and fade over .9 s, removed on animationend; none under reduced motion. Published.

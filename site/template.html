@@ -184,7 +184,7 @@ h3{font-size:14px;font-weight:700;margin:0 0 4px}
    pointer, the crab's salmon once pressed. The count is shared across every
    visitor through a free public counter (abacus.jasoncameron.dev, no key,
    CORS open); if it is unreachable the heart still works, without a number. */
-.love{display:flex;align-items:center;justify-content:center;gap:18px;margin:calc(var(--lh)*1.5) 0 0}
+.love{display:flex;align-items:center;justify-content:center;gap:18px;margin:calc(var(--lh)*4) 0 0}
 /* The heart is pixels: full blocks two cells to a pixel, so a pixel is
    near square in a mono face, and only U+2588, which every phone font
    draws (the half blocks were what iOS broke). Vivid at rest and beating
@@ -192,20 +192,28 @@ h3{font-size:14px;font-weight:700;margin:0 0 4px}
    2026-09-17: "more vibrant ... palpitate gently"); lighter under the
    pointer; a bigger beat and a glow once pressed. No motion for readers
    who asked for none. */
-.heart{background:none;border:0;padding:0;cursor:pointer;color:#ff4d6d;font:inherit;line-height:0}
-.heart pre{margin:0;font:700 11px/1 var(--mono);white-space:pre;color:inherit;transition:color .2s;transform-origin:50% 55%;
+.heart{position:relative;background:none;border:0;padding:0;cursor:pointer;color:#ff4d6d;font:inherit;line-height:0}
+.heart pre{margin:0;font:700 9px/1 var(--mono);white-space:pre;color:inherit;transition:color .2s,filter .3s;transform-origin:50% 55%;
   filter:drop-shadow(0 0 5px rgba(255,77,109,.35));animation:lubdub 1.8s ease-in-out infinite}
 .heart:hover{color:#ff8aa0}
 .heart:focus-visible{outline:2px solid var(--acc);outline-offset:6px}
 .heart.loved,.heart.loved:hover{color:#ff3358}
 .heart.loved pre{filter:drop-shadow(0 0 9px rgba(255,51,88,.65))}
-.heart.beat pre{animation:beat .55s ease-out}
+/* THE PRESS: two thumps, a flare of the glow, and a burst of small hearts
+   and sparks that fly out from the centre and fade (his note, 2026-09-17:
+   "expand upon the animation when the user clicks on it"). The sparks are
+   glyphs in the page's own face, made by the script, gone when they land. */
+.heart.beat pre{animation:beat .8s ease-out;filter:drop-shadow(0 0 16px rgba(255,51,88,.95))}
+.spark{position:absolute;left:50%;top:50%;margin:-.5em 0 0 -.5em;font:700 13px/1 var(--mono);color:#ff8aa0;pointer-events:none;
+  animation:fly .9s ease-out forwards}
+.spark.big{font-size:16px;color:#ff4d6d}
 @keyframes lubdub{0%,100%{transform:scale(1)}14%{transform:scale(1.07)}28%{transform:scale(1)}42%{transform:scale(1.045)}56%{transform:scale(1)}}
-@keyframes beat{0%{transform:scale(1)}30%{transform:scale(1.22)}60%{transform:scale(.95)}100%{transform:scale(1)}}
+@keyframes beat{0%{transform:scale(1)}18%{transform:scale(1.32)}38%{transform:scale(.94)}56%{transform:scale(1.18)}76%{transform:scale(.98)}100%{transform:scale(1)}}
+@keyframes fly{0%{transform:translate(0,0) scale(.6);opacity:0}12%{opacity:1;transform:translate(calc(var(--dx)*.2),calc(var(--dy)*.2)) scale(1.1)}100%{transform:translate(var(--dx),var(--dy)) scale(.5);opacity:0}}
 .lovetxt{color:var(--d);font-size:var(--meta)}
 .lovetxt b{color:var(--dd);font-weight:500}
 .by{color:var(--d);font-size:var(--meta);margin:var(--lh) auto 0;max-width:100%;text-align:center}
-@media (prefers-reduced-motion:reduce){.heart pre,.heart.beat pre{animation:none}}
+@media (prefers-reduced-motion:reduce){.heart pre,.heart.beat pre{animation:none}.spark{display:none}}
 /* the repository, in the page's own furniture: a drawn box that inverts
    when you point at it, like the mark. */
 .boxlink{display:inline-block;margin:var(--lh) 0 0;font-size:var(--meta);line-height:1.15;color:var(--dd);border:0;white-space:pre}
@@ -594,8 +602,24 @@ ul.feats.lead li{font-size:var(--body)}
     // The press beat replaces the idle pulse for half a second, then the
     // pulse resumes.
     heart.addEventListener("animationend", function(e){ if(e.animationName === "beat") heart.classList.remove("beat"); });
+    function sparks(){
+      if(reduce) return;
+      for(var k = 0; k < 12; k++){
+        var s = document.createElement("span");
+        var big = k % 4 === 0;
+        s.className = "spark" + (big ? " big" : "");
+        s.textContent = k % 3 === 0 ? "\u2665" : (k % 3 === 1 ? "+" : "\u00b7");
+        var a = Math.PI * 2 * (k / 12) + (Math.random() - .5) * .7, r = 38 + Math.random() * 34;
+        s.style.setProperty("--dx", (Math.cos(a) * r).toFixed(1) + "px");
+        s.style.setProperty("--dy", (Math.sin(a) * r - 16).toFixed(1) + "px");
+        s.style.animationDelay = Math.round(Math.random() * 90) + "ms";
+        s.addEventListener("animationend", function(){ this.parentNode && this.parentNode.removeChild(this); });
+        heart.appendChild(s);
+      }
+    }
     heart.addEventListener("click", function(){
       heart.classList.remove("beat"); void heart.offsetWidth; heart.classList.add("beat");
+      sparks();
       if(loved) return;
       loved = true; heart.classList.add("loved");
       try{ localStorage.setItem("xscapes-loved", "1"); }catch(e){}
