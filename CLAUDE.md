@@ -61,8 +61,10 @@
 > Then (14:47) spacing under the problem window, captions and the footer at the window's width, and **THE SHORE ON ITS
 > OWN in the Scapes section** (`sceneClips` "shore", 12 s, 80x24), PUBLISHED and verified. His "up our chances" question
 > answered in the reply (the entry has no text field; the app's description is in the builder's Publish panel; the
-> Chrome extension dropped before its fields were read). Suite 13/13 green; NOTHING COMMITTED to main. NEXT: commit at
-> his word (the page · the band · the default scape) and install · the README pass · F1.
+> Chrome extension dropped before its fields were read). ⭐ **COMMITTED at his word "commit" (~15:10 PDT) as four cuts:
+> `c240bcd` the band · `4444efa` the page · `a6b3c45` the vista as the default scape · `76dbfb3` the record; INSTALLED
+> from the clean tree (stamp `76dbfb3`, modified=false, inode 86900314). NOT PUSHED (origin/main = `fdf2894`).** Running
+> scapes hold the old binary until restarted (a NEW session, per F1). NEXT: push at his word · the README pass · F1.
 
 > **Session 38 (2026-09-16 evening): THREE KIMI AUDITS at his word (technical · user · Commons judge), every
 > major finding re-verified here; NOTHING committed; the record edited.** Page https://claude.ai/artifact/J4TebzQ45125RUYpnmpiXy ·

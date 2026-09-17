@@ -113,7 +113,10 @@ Do NOT drive Terminal.app (osascript, System Events) without asking me first.
 
 ## ▶ NEXT (session 39, 2026-09-16 night, CHECKPOINTED: the site fixed for phones and rebuilt, the hero in six variants published for his pick)
 
-**State:** HEAD `b22b0c0` (the snow), origin/main = `fdf2894` (NOT pushed). **UNCOMMITTED (s39):** `internal/canvas/canvas.go`
+**State (after "commit", ~15:10 PDT):** HEAD `76dbfb3`, tree clean, four cuts on top of the snow (`c240bcd` the band ·
+`4444efa` the page · `a6b3c45` the vista default · `76dbfb3` the record); INSTALLED from the clean tree (stamp `76dbfb3`,
+inode 86900314); origin/main still `fdf2894`, NOT pushed (his word). The paragraph below is the pre-commit state, kept
+for what it lists. **Was UNCOMMITTED (s39):** `internal/canvas/canvas.go`
 (+ `html_blocks_test.go`, `nosplit_test.go`) · `siteframes.go` · `site/template.html` · `vista_live.go` (`drawVistaWith`,
 the vista's ink pair) · `gifs.go` (the pane's `$ ` line) · `montage.go` · `heropage_test.go` · `site/index.html` (rebuilt) ·
 **the band** (`internal/scenes/forest.go` `bandColors`, `internal/scenes/vista.go`, `live.go` `drawSandInk`,
