@@ -4146,3 +4146,4 @@ binary and the tyastie one an older one: **a restart is what shows the afternoon
   rule). Suite 13/13 + vet + gofmt green. **TO GO LIVE, in this order: commit · tag v0.4.2 · `sh site/release.sh
   v0.4.2` · `gh auth switch --user donlucasx && git push origin main` · `sh site/publish.sh`.** The release must
   exist before the page, or the live script falls back to `go install`.
+- *"can you do it?"* ⇒ **DONE, in that order, ~16:00 PDT:** COMMITTED `6555300`, TAGGED v0.4.2, RELEASED (four binaries + checksums on GitHub), PUSHED (main and the tag verified with ls-remote), PUBLISHED (gh-pages == the build byte for byte on the first check), and VERIFIED end to end: the LIVE line run in a clean HOME with PATH=/usr/bin:/bin installed v0.4.2 stamped `6555300`, wrote the one rc line, and the printed next step ran as printed. The Go proxy's `@latest` still answered v0.4.1 at 16:05 PDT (its cache; the installer does not use it).

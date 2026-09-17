@@ -3,11 +3,11 @@
 **Copy-paste this prompt into a fresh session:**
 
 ```
-Session 40 (2026-09-17 afternoon), OPEN, waiting on his word. THE FIRST
+Session 40 (2026-09-17 afternoon), LIVE at his word "can you do it?". THE FIRST
 OUTSIDE INSTALL FAILED: his friend followed the page, `go install` put the
 binary in ~/go/bin, which no Mac has on PATH (measured: /etc/paths,
 /etc/paths.d, a bare login shell), and the site never said Go was needed
-either. OURS. BUILT, test-first, NOT committed, NOT live: ONE install line,
+either. OURS. BUILT test-first and SHIPPED: ONE install line,
 `curl -fsSL https://donlucasx.github.io/xscapes/install.sh | sh`
 (site/install.sh: the release binary into ~/.local/bin, one rc line if
 needed, next commands printed with a path that works in the same window;
@@ -15,11 +15,15 @@ go-install fallback; no-Go refusal), installsh_test.go (the real script,
 the real binary, a local server, both mutations red), site/release.sh
 (four cross-compiled binaries from a clean tagged tree → GitHub release,
 -n = build only), publish.sh ships install.sh, page + README rewritten,
-site rebuilt (diff vs live = the two lines), suite 13/13 green. @latest is
-v0.4.1, 35 behind, shore default, no release binaries yet. TO GO LIVE, in
-order: commit · tag v0.4.2 · sh site/release.sh v0.4.2 · gh auth switch
---user donlucasx && git push origin main · sh site/publish.sh. Details:
-_FEEDBACK.md §Session 40. Then the s39 NEXT list below.
+site rebuilt (diff vs live = the two lines), suite 13/13 green. Then, at
+his word: COMMITTED 6555300 · TAGGED v0.4.2 · RELEASED (4 binaries) ·
+PUSHED (main + tag, ls-remote) · PUBLISHED (gh-pages == build) · VERIFIED
+end to end (the live line in a clean HOME installed v0.4.2 stamped
+6555300; the printed next step ran). The proxy's @latest still cached
+v0.4.1 at 16:05 (refreshes itself; the installer does not use it). The
+friend re-runs the site's line; in that first window he uses the printed
+~/.local/bin/ path or opens a new terminal. Details: _FEEDBACK.md
+§Session 40. NEXT: his friend's report, then the s39 NEXT list below.
 
 Session 39 (2026-09-16 night into 09-17 afternoon), WRAPPED 15:30 PDT at
 his word, 90 minutes before the Commons deadline (Sep 17 23:59 UTC). HEAD

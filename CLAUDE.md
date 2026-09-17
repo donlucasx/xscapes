@@ -2,19 +2,20 @@
 
 *(Renamed end to end on 2026-09-03: directory, env vars, state path and hook marker. Two names are kept on purpose and are not leftovers -- `internal/envx` still reads `ASCIISCAPES_*` and warns, and `install.go` still RECOGNISES the `# asciiscapes:v1` marker so the hooks it wrote before the rename can be found and removed.)*
 
-> **Session 40 (2026-09-17 afternoon), OPEN: THE FIRST OUTSIDE INSTALL FAILED, AND IT WAS OURS.** His friend
+> **Session 40 (2026-09-17 afternoon), SHIPPED at his word: THE FIRST OUTSIDE INSTALL FAILED, AND IT WAS OURS.** His friend
 > followed the page and got `zsh: command not found: xscapes`: `go install` drops the binary in `~/go/bin`, which is
 > on no Mac's PATH by default (measured on `/etc/paths`, `/etc/paths.d`, a bare login shell), it prints nothing about
 > it, and the page never said Go was required. This machine never sees it (`.zshrc` line 1 adds `~/.local/bin`).
-> ⭐ **BUILT at his word "fix it on our end so he ... simply re install[s]", NOT committed, NOT live: ONE install
+> ⭐ **BUILT at his word "fix it on our end so he ... simply re install[s]", then at "can you do it?" COMMITTED
+> `6555300` · TAGGED v0.4.2 · RELEASED · PUSHED · PUBLISHED · VERIFIED end to end from a clean HOME: ONE install
 > line**, `curl -fsSL https://donlucasx.github.io/xscapes/install.sh | sh` (`site/install.sh`: the release binary
 > into `~/.local/bin`, one rc line when needed, the next commands printed with a path that works in the same window;
 > go-install fallback; a plain no-Go refusal), `installsh_test.go` (the real script, the real binary, a local server;
 > mutation-checked), `site/release.sh` (four cross-compiled binaries from a clean tagged tree to a GitHub release),
 > `publish.sh` ships the script, page + README rewritten, site rebuilt (diff vs live = the two lines). ⚠ `@latest`
-> is v0.4.1, **35 behind** (shore default, no spend counter); no release binaries exist yet. **TO GO LIVE, in
-> order: commit · tag v0.4.2 · `sh site/release.sh v0.4.2` · push main · `sh site/publish.sh`** (the release before
-> the page, or the live script falls back to `go install`).
+> was v0.4.1, **35 behind** (shore default, no spend counter) until the tag; the proxy's `@latest` cache still said
+> v0.4.1 at 16:05 (it refreshes itself; the installer downloads the release binary and never asks it). The friend
+> re-runs the site's line; in that first window he uses the printed `~/.local/bin/` path or opens a new terminal.
 
 > **Session 39 (2026-09-16 night): THE WEBSITE, MOBILE FIRST, THEN THE HERO IN SIX VARIANTS.** Opened on his two
 > phone screenshots (the hero cropped with the companion off-screen; the moon in strips, portrait and landscape) and
