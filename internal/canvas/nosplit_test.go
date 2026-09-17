@@ -94,8 +94,10 @@ func TestHTMLIsTheSameWhicheverTerminalBuiltIt(t *testing.T) {
 		t.Errorf("the HTML changed with the terminal flag: %d bytes vs %d", len(on), len(off))
 	}
 	// Positive control: the fragment must actually contain a split cell, or
-	// "they are equal" is the trivial equality of two collapsed pages.
-	if !strings.Contains(off, "▀") && !strings.Contains(off, "▄") {
-		t.Fatal("no half block in the HTML at all — this test cannot detect the leak")
+	// "they are equal" is the trivial equality of two collapsed pages. A
+	// split cell is a two-stop gradient since 2026-09-16 (writeBlockCSS),
+	// no longer a half-block glyph.
+	if !strings.Contains(off, "linear-gradient(") {
+		t.Fatal("no split cell in the HTML at all — this test cannot detect the leak")
 	}
 }

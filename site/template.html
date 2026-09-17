@@ -21,7 +21,8 @@
    criterion). Deck: once, the synopsis under the headline. Body: every
    other run of text, in --dd. Meta: what annotates a thing rather than
    says it -- captions, commands, tabs, the footer -- in --d. Titles are
-   bold caps at two sizes (section 14, kicker 11) and are labels, not text. */
+   bold caps at two sizes (section 14, kicker 12.5 -- "a tad bigger" than
+   the 11 it was, his word of 2026-09-17) and are labels, not text. */
 --deck:17px;--body:15px;--meta:13px}
 *{box-sizing:border-box}
 html{scroll-behavior:smooth}
@@ -100,6 +101,10 @@ main section>*{position:relative;z-index:1}
 @media (max-width:860px){.rail{display:none}}
 
 h1{font-weight:700;font-size:clamp(23px,3.4vw,38px);line-height:1.22;letter-spacing:-.02em;margin:0 0 12px;max-width:20em}
+/* the headline sits two lines clear of the problem window's bottom rule
+   (his note, 2026-09-17: "some spacing between 'the problem' section and the
+   headline below") */
+#top{margin-top:calc(var(--lh)*2)}
 .cur{display:inline-block;width:.62ch;height:1.05em;background:var(--i);vertical-align:-.17em;margin-left:.12em;animation:bl 1.15s steps(1) infinite}
 @keyframes bl{50%{opacity:0}}
 h2{font-size:15px;font-weight:700;letter-spacing:.11em;text-transform:uppercase;margin:0;white-space:nowrap}
@@ -140,9 +145,15 @@ h3{font-size:14px;font-weight:700;margin:0 0 4px}
    line-height a face whose glyphs overrun the em box gets its descenders
    clipped by the next row -- which is what Geist Mono did here. Menlo is what
    the frames were authored and measured against. */
-.fx pre{margin:0;font-family:Menlo,"SF Mono","DejaVu Sans Mono",ui-monospace,monospace;line-height:1;letter-spacing:0;white-space:pre;display:block;font-size:inherit!important}
+.fx pre{margin:0;font-family:Menlo,"SF Mono","DejaVu Sans Mono",ui-monospace,monospace;line-height:1;letter-spacing:0;white-space:pre;display:block;font-size:inherit!important;
+  -webkit-text-size-adjust:100%;text-size-adjust:100%}
 .fx{font-size:10px}
-.cap{color:var(--d);font-size:var(--meta);margin:12px 0 0;max-width:var(--measure)}
+/* A caption under a window runs the WINDOW's width, not the reading measure
+   (his note, 2026-09-17: "the descriptive text paragraph underneath 'xscapes
+   claude' should be as wide as the gif above ... same for every other
+   descriptive paragraph underneath the ascii bottom divider"). The measure
+   still holds for every run of text that is not under a window. */
+.cap{color:var(--d);font-size:var(--meta);margin:12px 0 0;max-width:100%}
 
 /* the state switcher: one scene, five moments, because an encoding is learned
    by comparison and nine separate clips cannot make one */
@@ -152,7 +163,7 @@ h3{font-size:14px;font-weight:700;margin:0 0 4px}
 .tab:hover{border-color:var(--acc);color:var(--i)}
 .tab[aria-selected="true"]{background:var(--acc);border-color:var(--acc);color:#0d0d0d;font-weight:700}
 .tab:focus-visible{outline:2px solid var(--acc);outline-offset:2px}
-.reads{margin:13px 0 0;color:var(--dd);font-size:var(--body);max-width:var(--measure);min-height:3em}
+.reads{margin:13px 0 0;color:var(--dd);font-size:var(--body);max-width:100%;min-height:3em}
 
 .grid2{display:grid;grid-template-columns:repeat(auto-fit,minmax(320px,1fr));gap:22px}
 .cast{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:14px}
@@ -166,8 +177,25 @@ h3{font-size:14px;font-weight:700;margin:0 0 4px}
 .win.floor .stage.port .fx{padding-bottom:0}
 .stage.port .fx{margin:0 auto}
 .cast .cap{text-align:center;margin-top:4px}
-.cast+.cmd{margin-top:var(--lh)}
-.cast+.cmd+.wide{margin-top:calc(var(--lh)*1.5)}
+.cast+.wide{margin-top:calc(var(--lh)*1.5)}
+.grid2+.cmd{margin-top:var(--lh)}
+/* d) and e): the maker, and a heart anyone can press. The heart is ASCII in
+   the page's own face and takes colour by state: dim at rest, warm under the
+   pointer, the crab's salmon once pressed. The count is shared across every
+   visitor through a free public counter (abacus.jasoncameron.dev, no key,
+   CORS open); if it is unreachable the heart still works, without a number. */
+.love{display:flex;align-items:center;gap:18px;margin:calc(var(--lh)*1.5) 0 0}
+.heart{background:none;border:0;padding:0;cursor:pointer;color:var(--d);font:inherit;line-height:0}
+.heart pre{margin:0;font:700 12px/1.05 var(--mono);white-space:pre;color:inherit;transition:color .2s;transform-origin:50% 60%}
+.heart:hover pre{color:var(--warm)}
+.heart:focus-visible{outline:2px solid var(--acc);outline-offset:4px}
+.heart.loved pre,.heart.loved:hover pre{color:#f08080}
+.heart.beat pre{animation:beat .5s ease-out}
+@keyframes beat{0%{transform:scale(1)}30%{transform:scale(1.18)}60%{transform:scale(.96)}100%{transform:scale(1)}}
+.lovetxt{color:var(--d);font-size:var(--meta)}
+.lovetxt b{color:var(--dd);font-weight:500}
+.by{color:var(--d);font-size:var(--meta);margin:var(--lh) 0 0}
+@media (prefers-reduced-motion:reduce){.heart.beat pre{animation:none}}
 /* the repository, in the page's own furniture: a drawn box that inverts
    when you point at it, like the mark. */
 .boxlink{display:inline-block;margin:var(--lh) 0 0;font-size:var(--meta);line-height:1.15;color:var(--dd);border:0;white-space:pre}
@@ -177,7 +205,14 @@ h3{font-size:14px;font-weight:700;margin:0 0 4px}
 .cmd .c{color:var(--d)}
 .cmd .pr{color:var(--warm)}
 ul.feats{list-style:none;padding:0;margin:22px 0 0;display:grid;gap:11px;max-width:var(--measure)}
-ul.feats li small{display:block;font-size:11px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--warm);margin:0 0 4px}
+ul.feats li small{display:block;font-size:12.5px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--warm);margin:0 0 4px}
+/* the three cues, playable: a judge should hear what "one sound" means
+   without installing anything. Buttons in the meta size, on the feature
+   that names them. */
+.cues{display:flex;gap:6px;flex-wrap:wrap;margin:8px 0 0}
+.cues button{font:inherit;font-size:var(--meta);color:var(--dd);background:var(--s);border:1px solid var(--ln);border-radius:5px;padding:3px 10px;cursor:pointer}
+.cues button:hover{border-color:var(--acc);color:var(--i)}
+.cues button:focus-visible{outline:2px solid var(--acc);outline-offset:2px}
 ul.feats.grid{max-width:none;grid-template-columns:repeat(2,minmax(0,1fr));gap:calc(var(--lh)*1.2) 4ch}
 ul.feats.grid li.span{grid-column:1/-1;max-width:var(--measure)}
 @media (max-width:720px){ul.feats.grid{grid-template-columns:1fr}}
@@ -187,18 +222,32 @@ ul.feats li{padding-left:26px;position:relative;color:var(--dd);font-size:var(--
 ul.feats li::before{content:"\00A0";position:absolute;left:0;top:.28em;width:1ch;height:1.05em;background:var(--warm)}
 ul.feats b{color:var(--i)}
 .clip img{display:block;width:100%;height:auto;border:1px solid var(--ln);border-radius:6px}
-.foot{margin-top:70px;color:var(--d);font-size:var(--meta);border-top:1px solid var(--ln);padding-top:18px}
+.foot{margin-top:70px;color:var(--d);font-size:var(--meta);border-top:1px solid var(--ln);padding-top:18px;max-width:100%}
 /* THE PROBLEM: Claude Code's own idle screen, redrawn in the page's face. It is
    the one frame on the page that is not the renderer, and the empty rows are
    the point: this is everything the terminal tells you while it works. */
-.wait pre{margin:0;padding:calc(var(--lh)*.5) 2ch calc(var(--lh)*.75);white-space:pre;overflow-x:auto;color:var(--dd);font-size:13.5px;line-height:var(--lh)}
+/* THE PROBLEM IS TYPED, his idea of 2026-09-17: the problem is typed in the
+   box that has it, in the third person (his note: a typed first person reads
+   as the agent talking), and the whole answer is the spinner. No paragraph under the window; the eye goes to the headline.
+   The prompt's rows are reserved so the window does not grow while it types
+   (four lines at the desktop measure, nine on a phone, ten on a narrow
+   one; measured 2026-09-17: 300 characters wrap to 9 lines at 390px). */
+.wait .term{padding:calc(var(--lh)*.5) 2ch calc(var(--lh)*.75);color:var(--dd);font-size:13.5px;line-height:var(--lh)}
+.wait .line{white-space:pre-wrap;min-height:var(--lh)}
+.wait .ask{padding-left:2ch;text-indent:-2ch;min-height:calc(var(--lh)*4)}
+@media (max-width:720px){.wait .ask{min-height:calc(var(--lh)*9)}}
+@media (max-width:400px){.wait .ask{min-height:calc(var(--lh)*10)}}
+.wait .think{visibility:hidden;margin-top:var(--lh)}
+.wait.typed .think{visibility:visible}
+.wait .tc{display:inline-block;width:.62ch;height:1.05em;background:var(--dd);vertical-align:-.17em;margin-left:.1em}
+.wait.typed .tc{display:none}
 .wait .sp{color:var(--warm)}
 .wait .t{color:var(--d)}
 .wait .pr{color:var(--warm)}
 .after{margin-top:var(--lh)}
 ul.feats.lead{margin-top:0;gap:var(--lh)}
 ul.feats.lead li{font-size:var(--body)}
-.grid2+.grid2,.grid2+.wide,.wide+.grid2{margin-top:calc(var(--lh)*1.5)}
+.grid2+.grid2,.grid2+.wide,.wide+.grid2,.wide+.wide{margin-top:calc(var(--lh)*1.5)}
 .sub.wide{max-width:var(--measure)}
 {{fxcss}}
 @media (prefers-reduced-motion:reduce){.cover .sea pre{animation:none}.cover .sea pre:first-child{opacity:1}.cur{animation:none}html{scroll-behavior:auto}}
@@ -221,48 +270,46 @@ ul.feats.lead li{font-size:var(--body)}
 <div class="sec" data-title="The problem"><div class="boxtop" aria-hidden="true"></div></div>
 <section id="problem">
 <div class="bgfx spin" aria-hidden="true">{{bg:problem}}</div>
-<div class="win wait" data-title="claude"><div class="boxtop" aria-hidden="true"></div>
-  <div class="stage"><pre><span class="pr">&gt;</span> refactor the auth module and run the tests
-
-<span class="sp" id="spin">&#10035;</span> Thinking&hellip; <span class="t">(esc to interrupt &middot; <span id="spin-t">2m 14s</span>)</span>
-
-
-
-</pre></div>
+<div class="win wait" id="problem-win" data-title="claude"><div class="boxtop" aria-hidden="true"></div>
+  <div class="stage"><div class="term">
+<div class="line ask"><span class="pr">&gt;</span> <span id="typed" data-text="A user sends a prompt in the terminal and the agent goes quiet. A spinner, a verb that changes every few seconds, and nothing else: not whether this is a five-second read or a five-minute refactor, not that a command just failed, not how much context is left before it compacts. So they tab away, and come back late."></span><span class="tc" id="tcur" aria-hidden="true"></span></div>
+<div class="line think" id="think"><span class="sp" id="spin">&#10035;</span> Thinking&hellip; <span class="t">(esc to interrupt &middot; <span id="spin-t">0m 00s</span>)</span></div>
+<div class="line"></div>
+</div></div>
   <div class="boxbot" aria-hidden="true"></div>
 </div>
-<p class="sub after">You send a prompt and the terminal goes quiet. A spinner, a verb that changes every few seconds, and nothing else: not whether this is a five-second read or a five-minute refactor, not that a command just failed, not how much context is left before it compacts. So you tab away, and come back late.</p>
 </section>
 
 <section id="top">
 <h1>Cozy ASCII scenes that react to your agent while it works<span class="cur"></span></h1>
 
-<p class="lead">A small living scene, drawn in text under your agent's transcript, that makes the wait readable from across the room. The sea rises with the work, the moon shows the context left, and a companion animal knocks when it needs you or is done. Claude Code out of the box; any other terminal agent with one command.</p>
+<p class="lead">Your agent's session, drawn as a landscape. Each element carries one thing you would otherwise read for: activity, the last tool call, the helpers, failures, context left, and the moment it needs you. Same window, any terminal agent.</p>
 
-<div class="win" data-title="xscapes claude" data-right="a whole session, sped up"><div class="boxtop" aria-hidden="true"></div>
+<div class="win" data-title="xscapes claude" data-right="one session, two turns, sped up"><div class="boxtop" aria-hidden="true"></div>
   <div class="stage" aria-hidden="true"><div class="fx" id="hero-fx"></div></div>
   <div class="boxbot" aria-hidden="true"></div>
 </div>
-<p class="cap">One session, sped up. The agent runs untouched in the top rows. Everything under it is drawn from what it is doing.</p>
+<p class="cap">One session, sped up. The agent runs untouched in the top rows; everything under it is drawn from what it is doing. The first turn is the owl's, on the mountain vista; at the second prompt the scape is the shore and the crab takes it. Either is one command, and a running scape switches on its next frame.</p>
 </section>
 
 <div class="sec" data-title="Features"><div class="boxtop" aria-hidden="true"></div></div>
 <section>
 <div class="bgfx sea" aria-hidden="true">{{bg:wait}}</div>
 <ul class="feats lead grid">
-<li class="span"><small>Activity</small><b>See how hard it is working, and what it just did.</b> The sea says how much: how many swells are travelling and how tall, whitecaps once it is flat out, flat water when it is waiting on you. The sand says what: every tool call and the file it touched, the newest brightest, the older lines fading as the tide takes them.</li>
-<li><small>Notifications</small><b>Leave the room.</b> A solid balloon and one sound when it needs an answer, a dotted balloon and a different sound when it is done, and a third when it finished but left something broken. Silent while it works, so every sound you hear is one that matters.</li>
-<li><small>Subagents</small><b>Count the helpers.</b> A crablet on the sand for each subagent running; when its job is done it walks into the water.</li>
-<li><small>Failures</small><b>Never miss a failed command.</b> It shows on the companion's face, claws down and amber eyes, until your next prompt.</li>
-<li><small>Context meter</small><b>See the context running out before it compacts.</b> The moon thins and sinks as the context fills, and from 40% used what is left is written under it as a number.</li>
-<li><small>Progress</small><b>Watch the work add up.</b> A star for every turn the agent finishes (every todo, when it keeps a list) and one more for every eight subagent jobs, each falling into its place in the sky.</li>
-<li><small>Your clock</small><b>Keep your own hours.</b> The sky is the real time of day where you sit, dawn to night as it happens, so the window tells the hour without a clock and no two sessions look the same.</li>
+<li class="span"><small>Activity</small><b>See how hard it is working, and what it just did.</b> The sea says how much: more and taller swells as it works, flat water while it waits on you; on the vista, the wind and the fire. The sand says what: every tool call and the file it touched, the newest brightest.</li>
+<li><small>Notifications</small><b>Leave the room.</b> One sound when it needs an answer, another when it is done, a third when it finished with something broken. Silent otherwise.
+<span class="cues" id="cues"><button type="button" data-cue="ask">hear: needs you</button><button type="button" data-cue="done">done</button><button type="button" data-cue="worried">done, something broken</button></span></li>
+<li><small>Subagents</small><b>Count the helpers.</b> A crablet on the sand, or an owlet by the owl, for each subagent running. It leaves when its job is done.</li>
+<li><small>Failures</small><b>Never miss a failed command.</b> It shows on the companion's face until your next prompt.</li>
+<li><small>Context meter</small><b>See the context running out before it compacts.</b> The moon sinks as the window fills, and from 40% used the number left is written under it.</li>
+<li><small>Progress</small><b>Watch the work add up.</b> A star for every finished turn or todo, each falling into its place in the sky.</li>
+<li><small>Your clock</small><b>Keep your own hours.</b> The sky is the real time of day where you sit, so no two sessions look the same.</li>
 </ul>
 </section>
 
 <div class="sec" data-title="Companion states"><div class="boxtop" aria-hidden="true"></div></div>
 <section>
-<p class="sub">The companion on its own, in its five states. Press one.</p>
+<p class="sub">The owl on its own, in its five states. Press one. The crab has the same five, its own way.</p>
 <div class="tabs" role="tablist" id="st-tabs"></div>
 <div class="win floor"><div class="stage port" aria-hidden="true"><div class="fx st-fx" id="st-fx"></div></div><div class="boxbot" aria-hidden="true"></div></div>
 <p class="reads" id="st-note"></p>
@@ -282,20 +329,22 @@ ul.feats.lead li{font-size:var(--body)}
 <div class="sec" data-title="Scapes and companions"><div class="boxtop" aria-hidden="true"></div></div>
 <section>
 <div class="bgfx rain" aria-hidden="true">{{bg:layer}}</div>
-<p class="sub wide">The shoreline is the first scape, not the product. Underneath is a small event protocol and a thin adapter for each agent, and any landscape with a light, a sky, something that moves with the work, a surface, somewhere the work piles up and someone living in it carries all of it unchanged. The shoreline and the mountain vista ship today (<code>xscapes scape vista</code>); the rainy window and the aquarium are drawn and next.</p>
-<p class="sub wide">Four companions so far, each drawn for its scape. Three ship; a running scape picks a swap up on its next frame.</p>
+<p class="sub wide">xscapes is a set of ASCII landscapes and companions that react as your agents work. Every scape carries the same six things: a light, a sky, something that moves with the work, a surface, somewhere the work piles up, and someone who lives there. So any of them tells the same story.</p>
+<p class="sub wide">The mountain vista ships as the default. Swap landscapes or companions with one command, mid-session included; a running scape picks it up on its next frame.</p>
 <div class="cast">
-<div><div class="stage port" aria-hidden="true"><div class="fx" data-clip="cast-crab"></div></div><p class="cap"><b>Hero the crab.</b> Ships as the default.</p></div>
+<div><div class="stage port" aria-hidden="true"><div class="fx" data-clip="cast-crab"></div></div><p class="cap"><b>Hero the crab.</b> The shore's companion.</p></div>
 <div><div class="stage port" aria-hidden="true"><div class="fx" data-clip="cast-cat"></div></div><p class="cap"><b>The cat.</b> Came first. One command away.</p></div>
-<div><div class="stage port" aria-hidden="true"><div class="fx" data-clip="cast-owl"></div></div><p class="cap"><b>The owl.</b> Ships with the vista: five faces, owlets for subagents.</p></div>
+<div><div class="stage port" aria-hidden="true"><div class="fx" data-clip="cast-owl"></div></div><p class="cap"><b>The owl.</b> The vista's companion: five faces, owlets for subagents.</p></div>
 <div><div class="stage port" aria-hidden="true"><div class="fx" data-clip="cast-frog"></div></div><p class="cap"><b>The frog.</b> Drawn for the aquarium. Next.</p></div>
 </div>
-<div class="cmd"><span class="pr">$</span> xscapes companion cat</div>
-<div class="wide"><div class="win" data-title="the mountain vista &middot; with the owl" data-right="the wind is the work"><div class="boxtop" aria-hidden="true"></div><div class="stage" aria-hidden="true"><div class="fx" data-clip="vista"></div></div><div class="boxbot" aria-hidden="true"></div></div><p class="cap"><b>The mountain vista, with the owl.</b> The wind is the work. Still air is a straight column of smoke and upright grass; as the agent gets busy the smoke streams sideways, the scrub flattens and the air fills. The fire lights the meadow at night, and the peaks take the last light at dusk.</p></div>
+<div class="wide"><div class="win" data-title="the mountain vista &middot; with the owl" data-right="the wind is the work"><div class="boxtop" aria-hidden="true"></div><div class="stage" aria-hidden="true"><div class="fx" data-clip="vista"></div></div><div class="boxbot" aria-hidden="true"></div></div><p class="cap"><b>The mountain vista, with the owl.</b> The default. The wind is the work: still air is a straight column of smoke and upright grass; as the agent gets busy the smoke streams sideways, the scrub flattens and the air fills. The fire lights the meadow at night, and the peaks take the last light at dusk.</p></div>
+<div class="wide"><div class="win" data-title="the shore &middot; with the crab" data-right="the sea is the work"><div class="boxtop" aria-hidden="true"></div><div class="stage" aria-hidden="true"><div class="fx" data-clip="shore"></div></div><div class="boxbot" aria-hidden="true"></div></div><p class="cap"><b>The shore, with the crab.</b> The sea is the work: more and taller swells as the agent works, flat water while it waits, and the tide comes up the beach with it. Crablets for subagents, the moon over the water, the last tool calls written in the sand.</p></div>
 <div class="grid2">
-<div><div class="win" data-title="the rainy window &middot; with the cat"><div class="boxtop" aria-hidden="true"></div><div class="stage" aria-hidden="true"><div class="fx" data-clip="rain"></div></div><div class="boxbot" aria-hidden="true"></div></div><p class="cap"><b>The rainy window, with the cat.</b> Rain on the glass is the work: watch it come down harder as the agent gets busy, then ease. The city behind it carries the hour.</p></div>
-<div><div class="win" data-title="the aquarium &middot; with the frog"><div class="boxtop" aria-hidden="true"></div><div class="stage" aria-hidden="true"><div class="fx" data-clip="aquarium"></div></div><div class="boxbot" aria-hidden="true"></div></div><p class="cap"><b>The aquarium, with the frog.</b> More fish come out as the work picks up, the tank's lamp is the light, and the gravel is where it settles.</p></div>
+<div><div class="win" data-title="the rainy window &middot; with the cat"><div class="boxtop" aria-hidden="true"></div><div class="stage" aria-hidden="true"><div class="fx" data-clip="rain"></div></div><div class="boxbot" aria-hidden="true"></div></div><p class="cap"><b>The rainy window, with the cat.</b> Rain on the glass is the work: harder as the agent gets busy, then easing. The city behind it carries the hour. Drawn; next.</p></div>
+<div><div class="win" data-title="the aquarium &middot; with the frog"><div class="boxtop" aria-hidden="true"></div><div class="stage" aria-hidden="true"><div class="fx" data-clip="aquarium"></div></div><div class="boxbot" aria-hidden="true"></div></div><p class="cap"><b>The aquarium, with the frog.</b> More fish come out as the work picks up, the tank's lamp is the light, and the gravel is where it settles. Drawn; next.</p></div>
 </div>
+<div class="cmd"><span class="pr">$</span> xscapes scape shore          <span class="c"># or vista, the default</span>
+<span class="pr">$</span> xscapes companion cat       <span class="c"># or crab</span></div>
 </section>
 
 <div class="sec" data-title="Different every session"><div class="boxtop" aria-hidden="true"></div></div>
@@ -304,10 +353,17 @@ ul.feats.lead li{font-size:var(--body)}
 <p class="sub wide">It is not a loop. The sea is your agent's work, the sand is its last few actions and the sky is your clock, so no two sessions draw the same picture. It asks nothing of you, and the agent's own output reaches your terminal byte for byte, so it can never get in the way of the work it is drawing.</p>
 </section>
 
-<p class="foot">Every scene on this page is the real renderer folding the events a Claude Code session emits &mdash; text, not video, drawn by the same code that runs in your terminal. Nothing is posed. <a href="https://github.com/donlucasx/xscapes">github.com/donlucasx/xscapes</a> &middot; MIT</p>
+<p class="foot">Every scene on this page is the real renderer folding the events a Claude Code session emits &mdash; text, not video, drawn by the same code that runs in your terminal. Nothing is posed. The page shows the scenes in truecolor; in a terminal the same scenes run on the 256-colour cube, on every terminal alike. <a href="https://github.com/donlucasx/xscapes">github.com/donlucasx/xscapes</a> &middot; MIT</p>
+<div class="love"><button type="button" class="heart" id="heart" aria-label="leave some love"><pre aria-hidden="true"> .::.  .::.
+::::::::::::
+ '::::::::'
+   '::::'
+     ''</pre></button><span class="lovetxt" id="lovetxt">leave some love</span></div>
+<p class="by">Built by <a href="https://x.com/donlucas">donlucas</a>, from inside its own scape.</p>
 </main>
 
 <script>{{fxjs}}</script>
+<script>{{cues}}</script>
 <script>
 (function(){
   "use strict";
@@ -362,17 +418,35 @@ ul.feats.lead li{font-size:var(--body)}
   }
   var fitted = [];
   function play(el, key, startFrac){
-    var clip = FX[key];
-    if(!el || !clip || !clip.frames.length) return null;
+    if(!el || !FX[key] || !FX[key].frames.length) return null;
+    // A PHONE GETS THE NARROW TWIN. The hero is a real 124-column window;
+    // on a 390px screen that is the 7px floor, a frame half off its stage
+    // and the companion on the half you cannot see (his screenshots,
+    // 2026-09-16). A clip that names a narrower rendering of itself plays
+    // that one whenever the wide one would fall under the floor, and is
+    // picked again on resize.
+    function pick(){
+      var c = FX[key], box = el.parentElement, w = box ? box.clientWidth : 0;
+      if(c.narrow && FX[c.narrow] && w && (w / c.cols) / advance(el) < 7) c = FX[c.narrow];
+      return c;
+    }
+    var clip = pick();
     var n = clip.frames.length;
     var i = Math.floor((startFrac||0) * n) % n;
     var id = null;
+    var api = {clip: clip, el: el};
     function show(k){ i = ((k % n) + n) % n; el.innerHTML = clip.frames[i]; }
-    show(i); fit(el, clip.cols); fitted.push([el, clip.cols]);
+    function refitThis(){
+      var c = pick();
+      if(c !== clip){ clip = c; api.clip = c; n = c.frames.length; i = i % n; show(i); }
+      fit(el, clip.cols);
+    }
+    show(i); fit(el, clip.cols); fitted.push(refitThis);
     function start(){ if(reduce || id) return; id = setInterval(function(){ show(i+1); }, 1000/(clip.fps||6)); }
     function stop(){ if(id){ clearInterval(id); id = null; } }
     start();
-    return {show:show, start:start, stop:stop, clip:clip, el:el};
+    api.show = show; api.start = start; api.stop = stop;
+    return api;
   }
 
   // ---- the furniture is DRAWN ------------------------------------------
@@ -471,17 +545,47 @@ ul.feats.lead li{font-size:var(--body)}
   });
   Array.prototype.forEach.call(document.querySelectorAll(".fx[data-cols]"), function(el){
     var cols = parseInt(el.getAttribute("data-cols"), 10);
-    fit(el, cols); fitted.push([el, cols]);
+    fit(el, cols); fitted.push(function(){ fit(el, cols); });
   });
   // The ask LAST, his note of 2026-09-15: first, it stood out as the
   // default rather than as one state of five. The page opens on working.
   switcher(["working","broke","done","quiet","needs"], "st-tabs", "st-fx", "st-note");
   drawAllBoxes();
 
-  function refit(){ ADV = null; fitted.forEach(function(f){ fit(f[0], f[1]); }); drawAllBoxes(); }
+  function refit(){ ADV = null; fitted.forEach(function(f){ f(); }); drawAllBoxes(); }
   window.addEventListener("resize", refit);
   requestAnimationFrame(refit);
   if(document.fonts && document.fonts.ready){ document.fonts.ready.then(refit); }
+
+  // ---- the cues, on a press: the three embedded sounds, the product's own
+  var CUES = window.CUES || {};
+  Array.prototype.forEach.call(document.querySelectorAll("#cues button"), function(b){
+    b.addEventListener("click", function(){
+      var src = CUES[b.getAttribute("data-cue")];
+      if(!src) return;
+      try{ var a = new Audio(src); a.play(); }catch(e){}
+    });
+  });
+
+  // ---- the heart: one press a visitor, counted for everyone ---------------
+  var heart = document.getElementById("heart"), loveTxt = document.getElementById("lovetxt");
+  if(heart && loveTxt){
+    var LOVE = "https://abacus.jasoncameron.dev/", LNS = "xscapes-site", LKEY = "love";
+    var loved = false;
+    try{ loved = localStorage.getItem("xscapes-loved") === "1"; }catch(e){}
+    function showLove(n){
+      loveTxt.innerHTML = (loved ? "thank you" : "leave some love") + " &middot; <b>" + n + "</b> " + (n === 1 ? "heart" : "hearts");
+    }
+    if(loved) heart.classList.add("loved");
+    fetch(LOVE + "get/" + LNS + "/" + LKEY).then(function(r){ return r.json(); }).then(function(d){ if(d && typeof d.value === "number") showLove(d.value); }).catch(function(){});
+    heart.addEventListener("click", function(){
+      heart.classList.remove("beat"); void heart.offsetWidth; heart.classList.add("beat");
+      if(loved) return;
+      loved = true; heart.classList.add("loved");
+      try{ localStorage.setItem("xscapes-loved", "1"); }catch(e){}
+      fetch(LOVE + "hit/" + LNS + "/" + LKEY).then(function(r){ return r.json(); }).then(function(d){ if(d && typeof d.value === "number") showLove(d.value); else loveTxt.textContent = "thank you"; }).catch(function(){ loveTxt.textContent = "thank you"; });
+    });
+  }
 
   // ---- the splash arrow, in ASCII: a chevron drips down three rows ---------
   var tip = document.getElementById("scrolltip");
@@ -491,12 +595,35 @@ ul.feats.lead li{font-size:var(--body)}
     setInterval(function(){ d = (d + 1) % drips.length; tip.textContent = drips[d]; }, 360);
   } else if(tip){ tip.textContent = "v\n.\n."; }
 
-  // ---- the wait: the spinner turns and the clock counts ------------------
+  // ---- the wait: the complaint is typed, then the spinner turns and the
+  // clock counts. Typed once, when the window comes into view; with reduced
+  // motion, or no observer, it is already typed and already waiting.
+  var pwin = document.getElementById("problem-win"), typed = document.getElementById("typed");
   var spin = document.getElementById("spin"), spinT = document.getElementById("spin-t");
-  if(spin && spinT && !reduce){
-    var glyphs = ["\u273b","\u2733","\u2736","\u273d","\u2722","\u00b7"], g = 0, secs = 134;
-    setInterval(function(){ g = (g + 1) % glyphs.length; spin.textContent = glyphs[g]; }, 220);
-    setInterval(function(){ secs++; spinT.textContent = Math.floor(secs/60) + "m " + (secs%60) + "s"; }, 1000);
+  if(pwin && typed && spin && spinT){
+    var text = typed.getAttribute("data-text") || "", started = false;
+    function wait(){
+      pwin.classList.add("typed");
+      if(reduce) return;
+      var glyphs = ["\u273b","\u2733","\u2736","\u273d","\u2722","\u00b7"], g = 0, secs = 0;
+      setInterval(function(){ g = (g + 1) % glyphs.length; spin.textContent = glyphs[g]; }, 220);
+      setInterval(function(){ secs++; spinT.textContent = Math.floor(secs/60) + "m " + (secs%60) + "s"; }, 1000);
+    }
+    function type(){
+      if(started) return; started = true;
+      var i = 0;
+      (function step(){
+        if(i >= text.length){ setTimeout(wait, 500); return; }
+        var ch = text.charAt(i++);
+        typed.textContent += ch;
+        setTimeout(step, ch === "." || ch === "?" ? 220 : (ch === "," ? 120 : 22));
+      })();
+    }
+    if(reduce || !("IntersectionObserver" in window)){ typed.textContent = text; wait(); }
+    else {
+      var io = new IntersectionObserver(function(es){ es.forEach(function(e){ if(e.isIntersecting){ type(); io.disconnect(); } }); }, {threshold: 0.4});
+      io.observe(pwin);
+    }
   }
 
   // ---- the rail, and the drift ------------------------------------------

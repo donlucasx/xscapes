@@ -1,7 +1,10 @@
 package main
 
 import (
+	"encoding/base64"
+	"encoding/json"
 	"fmt"
+	"github.com/donlucasx/xscapes/internal/notify"
 	"html"
 	"os"
 	"path/filepath"
@@ -113,6 +116,12 @@ func sitePage(seed int64, dir string) (string, error) {
 		return "", err
 	}
 	page = strings.Replace(page, "{{fxjs}}", fxjs, 1)
+	// The three cues as data URIs, so a reader can press and hear them
+	// (65 KB of WAV, the product's own bytes; the s38 judge's J4).
+	ask, done, worried := notify.Cues()
+	uri := func(b []byte) string { return "data:audio/wav;base64," + base64.StdEncoding.EncodeToString(b) }
+	cues, _ := json.Marshal(map[string]string{"ask": uri(ask), "done": uri(done), "worried": uri(worried)})
+	page = strings.Replace(page, "{{cues}}", "window.CUES="+string(cues)+";", 1)
 	page = strings.Replace(page, "{{fxcss}}", fxcss, 1)
 	// Each section's quiet moving field, his idea of 2026-09-14. See backdrops.go.
 	for key, frames := range renderBackdrops(seed) {

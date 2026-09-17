@@ -601,8 +601,8 @@ func (c *Canvas) HTMLFragment(fontPx int) string {
 // 112KB to under half that; it exists because the submission page has to be
 // pasted into a chat box.
 type HTMLPalette struct {
-	idx   map[[2]term.RGB]int
-	pairs [][2]term.RGB
+	idx  map[palKey]int
+	keys []palKey
 	// Transparent, when set, is the one background colour CSS writes as
 	// background:transparent, so a frame painted on it sits on the page's
 	// own ground. The submission page's portraits use it -- "no background
@@ -610,17 +610,29 @@ type HTMLPalette struct {
 	Transparent *term.RGB
 }
 
-func (h *HTMLPalette) class(fg, bg term.RGB) int {
+// palKey is one stylesheet class: a text run's ink and ground, or, when mask
+// is not zero, a BLOCK CELL painted as a background pattern (see blockMask).
+type palKey struct {
+	fg, bg term.RGB
+	mask   uint8
+}
+
+func (h *HTMLPalette) class(fg, bg term.RGB) int { return h.key(palKey{fg: fg, bg: bg}) }
+
+func (h *HTMLPalette) block(fg, bg term.RGB, mask uint8) int {
+	return h.key(palKey{fg: fg, bg: bg, mask: mask})
+}
+
+func (h *HTMLPalette) key(k palKey) int {
 	if h.idx == nil {
-		h.idx = map[[2]term.RGB]int{}
+		h.idx = map[palKey]int{}
 	}
-	k := [2]term.RGB{fg, bg}
 	if i, ok := h.idx[k]; ok {
 		return i
 	}
-	i := len(h.pairs)
+	i := len(h.keys)
 	h.idx[k] = i
-	h.pairs = append(h.pairs, k)
+	h.keys = append(h.keys, k)
 	return i
 }
 
@@ -628,20 +640,139 @@ func (h *HTMLPalette) class(fg, bg term.RGB) int {
 // <style> after the last fragment is rendered.
 func (h *HTMLPalette) CSS() string {
 	var b strings.Builder
-	for i, k := range h.pairs {
+	for i, k := range h.keys {
 		b.WriteString(".p")
 		b.WriteString(strconv.Itoa(i))
-		b.WriteString("{color:")
-		writeHex(&b, k[0])
-		b.WriteString(";background:")
-		if h.Transparent != nil && k[1] == *h.Transparent {
-			b.WriteString("transparent")
+		b.WriteString("{")
+		if k.mask != 0 {
+			writeBlockCSS(&b, k.fg, k.bg, k.mask, h.Transparent)
 		} else {
-			writeHex(&b, k[1])
+			b.WriteString("color:")
+			writeHex(&b, k.fg)
+			b.WriteString(";background:")
+			writeGround(&b, k.bg, h.Transparent)
 		}
 		b.WriteString("}")
 	}
 	return b.String()
+}
+
+// writeGround writes a background colour, or the word for the one colour a
+// palette treats as the page showing through.
+func writeGround(b *strings.Builder, c term.RGB, transparent *term.RGB) {
+	if transparent != nil && c == *transparent {
+		b.WriteString("transparent")
+		return
+	}
+	writeHex(b, c)
+}
+
+// BLOCK CELLS ARE BACKGROUNDS, NOT GLYPHS (2026-09-16).
+//
+// His phone, iOS Safari, 22:32: the moon in the hero clip had come apart
+// into strips sitting twenty cells from where they belonged, with a black
+// rule beside each, in portrait and in landscape. The disc's edge is drawn
+// with U+2584, the lower half block, in two colours, and every other row of
+// that sky is spaces. The same page renders whole in WebKit on this Mac,
+// where Menlo carries the block elements; on the phone the glyph comes from
+// whatever font iOS falls back to, at that font's own width and height, and
+// the row breaks around it.
+//
+// So the page never asks a font for a block. A cell whose glyph is a half or
+// a quarter block -- the fifteen the renderer draws, U+2580..U+259F -- is
+// written as a SPACE with a background that paints the same pattern: a
+// two-stop linear gradient for a half, a four-stop conic gradient for a
+// quadrant (from twelve o'clock clockwise: top right, bottom right, bottom
+// left, top left; measured at 70 bytes a class against 230 for four layers,
+// which was 200KB of gzipped stylesheet on the page). The
+// picture is the same in any font, and the hairline term.LowerHalf exists to
+// hide in a terminal cannot happen here, because there is no glyph to leave
+// a gap under. A full block is a space on its own ink and joins the run
+// beside it.
+func writeBlockCSS(b *strings.Builder, fg, bg term.RGB, mask uint8, transparent *term.RGB) {
+	col := func(bit uint8) {
+		if mask&bit != 0 {
+			writeHex(b, fg)
+		} else {
+			writeGround(b, bg, transparent)
+		}
+	}
+	b.WriteString("background:")
+	switch mask {
+	case maskTop, maskBottom:
+		b.WriteString("linear-gradient(")
+		col(maskTopLeft)
+		b.WriteString(" 50%,")
+		col(maskBottomLeft)
+		b.WriteString(" 50%)")
+	case maskLeft, maskRight:
+		b.WriteString("linear-gradient(90deg,")
+		col(maskTopLeft)
+		b.WriteString(" 50%,")
+		col(maskTopRight)
+		b.WriteString(" 50%)")
+	default:
+		b.WriteString("conic-gradient(")
+		col(maskTopRight)
+		b.WriteString(" 0 25%,")
+		col(maskBottomRight)
+		b.WriteString(" 0 50%,")
+		col(maskBottomLeft)
+		b.WriteString(" 0 75%,")
+		col(maskTopLeft)
+		b.WriteString(" 0)")
+	}
+}
+
+// The quarters of a cell, as bits of a block's mask.
+const (
+	maskTopLeft     uint8 = 8
+	maskTopRight    uint8 = 4
+	maskBottomLeft  uint8 = 2
+	maskBottomRight uint8 = 1
+	maskTop               = maskTopLeft | maskTopRight
+	maskBottom            = maskBottomLeft | maskBottomRight
+	maskLeft              = maskTopLeft | maskBottomLeft
+	maskRight             = maskTopRight | maskBottomRight
+	maskFull              = maskTop | maskBottom
+)
+
+// blockMask is the 2x2 pattern a block element paints, or zero for any other
+// rune. The shade blocks are tone, not shape, and stay glyphs.
+func blockMask(r rune) uint8 {
+	switch r {
+	case '▀':
+		return maskTop
+	case '▄':
+		return maskBottom
+	case '█':
+		return maskFull
+	case '▌':
+		return maskLeft
+	case '▐':
+		return maskRight
+	case '▖':
+		return maskBottomLeft
+	case '▗':
+		return maskBottomRight
+	case '▘':
+		return maskTopLeft
+	case '▙':
+		return maskTopLeft | maskBottomLeft | maskBottomRight
+	case '▚':
+		return maskTopLeft | maskBottomRight
+	case '▛':
+		return maskTopLeft | maskTopRight | maskBottomLeft
+	case '▜':
+		return maskTopLeft | maskTopRight | maskBottomRight
+	case '▝':
+		return maskTopRight
+	case '▞':
+		return maskTopRight | maskBottomLeft
+	case '▟':
+		return maskTopRight | maskBottomLeft | maskBottomRight
+	}
+	return 0
 }
 
 // HTMLFragmentClassed is HTMLFragmentAs with the colours taken out of the
@@ -693,13 +824,10 @@ func (c *Canvas) htmlFragmentWith(fontPx int, p term.Profile, quantise bool, pal
 	// built on. A page is not a terminal; it has no half-block hairline to
 	// avoid, and the studies exist precisely to show the split.
 	//
-	// ⚠ term.LowerHalf is NOT cleared here and must not be. Measured in
-	// headless Chrome at the clips' own CSS (Menlo, 14px, line-height 1):
-	// U+2580 has the same gap in the browser that it has in Terminal.app --
-	// two device pixel rows of the lower colour above the upper half -- so
-	// clearing it would put a wrong-coloured band above all 500 split cells in
-	// the sky clip. The published page is the good one because it was built
-	// under LowerHalf; that stays.
+	// term.LowerHalf used to matter here too (U+2580 leaves the same gap in
+	// headless Chrome that it leaves in Terminal.app). Since 2026-09-16 a
+	// half block is written as a background, not a glyph (writeBlockCSS), so
+	// the page has no gap to hide whichever way the flag is set.
 	was := term.NoSplitCells
 	term.NoSplitCells = false
 	defer func() { term.NoSplitCells = was }()
@@ -746,11 +874,32 @@ func (c *Canvas) htmlFragmentRect(fontPx int, p term.Profile, quantise bool, pal
 				fg = p.Quantise(fg, r.glyph)
 				bg = p.Quantise(bg, false)
 			}
+			ch := r.ch
+			if m := blockMask(ch); m != 0 {
+				if m == maskFull {
+					// A full block is a space on its own ink.
+					ch, bg = ' ', fg
+				} else {
+					// A half or a quarter: its own span, painted as a
+					// background (writeBlockCSS), never as a glyph.
+					flush()
+					if pal != nil {
+						b.WriteString(`<span class="p`)
+						b.WriteString(strconv.Itoa(pal.block(fg, bg, m)))
+						b.WriteString(`"> </span>`)
+					} else {
+						b.WriteString(`<span style="`)
+						writeBlockCSS(&b, fg, bg, m, nil)
+						b.WriteString(`"> </span>`)
+					}
+					continue
+				}
+			}
 			// A space shows only its background, so it joins any run with
 			// that background, and a run made only of spaces takes the
 			// foreground of the first glyph that follows it. Fewer runs, and
 			// the same picture: a fifth of a page was space-only spans.
-			space := r.ch == ' '
+			space := ch == ' '
 			switch {
 			case run.Len() == 0:
 				rFG, rBG, runGlyph = fg, bg, !space
@@ -760,7 +909,7 @@ func (c *Canvas) htmlFragmentRect(fontPx int, p term.Profile, quantise bool, pal
 			case !space && !runGlyph:
 				rFG, runGlyph = fg, true
 			}
-			switch r.ch {
+			switch ch {
 			case '<':
 				run.WriteString("&lt;")
 			case '>':
@@ -768,7 +917,7 @@ func (c *Canvas) htmlFragmentRect(fontPx int, p term.Profile, quantise bool, pal
 			case '&':
 				run.WriteString("&amp;")
 			default:
-				run.WriteRune(r.ch)
+				run.WriteRune(ch)
 			}
 		}
 		flush()

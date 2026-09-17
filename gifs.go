@@ -431,6 +431,11 @@ func agentPane(cols, rows int, lines []string) *canvas.Canvas {
 					put(col, y, f[2], dim)
 				}
 			}
+		case strings.HasPrefix(l, "$ "):
+			// A shell line typed at the agent's prompt, the way Claude Code
+			// shows one: the bang, then the command.
+			put(2, y, "!", dim)
+			put(4, y, l[2:], bright)
 		case strings.HasPrefix(l, "!"):
 			put(4, y, l[1:], bright)
 		default:

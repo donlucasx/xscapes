@@ -47,6 +47,12 @@ var worriedWAV []byte
 // whole ambience bed), not to shave bytes.
 const maxCueBytes = 128 << 10
 
+// Cues returns the three embedded sounds, WAV bytes, in the order they are
+// heard: the ask, the finish, and the finish that leaves a failure standing.
+// The submission page embeds them so a reader can press and hear what "one
+// sound" means (his site session of 2026-09-17; the s38 judge's J4).
+func Cues() (ask, done, worried []byte) { return askWAV, doneWAV, worriedWAV }
+
 // cueDir is where the embedded bytes get written so a player can open them.
 //
 // afplay and paplay take a PATH, not a stream, so the bytes have to land on

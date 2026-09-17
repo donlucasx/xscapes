@@ -63,6 +63,16 @@ type fxClip struct {
 	// port, when set, is the companion ALONE on a flat ground: no sea, no
 	// sand, no litter. See portraitFrames.
 	port *portrait
+
+	// narrow, when set, names the clip the player swaps in when this one
+	// would fall under the page's font floor: the same session rendered at
+	// fewer columns, for a phone. See heroNarrowClip.
+	narrow string
+
+	// mont, when set, is a montage (montage.go): a session whose scape and
+	// companion change part-way. The hero is one since 2026-09-17, his pick
+	// of H1 from six.
+	mont *montage
 }
 
 // A PORTRAIT IS THE COMPANION BY ITSELF.
@@ -111,6 +121,37 @@ var portraitGround = term.RGB{R: 1, G: 0, B: 1}
 // could not import.
 func sceneClips(pal *canvas.HTMLPalette) []fxClip {
 	return []fxClip{
+		// THE SHORE ON ITS OWN, his ask of 2026-09-17: "another mini section
+		// for the 'beach scape' same size as the mountain vista". The live
+		// shore folded through a short session of its own: a prompt, two
+		// crablets, the work rising and the finish; 80x24 with no pane, the
+		// vista clip's size. The sea keeps real time, so the loop cuts at its
+		// end; twelve seconds so the cut is rare.
+		{key: "shore", label: "the shore", note: "The sea is the work.",
+			sc: gifScene{name: "shore", tod: 0.62, secs: 12, fps: 6, speed: 4, pal: pal, cube: !truecolorFX,
+				beats: []loopBeat{
+					{at: 1, evs: []event.Event{{Kind: event.Prompt, Text: "add rate limiting to the auth endpoint"}, todo(0, 3), ctx(0.30)}},
+					{at: 3, evs: []event.Event{
+						tool(event.ToolStart, "s1", event.OpRead, "Read", "internal/auth/handler.go", ""),
+						tool(event.ToolEnd, "s1", event.OpRead, "Read", "internal/auth/handler.go", "142 lines"),
+					}},
+					{at: 6, evs: []event.Event{sub("sa1", "Explore", event.SubStart), sub("sa2", "Explore", event.SubStart)}},
+					{at: 10, evs: []event.Event{
+						tool(event.ToolStart, "s2", event.OpEdit, "Edit", "internal/auth/handler.go", ""),
+						tool(event.ToolEnd, "s2", event.OpEdit, "Edit", "internal/auth/handler.go", "+18 -2"),
+						todo(1, 3),
+					}},
+					{at: 16, evs: []event.Event{
+						tool(event.ToolStart, "s3", event.OpWrite, "Write", "internal/auth/limiter.go", ""),
+						tool(event.ToolEnd, "s3", event.OpWrite, "Write", "internal/auth/limiter.go", "64 lines"),
+						todo(2, 3), ctx(0.38),
+					}},
+					{at: 26, evs: []event.Event{
+						tool(event.ToolStart, "s4", event.OpShell, "Bash", "go test ./internal/auth", ""),
+						tool(event.ToolEnd, "s4", event.OpShell, "Bash", "go test ./internal/auth", "ok 1.4s"),
+					}},
+					{at: 38, evs: []event.Event{todo(3, 3), {Kind: event.Done, Text: "Rate limiting is in."}}},
+				}}},
 		{key: "rain", label: "the rainy window", note: "Rain on the glass is the work.",
 			scene: scenes.Find("Rainy window"), tod: 0.75, frames: scenes.RainPeriod, fps: 6, sc: gifScene{pal: pal}},
 		// His pick of 2026-09-15: the wind is the work, the fire is the light.
@@ -128,7 +169,7 @@ func sceneClips(pal *canvas.HTMLPalette) []fxClip {
 // allFX is every embedded animation, in one place so the page and the cost
 // test cannot disagree about what ships.
 func allFX(pal *canvas.HTMLPalette) []fxClip {
-	clips := append([]fxClip{heroClip(pal)}, stateClips(pal)...)
+	clips := append([]fxClip{heroClip(pal), heroNarrowClip(pal)}, stateClips(pal)...)
 	clips = append(clips, castClips(pal)...)
 	return append(clips, sceneClips(pal)...)
 }
@@ -234,7 +275,22 @@ func portraitCanvases(cl fxClip) (cs []*canvas.Canvas, box [4]int, err error) {
 		blink := i == 3
 		switch p.who {
 		case "owl":
-			scenes.DrawOwlPicked(c, p.x, p.y, blink)
+			if run == nil && p.pose == companion.Working && cl.sc.beats == nil && cl.sc.at == 0 {
+				// The cast's owl: today's face with one blink a loop.
+				scenes.DrawOwlPicked(c, p.x, p.y, blink)
+				break
+			}
+			// The legend's owl: the state's face with its picked motion,
+			// exactly as the vista draws it, and the balloon over its head.
+			scenes.DrawOwlMoving(c, p.x, p.y, t, pose, scenes.PickedOwlMotion(pose), 0)
+			if bubble != "" {
+				rows, col := companion.DoneBubble(bubble), bubbleCol
+				if ask {
+					rows, col = companion.Bubble(bubble), bubbleAskCol
+				}
+				rows, bx := portraitBubble(rows, p.x+scenes.OwlHeadCol, c.W)
+				(&companion.Sprite{Rows: rows, Body: col, Opaque: true}).Draw(c.Near(), bx, p.y-len(rows))
+			}
 		case "frog":
 			scenes.DrawCandidate(c, scenes.FindAnimal("Frog"), p.x, p.y, true, blink)
 		default:
@@ -352,6 +408,10 @@ func portraitBubble(rows []string, head, w int) ([]string, int) {
 
 // framesOf renders one clip whichever way it is declared.
 func framesOf(seed int64, cl fxClip) (frames []string, cols, rows, fps int, err error) {
+	if cl.mont != nil {
+		frames, err = montageFrames(seed, *cl.mont, cl.sc.pal)
+		return frames, cl.mont.cols, cl.mont.rows + cl.mont.agentRows, cl.mont.fps, err
+	}
 	if cl.scene != nil {
 		frames, err = sceneFrames(cl)
 		return frames, 80, 24, cl.fps, err
@@ -371,6 +431,7 @@ type fxPayload struct {
 	FPS    int      `json:"fps"`
 	Label  string   `json:"label"`
 	Note   string   `json:"note"`
+	Narrow string   `json:"narrow,omitempty"`
 	Frames []string `json:"frames"`
 }
 
@@ -381,21 +442,41 @@ type fxPayload struct {
 // frame is markup, so 10fps at 108 columns is four times the page a judge will
 // wait for; the sea and the companion still read at 6.
 func heroClip(pal *canvas.HTMLPalette) fxClip {
+	// HIS PICK OF 2026-09-17, "lets use H1 to replace the hero gif": two
+	// turns of one session, the owl's on the mountain vista and then the
+	// crab's on the shore, one day across both (montage.go, heroVariants).
+	// A REAL WINDOW, not a thumbnail of one. His own is 125x62; this
+	// renders at 124x44 -- 14 rows of transcript over a 30-row scape --
+	// because the page had been showing a cramped version of a product
+	// whose whole argument is that it has room to breathe. The detail
+	// clips below stay tight on purpose; this one is the wide shot.
+	m := heroVariant("h1")
 	return fxClip{
-		key:   "hero",
-		label: "a whole session",
-		note:  "one turn, start to finish, with the day turning under it",
-		// A REAL WINDOW, not a thumbnail of one. His own is 125x62; this
-		// renders at 124x44 -- 14 rows of transcript over a 30-row scape --
-		// because the page had been showing a cramped version of a product
-		// whose whole argument is that it has room to breathe. The detail
-		// clips below stay tight on purpose; this one is the wide shot.
-		sc: gifScene{
-			name: "hero-live", tod: 0.30, todEnd: 1.30, secs: 15, cols: 124,
-			agentRows: 14, rows: 30, speed: loopSecs / 15.0, beats: windowLoop(),
-			fps: 6, pal: pal, cube: !truecolorFX,
-		},
+		key:    "hero",
+		narrow: "hero-n",
+		label:  "a whole session",
+		note:   m.note,
+		mont:   &m,
+		sc:     gifScene{name: "hero-live", pal: pal, cube: !truecolorFX},
 	}
+}
+
+// heroNarrowClip is the hero for a PHONE. His screenshots of 2026-09-16
+// (22:32, portrait and landscape): at 124 columns on a 390px screen the
+// frame sits at the player's 7px floor, 523px wide on a 351px stage, and
+// the companion is on the half you cannot see -- and a touch-drag scrubs the
+// session rather than scrolling the stage, so it can never be reached. The
+// same session at 80 columns fits: 10 rows of transcript over the shore's
+// own 24. The player plays it whenever the wide one would fall under the
+// floor (fxPayload.Narrow), and goes back on resize.
+func heroNarrowClip(pal *canvas.HTMLPalette) fxClip {
+	cl := heroClip(pal)
+	cl.key, cl.narrow, cl.label = "hero-n", "", "a whole session, narrow"
+	cl.sc.name = "hero-narrow"
+	m := *cl.mont
+	m.cols, m.agentRows, m.rows = 80, 10, 24
+	cl.mont = &m
+	return cl
 }
 
 // stateClips are the legend, and they are deliberately ONE scene at five
@@ -449,8 +530,14 @@ func stateClips(pal *canvas.HTMLPalette) []fxClip {
 	// rung, which grows DOWN from that row. On the beach the sand's edge
 	// crops those legs and he liked the crop; on a transparent ground a
 	// cropped leg reads as a cut one, so the whole pose fits.
+	//
+	// THE OWL, his word of 2026-09-17: "replace the crab for the owl for the
+	// 'companion states' section". The owl never grows, so the same box
+	// holds every state with room for the balloon above it. Each loop is as
+	// long as the state's own picked motion (owl_anim.go, OwlMotionPick), so
+	// the thing that moves is seen once a loop and the loop closes on it.
 	port := func() *portrait {
-		return &portrait{who: companion.NameCrab, cols: 48, rows: 17, x: 18, y: 3}
+		return &portrait{who: "owl", cols: 48, rows: 17, x: 18, y: 3}
 	}
 	mk := func(key, label, note string, at, tod, secs float64) fxClip {
 		return fxClip{key: key, label: label, note: note, port: port(),
@@ -458,16 +545,14 @@ func stateClips(pal *canvas.HTMLPalette) []fxClip {
 	}
 	clips := []fxClip{
 		{key: "needs", label: "it needs you",
-			note: "A solid balloon and a chime, and the companion walks up the beach to ask -- three strides, twice its resting size, so the question is impossible to miss from across the room. It holds the pose until you come back.",
+			note: "A solid balloon and a chime. Eyes wide, two quick blinks, the near wing waving, until you come back.",
 			port: port(),
-			sc: gifScene{name: "st-needs", tod: 0.80, secs: 5, fps: 6,
+			sc: gifScene{name: "st-needs", tod: 0.80, secs: 8, fps: 6,
 				beats: askBeats(), speed: 2, pal: pal, cube: !truecolorFX}},
-		mk("working", "it is working", "Eyes open, breathing quicker, a blink now and then. How hard is the sea's to say; the companion only says that it is at it.", 14, 0.52, 4),
-		mk("broke", "something broke", "The companion carries it, never the weather: claws down, stalks short, amber eyes, until the trouble clears.", 22, 0.62, 4),
-		// 7 s, because the settled pincer shuts once every 7 (crabClawPeriod)
-		// and a shorter loop would never show the one thing that moves.
-		mk("done", "it finished", "A dotted balloon and a low note, both claws up, settled on the sand with one pincer shutting every few seconds.", 44, 0.96, 7),
-		mk("quiet", "it is waiting", "Eyes closed, breathing slow. Nothing is running and nothing is asked; the next prompt wakes it.", 72, 0.27, 4),
+		mk("working", "it is working", "Eyes open. Now and then a look away, a blink, and a flutter of the small wings.", 14, 0.52, 10),
+		mk("broke", "something broke", "A squint with worried brows and amber slit eyes, until the trouble clears. The companion carries it, never the weather.", 22, 0.62, 6),
+		mk("done", "it finished", "A dotted balloon and a low note, ^ ^ eyes, two hops with the wings out.", 44, 0.96, 5),
+		mk("quiet", "it is waiting", "Lids down. One eye peeks now and then. The next prompt wakes it.", 72, 0.27, 10),
 	}
 	legendCrop(clips)
 	return clips
@@ -506,7 +591,7 @@ func renderFX(seed int64) (js, css string, err error) {
 		}
 		out[cl.key] = fxPayload{
 			Cols: cols, Rows: rows, FPS: fps,
-			Label: cl.label, Note: cl.note, Frames: frames,
+			Label: cl.label, Note: cl.note, Narrow: cl.narrow, Frames: frames,
 		}
 	}
 	// The palette must be asked for its CSS only after the last frame, since
