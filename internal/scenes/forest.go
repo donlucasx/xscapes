@@ -577,7 +577,6 @@ func paintVistaL(c *canvas.Canvas, lay vistaLayout, tod, t, level float64, seed 
 
 	// Three ranges. Rock is grey at night and warm stone by day; each farther
 	// range is pulled toward the sky, which is what distance does.
-	rock := term.Lerp(grey(3), term.RGB{R: 150, G: 138, B: 118}, l)
 	// THE SEAMS, measured over a day at 125x28 (s36, his ask that every
 	// element "stay consistent and legible throughout"): the far range's
 	// rock sat within 1-10 luma of the mid range's all day, so it went
@@ -587,25 +586,33 @@ func paintVistaL(c *canvas.Canvas, lay vistaLayout, tod, t, level float64, seed 
 	// lakeApart luma above the meadow's top green; the mound's day grey was
 	// 10 luma off the meadow, so its day end is grey 13 rather than 9.
 	farInto := 0.58
+	// The snow is the live scape's pick; the study keeps today's.
+	snowPick := 0
 	if live != nil {
 		farInto = 0.70
+		snowPick = SnowPick
 	}
-	farCol := term.Lerp(rock, p.SkyHorizon, farInto)
-	midCol := term.Lerp(rock, p.SkyHorizon, 0.22)
-	nearCol := term.Lerp(grey(1), term.RGB{R: 34, G: 62, B: 36}, l)
-	paintRange(c, farTop, term.Lerp(farCol, warm, 0.22*glow), c.H, nil)
-	snow := term.Lerp(term.Lerp(grey(15), grey(23), l), warm, 0.45*glow)
-	midLit := term.Lerp(midCol, warm, 0.6*glow)
+	rt := rangeTones(p, l, glow, warm, farInto, snowPick)
+	midCol, nearCol, midLit, snow := rt.Mid, rt.Near, rt.MidLit, rt.Snow
+	paintRange(c, farTop, rt.Far, c.H, nil)
+	snowLine := snowLines(snowPick, midTop, midBase, seed)
 	paintRange(c, midTop, midCol, c.H, func(u, v, depth int) (term.RGB, bool) {
-		// Snow in the upper faces and down the gullies, patchy, only where
-		// the massif stands high enough to hold it.
-		high := midBase - midTop[u]
-		if high >= 7 {
-			if depth <= 2 && scape.HashF(u/2, v, seed+41) < 0.75 {
+		if snowPick >= 1 {
+			// Snow above the snowline, see snowLines.
+			if v < snowLine[u] {
 				return snow, true
 			}
-			if depth <= 7 && scape.HashF(u/3, 9, seed+42) < 0.18 {
-				return snow, true
+		} else {
+			// Snow in the upper faces and down the gullies, patchy, only where
+			// the massif stands high enough to hold it.
+			high := midBase - midTop[u]
+			if high >= 7 {
+				if depth <= 2 && scape.HashF(u/2, v, seed+41) < 0.75 {
+					return snow, true
+				}
+				if depth <= 7 && scape.HashF(u/3, 9, seed+42) < 0.18 {
+					return snow, true
+				}
 			}
 		}
 		// The upper faces take the low sun.
@@ -1069,4 +1076,175 @@ func paintLogs(near *canvas.Layer, cx, row, bandTop int, l float64, style int) {
 			plot(near, x, row, '=', cube(95, 95, 0), 1)
 		}
 	}
+}
+
+// THE SNOW (s38, 2026-09-16). His note on the vista at 20:31: "the snow on
+// the mountain peaks (I assume its snow?) seems pretty bright at night.
+// Clean up the snow art, the mountains overall look great but the snow
+// detail could be better." Then, on the first six candidates: "the moonlit
+// versions ... dont look right. seems like the different layers of the
+// mountain range merge at some times of the day ... none of the options
+// look good. try to make it look more realistic within the possibilities.
+// and the contrast should be more subtle between the snow and the
+// mountains."
+//
+// What the first round got wrong, measured: a night snow lifted from the
+// sky's horizon quantised to lavender (135,135,175), and at dusk it was the
+// far range's own colour, so the caps of the mid range vanished into the
+// range behind them -- the merge he saw. And a line across the frame reads
+// as a line, not as weather.
+//
+// COLOUR, styles 1 and up: the snow is the ROCK FACE IT SITS ON lifted a
+// little toward white. The same light falls on both, so the snow keeps the
+// rock's hue (grey at night, warm stone by day, the alpenglow at dusk and
+// dawn) and sits a small, fixed fraction above it: 0.30 of the way to white
+// at night rising to 0.55 by noon ("subtle"), or 0.22 to 0.42 ("faint").
+// Lifted from the mid range's lit face, it stays apart from the far range
+// wherever the face does. Today's snow (style 0) is grey 15 at night, 118
+// luma over the rock and 16 under the moon at 20:30.
+//
+// SHAPE, styles 1 and up: the snow follows the TERRAIN. A snowline is an
+// altitude with a ragged edge, and then: it runs deeper where the skyline
+// is concave -- a gully or a saddle, measured as how far the crest sits
+// below the mean of its thirteen neighbours -- so couloirs form where the
+// ground would hold snow; it stops shorter on a steep crest (four sub-rows
+// of rise over four sub-columns), where rock shows through; and the faces
+// that fall away to the right, the lee of a wind from the left, hold it two
+// sub-rows deeper while the windward faces hold one less. Nothing below the
+// line is drawn by chance: every edge is the terrain's. The three covers
+// differ only in where the line sits: 54%, 42% or 30% of the tallest peak.
+var SnowStyles = []struct{ Name, Note string }{
+	{"today", "grey 15 at night; a 75% coin flip per cell on the top two sub-rows, streaks in 18% of the columns"},
+	{"light cover, subtle", "the snowline at 54% of the tallest peak, terrain-following; the snow is the lit rock lifted 30% toward white at night, 55% by noon"},
+	{"medium cover, subtle", "the snowline at 42%; the same colour"},
+	{"heavy cover, subtle", "the snowline at 30%; the same colour"},
+	{"medium cover, faint", "the snowline at 42%; the lit rock lifted 22% at night, 42% by noon"},
+}
+
+// SnowPick is the snow the live vista draws; 0 is today. HIS PICK, 2026-09-16
+// 21:40: "i like S1", light cover, subtle. TestThePickedSnowIsByName holds it.
+var SnowPick = 1
+
+// RangeTones is every colour the three ranges are painted in at one hour,
+// and the snow on the mid range, before quantisation.
+type RangeTones struct{ Far, Mid, MidLit, Near, Snow, Moon term.RGB }
+
+func rangeTones(p scape.Palette, l, glow float64, warm term.RGB, farInto float64, snowPick int) RangeTones {
+	rock := term.Lerp(grey(3), term.RGB{R: 150, G: 138, B: 118}, l)
+	mid := term.Lerp(rock, p.SkyHorizon, 0.22)
+	midLit := term.Lerp(mid, warm, 0.6*glow)
+	rt := RangeTones{
+		Far:    term.Lerp(term.Lerp(rock, p.SkyHorizon, farInto), warm, 0.22*glow),
+		Mid:    mid,
+		MidLit: midLit,
+		Near:   term.Lerp(grey(1), term.RGB{R: 34, G: 62, B: 36}, l),
+		Moon:   p.Moon,
+	}
+	if snowPick == 0 {
+		rt.Snow = term.Lerp(term.Lerp(grey(15), grey(23), l), warm, 0.45*glow)
+		return rt
+	}
+	// THE SEAMS THE SNOW STYLES HOLD (his note: "the different layers of
+	// the mountain range merge at some times of the day"; measured on the
+	// cube, hour by hour, 2026-09-16). At 06:00 and 19:00 the alpenglow put
+	// the far range and the mid range's lit face on the same cube entry
+	// (173), and at 23:00 the two ranges rounded to the same grey (237). So
+	// the far range goes further into the horizon at dusk and dawn and
+	// pales with the glow (the haze of distance), and is then lifted toward
+	// white until it clears BOTH the mid body and the lit face by 15 luma
+	// as drawn; the snow is lifted the same way until it clears the far
+	// range by 20 (at 17:00 the haze and the caps had met at 178 and 182).
+	// The far range at dusk and dawn: further into the horizon, and then a
+	// quarter of the glow toward white, the haze of distance -- at 19:00 the
+	// horizon itself is the lit face's entry (173), so going into it alone
+	// still met the face; the haze lifts it to 216.
+	far := term.Lerp(term.Lerp(rock, p.SkyHorizon, farInto+0.15*glow), grey(23), 0.25*glow)
+	rt.Far = apart(far, 15, mid, midLit)
+	lift := 0.30 + 0.25*l
+	if snowPick == 4 {
+		lift = 0.22 + 0.20*l
+	}
+	rt.Snow = apart(term.Lerp(midLit, grey(23), lift), 20, rt.Far)
+	return rt
+}
+
+// apart lifts c toward white, a fiftieth at a time, until its luma as the
+// terminal draws it clears every colour in under by at least floor. The
+// cube is coarse in the warm mid-tones (the dusk horizon, the lit face and
+// the far range all rounded to one entry at 19:00), so the check is made on
+// the quantised colours and not on the blend.
+func apart(c term.RGB, floor float64, under ...term.RGB) term.RGB {
+	need := func(x term.RGB) bool {
+		for _, u := range under {
+			if qluma(x)-qluma(u) < floor {
+				return true
+			}
+		}
+		return false
+	}
+	out := c
+	for k := 0.02; k <= 1.0001 && need(out); k += 0.02 {
+		out = term.Lerp(c, grey(23), k)
+	}
+	return out
+}
+
+// qluma is a colour's luma as the terminal will draw it, after the cube.
+func qluma(c term.RGB) float64 {
+	q := term.FromIndex256(c.Index256Keeping())
+	return 0.299*float64(q.R) + 0.587*float64(q.G) + 0.114*float64(q.B)
+}
+
+// VistaRangeTones is rangeTones for the instruments: the live vista's
+// colours at an hour, for a snow style.
+func VistaRangeTones(pick int, tod float64) RangeTones {
+	p, _ := applyTone(scape.PaletteAt(tod), tod, VistaTonePick)
+	return rangeTones(p, lit(p), glowAt(tod), term.RGB{R: 255, G: 135, B: 95}, 0.70, pick)
+}
+
+// snowLines is, for styles 1 and up, the sub-row per sub-column below which
+// there is no snow (snow where v < line[u]; -1 is none); nil for style 0.
+func snowLines(pick int, top []int, base int, seed int64) []int {
+	if pick < 1 {
+		return nil
+	}
+	frac := map[int]float64{1: 0.54, 2: 0.42, 3: 0.30, 4: 0.42}[pick]
+	n := len(top)
+	line := make([]int, n)
+	hMax := 0
+	for _, t := range top {
+		hMax = max(hMax, base-t)
+	}
+	at := func(k int) int { return top[min(n-1, max(0, k))] }
+	// Never lower than seven sub-rows, today's floor for snow at all.
+	lineH := max(7.0, frac*float64(hMax))
+	for u := 0; u < n; u++ {
+		high := base - top[u]
+		// h is the snow's depth from the base: more h, more snow.
+		h := lineH + (ridged(float64(u), seed+61, 0.31)-0.5)*4
+		// Concave ground holds more: the crest below its neighbours' mean.
+		sum := 0
+		for k := u - 6; k <= u+6; k++ {
+			sum += at(k)
+		}
+		conc := float64(top[u]) - float64(sum)/13
+		h += math.Min(6, math.Max(0, conc))
+		// A steep crest holds less; the lee holds more.
+		l, r := at(u-2), at(u+2)
+		if d := r - l; d >= 4 || d <= -4 {
+			h -= 2
+		}
+		switch {
+		case r > l:
+			h += 2
+		case l > r:
+			h -= 1
+		}
+		if float64(high) < h+1 {
+			line[u] = -1
+			continue
+		}
+		line[u] = base - int(math.Round(h))
+	}
+	return line
 }

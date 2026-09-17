@@ -2,6 +2,29 @@
 
 *(Renamed end to end on 2026-09-03: directory, env vars, state path and hook marker. Two names are kept on purpose and are not leftovers -- `internal/envx` still reads `ASCIISCAPES_*` and warns, and `install.go` still RECOGNISES the `# asciiscapes:v1` marker so the hooks it wrote before the rename can be found and removed.)*
 
+> **Session 38 (2026-09-16 evening): THREE KIMI AUDITS at his word (technical · user · Commons judge), every
+> major finding re-verified here; NOTHING committed; the record edited.** Page https://claude.ai/artifact/J4TebzQ45125RUYpnmpiXy ·
+> packet `~/Documents/kimi/xscapes-full-audit-2026-09-16/`. Verdicts: SHIP WITH FIXES · WOULD INSTALL · 8.1/10, places 4–19.
+> ⭐ **NEW AND CONFIRMED: A RESUMED SESSION NEVER BINDS ITS HOOKS** (`inside.go:119/185` bind only to an id that
+> differs from `run/current` at launch; a resume rewrites the same id, his spools prove it), so a restart-by-id
+> shows the watcher, not the hooks, and the next SessionStart from another window can bind the scape to the wrong
+> session. Also confirmed: `xscapes claude -c` dies on flag parsing (`--` undocumented) · the moon's statusline line
+> is printed, never written, and the README omits it · README stale on stars (l.228) and sounds (l.104-105) · the
+> live entry still says the vista is "next" (the s35 rebuild unpublished; publishing is item 1 and free) ·
+> kimi/hermes uninstalls not byte-exact and no backups · reallocBand unpinned until the next frame (a race) ·
+> @latest 22 behind. REFUTED: Kimi's "uninstall not byte for byte" (a clean round trip is identical). All 11 locked
+> constants and 11 encoding rows SUPPORTED. NEXT: his rulings on the ranked list (`RESUME.md` ▶ NEXT s38).
+> ⭐ **Then his note at 20:31: the vista's snow is too bright at night and its detail could be better.** Measured
+> 186 vs the moon's 202 at his hour. `scenes.SnowPick` (0 = today, live only) with six styles, colour and shape
+> drawn apart, on https://claude.ai/artifact/XxUChxf7HwUusvm3z55ggx ; UNCOMMITTED, his pick pending.
+> Round 2 on his *"none of the options look good"*: the merge he saw is OLDER than the round and MEASURED (far == mid
+> on grey 237 at 23:00; far == the lit face on entry 173 at 06:00 and 19:00); styles 1-4 now hold every seam by a
+> quantised-luma rule and draw the snow as the lit rock lifted a little, edges from the terrain. Same link, v2.
+> ⭐ **RULED 21:40: "i like S1"** (light cover, subtle): `SnowPick = 1`, locked by name and by a half-hour seam test;
+> installed dirty, UNCOMMITTED. **WRAPPED 2026-09-16 ~21:50 PDT at his word. NEXT: commit first (his word), then
+> his words "website + update submisson on commonsmade": publish the s35 rebuild and verify from outside, the
+> judge's page edits, the Commons submission page in his Chrome; then the ranked list (F1 first).**
+
 > **Session 36 (2026-09-16), WRAPPED at his word "commit!". HIS FIRST LOOK AT THE VISTA LIVE: THIRTEEN
 > NOTES, EVERY ONE BUILT TO AND RULED ON THE SAME DAY.** Opened on the resume; his first screenshot had
 > the balloon's letters missing. Measured, not inferred: the runes were all there and the INK was the

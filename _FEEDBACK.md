@@ -3852,3 +3852,88 @@ files staged by hunk and by content so each commit holds only its own change. *"
 --user donlucasx && git push`, origin/main read back. *"lets /wrap"* ⇒ WRAPPED 2026-09-16 ~16:40 PDT.
 Installed from the clean tree (stamp 781e530, modified=false); his window's scape still holds the morning's
 binary and the tyastie one an older one: **a restart is what shows the afternoon.**
+
+## Session 38 — 2026-09-16 evening: three Kimi audits (technical · user · Commons judge), every major finding re-verified
+
+- *"resume work on xscapes. Have a kimi agent do a full audit of xscapes, or multiple, from a technical perspective, from a user perspective and from a commonsmade judge perspective"*
+  ⇒ Three `kimi -p` runs (K3, v0.39.1), each from its own packet dir under `~/Documents/kimi/xscapes-full-audit-2026-09-16/` (shared `CONTEXT.md` +
+    an `AUDIT-CHARGE.md` per perspective; `repo/` = `git archive HEAD` fdf2894; `bin/xscapes` built from it;
+    `fakehome/` a sandbox HOME so `--apply`, `uninstall` and `hook` could run without touching his config or a
+    live socket; `user/frames/` 56 PNGs of the vista at five sizes and of every page clip, re-cut at 16px;
+    `judge/page/` seven 1440px slices of the live entry plus its prose). The live tree was verified untouched
+    afterwards. ⚠ `sips` ignores `--cropOffset` (every slice was the centre crop; the judge's first run was
+    killed and relaunched on corrected slices from ImageMagick).
+  ⇒ **Verdicts: technical SHIP WITH FIXES · user WOULD INSTALL · judge 8.1/10, places 4–19.** Every major finding
+    re-verified here before acceptance: `VERIFIED.md` in the packet, and the page https://claude.ai/artifact/J4TebzQ45125RUYpnmpiXy .
+  ⭐ **CONFIRMED AND NEW: F1, a resumed session never binds its hooks.** `inside.go:119` reads `run/current` at
+    launch and `:185` binds only to an id that DIFFERS from it; `hook.go:234` rewrites the pointer with the SAME
+    id on a resume (his own spools hold a session with a `startup` and a later `resume` session_start).
+    `run/current` held THIS session's id, so quit-and-resume of this session gets the generic watcher, not the
+    hooks; and the next SessionStart from another window DOES differ, so the scape can bind to another
+    project's session. Fix proposed: hand the session over through the agent's environment (the hook already
+    reads it, `SessionFromEnv`), or at least clear the pointer at launch.
+  ⭐ CONFIRMED: `xscapes claude -c` → "flag provided but not defined: -c"; `xscapes claude -- -c` works and the
+    README never shows `--` (F6) · the moon needs the statusline chain that install prints and does not write,
+    and the README never mentions it (U2) · README stale: stars "specified and not built" (l.228), "bright chime
+    / low sonar" (l.104-105) (F19/J6) · the live entry still says the vista is "next" (the s35 rebuild was
+    never published) (J1) · kimi/hermes uninstalls not byte-exact (a blank line eaten; `hooks: {}` left) and
+    neither writes a backup (F3/F4) · reallocBand ends with the region reset and origin off, re-pinned only by
+    the next frame (F2, by reading; a race with the agent's ~100 ms repaint) · `GOOS=linux go build ./...`
+    fails in two notes/ probes (F8) · @latest = v0.4.1, 22 commits behind the page (U12) · `xscapes install`
+    with no target plans for claude (U11) · `-scape 24` sets rows (U17) · the /dev/tty size fallback closes its
+    fd before use (F15) · the socket file survives a SIGTERM (F12).
+  ⚠ **REFUTED (Kimi wrong, checked here):** U1 "uninstall is not byte for byte" — on a settings file with no
+    xscapes in it, install --apply then uninstall --apply returns the IDENTICAL file (its sandbox already
+    carried the 12 hooks) · U3 "the cleanup never runs on a panic" — the paint is on the main goroutine, so
+    `defer leave()` restores the terminal; the agent still dies with the pty, and there is no recover around
+    Paint · F19 "`xscapes inside` is not in v0.4.1" — it is; the watch adapter, the vista, the kimi/hermes
+    installers and the counter are what v0.4.1 lacks.
+  ⇒ Axis 5: all 11 locked constants and all 11 encoding-rule rows SUPPORTED by the code; none contradicted.
+  ⇒ Measured by Kimi, consistent with ps here: a hook invocation ~3 ms (250 ms watchdog, always exit 0); his
+    three live scapes idle at 0.5–1% CPU, ~15 MB after 35 h; spools 18 MB in 162 files after three weeks.
+  ⏭ **His rulings pending on the ranked list** (the page): 1 publish (free; J1) · 2 F1 the resume bind ·
+    3 F6 + README `--` · 4 README pass (statusline step, terminals, stars, sounds, uninstall) · 5 tag v0.4.2 ·
+    6 F2 bracket reallocBand (+ one live drag) · 7 F4/F3 · 8 page: knocks, thesis, truecolor caption · 9 later:
+    recover around Paint, the spend attach read off the paint goroutine, spool GC, build tags.
+
+- *"some notes before we move onto #1. Looking at the mountain scape at night, the snow on the mountain peaks (I assume its snow?) seems pretty bright at night. Clean up the snow art, the mountains overall look great but the snow detail could be better. [screenshot 20:31 PDT, 133x59, the vista at dusk, the counter reads 17M tokens]"*
+  ⇒ Measured first: at 20:30 today's snow is luma 186 against a moon at 202 (16 under it); at midnight 158 vs
+    220. Today's shape is a 75% coin flip per cell on the top two sub-rows plus an 18% streak per column and a
+    half, which is the "specks". Built `scenes.SnowPick` (0 = today; live only, the page's clip and its guard
+    untouched) with six styles, two changes drawn apart: the COLOUR (S1: today's shapes, the night snow = the
+    MIDNIGHT horizon lifted 45% toward white, luma 133, rising to white with the SQUARE of the daylight → 150 at
+    20:30, 52 under the moon) and the SHAPE (S2 a snowline at 38% of the tallest peak with a ragged edge, lower
+    peaks bare · S3 + couloirs down from every saddle · S4 + lee: the right-hand faces hold snow deeper, the wind
+    is from the left · S5 = S4 with the night lifted 30%, luma 103). ⚠ Two things caught on the first render: a
+    night base read off the CURRENT horizon lifts with the dusk's mauve (180 at 20:30, no fix) → a fixed midnight
+    base; the line at 55% left only the tallest peak with a cap at 133 columns → 38%. Page, his band 133x24 at
+    five hours with the luma table: https://claude.ai/artifact/XxUChxf7HwUusvm3z55ggx (`XSCAPES_SNOWPAGE=<file> go test -run TestSnowPage .`).
+    NOT committed; his pick pending.
+- *"theres an issue with the moonlit versions - multiple issues, they dont look right. seems like the different layers of the mountain range merge at some times of the day. and honestly none of the options look good. try to make it look more realistic within the possibilities. and the contrast should be more subtle between the snow and the mountains"*
+  ⇒ **Measured before redrawing, on the cube hour by hour (a scratch sweep, then the page's own table):** his
+    "layers merge" is REAL and OLDER THAN THIS ROUND: at 23:00 the far and mid ranges both quantise to grey index
+    237 (luma 58 == 58), and at 06:00 and 19:00 the alpenglow puts the far range and the mid range's lit face on
+    the same cube entry (173, (215,135,95)). `TestTheElementsStayApart` says in its own comment that the far/mid
+    seam "is by hue and snow more than luma and is not held". My first-round moonlit snow made it worse: lavender
+    (135,135,175) at night and, at dusk, the far range's own colour, so the caps vanished into the range behind.
+  ⇒ **Second round, styles 1-4 (0 stays today; live only):** COLOUR = the lit rock face itself lifted toward white
+    (0.30 at night → 0.55 by noon "subtle"; 0.22 → 0.42 "faint"), so the snow takes the rock's own light and hue
+    at every hour. SHAPE = the terrain: a snowline with a ragged edge, deeper where the skyline is concave (a
+    gully or saddle: the crest below the mean of its thirteen neighbours, up to 6 sub-rows), shorter on a steep
+    crest (4 sub-rows over 4 sub-columns), 2 deeper on the lee (right) faces, 1 less on the windward; nothing
+    below the line by chance. Covers: the line at 54% / 42% / 30% of the tallest peak (light / medium / heavy).
+    SEAMS held by a general rule (`apart`): the far range goes further into the horizon at the glow hours and
+    pales with it (haze), then is lifted toward white until it clears BOTH the mid body and the lit face by 15
+    luma AS DRAWN (quantised); the snow is lifted until it clears the far range by 20. Sweep, every half hour:
+    S1-S3 snow over the face 41-68 (today: 33-120), snow from the far range ≥ 20 (today: 5 at 06:30), far from mid
+    ≥ 15 (today: 0 at 03:30). ⚠ The price at dusk and dawn: to clear a pale far range the snow lands on grey 208,
+    18 above the sun disc (190); the cube has no pink between 187 and 208. Page (same link, v2): https://claude.ai/artifact/XxUChxf7HwUusvm3z55ggx
+- *"i like S1"* ⇒ **RULED: S1, light cover, subtle** (the snowline at 54% of the tallest peak, terrain-following; the
+  snow is the lit face lifted 30% at night to 55% by noon; every seam held by `apart`). `scenes.SnowPick = 1`,
+  `TestThePickedSnowIsByName` + `TestTheSnowStaysApart` (every half hour: far ≥ mid body and lit face + 15, snow ≥
+  far + 20, snow over the face within 35..75, all as drawn). Installed dirty; commit at his word.
+- *"ok lets move onto updating the website. lets /wrap first and get ready to start on that next session"* then, mid-wrap:
+  *"website + update submisson on commonsmade"* ⇒ **WRAPPED 2026-09-16 ~21:50 PDT at his word.** NOTHING committed
+  (his word not given): `internal/scenes/forest.go`, `internal/scenes/snow_test.go`, `snowpage_test.go` + the record.
+  Installed dirty. NEXT SESSION = the website (publish the s35 rebuild, then the judge's page edits) + the Commons
+  submission page, in that order; the ranked list after.

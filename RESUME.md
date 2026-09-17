@@ -3,6 +3,36 @@
 **Copy-paste this prompt into a fresh session:**
 
 ```
+Session 38 (2026-09-16 evening), WRAPPED at his word "lets /wrap first":
+THREE KIMI AUDITS (technical · user · Commons judge), every major finding
+re-verified here (page https://claude.ai/artifact/J4TebzQ45125RUYpnmpiXy ; packet
+~/Documents/kimi/xscapes-full-audit-2026-09-16/, VERIFIED.md is the table):
+SHIP WITH FIXES · WOULD INSTALL · 8.1/10, places 4-19. ⭐ NEW AND CONFIRMED:
+A RESUMED SESSION NEVER BINDS ITS HOOKS (inside.go:119/185 bind only to an
+id that differs from run/current at launch; a resume rewrites the same id,
+his spools prove it) -- a restart must be a NEW session until F1 is fixed.
+Then his note on the vista's SNOW ("pretty bright at night ... the snow
+detail could be better"; round 2: "the different layers of the mountain
+range merge", "contrast ... more subtle"): measured on the cube, the merge
+is OLDER than the round (far == mid on grey 237 at 23:00; far == the lit
+face on entry 173 at 06:00 and 19:00); rebuilt as the lit face lifted a
+little with terrain-following edges and every seam held by a quantised-luma
+rule (`apart`); ⭐ RULED "i like S1" (light cover, subtle): scenes.SnowPick
+= 1, locked by name + TestTheSnowStaysApart; page https://claude.ai/artifact/XxUChxf7HwUusvm3z55ggx .
+Suite 13/13 + vet + fmt green; INSTALLED DIRTY (inode 86728941).
+⚠ UNCOMMITTED: internal/scenes/forest.go, internal/scenes/snow_test.go,
+snowpage_test.go + the record; origin/main = HEAD = fdf2894. COMMIT AT HIS
+WORD, FIRST. NEXT, his words: "website + update submisson on commonsmade":
+(1) publish the s35 rebuild -- `go run . -site site && sh site/publish.sh`,
+the entry proxies gh-pages within 10 min, verify from OUTSIDE (the live
+copy still says "the three below are drawn and next"); (2) the judge's
+page edits: the thesis above the fold, click-to-play knocks, a truecolor
+caption (the page is the study's clips; the snow pick is live-only); (3)
+the Commons submission page in his logged-in Chrome, read-only unless he
+says publish/submit (s34: the entry keeps serving the live page; what
+"update" means there is his to say). Then the ranked list (▶ NEXT s38):
+F1, F6 + README, tag v0.4.2, F2, F4/F3.
+
 cd ~/Documents/claude/xscapes/ and read CLAUDE.md (the brief, authoritative)
 and RESUME.md before responding. Session 37 (2026-09-16 afternoon) opened on
 his restart and closed every card in one sitting, COMMITTED as five cuts and
@@ -58,6 +88,31 @@ falling star cost his flight floors (88.6 → 84.3%); counting crossings
 (8.4%) is what let the label yield instead.
 Do NOT drive Terminal.app (osascript, System Events) without asking me first.
 ```
+
+## ▶ NEXT (session 38, 2026-09-16 evening, WRAPPED ~21:50 PDT at his word: three Kimi audits verified; the snow RULED S1; NOTHING committed)
+
+**State:** origin/main = HEAD = `fdf2894`. **UNCOMMITTED:** `internal/scenes/forest.go` (SnowPick, rangeTones, apart,
+snowLines), `internal/scenes/snow_test.go` (the pick by name; the seams every half hour as drawn), `snowpage_test.go`
+(`XSCAPES_SNOWPAGE=<file> go test -run TestSnowPage .`), and the record. Suite 13/13 + vet + fmt green. INSTALLED
+DIRTY (inode 86728941, stamp fdf2894 modified=true). Audit packet `~/Documents/kimi/xscapes-full-audit-2026-09-16/`
+(three AUDIT-REPORT.md, VERIFIED.md, frames, page slices, sandbox HOMEs). Pages: the audit https://claude.ai/artifact/J4TebzQ45125RUYpnmpiXy · the snow https://claude.ai/artifact/XxUChxf7HwUusvm3z55ggx .
+Verbatim rulings in `_FEEDBACK.md` §Session 38.
+**0. COMMIT at his word** (one cut: the snow + its tests + the page instrument; the record with it), install from the
+clean tree, push at his word.
+**1. THE WEBSITE + THE COMMONS SUBMISSION, his words "website + update submisson on commonsmade":**
+- publish the s35 rebuild: `go run . -site site && sh site/publish.sh`; the entry proxies gh-pages within 10 min;
+  verify from OUTSIDE (`curl -s https://xscapes.vibe.commonsmade.com/ | grep -o 'The shoreline[^<]*'` must say the
+  vista ships). The live copy today: "The shoreline ships today; the three below are drawn and next."
+- the judge's page edits (J3 the thesis above the fold; J4 click-to-play knocks, three WAVs in `internal/notify`;
+  J5 a caption that the clips are truecolor): his design calls, on a review page first if he wants options.
+- the Commons submission page: his logged-in Chrome (claude-in-chrome), read-only unless he says publish/submit;
+  ask what "update" means there (the entry's own text/screenshots vs the proxied page, which updates itself).
+- README pass in the same breath (U2 the statusline line, U5 terminals, J6 stars, F19 sounds, the uninstall command).
+**2. The ranked list after that:** F1 the resume bind (an hour; env handoff via the hook's `SessionFromEnv`) ·
+F6 `xscapes claude -- <flags>` documented or passed through · tag v0.4.2 · F2 bracket reallocBand (+ one live
+drag) · F4/F3 kimi/hermes backup + uninstall fidelity · later: recover around Paint, the spend attach read, spool
+GC, build tags on two probes.
+**3. His look at the snow live** needs a restart, and ⚠ per F1 a NEW session (this session's id is in `run/current`).
 
 ## ▶ NEXT (session 37, 2026-09-16 afternoon: COMMITTED at his word, five cuts + the record; PUSHED at his word)
 
