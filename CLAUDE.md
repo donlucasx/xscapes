@@ -2,6 +2,68 @@
 
 *(Renamed end to end on 2026-09-03: directory, env vars, state path and hook marker. Two names are kept on purpose and are not leftovers -- `internal/envx` still reads `ASCIISCAPES_*` and warns, and `install.go` still RECOGNISES the `# asciiscapes:v1` marker so the hooks it wrote before the rename can be found and removed.)*
 
+> **Session 39 (2026-09-16 night): THE WEBSITE, MOBILE FIRST, THEN THE HERO IN SIX VARIANTS.** Opened on his two
+> phone screenshots (the hero cropped with the companion off-screen; the moon in strips, portrait and landscape) and
+> his ask for hero candidates, "leaning towards the mountain scape". The s38 snow cut COMMITTED first (`b22b0c0`,
+> his word from the wrap). ⭐ **TWO MOBILE DEFECTS, one reproduced and one inferred.** The crop reproduces in
+> WebKit's iPhone emulation (Playwright 1.60 + webkit 2287, `scratchpad/shot.js`): 124 columns at the player's 7px
+> floor is 523px on a 351px stage, and the scrubber takes the touch-drag, so the companion can never be reached ⇒
+> **THE HERO HAS A NARROW TWIN** (`heroNarrowClip`, the same session at 80x34; `FX.hero.narrow`; the player plays it
+> whenever the wide one would fall under the floor and re-picks on resize; measured after: 351px on 351px at 7.3px).
+> The broken moon does NOT reproduce on this Mac's fonts, so it is iOS's fallback on the disc's U+2584 edge cells ⇒
+> **THE PAGE NEVER ASKS A FONT FOR A BLOCK** (`canvas.writeBlockCSS`: every half and quarter block is a SPACE on a
+> CSS gradient background, a full block a space on its ink; `TestAPageNeverAsksAFontForABlock`; plus
+> `text-size-adjust:100%` on the frames). Site rebuilt: 9.0 MB raw / 604 KB gz (the twin is most of the growth;
+> the gradients cost 80 KB raw). ⚠ **NOT PUBLISHED: `sh site/publish.sh` was refused by the auto-mode permission
+> classifier ("Production Deploy"); it is one command in his hand, then verify from outside.** ⚠ Unverified on a
+> real iPhone until he looks at the live page. ⭐⭐ **THE HERO IN SIX VARIANTS ON ONE PAGE, his pick pending:**
+> https://claude.ai/artifact/6Uq5BeCFBVPrNSPjEsxHCi — V1 the vista over a whole day · V2 the vista evening into
+> night · H1 vista then shore · H2 shore then vista · M1 his trailer (owl → cat → crab, each with its finished
+> face, then the shore at the same hour and the crab's turn into the night) · M2 the trailer with the commands
+> typed (`! xscapes companion cat` …). `montage.go`: `heroVariants`, `montageFrames` (the hero's machinery with
+> the scape and the companion switchable on a session timeline and the hour on a schedule of stops);
+> `drawVistaWith` puts the cat or the crab on the owl's mound; `XSCAPES_HEROPAGE=<dir> go test -run TestHeroPage .`
+> writes the page + six frame files + contact sheets. Every variant screenshotted before publishing; V2 opened on a
+> bright afternoon and was moved to 0.66→1.08. Suite 13/13 + vet + fmt green; **NOTHING of s39 committed** (his
+> word). ⭐ **Then his first note on the variants (23:38): "the bottom background color should be a deeper green, a
+> continuation of the grass gradient above. And the terminal text over it should adapt in color to be legible."**
+> The live band was olive (95,95,0), a colour the meadow never reaches ⇒ `scenes.bandColors`: the band opens on the
+> meadow's own last colour and deepens a quarter toward black in solid rows (measured on the cube first: (5,60,5)
+> goes GREY, (0,75,0) stays the meadow's green, so a terminal shows the dark end held flat; the page sinks further).
+> The ink: `drawSandInk` with the vista's green-white pair and a NEUTRAL fade (toward the ground's grey, reach 0.60),
+> because the first version faded into the green and the glyph boost put it 23 luma from its ground on the cube;
+> `TestTheVistaTailReadsOnTheBand` holds every glyph ≥ 40 luma from its ground at four hours, two sizes, both
+> profiles. The beach's writing is byte-identical. Review page republished (same link); the product's live vista
+> code changed and is NOT installed. ⭐ **HIS PICK, 2026-09-17 ~00:10: "lets use H1 to replace the hero gif"**, plus
+> "replace the crab for the owl for the 'companion states' section", the feature kickers "a tad bigger", and "any/all
+> other updates the website needs" ⇒ **BUILT AND LOOKED AT (Playwright, desktop + phone), NOT PUBLISHED:** `heroClip`
+> is the H1 montage (+ its narrow twin at 80x34) · the states section draws the owl with each state's PICKED motion and
+> the balloon at its head, five notes rewritten · kickers 12.5px · the features name the vista's channels beside the
+> shore's · J5 the truecolor note in the footer · J4 the three cues PLAYABLE on the Notifications feature
+> (`notify.Cues()`, data URIs). Page 14.1 MB raw / 1.03 MB gz (was 5.9 / 0.41). Not done, his call: J3 (the thesis
+> above the fold). ⭐ **HE PUBLISHED (10:31 PDT); the live page was verified from outside (bytes and markers equal);
+> his "I dont see the updates" was `max-age=600` in his browser.** Then **ONE MORE PASS (his six asks, ~11:00):**
+> features and owl states synthesised · the Scapes section rewritten on his sentence, art then commands · the lead
+> replaced (four options offered; RULED "go with 3", on the page) · "Built by donlucas, from inside its own scape" → x.com/donlucas
+> · ⭐ **A HEART**: ASCII, reactive (dim / warm / salmon), one press a browser, the count shared through a free public
+> counter (abacus.jasoncameron.dev, xscapes-site/love, CORS verified; admin key in private memory only) · installs:
+> `go install` is untrackable, GitHub traffic reported. ⚠ **HIS LINE "the mountains vista ships default" MADE THE
+> VISTA THE DEFAULT SCAPE** (`scape_pref.go`, README l.173; the shore was the default since s35; one line to revert).
+> Site REBUILT and looked at (Playwright: lead, features, scapes, the heart before and after a press). ⭐ **PUBLISHED
+> by me at his word "you publish it" (~11:40 PDT), VERIFIED from outside: gh-pages == the local build byte for byte
+> (14,229,253), lead 3 and the heart live.** ⭐ **Then his idea (~11:50): "explain 'the problem' within its animated
+> gif ... would that work?"** ⇒ BUILT: the complaint is typed AT the agent in the box that has the problem, the spinner
+> is its only answer (appears after the last character, counts from zero), the paragraph under the window is gone;
+> typed once on scroll-in, rows reserved (4 desktop / 8 phone / 9 narrow, measured). Preview for his look:
+> https://claude.ai/artifact/XtfaptXRLeRC6Z3MRrtMdk . His note: a typed first person reads as the agent talking ⇒
+> THIRD PERSON on his opener ("A user sends a prompt in the terminal and the agent goes quiet..."). ⭐ **"looks great,
+> push it live everywhere" ⇒ PUBLISHED ~12:30 PDT, verified (gh-pages == build after 20 s); the Commons entry follows.**
+> Then (14:47) spacing under the problem window, captions and the footer at the window's width, and **THE SHORE ON ITS
+> OWN in the Scapes section** (`sceneClips` "shore", 12 s, 80x24), PUBLISHED and verified. His "up our chances" question
+> answered in the reply (the entry has no text field; the app's description is in the builder's Publish panel; the
+> Chrome extension dropped before its fields were read). Suite 13/13 green; NOTHING COMMITTED to main. NEXT: commit at
+> his word (the page · the band · the default scape) and install · the README pass · F1.
+
 > **Session 38 (2026-09-16 evening): THREE KIMI AUDITS at his word (technical · user · Commons judge), every
 > major finding re-verified here; NOTHING committed; the record edited.** Page https://claude.ai/artifact/J4TebzQ45125RUYpnmpiXy ·
 > packet `~/Documents/kimi/xscapes-full-audit-2026-09-16/`. Verdicts: SHIP WITH FIXES · WOULD INSTALL · 8.1/10, places 4–19.

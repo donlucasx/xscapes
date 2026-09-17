@@ -3,6 +3,28 @@
 **Copy-paste this prompt into a fresh session:**
 
 ```
+Session 39 (2026-09-16 night), CHECKPOINTED (not wrapped): the website,
+mobile first, then the hero in six variants. The s38 snow cut is COMMITTED
+(b22b0c0). His phone screenshots: the hero cropped with the companion off
+the stage, the moon in strips. The crop REPRODUCED in WebKit iPhone emulation
+(Playwright 1.60 at ~/.npm/_npx/5e2e484947874241, webkit 2287; a local
+`python3 -m http.server 8765` in site/) and is FIXED by a narrow twin of the
+hero (heroNarrowClip, 80x34, FX.hero.narrow, picked under the 7px floor);
+the moon did NOT reproduce on this Mac's fonts, so it is iOS's fallback on
+the U+2584 edge, FIXED by never asking a font for a block
+(canvas.writeBlockCSS: halves and quadrants are spaces on CSS gradients,
+TestAPageNeverAsksAFontForABlock). Site REBUILT (604 KB gz) and NOT
+PUBLISHED: `sh site/publish.sh` was refused by the auto-mode permission
+classifier as a production deploy -- HIS hand (as donlucasx), then verify
+from outside and on his phone. THE HERO IN SIX VARIANTS, his pick pending:
+https://claude.ai/artifact/6Uq5BeCFBVPrNSPjEsxHCi (V1 vista whole day, V2
+vista evening->night, H1 vista->shore, H2 shore->vista, M1 his trailer
+owl->cat->crab->shore into the night, M2 the same with the commands typed);
+montage.go (heroVariants, montageFrames, drawVistaWith), XSCAPES_HEROPAGE=
+<dir> go test -run TestHeroPage . Suite 13/13 + vet + fmt green; NOTHING of
+s39 committed (his word). NEXT: his pick + the four rulings at the foot of
+the page; his publish; the Commons submission page; the README pass.
+
 Session 38 (2026-09-16 evening), WRAPPED at his word "lets /wrap first":
 THREE KIMI AUDITS (technical · user · Commons judge), every major finding
 re-verified here (page https://claude.ai/artifact/J4TebzQ45125RUYpnmpiXy ; packet
@@ -88,6 +110,43 @@ falling star cost his flight floors (88.6 → 84.3%); counting crossings
 (8.4%) is what let the label yield instead.
 Do NOT drive Terminal.app (osascript, System Events) without asking me first.
 ```
+
+## ▶ NEXT (session 39, 2026-09-16 night, CHECKPOINTED: the site fixed for phones and rebuilt, the hero in six variants published for his pick)
+
+**State:** HEAD `b22b0c0` (the snow), origin/main = `fdf2894` (NOT pushed). **UNCOMMITTED (s39):** `internal/canvas/canvas.go`
+(+ `html_blocks_test.go`, `nosplit_test.go`) · `siteframes.go` · `site/template.html` · `vista_live.go` (`drawVistaWith`,
+the vista's ink pair) · `gifs.go` (the pane's `$ ` line) · `montage.go` · `heropage_test.go` · `site/index.html` (rebuilt) ·
+**the band** (`internal/scenes/forest.go` `bandColors`, `internal/scenes/vista.go`, `live.go` `drawSandInk`,
+`vista_band_test.go`) · the record. Suite 13/13 + vet + fmt green. ⚠ The band and the ink are LIVE product code
+(the vista scape): NOT installed; install from the clean tree after the commit and restart a NEW session (F1).
+Two cuts when he says commit: (1) the page (emitter, twin, montage, review page) · (2) the band and its ink.
+**0. RULED 2026-09-17 ~00:10: H1 IS THE HERO** (`heroClip` = `heroVariant("h1")` + the narrow twin at 80x34), **the owl is
+the companion of the states section** (`DrawOwlMoving` with the picked motions, loops as long as each motion's period),
+**kickers 12.5px**, and the audit's page items done (features name both scapes' channels; J5 truecolor note; J4 the cues
+playable via `notify.Cues()` and `{{cues}}` in site.go). Site REBUILT and LOOKED AT (Playwright desktop full page + phone
++ the ask state), 14.1 MB raw / 1.03 MB gz. The review page's other three rulings (what the arriving companions do,
+the cut, the typed commands) are moot for the site now that H1 is the hero; M1/M2 stay on the page as a trailer option.
+Not done, his design call: J3, the thesis above the fold (the cover is a 100vh splash).
+**Then he PUBLISHED (10:31 PDT, verified from outside; his "not live" was his browser's max-age=600) and asked ONE MORE
+PASS (six asks, verbatim in `_FEEDBACK.md`): built, looked at, and PUBLISHED by me at his word "you publish it" (~11:40
+PDT), verified from outside: gh-pages == the local build, 14,229,253 bytes.** **Then his idea "explain the problem within
+its animated gif": BUILT (the complaint typed at the agent, the spinner its only answer, no paragraph; rows reserved
+4/9/10), preview https://claude.ai/artifact/XtfaptXRLeRC6Z3MRrtMdk ; reframed in the THIRD PERSON at his note (a typed
+first person reads as the agent's voice); PUBLISHED ~12:30 PDT at "push it live everywhere", verified from outside.** Synthesised copy · the Scapes section on
+his sentence with the art then the commands · the lead (4 options; RULED 3, on the page) · "Built by
+donlucas, from inside its own scape" → x.com/donlucas · the ASCII heart with a shared count (abacus.jasoncameron.dev,
+`xscapes-site/love`, created at 0, pressed once in the check; admin key in private memory `reference_love_counter.md`) ·
+installs: untrackable for `go install`; GitHub traffic 866 clones / 279 unique in 14 days. ⚠ **THE VISTA IS THE DEFAULT
+SCAPE NOW** (`scape_pref.go`, README l.173), from his line "the mountains vista ships default"; the shore was the default
+since s35. If he did not mean it: three `ScapeVista` fallbacks and `ScapeNames()` back, the README line, the page's two
+"default" mentions. Commit list grows: the default is a third cut.
+**1. HE PUBLISHES:** `gh auth switch --user donlucasx && sh site/publish.sh` from the repo root; then
+`curl -s https://donlucasx.github.io/xscapes/ | grep -c '"narrow":"hero-n"'` must print 1 and the Commons entry
+follows within 10 min; then HIS PHONE, portrait and landscape, the first clip: whole width, companion visible, the
+moon a disc. If the moon is still wrong on the phone the next suspect is the sky's dust glyphs, not the blocks.
+**2. The Commons submission page** in his logged-in Chrome, read-only unless he says publish/submit (s34: the entry
+serves the live page; what "update" means there is his to say). **3. The README pass** (s38 U2/U5/J6/F19).
+**4. The ranked list** (▶ NEXT s38 item 2): F1 the resume bind first.
 
 ## ▶ NEXT (session 38, 2026-09-16 evening, WRAPPED ~21:50 PDT at his word: three Kimi audits verified; the snow RULED S1; NOTHING committed)
 
