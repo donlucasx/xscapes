@@ -15,9 +15,10 @@ import (
 // run, and `xscapes scape <name>` to set it -- which a running scape picks up
 // on its next poll, so there is nothing to restart.
 //
-// The shore is the default and stays it. The vista is the second scape that
-// ships; the rainy window and the aquarium are drawn and on the page and are
-// next.
+// THE VISTA IS THE DEFAULT since 2026-09-17, his line for the page: "the
+// mountains vista ships default, but you can swap landscapes or companions
+// between sessions." (The shore was the default from s35 to then.) The
+// rainy window and the aquarium are drawn and on the page and are next.
 
 const (
 	ScapeShore = "shore"
@@ -25,7 +26,7 @@ const (
 )
 
 // ScapeNames is every scape that ships, the default first.
-func ScapeNames() []string { return []string{ScapeShore, ScapeVista} }
+func ScapeNames() []string { return []string{ScapeVista, ScapeShore} }
 
 func scapePath() (string, error) {
 	h, err := event.Home()
@@ -47,11 +48,11 @@ func scapePref() string {
 	}
 	p, err := scapePath()
 	if err != nil {
-		return ScapeShore
+		return ScapeVista
 	}
 	b, err := os.ReadFile(p)
 	if err != nil {
-		return ScapeShore
+		return ScapeVista
 	}
 	return scapeName(string(b))
 }
@@ -63,7 +64,7 @@ func scapeName(v string) string {
 			return v
 		}
 	}
-	return ScapeShore
+	return ScapeVista
 }
 
 func setScapePref(name string) error {

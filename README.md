@@ -170,7 +170,7 @@ emitting the events above. Nothing in the engine knows what any agent is.
 
 ```sh
 xscapes companion crab     # choose the animal: crab (default) or cat
-xscapes scape vista        # choose the scape: shore (default) or vista; a running scape switches
+xscapes scape shore        # choose the scape: vista (default) or shore; a running scape switches
 xscapes inside <command>   # host any command inside the scape, not just claude
 xscapes install kimi       # Kimi Code CLI hooks (a plan; --apply writes)
 xscapes install hermes     # Hermes Agent hooks (a plan; --apply writes)
