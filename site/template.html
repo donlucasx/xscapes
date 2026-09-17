@@ -185,17 +185,27 @@ h3{font-size:14px;font-weight:700;margin:0 0 4px}
    visitor through a free public counter (abacus.jasoncameron.dev, no key,
    CORS open); if it is unreachable the heart still works, without a number. */
 .love{display:flex;align-items:center;justify-content:center;gap:18px;margin:calc(var(--lh)*1.5) 0 0}
-.heart{background:none;border:0;padding:0;cursor:pointer;color:var(--d);font:inherit;line-height:0}
-.heart pre{margin:0;font:700 12px/1.05 var(--mono);white-space:pre;color:inherit;transition:color .2s;transform-origin:50% 60%}
-.heart:hover pre{color:var(--warm)}
-.heart:focus-visible{outline:2px solid var(--acc);outline-offset:4px}
-.heart.loved pre,.heart.loved:hover pre{color:#f08080}
-.heart.beat pre{animation:beat .5s ease-out}
-@keyframes beat{0%{transform:scale(1)}30%{transform:scale(1.18)}60%{transform:scale(.96)}100%{transform:scale(1)}}
+/* The heart is pixels: full blocks two cells to a pixel, so a pixel is
+   near square in a mono face, and only U+2588, which every phone font
+   draws (the half blocks were what iOS broke). Vivid at rest and beating
+   gently, a lub-dub every 1.8 s, so it asks to be pressed (his note,
+   2026-09-17: "more vibrant ... palpitate gently"); lighter under the
+   pointer; a bigger beat and a glow once pressed. No motion for readers
+   who asked for none. */
+.heart{background:none;border:0;padding:0;cursor:pointer;color:#ff4d6d;font:inherit;line-height:0}
+.heart pre{margin:0;font:700 11px/1 var(--mono);white-space:pre;color:inherit;transition:color .2s;transform-origin:50% 55%;
+  filter:drop-shadow(0 0 5px rgba(255,77,109,.35));animation:lubdub 1.8s ease-in-out infinite}
+.heart:hover{color:#ff8aa0}
+.heart:focus-visible{outline:2px solid var(--acc);outline-offset:6px}
+.heart.loved,.heart.loved:hover{color:#ff3358}
+.heart.loved pre{filter:drop-shadow(0 0 9px rgba(255,51,88,.65))}
+.heart.beat pre{animation:beat .55s ease-out}
+@keyframes lubdub{0%,100%{transform:scale(1)}14%{transform:scale(1.07)}28%{transform:scale(1)}42%{transform:scale(1.045)}56%{transform:scale(1)}}
+@keyframes beat{0%{transform:scale(1)}30%{transform:scale(1.22)}60%{transform:scale(.95)}100%{transform:scale(1)}}
 .lovetxt{color:var(--d);font-size:var(--meta)}
 .lovetxt b{color:var(--dd);font-weight:500}
 .by{color:var(--d);font-size:var(--meta);margin:var(--lh) auto 0;max-width:100%;text-align:center}
-@media (prefers-reduced-motion:reduce){.heart.beat pre{animation:none}}
+@media (prefers-reduced-motion:reduce){.heart pre,.heart.beat pre{animation:none}}
 /* the repository, in the page's own furniture: a drawn box that inverts
    when you point at it, like the mark. */
 .boxlink{display:inline-block;margin:var(--lh) 0 0;font-size:var(--meta);line-height:1.15;color:var(--dd);border:0;white-space:pre}
@@ -354,11 +364,14 @@ ul.feats.lead li{font-size:var(--body)}
 </section>
 
 <p class="foot">Every scene on this page is the real renderer folding the events a Claude Code session emits &mdash; text, not video, drawn by the same code that runs in your terminal. Nothing is posed. The page shows the scenes in truecolor; in a terminal the same scenes run on the 256-colour cube, on every terminal alike. <a href="https://github.com/donlucasx/xscapes">github.com/donlucasx/xscapes</a> &middot; MIT</p>
-<div class="love"><button type="button" class="heart" id="heart" aria-label="leave some love"><pre aria-hidden="true"> .::.  .::.
-::::::::::::
- '::::::::'
-   '::::'
-     ''</pre></button><span class="lovetxt" id="lovetxt">leave some love</span></div>
+<div class="love"><button type="button" class="heart" id="heart" aria-label="leave some love"><pre aria-hidden="true">  ████      ████  
+████████  ████████
+██████████████████
+██████████████████
+  ██████████████  
+    ██████████    
+      ██████      
+        ██        </pre></button><span class="lovetxt" id="lovetxt">leave some love</span></div>
 <p class="by">Built by <a href="https://x.com/donlucas" target="_blank" rel="noopener">donlucas</a>, from inside its own scape.</p>
 </main>
 
@@ -578,6 +591,9 @@ ul.feats.lead li{font-size:var(--body)}
     }
     if(loved) heart.classList.add("loved");
     fetch(LOVE + "get/" + LNS + "/" + LKEY).then(function(r){ return r.json(); }).then(function(d){ if(d && typeof d.value === "number") showLove(d.value); }).catch(function(){});
+    // The press beat replaces the idle pulse for half a second, then the
+    // pulse resumes.
+    heart.addEventListener("animationend", function(e){ if(e.animationName === "beat") heart.classList.remove("beat"); });
     heart.addEventListener("click", function(){
       heart.classList.remove("beat"); void heart.offsetWidth; heart.classList.add("beat");
       if(loved) return;

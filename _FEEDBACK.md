@@ -4084,3 +4084,10 @@ binary and the tyastie one an older one: **a restart is what shows the afternoon
     text not under a window; the rule written beside the token) · **the shore on its own** (`sceneClips` "shore": the
     live shore through a 12 s session of its own, 80x24, afternoon, two crablets, the finish) under the vista's window
     with a three-line caption. Measured: the hero caption 810px == the window. PUBLISHED, verified from outside.
+- *"can we center these two elements at the bottom of the page? Also, the link to my X profile should open on a new
+  tab"* ⇒ done, published, `d851f1f`.
+- *"make the heart better and more vibrant, can it palpitate gently as to call for attention?"* ⇒ **A pixel heart**
+  (full blocks only, two cells to a pixel so a pixel is near square; U+2588 is the one block every phone font drew),
+  vivid `#ff4d6d` at rest with a soft glow, a lub-dub every 1.8 s (`lubdub`, 7% then 4.5%), lighter under the pointer,
+  `#ff3358` with a stronger glow once pressed, the press beat handing back to the pulse on animationend; no motion
+  under prefers-reduced-motion. Looked at in three states; published.
