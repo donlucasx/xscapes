@@ -30,7 +30,8 @@
 > ⭐ **THE FIRE IS THE WORK WITH THE WIND** (his word; the firelight stays the night's) · the logs L5 · the
 > campfire page https://claude.ai/artifact/SsWPgPr9szhkjs18sZLxMf · ⭐ **THE SPEND COUNTER**, top-right in
 > every scape, summed off the TRANSCRIPT (the status payload's "totals" are the window's; no "/1M"). Installed
-> clean. NEXT: his look after a restart · publish at his word.
+> clean. **WRAPPED 2026-09-16 ~16:40 PDT at his word.** NEXT: his look after a restart · publish at his word ·
+> the parked window size.
 
 > **Session 35 (2026-09-16), WRAPPED. THE WALKTHROUGH, THEN EVERY OPEN CARD CLOSED IN ONE AFTERNOON.** Opened on a
 > status check (all of s34 held; this window's scape runs the three-cue binary). Every open item on the

@@ -4,29 +4,29 @@
 
 ```
 cd ~/Documents/claude/xscapes/ and read CLAUDE.md (the brief, authoritative)
-and RESUME.md before responding. Session 36 (2026-09-16) was HIS FIRST LOOK
-AT THE VISTA LIVE: thirteen notes, every one built to and ruled on. The
-balloon and the readout bring their own ground (the ink had been the
-mountain's own grey); the vista clears its layers every frame (it never
-had, and the wind's debris piled up for minutes); the owl's motions in three
-rounds, LOCKED: resting = peek, working = looks-blink-flutter on two small
-wings, needs you = double blink with the near wing waving every other time,
-done = flap and bounce, worried = squint with brows; the litter = L6 (one
-owlet at a time, still half the time), placement = by turns (P3), flights in
-and out behind the owl on a three-leg path; the context body = THE ARC (S5),
-a two-colour gauge in front of the far ranges, setting behind the near
-ridge; the daytime tone = DEEP AND COOL (T4) with a mauve stop through dusk;
-a pass over every element's colour through the day (SetBGSolid in the
-canvas so the resolver never draws a line across a mound; the lake kept 25
-luma above the meadow; the mound lighter; the far range further into the
-sky; TestTheElementsStayApart). COMMITTED at his word as five commits, each
-building, vetting and testing alone; PUSHED at his word; the site NOT rebuilt or
-published (the study clip is byte-identical still; the live vista differs
-from it on purpose). Installed from the clean tree. Three review pages hold
-the locked record. WRAPPED at his word: "lets test it first before anything
-else", so he restarts a scape to see the day's work live. NEXT: his notes
-from that look; publish at his word; D4's wings (big, as he picked it, or
-the working owl's small ones) is the one open card.
+and RESUME.md before responding. Session 37 (2026-09-16 afternoon) opened on
+his restart and closed every card in one sitting, COMMITTED as five cuts and
+PUSHED at his word (origin/main = f0571b1, tree clean): done's flap on the
+SMALL wings ("small wings for both"); the working pick was OFF BY ONE (a
+parallel session's audit: index 8 was "long hop", the ruling is 7; every
+pick is asserted by name now); his BLACK SQUARE behind the owl on a tiny
+window (the near treeline was SET to the owl's head row across its box, a
+dip at 80x24 and a tower at a short height; live it only dips); the
+CAMPFIRE PAGE at his ask, which drew his word "the wind + fire (both)": the
+fire's height, sparks and smoke follow the level with the wind, the
+firelight's reach stays the night's (light is the world's channel); the
+LOGS six ways, his pick L5 (a log with five stones in front); and the SPEND
+COUNTER, "a simple number on the top right of the xscape", in both scapes,
+summed off the TRANSCRIPT because Claude Code's status payload "totals" are
+the WINDOW's tokens from the last response (its docs), not the session's;
+no "/1M" (22.77M tokens over 79 responses this session, 97% cache reads);
+the window size is detected and parked. Installed from the clean tree. His
+running scape still holds the MORNING's binary: a restart shows all of it.
+NEXT: his look live (the counter, the fire climbing, the stones, the flap);
+publish at his word; the parked window size (a "62% left of 1M" readout).
+Pages: the owl locked https://claude.ai/artifact/UHB96YTm8QHMsFViHmfq7v
+(a NEW link; the s36 one could not be replaced without reading 2.7 MB back)
+· the campfire https://claude.ai/artifact/SsWPgPr9szhkjs18sZLxMf .
 
 Six things about how to work on this, all paid for:
 build the instrument before trusting the picture; measure the RENDERED frame
@@ -49,6 +49,13 @@ publish/submit; he presses those himself.
 ⚠ s35: CHECK THE CODE BEFORE ASKING ABOUT A MEMORY LINE (two stale ones were
 asked as open items and had to be retracted the same turn). Commit only at
 his word; stage by explicit path, never `git add -A`.
+⚠ s37: A FIELD LIST IS NOT ITS SEMANTICS. The ideas card said the status
+payload "carries session totals"; the verified notes listed the field names;
+the doc says they are the WINDOW's tokens from the last response. Read the
+doc, or a real payload, for what a field MEANS before building on it. And
+MEASURE A GUARD BEFORE CHOOSING IT: blocking the counter's corner for the
+falling star cost his flight floors (88.6 → 84.3%); counting crossings
+(8.4%) is what let the label yield instead.
 Do NOT drive Terminal.app (osascript, System Events) without asking me first.
 ```
 

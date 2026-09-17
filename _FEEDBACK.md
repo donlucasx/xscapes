@@ -3845,3 +3845,10 @@ of the xscape? should we do it xxxx/1M? can xscapes automatically detect the max
   four sizes, four hours, ≥ 100 luma; hidden under the vista's floor where the owl's box holds the corner),
   `TestTheTallyCountsEachResponseOnce`, `TestTheStatuslineCarriesTheWindow`. Looked at: both scapes at
   125x28 / 80x24 / 60x20, night and noon, "23M tokens" in the corner.
+
+**His words to land it:** *"commit"* ⇒ five cuts (`9c54ea7` owl · `f6b48c5` treeline · `dc76f26` fire+logs+page
+· `9189a4a` counter · `5f35359` record), each verified to build/vet/test alone with the rest stashed; two
+files staged by hunk and by content so each commit holds only its own change. *"push"* ⇒ `gh auth switch
+--user donlucasx && git push`, origin/main read back. *"lets /wrap"* ⇒ WRAPPED 2026-09-16 ~16:40 PDT.
+Installed from the clean tree (stamp 781e530, modified=false); his window's scape still holds the morning's
+binary and the tyastie one an older one: **a restart is what shows the afternoon.**
