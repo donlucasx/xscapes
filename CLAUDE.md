@@ -61,11 +61,18 @@
 > Then (14:47) spacing under the problem window, captions and the footer at the window's width, and **THE SHORE ON ITS
 > OWN in the Scapes section** (`sceneClips` "shore", 12 s, 80x24), PUBLISHED and verified. His "up our chances" question
 > answered in the reply (the entry has no text field; the app's description is in the builder's Publish panel; the
-> Chrome extension dropped before its fields were read). ⭐ **COMMITTED at his word "commit" (~15:10 PDT) as four cuts:
+> Chrome extension dropped before its fields were read). Then the foot: the heart and the maker's line centred, the X link
+> in a new tab; the heart a PIXEL heart, vivid, beating gently, smaller, a burst of sparks on the press; "Built by
+> donlucas, from inside his xscape"; the blinking mark at the very bottom; and a SHARE CARD (`site/og.png`, the live
+> vista at dusk rendered by the renderer at 1200x630, Open Graph + Twitter tags, `publish.sh` ships it; verified
+> fetchable). ⭐ **COMMITTED at his word "commit" (~15:10 PDT) as four cuts:
 > `c240bcd` the band · `4444efa` the page · `a6b3c45` the vista as the default scape · `76dbfb3` the record; INSTALLED
 > from the clean tree (stamp `76dbfb3`, modified=false, inode 86900314). PUSHED at his word "push": origin/main =
-> `601ba24`, verified with ls-remote.** Running scapes hold the old binary until restarted (a NEW session, per F1).
-> NEXT: the README pass · F1 · a v0.4.2 tag (`@latest` is behind).
+> `601ba24`, verified with ls-remote; the foot and the card followed as `d851f1f` · `06c49f5` · `beb073d` · `5edf076` ·
+> `f643ac9`, each published and verified live.** **WRAPPED 2026-09-17 15:30 PDT at his word, 90 minutes before the
+> deadline: HEAD == origin == the live build.** Running scapes hold the old binary until restarted (a NEW session, per
+> F1). NEXT: his hand on the app's description in the Commons Publish panel · F1 · the README pass · v0.4.2 · later the
+> web embed (Go → wasm).
 
 > **Session 38 (2026-09-16 evening): THREE KIMI AUDITS at his word (technical · user · Commons judge), every
 > major finding re-verified here; NOTHING committed; the record edited.** Page https://claude.ai/artifact/J4TebzQ45125RUYpnmpiXy ·

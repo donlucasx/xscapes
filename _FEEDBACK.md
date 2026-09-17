@@ -4104,3 +4104,7 @@ binary and the tyastie one an older one: **a restart is what shows the afternoon
   the real renderer at 80x25 cells / 25px to exactly 1200x630 (`ogimage_test.go`, `XSCAPES_OGPAGE=`, headless Chrome)
   and shipped as `site/og.png` beside the page on gh-pages (publish.sh copies it), pointed at by absolute URL because
   the Worker answers only the root. Published; the card's image verified fetchable from outside.
+- */wrap* (15:29 PDT, 90 minutes before the Commons deadline) ⇒ **WRAPPED.** HEAD == origin/main == the live page's
+  build; installed binary `76dbfb3` (the product's code has not moved since); everything of the day live on both
+  addresses. Open, his: the app's description in the builder's Publish panel (the entry has no field of its own; the
+  Chrome extension dropped before the panel was read); F1; the README; v0.4.2.

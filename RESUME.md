@@ -3,27 +3,40 @@
 **Copy-paste this prompt into a fresh session:**
 
 ```
-Session 39 (2026-09-16 night), CHECKPOINTED (not wrapped): the website,
-mobile first, then the hero in six variants. The s38 snow cut is COMMITTED
-(b22b0c0). His phone screenshots: the hero cropped with the companion off
-the stage, the moon in strips. The crop REPRODUCED in WebKit iPhone emulation
-(Playwright 1.60 at ~/.npm/_npx/5e2e484947874241, webkit 2287; a local
-`python3 -m http.server 8765` in site/) and is FIXED by a narrow twin of the
-hero (heroNarrowClip, 80x34, FX.hero.narrow, picked under the 7px floor);
-the moon did NOT reproduce on this Mac's fonts, so it is iOS's fallback on
-the U+2584 edge, FIXED by never asking a font for a block
-(canvas.writeBlockCSS: halves and quadrants are spaces on CSS gradients,
-TestAPageNeverAsksAFontForABlock). Site REBUILT (604 KB gz) and NOT
-PUBLISHED: `sh site/publish.sh` was refused by the auto-mode permission
-classifier as a production deploy -- HIS hand (as donlucasx), then verify
-from outside and on his phone. THE HERO IN SIX VARIANTS, his pick pending:
-https://claude.ai/artifact/6Uq5BeCFBVPrNSPjEsxHCi (V1 vista whole day, V2
-vista evening->night, H1 vista->shore, H2 shore->vista, M1 his trailer
-owl->cat->crab->shore into the night, M2 the same with the commands typed);
-montage.go (heroVariants, montageFrames, drawVistaWith), XSCAPES_HEROPAGE=
-<dir> go test -run TestHeroPage . Suite 13/13 + vet + fmt green; NOTHING of
-s39 committed (his word). NEXT: his pick + the four rulings at the foot of
-the page; his publish; the Commons submission page; the README pass.
+Session 39 (2026-09-16 night into 09-17 afternoon), WRAPPED 15:30 PDT at
+his word, 90 minutes before the Commons deadline (Sep 17 23:59 UTC). HEAD
+== origin/main == f643ac9, tree clean, the live page == the build on both
+https://donlucasx.github.io/xscapes/ and https://xscapes.vibe.commonsmade.com
+(the entry proxies gh-pages, 10-minute cache; the page is NOT frozen at the
+deadline, the Worker is). Installed binary stamped 76dbfb3 (the product's
+code has not moved since; the later commits are the page). THE DAY, all
+his rulings, verbatim in _FEEDBACK.md §Session 39: the s38 snow cut
+committed; the phone crop FIXED with a narrow twin of the hero (80x34,
+picked under the 7px floor) and the broken moon FIXED by never asking a
+font for a block (canvas.writeBlockCSS: halves and quadrants are spaces on
+CSS gradients); six hero variants on a review page (montage.go), HIS PICK
+H1 (the owl's turn on the vista, then the crab's on the shore); the vista's
+BAND continues the meadow with a neutral-faded ink
+(TestTheVistaTailReadsOnTheBand); the owl in the companion-states section
+with its picked motions; kickers 12.5px; copy synthesised; the Scapes
+section on his sentence with the art then the commands; the lead = his
+option 3; THE VISTA IS THE DEFAULT SCAPE (his line; scape_pref.go, README);
+the problem TYPED in its own window in the third person (a typed first
+person reads as the agent's voice); the cues playable; the shore on its own
+beside the vista; captions at their window's width; a pixel HEART that
+beats, bursts on the press and counts for everyone through
+abacus.jasoncameron.dev (xscapes-site/love; admin key in private memory
+reference_love_counter.md, never in the repo); "Built by donlucas, from
+inside his xscape" (x.com/donlucas, new tab); the blinking mark at the
+foot; a SHARE CARD (site/og.png, the live vista at dusk, ogimage_test.go,
+Open Graph + Twitter tags, publish.sh ships it). Page 14 MB raw / ~1 MB gz.
+NEXT: (1) HIS: the app's description in the Commons builder's Publish panel
+(the entry has NO text field of its own; draft copy in the 09-17 reply; the
+Chrome extension dropped before the panel's fields were read; do NOT touch
+anything that redeploys the Worker); (2) F1 the resume bind (a restart must
+be a NEW session until then); (3) the README pass (s38 U2/U5/J6/F19 + the
+vista default); (4) tag v0.4.2 (@latest is behind); (5) later: a web embed
+(Go -> wasm) so web apps, Commons apps included, can use the layer.
 
 Session 38 (2026-09-16 evening), WRAPPED at his word "lets /wrap first":
 THREE KIMI AUDITS (technical · user · Commons judge), every major finding
@@ -111,7 +124,7 @@ falling star cost his flight floors (88.6 → 84.3%); counting crossings
 Do NOT drive Terminal.app (osascript, System Events) without asking me first.
 ```
 
-## ▶ NEXT (session 39, 2026-09-16 night, CHECKPOINTED: the site fixed for phones and rebuilt, the hero in six variants published for his pick)
+## ▶ NEXT (session 39, 2026-09-16 night into 09-17, WRAPPED 15:30 PDT: the whole day live on both addresses; HEAD == origin == the build, `f643ac9`)
 
 **State (after "commit", ~15:10 PDT):** HEAD `76dbfb3`, tree clean, four cuts on top of the snow (`c240bcd` the band ·
 `4444efa` the page · `a6b3c45` the vista default · `76dbfb3` the record); INSTALLED from the clean tree (stamp `76dbfb3`,
