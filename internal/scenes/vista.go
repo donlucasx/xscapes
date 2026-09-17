@@ -43,6 +43,9 @@ type Vista struct {
 	Flock OwletFlock
 	lay   vistaLayout
 	lit   float64
+	// band is the writing's ground at its first and last row, as the last
+	// Update painted it (bandColors).
+	band [2]term.RGB
 }
 
 // FireX is the fire's column after the last Update.
@@ -72,10 +75,12 @@ func (v *Vista) Update(c *canvas.Canvas, t float64, act scape.Activity) {
 	c.Clear()
 	v.lay = vistaLayoutFor(c.W, c.H, v.OwlX)
 	v.lit = lit(scape.PaletteAt(act.TimeOfDay))
-	paintVistaL(c, v.lay, act.TimeOfDay, t, act.Level, v.Seed, false, &vistaLive{
+	lv := &vistaLive{
 		ContextUsed: act.ContextUsed, TodoDone: act.TodoDone,
 		SkipOwl: true, SkipBand: true, MoonStyle: v.MoonStyle, FireWork: true,
-	})
+	}
+	paintVistaL(c, v.lay, act.TimeOfDay, t, act.Level, v.Seed, false, lv)
+	v.band = [2]term.RGB{lv.BandTop, lv.BandBot}
 }
 
 // Layout is the frame's geometry after the last Update. The owlets stand
@@ -90,8 +95,9 @@ func (v *Vista) Layout() (owlX, owlY, grassY, bandTop int) {
 // BandTop is the first row of the writing.
 func (v *Vista) BandTop() int { return v.lay.bandTop }
 
-// BandColor is the writing's ground, for the sand's ink to be sampled from.
-func (v *Vista) BandColor() term.RGB { return v.lay.bandColor(v.lit) }
+// BandColor is the writing's ground at its first row, for the sand's ink to
+// be sampled from when a row cannot be read back.
+func (v *Vista) BandColor() term.RGB { return v.band[0] }
 
 // MoonAt is the body's cell, for the context readout to sit under: the
 // block's top-left, or for a disc the cell whose readout row is the row

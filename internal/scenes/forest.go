@@ -250,6 +250,10 @@ type vistaLive struct {
 	// and smoke with the level; the light stays the night's. His word of
 	// 2026-09-16; the study's clips keep their single channel each.
 	FireWork bool
+	// BandTop and BandBot are written back by the painter: the band's
+	// colours at its first and last row, for the writing's ink to be
+	// sampled against (Vista.BandColor).
+	BandTop, BandBot rgb
 }
 
 // THE CONTEXT BODY, SEVEN WAYS (s36, 2026-09-16). His ask: "explore further
@@ -926,13 +930,34 @@ func paintVistaL(c *canvas.Canvas, lay vistaLayout, tod, t, level float64, seed 
 	if live == nil || !live.SkipBand {
 		writeBand(c, bandTop, term.Lerp(grey(2), cube(95, 95, 0), l))
 	} else {
-		fill(c, 0, bandTop, c.W-1, c.H-1, lay.bandColor(l))
+		top, bot := bandColors(mBot)
+		live.BandTop, live.BandBot = top, bot
+		// Solid rows, not a ramp: a ramp's implied splits drew rules across
+		// the mound (s36), and the band is where the writing goes.
+		n := c.H - 1 - bandTop
+		for y := bandTop; y < c.H; y++ {
+			u := 0.0
+			if n > 0 {
+				u = float64(y-bandTop) / float64(n)
+			}
+			fill(c, 0, y, c.W-1, y, term.Lerp(top, bot, u))
+		}
 	}
 }
 
-// bandColor is the writing's ground: the meadow's dark end.
-func (lay vistaLayout) bandColor(l float64) term.RGB {
-	return term.Lerp(grey(2), cube(95, 95, 0), l)
+// THE BAND CONTINUES THE MEADOW. His note of 2026-09-16, 23:38, on the
+// hero variants: "the bottom background color should be a deeper green, a
+// continuation of the grass gradient above." Until then the live band was
+// olive, (95,95,0) by day, a colour the meadow never reaches, so the writing
+// sat on a strip of its own. Now its first row is the meadow's own last
+// colour (mBot), so there is no seam, and it deepens toward the bottom: a
+// quarter of the way to black. That is as deep as the cube keeps green --
+// measured 2026-09-16: (5,60,5) quantises to grey 38 on Terminal.app while
+// (0,75,0) goes to the meadow's own (0,95,0) -- so in a terminal the band is
+// the meadow's dark end held flat, and on the page, in truecolor, it sinks a
+// little further. At night both ends are the greys the meadow already is.
+func bandColors(mBot rgb) (top, bot rgb) {
+	return mBot, term.Lerp(mBot, grey(0), 0.25)
 }
 
 // vistaStars is the checklist in the vista's sky: one star per finished

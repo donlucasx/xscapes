@@ -606,6 +606,28 @@ func bubbleWidth(rows []string) int {
 // to the canvas it drifts upward as lines accumulate and ends up written across
 // open water, which is the opposite of what "written in the sand" means.
 func drawSand(c *canvas.Canvas, lines []reduce.Line, sand term.RGB, sandTop, xFrom, xTo int) {
+	drawSandInk(c, lines, sand, sandTop, xFrom, xTo, sandInkPale, sandInkDark, false)
+}
+
+// The beach's inks: a warm cream on a dark beach, a dark brown on a bright
+// one. The vista writes on grass and brings its own pair (vista_live.go).
+var (
+	sandInkPale = term.RGB{R: 244, G: 236, B: 220}
+	sandInkDark = term.RGB{R: 34, G: 26, B: 20}
+)
+
+// drawSandInk is drawSand with the ink pair chosen by the caller: pale is
+// used on a dark ground, dark on a bright one, decided per row from what is
+// painted there.
+//
+// neutral makes a line fade toward the GREY of its ground's luma instead of
+// toward the ground's own colour. On the beach the two are nearly the same
+// thing, sand being a low-chroma colour. On the vista's green band they are
+// not: an ink three quarters of the way to (0,95,0) has more chroma than
+// the glyph boost leaves alone, and on the cube it comes out (0,135,0), 23
+// luma from its ground (measured 2026-09-16, TestTheVistaTailReadsOnTheBand).
+// Faded toward the grey it keeps its distance on either profile.
+func drawSandInk(c *canvas.Canvas, lines []reduce.Line, sand term.RGB, sandTop, xFrom, xTo int, pale, dark term.RGB, neutral bool) {
 	if len(lines) == 0 || xTo-xFrom < 12 {
 		return
 	}
@@ -661,9 +683,9 @@ func drawSand(c *canvas.Canvas, lines []reduce.Line, sand term.RGB, sandTop, xFr
 			continue
 		}
 		beach := beachAt(row)
-		base := term.RGB{R: 244, G: 236, B: 220}
+		base := pale
 		if luma(beach) > 140 {
-			base = term.RGB{R: 34, G: 26, B: 20}
+			base = dark
 		}
 		if ln.Bad {
 			base = bad
@@ -672,7 +694,16 @@ func drawSand(c *canvas.Canvas, lines []reduce.Line, sand term.RGB, sandTop, xFr
 		// that has sat there two minutes looks it even when nothing newer has
 		// arrived to push it down. It stops at 0.72 rather than 1: the tide
 		// takes a line by TTL, not by fading it into unreadability first.
-		col := term.Lerp(base, beach, 0.10+0.62*ln.Age)
+		target, reach := beach, 0.62
+		if neutral {
+			g := uint8(math.Round(luma(beach)))
+			target = term.RGB{R: g, G: g, B: g}
+			// And it stops sooner: at 0.72 the oldest line lands on the
+			// cube's grey 95 over the meadow's green at luma 56, one luma
+			// under the 40 the test holds; at 0.60 it lands two greys up.
+			reach = 0.60
+		}
+		col := term.Lerp(base, target, 0.10+reach*ln.Age)
 		x := xFrom
 		for _, r := range []rune(companion.NarrowOnly(ln.Text)) {
 			if x >= xTo {

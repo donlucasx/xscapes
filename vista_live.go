@@ -49,6 +49,15 @@ var (
 // after its dwell), and the companion does not pace -- an owl on a mound is
 // still by nature, and its steps would be a count with nowhere to go.
 func drawVista(c *canvas.Canvas, v *scenes.Vista, lay layout, st reduce.State, t float64) {
+	drawVistaWith(c, v, lay, st, t, nil)
+}
+
+// drawVistaWith is drawVista with the companion chosen: nil is the owl, the
+// vista's own; a Cat -- the crab or the cat -- stands on the mound in its
+// place, in the same 12x7 box. The page's montage uses it (montage.go) for
+// the moment the owl turns into the cat and then the crab before the scene
+// becomes the shore. The product itself never draws a cat on the vista.
+func drawVistaWith(c *canvas.Canvas, v *scenes.Vista, lay layout, st reduce.State, t float64, cat *companion.Cat) {
 	owlX, owlY, grassY, bandTop := v.Layout()
 	drawVistaReadout(c, v, st.Act.ContextUsed)
 	// The spend counter, unless the owl's box reaches the counter's row:
@@ -68,7 +77,13 @@ func drawVista(c *canvas.Canvas, v *scenes.Vista, lay layout, st reduce.State, t
 	}
 	// The owl, with whatever motion he has picked from the round
 	// (owl_anim.go); no pick draws today's owl exactly.
-	scenes.DrawOwlMoving(c, owlX, owlY, t, st.Pose, scenes.PickedOwlMotion(st.Pose), scenes.OwlMotionPeriodOverride)
+	head := owlX + scenes.OwlHeadCol
+	if cat != nil {
+		cat.Draw(c.Near(), owlX, owlY, t, st.Pose)
+		head = owlX + cat.DrawnHeadCol(c.W)
+	} else {
+		scenes.DrawOwlMoving(c, owlX, owlY, t, st.Pose, scenes.PickedOwlMotion(st.Pose), scenes.OwlMotionPeriodOverride)
+	}
 	if st.Bubble != "" {
 		rows, col := companion.DoneBubble(st.Bubble), bubbleCol
 		if st.BubbleAsk {
@@ -77,7 +92,7 @@ func drawVista(c *canvas.Canvas, v *scenes.Vista, lay layout, st reduce.State, t
 		if lay.Mirror {
 			rows = companion.MirrorTail(rows)
 		}
-		x := bubbleX(rows, owlX+scenes.OwlHeadCol, c.W)
+		x := bubbleX(rows, head, c.W)
 		y := owlY - len(rows)
 		if y < 0 {
 			y = 0
@@ -98,8 +113,22 @@ func drawVista(c *canvas.Canvas, v *scenes.Vista, lay layout, st reduce.State, t
 		(&companion.Sprite{Rows: rows, Body: col, Opaque: true}).Draw(c.Near(), x, y)
 	}
 	// The writing runs the whole band: the owl is above it, not beside it.
-	drawSand(c, st.Tail, v.BandColor(), bandTop, 2, c.W-2)
+	// Its ink is the vista's own pair, chosen per row against the painted
+	// ground as on the beach.
+	drawSandInk(c, st.Tail, v.BandColor(), bandTop, 2, c.W-2, vistaInkPale, vistaInkDark, true)
 }
+
+// The band's inks. His note of 2026-09-16 (23:38): the band becomes a
+// continuation of the meadow, "and the terminal text over it should adapt
+// in color to be legible." The beach's warm cream belonged to sand; on
+// grass the pale ink is a green-white and the dark one a deep green, and
+// which of the two a row gets is still read off what is painted under it.
+// TestTheVistaTailReadsOnTheBand holds every glyph at least 40 luma from
+// its own ground, in truecolor and on the cube, at every hour.
+var (
+	vistaInkPale = term.RGB{R: 228, G: 242, B: 220}
+	vistaInkDark = term.RGB{R: 18, G: 34, B: 18}
+)
 
 // drawVistaReadout is the context number under the vista's moon, the same
 // thresholds and colours as the shore's.
