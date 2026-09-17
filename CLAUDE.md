@@ -25,12 +25,12 @@
 > ~~done's wings, the one open card~~ RULED s37 (09-16 afternoon): *"small wings for both"*.**
 >
 > **Session 37 (2026-09-16 afternoon), COMMITTED at his word as five cuts (`9c54ea7` · `f6b48c5` · `dc76f26` ·
-> `9189a4a` · `5f35359`), NOT pushed:** done's small wings · the working pick was off by one (a parallel audit;
+> `9189a4a` · `5f35359`) and PUSHED at his word (`origin/main` = `781e530`+):** done's small wings · the working pick was off by one (a parallel audit;
 > picks by name now) · the black square behind the owl on a tiny window (the treeline dips, never rises) ·
 > ⭐ **THE FIRE IS THE WORK WITH THE WIND** (his word; the firelight stays the night's) · the logs L5 · the
 > campfire page https://claude.ai/artifact/SsWPgPr9szhkjs18sZLxMf · ⭐ **THE SPEND COUNTER**, top-right in
 > every scape, summed off the TRANSCRIPT (the status payload's "totals" are the window's; no "/1M"). Installed
-> clean. NEXT: his look after a restart · push and publish at his word.
+> clean. NEXT: his look after a restart · publish at his word.
 
 > **Session 35 (2026-09-16), WRAPPED. THE WALKTHROUGH, THEN EVERY OPEN CARD CLOSED IN ONE AFTERNOON.** Opened on a
 > status check (all of s34 held; this window's scape runs the three-cue binary). Every open item on the

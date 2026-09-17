@@ -52,16 +52,16 @@ his word; stage by explicit path, never `git add -A`.
 Do NOT drive Terminal.app (osascript, System Events) without asking me first.
 ```
 
-## ▶ NEXT (session 37, 2026-09-16 afternoon: COMMITTED at his word, five cuts + the record; NOT pushed)
+## ▶ NEXT (session 37, 2026-09-16 afternoon: COMMITTED at his word, five cuts + the record; PUSHED at his word)
 
 **State:** `9c54ea7` the owl (small wings, the pick by name) · `f6b48c5` the treeline · `dc76f26` the fire
 with the wind + the logs L5 + the campfire page · `9189a4a` the spend counter · `5f35359` the record, each
-verified to build/vet/test alone with the rest stashed. Tree clean. **NOT pushed** (`origin/main` = e5da174).
+verified to build/vet/test alone with the rest stashed. Tree clean. **PUSHED 2026-09-16 ~16:30 PDT at his word:
+`origin/main` = `781e530` + this note, read back with ls-remote.**
 Installed from the clean tree after the record commit. His running scape still holds the morning's binary:
 **a restart shows all of it**, the counter once the session's first hook fires.
 **0. His look live**: the counter top-right, the fire climbing, the stones, the owl's flap.
-**1. His word on: push** (`gh auth switch --user donlucasx && git push origin main`) · **publish** (unchanged:
-the site's clips are the study's).
+**1. His word on: publish** (unchanged: the site's clips are the study's). Push is done.
 **2. Open threads:** the window size is detected and parked (a "62% left of 1M" readout is the natural home)
 · the vista's owl walk-up / owlets leaving / a disc moon with phase (s35 list) · per-scape sounds.
 **3. Everything above, item by item, with the verbatim rulings:** the session 36 block below and
