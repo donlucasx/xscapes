@@ -63,8 +63,9 @@
 > answered in the reply (the entry has no text field; the app's description is in the builder's Publish panel; the
 > Chrome extension dropped before its fields were read). ⭐ **COMMITTED at his word "commit" (~15:10 PDT) as four cuts:
 > `c240bcd` the band · `4444efa` the page · `a6b3c45` the vista as the default scape · `76dbfb3` the record; INSTALLED
-> from the clean tree (stamp `76dbfb3`, modified=false, inode 86900314). NOT PUSHED (origin/main = `fdf2894`).** Running
-> scapes hold the old binary until restarted (a NEW session, per F1). NEXT: push at his word · the README pass · F1.
+> from the clean tree (stamp `76dbfb3`, modified=false, inode 86900314). PUSHED at his word "push": origin/main =
+> `601ba24`, verified with ls-remote.** Running scapes hold the old binary until restarted (a NEW session, per F1).
+> NEXT: the README pass · F1 · a v0.4.2 tag (`@latest` is behind).
 
 > **Session 38 (2026-09-16 evening): THREE KIMI AUDITS at his word (technical · user · Commons judge), every
 > major finding re-verified here; NOTHING committed; the record edited.** Page https://claude.ai/artifact/J4TebzQ45125RUYpnmpiXy ·
