@@ -4716,3 +4716,4 @@ binary and the tyastie one an older one: **a restart is what shows the afternoon
   (Ng2uUanTJ8TAwLbZ86rMhP) is a taste question only. NEXT, cheap insurance for the same class: `refreshEvery` 50 → 12
   (an unfiltered wipe heals in 1 s, ~30 KB/s), a count of agent EDs in the event log so the next one is attributed, and
   reallocBand's region + cursor hazard (measured in the trace at a mark).
+- *"push"* (~11:05, 09-18) ⇒ PUSHED: origin/main = `08b4510` (the seven cuts + the record), verified with ls-remote.

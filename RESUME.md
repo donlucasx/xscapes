@@ -138,7 +138,8 @@ MB/min); the wave is captured; it can end. ⭐ COMMITTED at his word "comit" (10
 alone: `ad8d961` launcher refusal + backups · `efefec5` Kimi payloads, the
 logs, the replay (its empty-log panic guarded) · `c355e9d` the wind ·
 `5f6f4a1` -live -level · `7c4be94` the tall window · `ef602ab` the erase
-confined · `9e55428` the instruments. NOT PUSHED. The tree holds only his
+confined · `9e55428` the instruments. PUSHED at his word (origin/main =
+`08b4510`+). The tree holds only his
 parallel session's trailer files. Installed binary = inode 87309990 (built
 from the pre-commit tree, same content).
 ⭐⭐ HIS SEAM A/B (11:00): "they both look fine" ⇒ THE JUMP IS EXONERATED TOO.

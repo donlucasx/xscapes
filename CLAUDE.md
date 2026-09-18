@@ -37,7 +37,7 @@
 > THE PRIME SUSPECT for the working flicker, and neither earlier test had it; `XSCAPES_WINDSEAM=1` puts it back for his
 > one-minute look, INSTALLED. Kimi's assessment verified 6/6 on the claims checked; its 12 cards are next, reallocBand's
 > region+cursor hazard first. ⭐ **COMMITTED at his word as seven cuts** (`ad8d961` · `efefec5` · `c355e9d` · `5f6f4a1` ·
-> `7c4be94` · `ef602ab` · `9e55428`), each built + vetted alone; **NOT PUSHED**. ⭐⭐ HIS SEAM A/B: "they both look fine" ⇒ THE JUMP IS EXONERATED TOO; every
+> `7c4be94` · `ef602ab` · `9e55428`), each built + vetted alone; **PUSHED at his word** (origin/main = `08b4510`+). ⭐⭐ HIS SEAM A/B: "they both look fine" ⇒ THE JUMP IS EXONERATED TOO; every
 > wind hypothesis refuted on his glass. The 09-17 flicker is CLOSED on the one mechanism with evidence, an agent's ED
 > reaching the scape (the blank top rows) + the tracker's 4.2 s persistence, confined since `ef602ab`; not reproducible
 > on the current binary. NEXT: refreshEvery 50 → 12 · count agent EDs · reallocBand's region + cursor hazard · push at
