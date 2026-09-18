@@ -18,14 +18,18 @@ type damage struct {
 }
 
 // refreshEvery is how often the tracker forgets everything and repaints in
-// full, in frames. At the scape's frame rate that is a few seconds.
+// full, in frames. At the hosted 12 fps that is one second.
 //
 // Damage tracking has one failure mode that never heals on its own: if anything
 // writes over a cell the tracker believes it already painted, that row is
 // skipped for as long as its content does not change -- and the sky and the
-// beach can sit unchanged for minutes. A periodic full repaint costs one frame
-// in fifty and makes every such fault temporary instead of permanent.
-const refreshEvery = 50
+// beach can sit unchanged for minutes. A periodic full repaint makes every
+// such fault temporary instead of permanent. It was one frame in fifty, 4.2
+// seconds, which is how long the blank top rows of his 2026-09-17 screenshot
+// stayed on screen after an agent's clear (the Filter confines those now;
+// this is the insurance for whatever else writes over the scape). One frame
+// in twelve costs about 30 KB/s more output and heals anything in a second.
+const refreshEvery = 12
 
 // changed returns the indices of the rows that need painting.
 func (d *damage) changed(rows []string) []int {
