@@ -125,7 +125,19 @@ func currentPath() (string, error) {
 // SetCurrent records a session as the newest one. A scape pane started by
 // hand, in a terminal that never saw the agent's environment, has no other way
 // to find out which session to show.
+//
+// It makes the run directory first. It used to assume the directory was
+// there, and on a fresh machine it is NOT: the first SessionStart hook is the
+// first thing that ever writes under run/, so the pointer failed with ENOENT,
+// the error was discarded, and the scape above never bound -- the spool
+// created the directory a moment later, so the SECOND session worked, which
+// is why no machine that had run xscapes once ever showed it (found
+// 2026-09-17 by running the probes under a state directory that had never
+// existed).
 func SetCurrent(session string) error {
+	if _, err := EnsureRunDir(); err != nil {
+		return err
+	}
 	p, err := currentPath()
 	if err != nil {
 		return err
