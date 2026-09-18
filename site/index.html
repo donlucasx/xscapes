@@ -195,6 +195,9 @@ h3{font-size:14px;font-weight:700;margin:0 0 4px}
 .cast+.wide{margin-top:calc(var(--lh)*1.5)}
 .grid2+.cmd{margin-top:var(--lh)}
 .agents{gap:14px 22px;margin-top:var(--lh)}.agents .cap{margin:0;color:var(--dd)}.agents .cmd{margin-top:6px}
+/* The agent's name as a status chip: reverse video in the dim grey, dark text, one segment of a terminal status
+   bar. His pick of 2026-09-17 over a warm kicker and a box title. Grey, not gold: the gold reverse is the brand's. */
+.chip{display:inline-block;background:var(--d);color:var(--g);font-size:12.5px;font-weight:700;letter-spacing:.06em;padding:0 1ch;line-height:1.6;border-radius:1px}
 /* d) and e): the maker, and a heart anyone can press. The heart is ASCII in
    the page's own face and takes colour by state: dim at rest, warm under the
    pointer, the crab's salmon once pressed. The count is shared across every
@@ -2593,13 +2596,13 @@ $
 <p class="sub wide">Three commands, no app, no tab, no tmux, nothing to build. The install writes the agent's hooks after a backup; then the agent runs on top and the scape underneath, in the same window, so you never look away from the work to see the work.</p>
 <div class="cmd" data-title="install"><span class="pr">$</span> curl -fsSL https://donlucasx.github.io/xscapes/install.sh | sh   <span class="c"># Mac or Linux, with or without Go</span></div>
 <div class="grid2 agents">
-<div><p class="cap">Claude Code</p><div class="cmd"><span class="pr">$</span> xscapes install claude --apply
+<div><p class="cap"><span class="chip">Claude Code</span></p><div class="cmd"><span class="pr">$</span> xscapes install claude --apply
 <span class="pr">$</span> xscapes claude</div></div>
-<div><p class="cap">Kimi Code CLI</p><div class="cmd"><span class="pr">$</span> xscapes install kimi --apply
+<div><p class="cap"><span class="chip">Kimi Code CLI</span></p><div class="cmd"><span class="pr">$</span> xscapes install kimi --apply
 <span class="pr">$</span> xscapes kimi</div></div>
-<div><p class="cap">Hermes Agent</p><div class="cmd"><span class="pr">$</span> xscapes install hermes --apply
+<div><p class="cap"><span class="chip">Hermes Agent</span></p><div class="cmd"><span class="pr">$</span> xscapes install hermes --apply
 <span class="pr">$</span> xscapes hermes</div></div>
-<div><p class="cap">Anything else</p><div class="cmd"><span class="pr">$</span> xscapes inside &lt;any command&gt;   <span class="c"># no hooks needed</span></div></div>
+<div><p class="cap"><span class="chip">Anything else</span></p><div class="cmd"><span class="pr">$</span> xscapes inside &lt;any command&gt;   <span class="c"># no hooks needed</span></div></div>
 </div>
 <p class="cap">Coming soon: Codex CLI, Gemini CLI, OpenCode.</p>
 <a class="boxlink" href="https://github.com/donlucasx/xscapes"><span aria-hidden="true">┌──────────────────────────────┐</span><span>│ github.com/donlucasx/xscapes │</span><span aria-hidden="true">└──────────────────────────────┘</span></a>
