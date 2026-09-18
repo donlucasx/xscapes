@@ -29,6 +29,17 @@ const (
 	SubEnd       Kind = "sub_end"
 	Todo         Kind = "todo"
 	Context      Kind = "context"
+	// Interrupt is the user cutting the turn short (Esc). The turn is over
+	// and nothing was finished: the scene settles and no cue rings, because
+	// the person who pressed the key is the one who would have heard it.
+	// Kimi Code CLI fires it IN PLACE OF Stop (measured 2026-09-17); an
+	// adapter that did not send it would leave the sea up until TurnSilence.
+	Interrupt Kind = "interrupt"
+	// Answered is a pending ask resolved by the user: an approval given or
+	// refused. Kimi Code CLI reports the moment (PermissionResult, measured
+	// 2026-09-17); Claude Code never does, so there the next tool starting
+	// is what clears the ask. It clears the ask and touches nothing else.
+	Answered Kind = "answered"
 )
 
 // Kinds is every kind the reducer understands, in protocol order.
@@ -41,7 +52,7 @@ const (
 var Kinds = []Kind{
 	SessionStart, SessionEnd, Prompt, ToolStart, ToolEnd, Error,
 	TestPass, TestFail, Compact, NeedsInput, Done, SubStart, SubEnd,
-	Todo, Context,
+	Todo, Context, Interrupt, Answered,
 }
 
 // Known says the reducer has a meaning for this kind.
@@ -159,7 +170,7 @@ func (e Event) Known() bool {
 	switch e.Kind {
 	case SessionStart, SessionEnd, Prompt, ToolStart, ToolEnd, Error,
 		TestPass, TestFail, Compact, NeedsInput, Done, SubStart, SubEnd,
-		Todo, Context:
+		Todo, Context, Interrupt, Answered:
 		return true
 	}
 	return false

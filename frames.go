@@ -1,6 +1,7 @@
 package main
 
 import (
+	"math"
 	"time"
 
 	"github.com/donlucasx/xscapes/internal/canvas"
@@ -199,6 +200,16 @@ func (f *frames) state(now time.Time, t float64) reduce.State {
 	}
 	if st.Act.Tokens == 0 && f.spend != nil {
 		st.Act.Tokens = f.spend.Total()
+	}
+	// The moon, from the transcript, when no status line reported it. Kimi's
+	// wire records the context in use and the window (internal/spend/kimi.go);
+	// Claude Code's transcript does not, and its status line does.
+	if !st.ContextKnown && f.spend != nil {
+		if used, window, ok := f.spend.Context(); ok {
+			frac := float64(used) / float64(window)
+			st.Act.ContextUsed = math.Max(0, math.Min(1, frac))
+			st.Act.Window = window
+		}
 	}
 	// Re-render the sand to the columns this layout actually leaves it, so a
 	// narrow pane loses whole pieces of a line rather than getting a path

@@ -9,6 +9,7 @@
 package reduce
 
 import (
+	"fmt"
 	"math"
 	"sort"
 	"time"
@@ -155,6 +156,9 @@ type State struct {
 	Session string
 	// Transcript is the agent's transcript path when an adapter named one.
 	Transcript string
+	// ContextKnown says an adapter reported the context reading; when it is
+	// false the composer may derive one from the transcript instead.
+	ContextKnown bool
 
 	// tail lets a renderer re-fit the sand to its own width.
 	tail *tail
@@ -198,6 +202,15 @@ type Reducer struct {
 	subs   map[string]time.Time
 	gone   map[string]time.Time // subagents that ended: when each kitten leaves (may be ahead of now, the dwell), until it has swum off
 
+	// Kimi Code CLI names a subagent by its PROFILE ("explore"), not by an
+	// instance, and marks neither a subagent's tool calls nor its Stop
+	// (measured 2026-09-17: two parallel explores both said "explore", and
+	// two of the three Stops for one prompt were theirs). kimiOpen holds the
+	// instances this reducer has minted per profile, oldest first, so the
+	// litter counts two and a Stop with any of them open is not the turn's.
+	kimiOpen map[string][]string
+	kimiSeq  int
+
 	worried    bool
 	needsInput bool
 	doneAt     time.Time
@@ -237,11 +250,64 @@ type Reducer struct {
 
 func New(session string) *Reducer {
 	return &Reducer{
-		flight:  map[string]inflight{},
-		subs:    map[string]time.Time{},
-		gone:    map[string]time.Time{},
-		session: session,
+		flight:   map[string]inflight{},
+		subs:     map[string]time.Time{},
+		gone:     map[string]time.Time{},
+		kimiOpen: map[string][]string{},
+		session:  session,
 	}
+}
+
+// kimi applies Kimi Code CLI's rules to an event before the switch sees it,
+// and reports whether it should be applied at all. Src is set by the hook
+// command from its own argument, never from the payload, so a Claude Code
+// event can never take this path.
+//
+//   - SubStart/SubEnd: the profile name becomes an instance key ("explore#3"),
+//     ended oldest first, so a fan-out of one profile is a litter of that size.
+//   - Done while an instance is open is a SUBAGENT's Stop, not the turn's:
+//     dropped. (A background subagent keeps the turn open a little longer
+//     than it strictly is; the cue rings when the last of them is in.)
+//   - A tool event with no agent while a FOREGROUND Agent call is in flight
+//     is the subagent's work: it is marked so it neither paces the companion
+//     nor worries it (his ruling: main-thread errors only). The Agent call's
+//     own ToolEnd is exempt, or it could never close.
+func (r *Reducer) kimi(e event.Event) (event.Event, bool) {
+	switch e.Kind {
+	case event.SubStart:
+		name := e.Agent
+		if name == "" {
+			name = "subagent"
+		}
+		r.kimiSeq++
+		key := fmt.Sprintf("%s#%d", name, r.kimiSeq)
+		r.kimiOpen[name] = append(r.kimiOpen[name], key)
+		e.Agent, e.AgentType = key, name
+	case event.SubEnd:
+		name := e.Agent
+		if open := r.kimiOpen[name]; len(open) > 0 {
+			e.Agent, e.AgentType = open[0], name
+			if len(open) == 1 {
+				delete(r.kimiOpen, name)
+			} else {
+				r.kimiOpen[name] = open[1:]
+			}
+		}
+	case event.Done:
+		if len(r.kimiOpen) > 0 {
+			return e, false
+		}
+	case event.ToolStart, event.ToolEnd, event.Error, event.TestPass, event.TestFail:
+		if e.Agent == "" {
+			for id, f := range r.flight {
+				if f.op == event.OpSub && id != e.ID {
+					e.Agent = "kimi-subagent"
+					break
+				}
+			}
+		}
+	}
+	return e, true
 }
 
 // Apply folds one event in.
@@ -252,6 +318,12 @@ func (r *Reducer) Apply(e event.Event, now time.Time) {
 	r.decay(now)
 	r.last = now
 	r.count++
+	if e.Src == "kimi" {
+		var ok bool
+		if e, ok = r.kimi(e); !ok {
+			return
+		}
+	}
 
 	// Any sign of work refreshes the turn clock. It used to be set once, at
 	// the prompt, so TurnSilence measured how LONG the turn was rather than
@@ -363,6 +435,23 @@ func (r *Reducer) Apply(e event.Event, now time.Time) {
 	case event.NeedsInput:
 		r.needsInput = true
 		r.bubble = e.Text
+
+	case event.Answered:
+		// The ask was answered, so the balloon and the pose come down on
+		// the user's own word, before the approved command has run. With no
+		// ask up there is nothing to clear: the done words stay.
+		if r.needsInput {
+			r.needsInput = false
+			r.bubble = ""
+		}
+
+	case event.Interrupt:
+		// The turn is over and nothing finished: settle, ring nothing. doneAt
+		// stays where it was, so no knock and no done pose.
+		r.turnOpn = false
+		r.needsInput = false
+		r.flight = map[string]inflight{}
+		r.bubble = ""
 
 	case event.Done:
 		r.turnsDone++
@@ -702,15 +791,16 @@ func (r *Reducer) State(now time.Time) State {
 			Arriving:     arriving,
 			ArrivalPhase: phase,
 		},
-		Pose:        r.pose(now),
-		Kittens:     len(r.subs),
-		KittenExits: r.kittenExits(now),
-		Tail:        r.tail.lines(now),
-		tail:        &r.tail,
-		Session:     r.session,
-		Transcript:  r.transcript,
-		LastEvent:   r.last,
-		Events:      r.count,
+		Pose:         r.pose(now),
+		Kittens:      len(r.subs),
+		KittenExits:  r.kittenExits(now),
+		Tail:         r.tail.lines(now),
+		tail:         &r.tail,
+		Session:      r.session,
+		Transcript:   r.transcript,
+		ContextKnown: r.ctxSet,
+		LastEvent:    r.last,
+		Events:       r.count,
 	}
 	// The bubble is NOT gated on the pose. Gating it meant that after any
 	// failed command the companion went Worried and swallowed everything --
@@ -753,6 +843,7 @@ func (r *Reducer) reset() {
 	r.turnOpn = false
 	r.flight = map[string]inflight{}
 	r.subs = map[string]time.Time{}
+	r.kimiOpen = map[string][]string{}
 	r.gone = map[string]time.Time{}
 	r.worried, r.needsInput = false, false
 	r.doneAt = time.Time{}
