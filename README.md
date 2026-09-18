@@ -215,6 +215,8 @@ xscapes replay session.jsonl   # feed a recorded session back through the engine
 XSCAPES_COMPANION=cat …    # override the companion for one run, without saving it
 XSCAPES_SCAPE=vista …      # override the scape for one run, without saving it
 XSCAPES_SILENT=1 …         # mute
+XSCAPES_HOOKLOG=file …     # the hook command appends every raw payload and where it went (adapter debugging)
+XSCAPES_EVENTLOG=file …    # the scape appends every event its reducer applied (the other end of the same question)
 ```
 
 `xscapes claude -print` shows you how the window will be split and what will be

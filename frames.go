@@ -6,6 +6,7 @@ import (
 
 	"github.com/donlucasx/xscapes/internal/canvas"
 	"github.com/donlucasx/xscapes/internal/companion"
+	"github.com/donlucasx/xscapes/internal/envx"
 	"github.com/donlucasx/xscapes/internal/event"
 	"github.com/donlucasx/xscapes/internal/notify"
 	"github.com/donlucasx/xscapes/internal/reduce"
@@ -65,6 +66,10 @@ type frames struct {
 	scapeName      string
 	ascii          bool
 	nextScapeCheck time.Time
+	// evlog is XSCAPES_EVENTLOG, the file every applied event is appended
+	// to (eventlog.go); evDropped/evBad are the bus counts last written.
+	evlog            string
+	evDropped, evBad int64
 }
 
 // companionPoll is how often a running scape re-reads the saved companion.
@@ -117,6 +122,7 @@ func newFrames(w, h int, seed int64, ascii, mirror bool, ctxUsed, tod float64) *
 		mirror: mirror, profile: term.DetectProfile(), seed: seed,
 		player: notify.New(), ctxUsed: ctxUsed, tod: tod, start: time.Now(),
 		ascii: ascii, scapeName: ScapeShore,
+		evlog: envx.Lookup("EVENTLOG"),
 	}
 	f.refreshScape(time.Time{})
 	return f
@@ -183,8 +189,17 @@ func (f *frames) state(now time.Time, t float64) reduce.State {
 		select {
 		case e := <-f.bus.C:
 			f.red.Apply(e, now)
+			if f.evlog != "" {
+				appendEventLog(f.evlog, e, now)
+			}
 		default:
 			draining = false
+		}
+	}
+	if f.evlog != "" && f.bus != nil {
+		if dropped, bad := f.bus.Stats(); dropped != f.evDropped || bad != f.evBad {
+			f.evDropped, f.evBad = dropped, bad
+			appendEventLogStats(f.evlog, dropped, bad, now)
 		}
 	}
 	st := f.red.State(now)

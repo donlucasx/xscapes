@@ -4,6 +4,7 @@ import (
 	"bufio"
 	"encoding/json"
 	"os"
+	"path/filepath"
 	"strings"
 	"testing"
 	"time"
@@ -95,6 +96,16 @@ func TestARealKimiSessionThroughThePipeline(t *testing.T) {
 			if st.Bubble != "" || st.Pose == companion.NeedsYou {
 				t.Fatalf("after the approval: bubble %q pose %v", st.Bubble, st.Pose)
 			}
+		case "PreToolUse":
+			if p.ToolName == "AskUserQuestion" && (st.Pose != companion.NeedsYou || st.Bubble == "") {
+				t.Fatalf("Kimi's question did not raise the ask: pose %v bubble %q", st.Pose, st.Bubble)
+			}
+		case "PostToolUse":
+			// The question answered is the answer: in his run the balloon
+			// stayed up 19 s after he had replied, until Kimi's next tool.
+			if p.ToolName == "AskUserQuestion" && (st.Bubble != "" || st.Pose == companion.NeedsYou) {
+				t.Fatalf("the answered question left the ask up: pose %v bubble %q", st.Pose, st.Bubble)
+			}
 		}
 	}
 
@@ -106,8 +117,9 @@ func TestARealKimiSessionThroughThePipeline(t *testing.T) {
 	if len(errors) != 1 || !strings.Contains(errors[0], "No such file") {
 		t.Fatalf("errors = %q", errors)
 	}
-	// The permission prompt is the ask, and only it.
-	if len(asks) != 1 || asks[0] != "allow Bash?" {
+	// The permission prompt is an ask, and so is Kimi's question to the user
+	// (the AskUserQuestion payloads are from his 2026-09-17 run).
+	if len(asks) != 2 || asks[0] != "allow Bash?" || asks[1] == "" {
 		t.Fatalf("asks = %q", asks)
 	}
 	// Five Stops reach the reducer: the two subagents' (dropped while they
@@ -178,6 +190,17 @@ func TestKimiShapesBesideClaudes(t *testing.T) {
 	if got := translate(payload(t, ask)); len(got) != 1 || got[0].Kind != event.ToolStart {
 		t.Fatalf("claude AskUserQuestion: %+v", got)
 	}
+	// The question's completion is the answer, on either agent: an
+	// Answered follows the tool's end (a no-op when no ask is up).
+	done := `{"hook_event_name":"PostToolUse","session_id":"s","tool_name":"AskUserQuestion","tool_input":{"questions":[{"question":"Red or blue?"}]},"tool_output":"blue"}`
+	for _, src := range []string{"kimi", "claude"} {
+		p := payload(t, done)
+		p.Src = src
+		got := translate(p)
+		if len(got) != 2 || got[0].Kind != event.ToolEnd || got[1].Kind != event.Answered {
+			t.Fatalf("%s AskUserQuestion answered: %+v", src, got)
+		}
+	}
 	// Esc.
 	if got := translate(kimi(t, `{"hook_event_name":"Interrupt","session_id":"s","reason":"cancelled","turn_id":1}`)); len(got) != 1 || got[0].Kind != event.Interrupt || got[0].Text != "cancelled" {
 		t.Fatalf("Interrupt: %+v", got)
@@ -197,5 +220,110 @@ func TestAnApprovalAnsweredClearsTheAsk(t *testing.T) {
 	got := translate(p)
 	if len(got) != 1 || got[0].Kind != event.Answered || got[0].Text != "approved" {
 		t.Fatalf("PermissionResult: %+v", got)
+	}
+}
+
+// Kimi's AgentSwarm launches one sub-agent per item (its own schema says
+// so, and the wire of his 2026-09-17 swarm shows seven), so it is sub-agent
+// work like Agent: the reducer's foreground-call rule needs the op.
+func TestAgentSwarmIsSubagentWork(t *testing.T) {
+	p := payload(t, `{"hook_event_name":"PreToolUse","session_id":"s","tool_name":"AgentSwarm","tool_input":{"description":"Multi-agent review of xscapes","subagent_type":"explore","items":["a","b","c"]}}`)
+	p.Src = "kimi"
+	got := translate(p)
+	if len(got) != 1 || got[0].Op != event.OpSub || got[0].Target != "explore" {
+		t.Fatalf("AgentSwarm: %+v", got)
+	}
+}
+
+// XSCAPES_HOOKLOG appends every raw payload the hook command receives, one
+// JSON line each, before any translation: the instrument for the next
+// adapter question, so an agent's real hook order can be read off a live
+// run instead of a probe.
+func TestHookLogKeepsEveryRawPayload(t *testing.T) {
+	path := filepath.Join(t.TempDir(), "hooks", "raw.jsonl")
+	logRaw(path, "kimi", []string{"PreToolUse", "kimi"}, []byte(`{"hook_event_name":"PreToolUse","tool_name":"AgentSwarm"}`))
+	logRaw(path, "kimi", []string{"Stop", "kimi"}, []byte("not json at all"))
+	b, err := os.ReadFile(path)
+	if err != nil {
+		t.Fatal(err)
+	}
+	lines := strings.Split(strings.TrimSpace(string(b)), "\n")
+	if len(lines) != 2 {
+		t.Fatalf("%d lines, want 2:\n%s", len(lines), b)
+	}
+	var first struct {
+		TS      int64           `json:"ts"`
+		Src     string          `json:"src"`
+		Argv    []string        `json:"argv"`
+		Payload json.RawMessage `json:"payload"`
+	}
+	if err := json.Unmarshal([]byte(lines[0]), &first); err != nil {
+		t.Fatalf("line 1 is not JSON: %v", err)
+	}
+	if first.TS == 0 || first.Src != "kimi" || len(first.Argv) != 2 || !strings.Contains(string(first.Payload), `"AgentSwarm"`) {
+		t.Fatalf("line 1: %+v", first)
+	}
+	// A payload that is not JSON is kept as a string, never dropped.
+	var second struct {
+		Payload string `json:"payload"`
+	}
+	if err := json.Unmarshal([]byte(lines[1]), &second); err != nil || second.Payload != "not json at all" {
+		t.Fatalf("line 2: %v %+v", err, second)
+	}
+}
+
+// The hook log also says what became of each payload: how many events it
+// produced and whether they reached the socket, the spool, or nothing. His
+// swarm of 2026-09-17: six SubagentStarts in the hook log, no owlets on the
+// scape, and no way to tell which side lost them.
+func TestHookLogRecordsTheOutcome(t *testing.T) {
+	path := filepath.Join(t.TempDir(), "raw.jsonl")
+	logOutcome(path, "kimi", []string{"SubagentStart", "kimi"}, 1, 0, 0)
+	b, _ := os.ReadFile(path)
+	var l struct {
+		TS      int64           `json:"ts"`
+		Src     string          `json:"src"`
+		Emitted map[string]int  `json:"emitted"`
+		Payload json.RawMessage `json:"payload"`
+	}
+	if err := json.Unmarshal(b, &l); err != nil || l.TS == 0 || l.Src != "kimi" {
+		t.Fatalf("outcome line: %v %s", err, b)
+	}
+	if l.Emitted["socket"] != 1 || l.Emitted["spool"] != 0 || l.Emitted["failed"] != 0 {
+		t.Fatalf("emitted = %v", l.Emitted)
+	}
+	if len(l.Payload) != 0 {
+		t.Fatalf("an outcome line must carry no payload, or a replay would translate it")
+	}
+}
+
+// XSCAPES_EVENTLOG=<file>: the scape appends every event its reducer
+// applies, so a hook log and an event log together say where a lost event
+// went missing: before the socket, or after it.
+func TestTheEventLogRecordsEachAppliedEvent(t *testing.T) {
+	path := filepath.Join(t.TempDir(), "events.jsonl")
+	now := time.Date(2026, 9, 17, 18, 22, 40, 0, time.UTC)
+	appendEventLog(path, event.Event{Kind: event.SubStart, Agent: "coder", Src: "kimi", Session: "s"}, now)
+	appendEventLog(path, event.Event{Kind: event.ToolStart, Tool: "Bash", Src: "kimi", Session: "s"}, now.Add(time.Second))
+	appendEventLogStats(path, 3, 1, now.Add(2*time.Second))
+	b, _ := os.ReadFile(path)
+	lines := strings.Split(strings.TrimSpace(string(b)), "\n")
+	if len(lines) != 3 {
+		t.Fatalf("%d lines, want 3:\n%s", len(lines), b)
+	}
+	var first struct {
+		TS    int64  `json:"ts"`
+		Kind  string `json:"kind"`
+		Agent string `json:"agent"`
+	}
+	if err := json.Unmarshal([]byte(lines[0]), &first); err != nil || first.Kind != "sub_start" || first.Agent != "coder" || first.TS != now.UnixMilli() {
+		t.Fatalf("line 1: %v %+v", err, first)
+	}
+	var stats struct {
+		Dropped int64 `json:"dropped"`
+		Bad     int64 `json:"bad"`
+	}
+	if err := json.Unmarshal([]byte(lines[2]), &stats); err != nil || stats.Dropped != 3 || stats.Bad != 1 {
+		t.Fatalf("stats line: %v %+v", err, stats)
 	}
 }

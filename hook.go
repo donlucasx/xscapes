@@ -10,6 +10,7 @@ import (
 	"strings"
 	"time"
 
+	"github.com/donlucasx/xscapes/internal/envx"
 	"github.com/donlucasx/xscapes/internal/event"
 	"github.com/donlucasx/xscapes/internal/spend"
 )
@@ -136,6 +137,32 @@ func firstQuestion(raw json.RawMessage) string {
 	return firstLine(in.Questions[0].Question)
 }
 
+// logRaw appends one line to the hook log: when, whose hooks, the command's
+// own arguments, and the payload exactly as it came (as JSON when it is
+// JSON, as a string when it is not, never dropped). Errors are swallowed:
+// the log is a diagnostic and must never fail the agent's turn.
+func logRaw(path, src string, args []string, raw []byte) {
+	_ = os.MkdirAll(filepath.Dir(path), 0o700)
+	f, err := os.OpenFile(path, os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0o600)
+	if err != nil {
+		return
+	}
+	defer f.Close()
+	var payload interface{}
+	if json.Valid(raw) {
+		payload = json.RawMessage(raw)
+	} else {
+		payload = string(raw)
+	}
+	line, err := json.Marshal(map[string]interface{}{
+		"ts": time.Now().UnixMilli(), "src": src, "argv": args, "payload": payload,
+	})
+	if err != nil {
+		return
+	}
+	_, _ = f.Write(append(line, '\n'))
+}
+
 // needsYouTypes are the notification types that mean a human is actually being
 // asked for something.
 //
@@ -230,29 +257,86 @@ func runHook(args []string) {
 	defer watchdog.Stop()
 	defer func() { recover() }()
 
-	var p hookPayload
-	if b, err := io.ReadAll(io.LimitReader(os.Stdin, maxPayload)); err == nil {
-		if json.Unmarshal(b, &p) != nil {
-			// The payload did not parse -- almost always because a big
-			// tool_response pushed it past the cap and the read cut it
-			// mid-object. Dropping it whole is the expensive failure: the
-			// tool_use_id goes with it, so the matching tool_start is never
-			// closed and the sea stays up forever. The scalar fields we need
-			// sit near the front, ahead of the payload that made it big.
-			salvage(b, &p)
+	b, rerr := io.ReadAll(io.LimitReader(os.Stdin, maxPayload))
+	if rerr != nil {
+		b = nil
+	}
+	src := hookSrc(args)
+	// XSCAPES_HOOKLOG=<file>: every raw payload, as received, one JSON line
+	// each. The instrument for an adapter question -- what does this agent
+	// actually fire, in what order -- read off a live run instead of a probe.
+	path := envx.Lookup("HOOKLOG")
+	if path != "" {
+		logRaw(path, src, args, b)
+	}
+	var socket, spooled, failed int
+	for _, e := range hookTranslate(args, b) {
+		switch via, err := event.Emit(e); {
+		case err != nil:
+			failed++
+		case via:
+			socket++
+		default:
+			spooled++
 		}
+	}
+	if path != "" {
+		logOutcome(path, src, args, socket, spooled, failed)
+	}
+}
+
+// logOutcome is the hook log's second line for a payload: what became of
+// it. A hook log with six SubagentStarts and a scape with no owlets (his
+// swarm, 2026-09-17) could not say which side lost them; this says whether
+// each left the hook at all, and by which door.
+func logOutcome(path, src string, args []string, socket, spooled, failed int) {
+	f, err := os.OpenFile(path, os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0o600)
+	if err != nil {
+		return
+	}
+	defer f.Close()
+	line, err := json.Marshal(map[string]interface{}{
+		"ts": time.Now().UnixMilli(), "src": src, "argv": args,
+		"emitted": map[string]int{"socket": socket, "spool": spooled, "failed": failed},
+	})
+	if err != nil {
+		return
+	}
+	_, _ = f.Write(append(line, '\n'))
+}
+
+// hookSrc is whose hooks these are: `xscapes hook <Event> [agent]`, the
+// installer having written which agent's hooks they are, because Kimi's
+// event names are Claude Code's. It never comes from the payload, so an
+// agent cannot claim to be another one.
+func hookSrc(args []string) string {
+	if len(args) > 1 && args[1] != "" {
+		return args[1]
+	}
+	return "claude"
+}
+
+// hookTranslate is the hook command's whole translation, as a function of
+// what it was given: the raw payload and its own arguments. runHook feeds
+// it stdin; a replay feeds it a hook log, so what a live run produced can
+// be folded again through the same code (kimilog_replay_test.go).
+func hookTranslate(args []string, b []byte) []event.Event {
+	var p hookPayload
+	if len(b) > 0 && json.Unmarshal(b, &p) != nil {
+		// The payload did not parse -- almost always because a big
+		// tool_response pushed it past the cap and the read cut it
+		// mid-object. Dropping it whole is the expensive failure: the
+		// tool_use_id goes with it, so the matching tool_start is never
+		// closed and the sea stays up forever. The scalar fields we need
+		// sit near the front, ahead of the payload that made it big.
+		salvage(b, &p)
 	}
 	if p.Event == "" && len(args) > 0 {
 		// The installed command names the event too, so a payload we could
 		// not parse still produces the right kind of event.
 		p.Event = args[0]
 	}
-	// `xscapes hook <Event> [agent]`: the installer writes which agent's
-	// hooks these are, because Kimi's event names are Claude Code's.
-	src := "claude"
-	if len(args) > 1 && args[1] != "" {
-		src = args[1]
-	}
+	src := hookSrc(args)
 	if p.Session == "" {
 		p.Session = event.SessionFromEnv()
 	}
@@ -274,7 +358,7 @@ func runHook(args []string) {
 	if p.AgentType == "" {
 		p.AgentType = p.AgentName
 	}
-
+	var out []event.Event
 	for _, e := range translate(p) {
 		e.Session = p.Session
 		e.Src = src
@@ -285,8 +369,9 @@ func runHook(args []string) {
 		if e.AgentType == "" {
 			e.AgentType = p.AgentType
 		}
-		_, _ = event.Emit(e)
+		out = append(out, e)
 	}
+	return out
 }
 
 // hermesExtra is what Hermes puts under "extra": every keyword argument the
@@ -355,6 +440,13 @@ func translate(p hookPayload) []event.Event {
 		// `xscapes emit`. Two halves of one feature that were never joined.
 		if done, total, ok := todoCounts(p.ToolName, p.ToolInput); ok {
 			return []event.Event{e, {Kind: event.Todo, N: done, Of: total}}
+		}
+		// A question answered is the answer: the tool completing means the
+		// user replied, so the ask comes down now and not at the next tool
+		// start (his 2026-09-17 run: 19 s of a stale balloon after he had
+		// answered). A no-op when no ask is up.
+		if p.ToolName == "AskUserQuestion" {
+			return []event.Event{e, {Kind: event.Answered, Text: "answered"}}
 		}
 		return []event.Event{e}
 
@@ -576,7 +668,9 @@ func classify(tool string, raw json.RawMessage) (event.Op, string) {
 		// A search query is the user's words, not a credential, but it is also
 		// not something to write across the beach in full.
 		return event.OpWeb, trimTo(in.Query, 40)
-	case "Agent", "Task":
+	case "Agent", "Task", "AgentSwarm":
+		// Kimi's AgentSwarm starts one sub-agent per item (its schema: "Each
+		// item launches one new subagent"; seven in his first swarm).
 		s := in.SubagentTyp
 		if s == "" {
 			s = firstLine(in.Description)
