@@ -44,9 +44,13 @@ func appendEventLog(path string, e event.Event, now time.Time) {
 	})
 }
 
-func appendEventLogStats(path string, dropped, bad int64, now time.Time) {
+// appendEventLogStats writes the counts whenever one changes: events the bus
+// dropped or could not parse, and erase-displays the agent sent that the host
+// confined to its band (or dropped), so a blank row is attributed to a clear
+// rather than inferred from a screenshot.
+func appendEventLogStats(path string, dropped, bad, erased int64, now time.Time) {
 	writeEventLogLine(path, map[string]interface{}{
-		"ts": now.UnixMilli(), "dropped": dropped, "bad": bad,
+		"ts": now.UnixMilli(), "dropped": dropped, "bad": bad, "erased": erased,
 	})
 }
 

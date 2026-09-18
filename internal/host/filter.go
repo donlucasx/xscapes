@@ -31,6 +31,10 @@ type Filter struct {
 	// other. The filter rewrites an ED into the band's own rows, using the
 	// band's bottom margin to stop it. Set by the host, followed on resize.
 	Band atomic.Int32
+	// Erases counts the agent's erase-displays the filter confined or
+	// dropped, for the event log: the next blank row is then attributed to
+	// a clear instead of inferred from a screenshot (his ruling, 2026-09-18).
+	Erases atomic.Int64
 	// pend holds an escape sequence that a read cut in half. A read from a
 	// PTY ends wherever the kernel's buffer ended, which is regularly inside
 	// a sequence: without this, ESC[ would be forwarded and the r that
@@ -103,6 +107,7 @@ func (f *Filter) confineErase(seq []byte) []byte {
 	if band <= 0 && p != "3" {
 		return seq
 	}
+	f.Erases.Add(1)
 	var b strings.Builder
 	switch p {
 	case "", "0":

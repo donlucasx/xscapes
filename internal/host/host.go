@@ -33,6 +33,9 @@ import (
 type Host struct {
 	// Cmd is the agent. Its stdio is replaced with the pty.
 	Cmd *exec.Cmd
+	// filter is the agent's output filter once Run has made it; AgentErases
+	// reads its count.
+	filter *Filter
 	// Size reports the real terminal's size. Injected rather than measured
 	// here so there is one TIOCGWINSZ in the project, not two.
 	Size func() (cols, rows int)
@@ -105,6 +108,15 @@ type Host struct {
 // write is the only path to the terminal. Serialised, because a scape frame
 // landing in the middle of a chunk of the agent's output would split an escape
 // sequence in half and paint garbage into the agent's own window.
+// AgentErases is how many erase-displays the agent has sent that the filter
+// confined to its band or dropped, for the event log.
+func (h *Host) AgentErases() int64 {
+	if h.filter == nil {
+		return 0
+	}
+	return h.filter.Erases.Load()
+}
+
 func (h *Host) write(s string) {
 	if s == "" || h.muted.Load() {
 		return
@@ -348,6 +360,7 @@ func (h *Host) Run() error {
 	fwdDone := make(chan struct{})
 	f := &Filter{}
 	f.Band.Store(int32(agentRows))
+	h.filter = f
 	go func() {
 		defer close(fwdDone)
 		buf := make([]byte, 8192)

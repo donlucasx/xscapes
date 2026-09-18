@@ -201,6 +201,7 @@ With no command, runs claude.
 		},
 	}
 	h.Cmd.Env = os.Environ()
+	fr.erases = h.AgentErases
 	if err := h.Run(); err != nil {
 		fmt.Fprintln(os.Stderr, "xscapes:", err)
 		os.Exit(1)

@@ -86,6 +86,11 @@ func TestAnAgentsEraseStaysInItsBand(t *testing.T) {
 		t.Errorf("ESC[1J changed to %q", out)
 	}
 
+	// The filter counts what it confined or dropped, for the event log.
+	if got := f.Erases.Load(); got != 2 {
+		t.Errorf("erases counted %d, want 2 (a 3J dropped and a 1J passed)", got)
+	}
+
 	// A clear cut across two reads is still confined.
 	s, f = pin()
 	s.feed("\x1b[4;3H")

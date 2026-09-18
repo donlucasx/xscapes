@@ -305,7 +305,7 @@ func TestTheEventLogRecordsEachAppliedEvent(t *testing.T) {
 	now := time.Date(2026, 9, 17, 18, 22, 40, 0, time.UTC)
 	appendEventLog(path, event.Event{Kind: event.SubStart, Agent: "coder", Src: "kimi", Session: "s"}, now)
 	appendEventLog(path, event.Event{Kind: event.ToolStart, Tool: "Bash", Src: "kimi", Session: "s"}, now.Add(time.Second))
-	appendEventLogStats(path, 3, 1, now.Add(2*time.Second))
+	appendEventLogStats(path, 3, 1, 0, now.Add(2*time.Second))
 	b, _ := os.ReadFile(path)
 	lines := strings.Split(strings.TrimSpace(string(b)), "\n")
 	if len(lines) != 3 {

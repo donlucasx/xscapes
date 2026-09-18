@@ -1,9 +1,29 @@
 package main
 
 import (
+	"encoding/json"
+	"os"
 	"path/filepath"
 	"testing"
+	"time"
 )
+
+// The stats line carries the agent's erases beside the bus's counts.
+func TestTheStatsLineCarriesTheErases(t *testing.T) {
+	p := filepath.Join(t.TempDir(), "events.jsonl")
+	appendEventLogStats(p, 1, 0, 3, time.Unix(1_789_700_000, 0))
+	b, err := os.ReadFile(p)
+	if err != nil {
+		t.Fatal(err)
+	}
+	var m map[string]interface{}
+	if err := json.Unmarshal(b, &m); err != nil {
+		t.Fatalf("%v in %q", err, b)
+	}
+	if m["erased"] != 3.0 || m["dropped"] != 1.0 {
+		t.Fatalf("stats line %s", b)
+	}
+}
 
 // The log switches pick a path for =1 the way the trace does; a path is
 // taken as given; unset is off.
