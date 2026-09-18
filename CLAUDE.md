@@ -19,7 +19,12 @@
 > every leaf JUMP 80 columns every four seconds at any width but 80; FIXED live (the unlooped clock modulo the width; the
 > study clip byte-identical). Three candidates built behind `scenes.WindPick` (W1 half+grounded 88 · W2 streaks in the near
 > air 65 · W3 sparse+slow 55 cells/frame) on one page for his pick: https://claude.ai/artifact/Ng2uUanTJ8TAwLbZ86rMhP ; my
-> recommendation W2. UNCOMMITTED, not installed. NEXT: his pick, then install and his look live (the s40 block below).
+> recommendation W2. His "are we sure it was the wind?" ⇒ NO: the churn and the jump are measured, that they are what
+> he saw is inferred (the BLANK TOP ROWS of 18:57 are untraced and read as flicker too); the A/B on his glass decides.
+> `-live -level N` now pins the demo and `XSCAPES_WIND=<n>` picks a style; his first (rest-state) run showed TWO
+> TALL-WINDOW DEFECTS (the pines at fixed rows, the dip deleting the range behind the owl at 132x41/71x39/124x30), both
+> FIXED with mutation-checked tests. INSTALLED dirty (inode 87217050). UNCOMMITTED at his word. NEXT: his A/B, his pick
+> (the s40 block below).
 
 > **Session 40, thread 2 (2026-09-17 16:00–20:10), WRAPPED: KIMI COMPATIBILITY MEASURED, BUILT ON HIS FOUR ANSWERS,
 > SHIPPED (six commits `ddde8c4`…`2bcc155`, v0.4.3 released, the friend's install line verified from a clean HOME),

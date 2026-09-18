@@ -4553,3 +4553,43 @@ binary and the tyastie one an older one: **a restart is what shows the afternoon
   sparse and slow; churn at full stretch 216 → 88 → 65 → 55. PAGE for his pick: https://claude.ai/artifact/Ng2uUanTJ8TAwLbZ86rMhP
   (12.7 MB; 36 frames a clip to stay under the artifact's 16 MB). Recommendation: W2. UNCOMMITTED, not installed;
   suite 13/13 + vet + fmt green.
+- HIS NOTES ON v1, verbatim (2026-09-18 ~00:50): *"The stars sprinkle in one at the time from even before we see
+  anything else, the shine effect should happen around each ascii characters that make the shore tides animation, as
+  they wipe in- not the current vertical line that wipes across the screen. And the wipe in should happen
+  progressively, at the same speed as the ascii animations, frame by frame the water reveals left tor right. This may
+  make it longer, so perhaps the X cursor comes in even before the background is fully revealed. Help me time it so it
+  has a good pace when all the elements come together at the end"* ⇒ v2 BUILT: the cover exported CELL BY CELL (the
+  sky's 129 specks are identical in all six frames; the horizon is row 24 of 57); the stars sprinkle in one at a time
+  from 0 over 1.7 s (shuffled, an ease-in on the count) each with a glow that decays; the field below the horizon
+  paints in SIX BANDS, one per step of the sea's own 0.7 s cycle, each band swept left to right inside its step, every
+  glyph lifted to white with a halo on arrival and settling to its ink in 0.45 s; no vertical band. The pace I set so
+  the elements meet at the end: the cell at 2.6 s blinks twice while the sea is still painting, the x lands at 4.9 as
+  the LAST band arrives, the letters type 5.05–5.7 as that band settles, the colour drains 5.5–6.9 while the slogan
+  glows in 5.9–7.1, the cell settles at 7.2, hold to 8.2, out by 9.0. `~/Desktop/xscapes-trailer/opener-v2.mp4`.
+- *"are we sure it was the wind that was breaking it ?"* (~00:40, 09-18) ⇒ NO. Measured in the renderer: the leaves are
+  seven in ten changed cells at full stretch and the field jumped 80 columns every 4 s at his width. Inferred, not
+  proven: that this is what he SAW. For it: the correlation with the level (his own "gone when quiet") and Kimi's byte
+  trace catching the leaf glyphs crossing the sky. Against a clean answer: his 18:57 screenshot's BLANK TOP ROWS, which
+  leaves cannot do and which read as flicker too, untraced (Kimi's bytes were clean, so it would be the host's paint
+  path under agent output). The decisive test: an A/B on his glass with NO agent, the vista pinned at level 1, today's
+  wind against a candidate; `-live` ignored `-level` (it ran the demo cycle), so the pin had to be built first.
+- *"I ran the command above, it opens the xscape alone (no agent). I also noticed some of the art elements seem broken.
+  The trees are shifted up, and there is a negative space up above the owl that sorts of blanks the landscape above
+  (behind it) the tree line and mountains- I can tell is linked to the companinon because the gap moves to the sides
+  as I resize the window"* (~00:57, screenshots at 132x41 and 71x39) ⇒ (1) That run was AT REST: the pin was not built
+  yet, so `-live -level 1` cycled the demo (an ember, upright scrub, smoke straight up); my command came before the
+  code. (2) BOTH DEFECTS REPRODUCED in the test path at his sizes (TestVistaShots now renders 132x41 and 71x39) and were
+  the 80x24 numbers surviving where everything else follows the layout: the PINES were drawn at fixed sub-rows 13/19 to
+  41 (rows 6..20) at any height, so at 41 rows they stood 7 rows above the lake; the DIP behind the owl pushed the
+  treeline to the owl's top row without checking that the head was in the trees, and at a tall window (the owl 3 rows
+  below the near range's base) the push landed below the range's base and deleted the range in the owl's span; the
+  blank moved with the owl because the span is the owl's. FIXED: the pines' feet are the meadow's last row and their
+  heights scale with the scene's (28/22 sub-rows x bandTop/21; the column clip follows the height), reproducing the old
+  numbers exactly at 80x24 (fingerprint green); the dip only where 2*owlY < nearBase (live path). Tests
+  `TestThePinesStandOnTheMeadow` and `TestTheTreelineStaysWhereTheOwlIsBelowIt`, both RED against the old code
+  (mutation-checked): the dip also bit 124x30 (7 cells), the pines 125x28 too. (3) THE PIN BUILT: `-live -level N`
+  holds the demo at one level (`pinnedState`; `TestLivePinsTheLevel`); `XSCAPES_WIND=<n>` picks a wind style for one
+  run. Suite 13/13 + vet + fmt green. INSTALLED dirty (new inode 87217050, stamp d880e40 modified): the A/B is his:
+  `XSCAPES_SCAPE=vista xscapes -live -level 1` (today's wind) against `XSCAPES_WIND=2 XSCAPES_SCAPE=vista xscapes -live
+  -level 1`. UNCOMMITTED (his word): forest.go · vista.go · frames.go · live.go · main.go · vista_shots_test.go ·
+  windprobe_test.go · vista_tall_test.go.

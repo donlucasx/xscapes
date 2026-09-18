@@ -66,6 +66,26 @@ tracks kept 95%). UNCOMMITTED, not installed: forest.go (styles + the clock),
 vista.go (Rows()), windprobe_test.go. Suite 13/13 + vet + fmt green. NOT
 touched: the BLANK TOP ROWS (needs his trace). NEXT: his pick → WindPick,
 a churn gate in the probe, install, his look live.
+⭐ THEN HIS "are we sure it was the wind that was breaking it?" ⇒ NO (the
+churn and the jump are measured in the renderer; that they are what he SAW
+is inferred: the level correlation + Kimi's byte trace; against: the BLANK
+TOP ROWS of 18:57, untraced, which read as flicker too). The decisive A/B on
+his glass with no agent needed `-live -level` to work (it ran the demo cycle)
+⇒ BUILT: `-live -level N` pins the demo (`pinnedState`, TestLivePinsTheLevel)
+and `XSCAPES_WIND=<n>` picks a style for one run. ⭐ HIS FIRST RUN (at rest,
+the pin not yet built) SHOWED TWO TALL-WINDOW DEFECTS at 132x41 and 71x39,
+both the 80x24 numbers surviving: the PINES at fixed rows 6..20 (7 rows above
+the lake at 41 rows) and the DIP behind the owl pushing the treeline below
+the near range's base when the owl is below it (the range deleted in the
+owl's span; also bit 124x30). FIXED (pines follow the layout, feet on the
+meadow's last row, height scaled by bandTop/21, byte-identical at 80x24; the
+dip only where 2*owlY < nearBase), mutation-checked tests
+(vista_tall_test.go), TestVistaShots renders his two sizes. INSTALLED dirty
+(inode 87217050, stamp d880e40 modified). THE A/B IS HIS:
+`XSCAPES_SCAPE=vista xscapes -live -level 1` vs the same with
+`XSCAPES_WIND=2` (or 1, 3), in Terminal.app at his size. UNCOMMITTED at his
+word: forest.go · vista.go · frames.go · live.go · main.go ·
+vista_shots_test.go · windprobe_test.go · vista_tall_test.go.
 
 Session 40, thread 2 (2026-09-17 16:00–20:10), WRAPPED at his word "lets /wrap
 and discuss this fix first thing on the next session". FIRST THING NEXT: THE
