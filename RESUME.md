@@ -134,9 +134,13 @@ KIMI'S ASSESSMENT verified 6 of 6 on the claims checked; its 12-item list =
 the next cards (the reallocBand region+cursor hazard first: the trace shows
 the cursor left on the scape's first row at a mark; do not fix blind).
 ⚠ His traced Kimi session is still running at 10:20 (trace 4.2 GB, ~8
-MB/min); the wave is captured; it can end. UNCOMMITTED now also:
-levelfold_test.go, internal/host/blankrows_replay_test.go, WindSeam
-(forest.go, main.go).
+MB/min); the wave is captured; it can end. ⭐ COMMITTED at his word "comit" (10:50) as seven cuts, each built + vetted
+alone: `ad8d961` launcher refusal + backups · `efefec5` Kimi payloads, the
+logs, the replay (its empty-log panic guarded) · `c355e9d` the wind ·
+`5f6f4a1` -live -level · `7c4be94` the tall window · `ef602ab` the erase
+confined · `9e55428` the instruments. NOT PUSHED. The tree holds only his
+parallel session's trailer files. Installed binary = inode 87309990 (built
+from the pre-commit tree, same content).
 
 Session 40, thread 2 (2026-09-17 16:00–20:10), WRAPPED at his word "lets /wrap
 and discuss this fix first thing on the next session". FIRST THING NEXT: THE

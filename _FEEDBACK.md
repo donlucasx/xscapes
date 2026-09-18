@@ -4685,3 +4685,9 @@ binary and the tyastie one an older one: **a restart is what shows the afternoon
   save: a second hazard, the cursor, not only the region; NOT fixed blind, carded) · the NEAR test skips whenever
   `companion.Near != 0` and the default is 2, so it never runs · Done is dropped while `kimiOpen` is non-empty and
   the comment promises a cue "when the last of them is in". Its 12-item list stands as the next cards.
+- *"comit"* (10:50, 09-18) ⇒ COMMITTED as seven cuts, each built and vetted on its own in a worktree: `ad8d961` the
+  launcher refusal + install backups (s40) · `efefec5` Kimi's payload gaps, HOOKLOG/EVENTLOG, the replay (s40; Kimi's
+  empty-log panic guarded) · `c355e9d` the wind (the unlooped clock, three candidates behind WindPick, XSCAPES_WIND /
+  XSCAPES_WINDSEAM, the probe + page) · `5f6f4a1` `-live -level` · `7c4be94` the tall window (pines, the dip) ·
+  `ef602ab` the erase confined to the band · `9e55428` the two trace instruments. NOT PUSHED (his word). Left in the
+  tree: his parallel session's `trailer_test.go` and `notes/trailer/`.

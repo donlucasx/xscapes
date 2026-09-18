@@ -36,7 +36,8 @@
 > through the reducer; the trace: 12,434 paints, 0 wiped scape rows) on the unlooped clock ⇒ THE 4-SECOND LEAF JUMP IS
 > THE PRIME SUSPECT for the working flicker, and neither earlier test had it; `XSCAPES_WINDSEAM=1` puts it back for his
 > one-minute look, INSTALLED. Kimi's assessment verified 6/6 on the claims checked; its 12 cards are next, reallocBand's
-> region+cursor hazard first (the s40 block below).
+> region+cursor hazard first. ⭐ **COMMITTED at his word as seven cuts** (`ad8d961` · `efefec5` · `c355e9d` · `5f6f4a1` ·
+> `7c4be94` · `ef602ab` · `9e55428`), each built + vetted alone; **NOT PUSHED** (the s40 block below).
 
 > **Session 40, thread 2 (2026-09-17 16:00–20:10), WRAPPED: KIMI COMPATIBILITY MEASURED, BUILT ON HIS FOUR ANSWERS,
 > SHIPPED (six commits `ddde8c4`…`2bcc155`, v0.4.3 released, the friend's install line verified from a clean HOME),
