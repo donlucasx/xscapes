@@ -118,6 +118,25 @@ Kimi session keeps the old binary. STILL OPEN: the WORKING flicker (his
 five-agent wave in the traced session is pending; no clears during work so
 far) and the blank top rows. UNCOMMITTED now also: internal/host/filter.go,
 host.go, erase_test.go, agentclear_replay_test.go.
+⭐⭐ HIS WAVE (10:20): "I did not see any flickering". MEASURED: the event log
+folded through the reducer (levelfold_test.go) says the wave hit LEVEL 1.00
+at 01:55 with FIVE OWLETS, ≥ 0.8 for 670 s (the 09-17 18:57 conditions:
+that session's log reads 0.98 with 3 owlets at 18:57); the trace's first 260
+MB through the model (blankrows_replay_test.go): 12,434 paints, 0 wiped
+scape rows. ⇒ THE SEAM IS THE PRIME SUSPECT FOR THE WORKING FLICKER: the 09-17
+binary jumped every leaf 80 columns every 4 s; NEITHER the standalone A/B nor
+this Kimi session had the jump (both ran the unlooped clock), so both tested
+the density, not the jump. Instrument built + INSTALLED: `XSCAPES_WINDSEAM=1
+XSCAPES_SCAPE=vista xscapes -live -level 1` shows the old jump standalone;
+his one-minute look closes it. The blank top rows of 18:57 fit Kimi's ED on
+a resize + the tracker's 4.2 s persistence (prevented by the Filter now).
+KIMI'S ASSESSMENT verified 6 of 6 on the claims checked; its 12-item list =
+the next cards (the reallocBand region+cursor hazard first: the trace shows
+the cursor left on the scape's first row at a mark; do not fix blind).
+⚠ His traced Kimi session is still running at 10:20 (trace 4.2 GB, ~8
+MB/min); the wave is captured; it can end. UNCOMMITTED now also:
+levelfold_test.go, internal/host/blankrows_replay_test.go, WindSeam
+(forest.go, main.go).
 
 Session 40, thread 2 (2026-09-17 16:00–20:10), WRAPPED at his word "lets /wrap
 and discuss this fix first thing on the next session". FIRST THING NEXT: THE

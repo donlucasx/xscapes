@@ -32,7 +32,11 @@
 > left the still rows blank. The paint/agent interleaving race is REFUTED on the same trace (5,605 paints, 0 inside).
 > FIXED in the host's Filter (an agent's ED confined to the band; 3J dropped, the scrollback is the mirror's), held by
 > `TestAnAgentsEraseStaysInItsBand` and `TestReplayTraceAgentClears` on his bytes (1076/1076 blank → 0/1076). INSTALLED.
-> STILL OPEN: the working flicker (his five-agent wave pending) and the blank top rows (the s40 block below).
+> ⭐⭐ HIS WAVE: "I did not see any flickering" at MEASURED level 1.00 with five owlets for minutes (the event log folded
+> through the reducer; the trace: 12,434 paints, 0 wiped scape rows) on the unlooped clock ⇒ THE 4-SECOND LEAF JUMP IS
+> THE PRIME SUSPECT for the working flicker, and neither earlier test had it; `XSCAPES_WINDSEAM=1` puts it back for his
+> one-minute look, INSTALLED. Kimi's assessment verified 6/6 on the claims checked; its 12 cards are next, reallocBand's
+> region+cursor hazard first (the s40 block below).
 
 > **Session 40, thread 2 (2026-09-17 16:00–20:10), WRAPPED: KIMI COMPATIBILITY MEASURED, BUILT ON HIS FOUR ANSWERS,
 > SHIPPED (six commits `ddde8c4`…`2bcc155`, v0.4.3 released, the friend's install line verified from a clean HOME),

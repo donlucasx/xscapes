@@ -4656,3 +4656,32 @@ binary and the tyastie one an older one: **a restart is what shows the afternoon
   explained by this: the WORKING flicker under five agents (no clears during work in this trace so far; his wave
   pending) and the BLANK TOP ROWS of 18:57 (if Kimi ever clears mid-work, this fix covers it; the trace of his wave will
   say).
+- THE SECOND CUT (2026-09-18 ~02:45): `~/Desktop/xscapes-trailer/xscapes-trailer-16x9-v2.mp4`, 36.7 s. Every shot
+  of his list, in his order, with hard cuts and two fast moves (a 0.4 s pull from the prompt's closeup, a 0.35 s zoom
+  to the moon). Three fixes from the stills before the render: the ask held only 1.2 s into the closeup so the crab
+  shrank back mid-shot ("> yes" moved from 19.5 to 20.25 of clip; the ask holds 4.25 s); the captions sat on the
+  sand's tail (raised to 108 px from the bottom, clear of the tail's rows); the moon shot showed a sliver of the
+  transcript at its top (a row lower). The eyes in the closeup are two different variants in two stills 0.9 s apart.
+  Sheet tiled and looked at. `notes/trailer/README.md` carries the new shot list.
+- *"I did not see any flickering- I wasnt able to follow thoroughout but didnt see any while I did"* (10:20, 09-18,
+  screenshot of the Kimi session at 130x61 after its five-assessor wave; the trace at 4.2 GB by then) ⇒ MEASURED what
+  the wave was: the event log folded through the reducer (`levelfold_test.go`, TestFoldTheEventLog; the file also holds
+  the 09-17 18:53-19:52 session, where 18:57 reads level 0.98 with 3 owlets, his flicker screenshot's moment): the
+  traced session reached LEVEL 1.00 at 01:55 with FIVE OWLETS and held ≥ 0.8 for 670 s, the 09-17 conditions
+  reproduced. The trace's first 260 MB (01:52 to past the wave) replayed through the model (`blankrows_replay_test.go`,
+  TestReplayTraceBlankRows: after each host paint, scape rows that were drawn at the previous paint and are empty now,
+  outside the 200 KB after a size change): 12,434 paints, 0 wiped rows. So at the reproduced conditions on the binary
+  with the unlooped clock (inode 87217050): no flicker seen, no blank rows measured. ⭐ THE SEAM IS THE PRIME SUSPECT
+  FOR THE WORKING FLICKER, and NEITHER earlier test had it: the standalone A/B ("none has the flicker") and this Kimi
+  session both ran the unlooped clock, so they tested the density, not the jump. The 09-17 binary jumped every leaf 80
+  columns every 4 s, ~140 leaves at level 1 on his width. Built the instrument: `XSCAPES_WINDSEAM=1` puts the looped
+  clock back under the live leaves (scenes.WindSeam; never shipped on), INSTALLED (inode 87270301-see ls -i). The
+  blank top rows of 18:57 fit Kimi's ED on a resize (his 18:57 window was being arranged) + the tracker's 4.2 s
+  persistence, now prevented by the Filter. KIMI'S ASSESSMENT (`notes/kimi-multiagent-assessment-2026-09-18.md`)
+  VERIFIED on six claims, 6 of 6 true: the unguarded `all[len(all)-1]` in kimilog_replay_test.go:79 (a panic on an
+  empty log) · `XSCAPES_HOOKLOG=1` writes a file named "1" (a path, unlike TRACE) · the installer hardcodes
+  `~/.kimi-code/config.toml` while spend.KimiHome honours `KIMI_CODE_HOME` · reallocBand ends with regionReset and no
+  re-pin (and, from the trace bytes at a mark, leaves the cursor on the scape's first row for the next paint's ESC7 to
+  save: a second hazard, the cursor, not only the region; NOT fixed blind, carded) · the NEAR test skips whenever
+  `companion.Near != 0` and the default is 2, so it never runs · Done is dropped while `kimiOpen` is non-empty and
+  the comment promises a cue "when the last of them is in". Its 12-item list stands as the next cards.
