@@ -4275,3 +4275,168 @@ binary and the tyastie one an older one: **a restart is what shows the afternoon
   names are status chips (reverse video in the dim grey, dark text; grey not gold, the gold reverse is the brand's;
   no new token). Template edited, site rebuilt, looked at once (desktop: matches the mock), COMMITTED `4c1e02c`,
   PUSHED, PUBLISHED; VERIFIED from outside 10 s later: live == local byte for byte, four chips on the page. He is on the Kimi script now.
+- **HIS FIRST KIMI LOOK (18:00), verbatim: *"[Image #3] ok, on a first look, seems to be running a swarm but no sub
+  agents populate on the xscape"*** (Kimi K2.8 Preview in swarm mode, an "Agent Swarm" of seven, the vista with the
+  owl working, no owlets, no spend count, no tool names on the band) · *"its running within this same subdirectory,
+  not sure if you can communicate with kimi directly (or if you need to)"*.
+  ⇒ MEASURED, not inferred: `~/.kimi-code/config.toml` held ZERO `[[hooks]]` tables. The install step never landed;
+  that run was the no-hooks watch adapter (output = work), which explains all three absences at once. **I ran
+  `xscapes install kimi --apply` (backup under ~/.config/xscapes/backups; `kimi doctor config` OK; 15 tables incl.
+  PermissionResult + Interrupt).** Hooks bind from his NEXT Kimi session; no talking to Kimi is needed or possible.
+  ⇒ THE SWARM, read off Kimi's session wire and its bundle (a 175 MB Node binary, `strings`): the tool is
+  **`AgentSwarm`** (schema: "Each item launches one new subagent"; `subagent_type`, default coder; his run: seven
+  "explore" members, agents 0-6 each with a wire.jsonl). Every spawn, Agent or swarm, passes `mirrorAgentRun` →
+  `subagents.hooks.onWillStartAgentTask` → the `SubagentStart` hook with `agentName` = the PROFILE, and
+  `notifyAgentTaskStopped` → `SubagentStop`. So seven SubagentStarts named "explore" are expected, which the reducer's
+  instance minting handles. ⚠ Unmeasured: whether AgentSwarm's own PostToolUse returns before the members finish (a
+  `WaitFor` tool exists in K2.8), in which case the members' unmarked tool events would pace and worry the owl.
+  ⇒ BUILT (uncommitted, INSTALLED dirty, inode 87036048): `AgentSwarm` classifies as sub-agent work
+  (`TestAgentSwarmIsSubagentWork`) · **`XSCAPES_HOOKLOG=<file>`: the hook command appends every raw payload as one
+  JSON line before translating** (`logRaw`, `TestHookLogKeepsEveryRawPayload`), the instrument for reading an
+  agent's real hook order off a LIVE run instead of a probe · README line.
+  ⚠ SIDE FINDING, this window: its scape (pid 59371) holds the socket of the DEAD session c126e104 (tag
+  dd8cbe8d3a4b); this session's (2e1af036) events spool to `run/aa4dc528348f.jsonl` unheard. A continued session in
+  the same window is F1's class: the scape never rebinds. Not chased now.
+- *"will regular users first time installing need to do anything different? or website commands are good?"* (18:10) ·
+  *"I ran the "export XSCAPES_HOOKLOG=~/.config/xscapes/kimi-hooks.jsonl" line but nothing happened"* (correct: export
+  is silent; `xscapes kimi` in the same shell is the next line).
+  ⇒ MEASURED: the plan mode is loud ("This is a plan. Nothing was written. Run again with --apply"), so the page's three
+  lines are right IF all three are run. The gaps: (1) **`xscapes kimi|claude|hermes` said NOTHING when the hooks were
+  missing** and ran half-blind on the watcher, which is how his first run went; (2) ⚠ **my "backup taken" was WRONG:
+  only the Claude installer kept a backup (s38 J1 had said so); the page's "after a backup" was untrue for Kimi and
+  Hermes.** No Kimi backup exists in `~/.config/xscapes/backups` from before mine because none was ever written.
+  ⇒ BUILT test-first (uncommitted, INSTALLED dirty): `backupConfig` — `install kimi|hermes --apply` now keeps the
+  original as `backups/<agent>-config.<stamp>.<ext>` and prints the path (`TestAgentInstallBacksUpTheOriginal` runs
+  the real command under a temp HOME) · `hooksInstalled` + `missingHooks` — **the launcher REFUSES to start when the
+  agent's hooks are not in its config**, naming the file, the install line and the way around (`xscapes inside
+  <agent>`, or `-watch=on`); Claude through its own marker, Kimi through its block, Hermes through its items
+  (`TestTheLauncherKnowsWhenHooksAreMissing`). Verified end to end: a temp HOME gets the refusal, exit 2; his real
+  HOME runs. The page copy is true for all three agents now.
+- *"ok session running now. In the meanwhile. id like to add a light/dark theme toggle on the xscapes site. The site should
+  default to dark theme (current), but the toggle should appear (and stay persistent) on the top right once the user
+  scrolls down past the splash page"* (18:20) ⇒ BUILT, looked at (Playwright: dark with the toggle, light at desktop
+  full page, light on a phone), NOT published, UNCOMMITTED. Dark stays the default and needs no attribute; light is
+  `data-theme="light"` on <html>, kept in localStorage (`xscapes-theme`) and set by a two-line head script before the
+  first paint (no flash). The light values are THE BRAND GUIDE'S light table (ground 255, surface 254, line 252, dim
+  241, ink 233, dawn 24 as the accent) plus the warm accent at cube 94 (#875f00; 179 on a light ground is a whisper)
+  and the splash sea's grey as a token. EVERY TERMINAL STAYS A TERMINAL: `.stage` re-declares the dark tokens, so the
+  frames, the typed problem and the study windows keep their night. The toggle: two words in the status-chip style,
+  the current one in reverse video, fixed top right, shown by an IntersectionObserver once `.cover` has scrolled out
+  (a scroll fallback), `aria-pressed`, keyboard-focusable, reduced-motion honoured. ⚠ For his look: the CREAM CAT on
+  the light ground is a pale silhouette (the cast floats with no background, his s33 ruling, made for dark); on a
+  phone the fixed toggle covers the last ~100 px of the top line as text scrolls under it.
+- ⭐ **HIS SECOND KIMI RUN, READ OFF THE RAW HOOK LOG (`XSCAPES_HOOKLOG`, 108+ payloads over 406 s, 18:20–18:27):**
+  the hooks bound (SessionStart → prompt → tools) · the permission prompt was the ask and his approval took it down
+  2.5 s later (PermissionRequest → PermissionResult) · **`AgentSwarm` is FOREGROUND: PreToolUse at 147 s, PostToolUse
+  at 229 s, after all six members had stopped**, so the sub-agent-work rule holds for the whole swarm · **six
+  SubagentStarts within 0.7 s, all named "coder"** (the swarm's default type), six SubagentStops at 156/165/168/184/
+  201/229 s, each preceded by a bare Stop in the same millisecond, so all six Stops fell inside the open litter and
+  none could ring done · the members' Bash/Read/Grep events carry NO marker at all (again) · a PostToolUseFailure
+  whose "error" is the command's whole OUTPUT (a non-zero exit after a `total 80` listing), so the first line on the
+  sand is not the reason (noted, not chased) · **ONE DEFECT: Kimi's AskUserQuestion answered at 386 s, and nothing
+  told the scape until the next tool at 406 s: 19 s of a stale balloon after he had replied.** FIXED test-first: a
+  PostToolUse of AskUserQuestion carries an Answered on either agent (a no-op with no ask up); the two real question
+  payloads from his run are in the fixture (43 payloads now) and the pipeline test checks the ask up at the question
+  and down at its completion. INSTALLED (uncommitted). The fixture question, verbatim from his Kimi: *"While the
+  6-agent swarm ran (and just now, as this question fires — watch for the balloon …"* — Kimi was testing us too.
+- *"[Image #5] here is a report from kimi"* (18:33; `notes/kimi-live-test-2026-09-17.md`, written by Kimi inside the scape) ·
+  *"i didnt see owlets originally when it ran the swarm, and then when it tested it I saw one"* (18:38) · *"[Image #6]
+  they look good now- but the session aint working so they shouldnt be there. Should I restart the session and test it
+  again? or anything else pending? --- also, push the latest changes to the xscapes website"* (18:46).
+  ⇒ **KIMI'S REPORT, VERIFIED (the auditor rule):** HELD: the spool "false alarm" (emit.go tries the socket first;
+  the file is the fallback) · one marked block, 15 events · six sub-agent wires. REFUTED: *"XSCAPES_HOOKLOG was off
+  this run"* (137 payloads, 18:20:13–18:31:25, the whole run) · *"per-agent attribution via a deliberate exit-1
+  subagent"* (`go vet ./doesnotexist; echo EXIT_CODE=$?` exits 0; the real failure was another member's listing of a
+  missing path) · *"First-run bind … held"* (run/ had 168 entries; not a first run) · *"the owlet left when the
+  subagent finished"* (the dwell keeps it a minute; Kimi marked it unconfirmed itself). Kimi cannot see the scape, so
+  every "confirmed working" row about the picture is inference. Tally: 3 held, 4 refuted/overclaimed, 2 rightly
+  left to his eyes. The file stays in `notes/` with this note pointing at it.
+  ⇒ **THE OWLETS, MEASURED THREE WAYS:** (1) the raw log folded through the hook command's own translation
+  (`hookTranslate`, extracted for this) and the reducer at the log's real timestamps
+  (`kimilog_replay_test.go`, `XSCAPES_KIMILOG=<file>`): kittens=6 from 146.9 s; (2) the vista at his 131x24 would
+  have drawn 5–6 sitting from 147 s to 207 s, then 1 to 230 s; (3) **the six real SubagentStart payloads replayed
+  INTO HIS LIVE SCAPE through the real hook command at 18:44: six owlets on his screen (his screenshot), nothing
+  spooled.** So the live process draws them; at 18:22 it either never got them or he did not see them. The spool
+  holds only the two pre-bind lines (every later datagram was accepted), the bus drops only past 256 queued (137
+  events all run), and six concurrent hooks measure 3–4 ms against the 250 ms watchdog (the intended load had
+  already finished; a real load test is still open). UNRESOLVED; INSTRUMENTED for the next run: the hook log now
+  writes an OUTCOME line per payload (socket / spool / failed counts; `logOutcome`) and **`XSCAPES_EVENTLOG=<file>`
+  makes the scape append every event its reducer applies plus the bus's drop counts** (`eventlog.go`), so a lost
+  event can be placed on one side of the socket or the other. Both test-first, installed (inode 87060467).
+  The six injected owlets were taken away with the six real SubagentStop payloads (they leave after the dwell).
+  ⇒ THE SITE: the theme toggle COMMITTED `cca9f49`, PUSHED, PUBLISHED at his word, VERIFIED from outside 10 s later: live == local byte for byte, the toggle on the page.
+- *"ok, kimi session running- while I test that, shall we find a better color for the companions in this particular
+  section? on the light theme (only) the eyes get lost a bit [Image #7] all but the owl"* (18:54) ⇒ MEASURED: the
+  crab, cat and frog eyes are `o` GLYPHS in the moonlit mint (168,236,176, `eyeCol`) drawn in holes that show the
+  page's ground; the owl's are solid blocks. BUILT: `canvas.HTMLPalette.Vars` (a colour the CSS writes as
+  `var(--name,#hex)`; `TestAPaletteColourCanCarryAThemeVariable`), `companion.EyeInk()`, the page palette routes the
+  eye colour through `--eye` (66 classes), `:root{--eye:#a8ecb0}`, and **on light, inside `.cast` only,
+  `--eye:#005f00` (cube 22, dark green)** so every frame on its own night keeps the mint. Looked at: light shows dark
+  green rings on all three; dark unchanged (computed --eye a8ecb0). Rebuilt, NOT published, his call on the shade.
+- *"push it live when done"* (19:00) ⇒ the eye fix COMMITTED `3e53ded` (canvas Vars + EyeInk + the page), PUSHED,
+  PUBLISHED; VERIFIED from outside 10 s later: live == local byte for byte, 66 eye classes through the variable.
+  ⭐ **HIS THIRD KIMI RUN (18:53:29 on), READ OFF BOTH LOGS: NOTHING LOST.** Hook side: 103 events, all 103 over the
+  socket, 0 spooled, 0 failed. Scape side: 103 applied, the same kinds and counts (tool_start/end 32+32, sub_start 5,
+  sub_end 5, needs_input 11, answered 11, done 5, todo 2), 0 dropped, 0 bad. Five parallel `Agent` calls at 28.8 s
+  (2 coder + 3 explore, all foreground, ending 228–272 s), the five sub-agent Stops inside the open litter, the
+  turn's own Stop at 314.5 s. So the pipeline holds end to end on a live run; the 18:22 miss is a one-off of the
+  earlier process that the instruments would now place. Awaiting his eyes: five owlets from 18:54 for ~4 min.
+- *"ok the sub agents seems to be working better on the kimi session, but I did notice an art-flickering issue when
+  running [Image #8] note this one is missing the very top bit of the art where it shows the tokens used, got worse (i
+  think when running multiple agents) not sure, kimi is currently looking into it and will prepare a report FYI"*
+  (19:05). His screenshot: the scape's first two rows (the token counter's row and the sky's top) are the terminal's
+  own background; the picture below is NOT shifted (the peak sits where it did at 18:45); the band's writing rows are
+  empty because the tail had faded. ⇒ MEASURED FIRST: Kimi's own TUI under a pty at the band's size (131x30, one
+  prompt, /exit; `tmp/kimi-tui.bin`, 30,747 bytes, 1,228 CSI): **no ED, no ESC[2J, no DECSTBM, no scroll, no CUP** —
+  only ESC[2K x144, CUU x91 (max 12), CUD x80 (max 2), CHA x88, SGR x554, DEC 2026 sync x87 pairs, ?25l x90 (never
+  ?25h), ?2004h/?1004h/?2031h once, kitty keyboard push/query, DA, `?996n`, OSC 8 x144 (hyperlinks), OSC 133 x3,
+  OSC 11 x2 (background query), OSC 0. Every one of those stays inside the band under DECSTBM. The host forwards the
+  agent's bytes untouched but for ESC[r (`filter.go`); the scape band is repainted by row damage with a full repaint
+  every 50 frames (`damage.go`), so ANY outside blanking shows for up to ~4 s at 12 fps before it heals, which is
+  the flicker's shape but not its cause. Cause UNKNOWN until a trace of HIS session: `XSCAPES_TRACE=1` records every
+  byte the host sends, replayable through the screen model. Kimi's report pending; to be verified against this capture.
+- *"back to the page- Site: could we have a small index/root on the left side of the screen (like a minimal table of
+  contents), small, w hyperlinks, persistent, so the user can quickly navigate sections: the problem / xscapes /
+  features / companions / install / scapes and companions / protocol. Also, the last section currently reads
+  "different every session". We had a blurb about xscapes being a protocol. Is it? Does it make sense to rephrase the
+  last blurb to angle it from there? Is there a mobile friendly version of it we can implement?"* (19:15)
+  ⇒ Yes, it is a protocol (the README's first paragraph; the "waiting layer" pitch the entry was built on): an event
+  protocol on a socket, adapters on top. BUILT, looked at, NOT published: **THE INDEX** (`nav.toc`): his seven
+  entries as small links, fixed at the left, the current section marked with the warm cell (the kicker's), shown with
+  the theme toggle once the splash has scrolled out; anchors on the dividers (`#s-problem #top #s-features
+  #s-companions #s-install #s-scapes #s-protocol`, scroll-margin 16px). Under 1200px the column leaves no gutter, so
+  it folds into an "index" chip at the bottom left (the status-chip style) that opens the same list as a small box,
+  closing on a pick; phones included. Two traps paid: the page's `a{border-bottom}` underlined every entry, and
+  `offsetTop` is measured from the positioned column (a splash lower than the window), so the current section is read
+  off `getBoundingClientRect()`; the foot of the page marks the last entry. **THE CLOSE IS "PROTOCOL"** (his word):
+  the event protocol with a scene on top; the seventeen event kinds in a drawn box; the three shipped adapters and
+  the output watcher; `xscapes emit` as the way to write one; the "different every session" paragraph kept as the
+  last word, so the repeatability sentence survives. Site rebuilt; his look and word to publish.
+- *"ok, lets synthesize the PROTOCOL session a bit. Also, i think we should mention the fact that xscapes is a "event
+  procotocol with a scene on top" in either the title "cozy ascii scenes that react..." or the blurb underneath.
+  Where is it more eye-catching / reads best?"* (19:28) ⇒ Recommended and built THE BLURB: its last sentence, after
+  "Same window, any terminal agent." — the protocol is why that claim is true; the headline stays the locked emotional
+  line (an eyebrow in the kicker style would be louder but would put the technical phrase before the hook). The close
+  synthesised: "Underneath the scene is an event protocol…" (the phrase itself now lives in the blurb only), the
+  adapter paragraph to one sentence plus the emit box, the repeatability paragraph tightened. Rebuilt, looked at,
+  NOT published.
+- *"push"* (19:35) ⇒ the index + the protocol close + the blurb line COMMITTED `b35d9c8`, PUSHED, PUBLISHED; VERIFIED from outside: live == local byte for byte, the index and the Protocol title on the page.
+- *"also looking at the website navigation menu (looks great!) but the "COMPANIONS" section should read "companion
+  states""* (19:42) ⇒ the index entry renamed to the section's own title; COMMITTED `ec7803f`, PUSHED, PUBLISHED;
+  VERIFIED from outside: live == local byte for byte.
+- *"[Image #9] report is up, if you havent seen it already. Note im running a previous model (k2.8) for economy"*
+  (19:57) ⇒ Kimi's second report (`notes/kimi-session-report-2026-09-17.md`, moved from the root) + its
+  `flickerprobe_test.go` (353 lines, root package). VERIFIED against the code: the vista's wind carries leaves
+  (`forest.go:852-871`) at a CONSTANT 20 cols/s over rows 4..bandTop with density `0.004 + 0.05*level` (13.5x at
+  level 1) ✓; sparks `0.004 + 0.04*level` re-rolled on the 6/s animation frame ✓; the reducer's level in his run:
+  0.99 during the five-agent wave, 0.6–0.85 for the rest of the session (my replay). At 131x24 that is roughly 9
+  leaf glyphs in the air idle, ~65 at level 0.5, ~120 at level 1, drifting across the sky and ranges: the busy churn
+  he called flicker, worse with more agents, gone when idle (his confirmation to Kimi). ⚠ Kimi's "tension with the
+  slot table" is a misreading: the density is COVERAGE (allowed); the drift is a constant, encoding nothing. ⚠ Kimi's
+  report does NOT explain the BLANK TOP ROWS (the token counter's row): leaves do not erase; that stays with the
+  trace. ⚠ Its `TestFlickerAmbientOnly` metric ("5,751 single-frame blinks/min" at level 0) counts every row that
+  changes and changes back, which a drifting glyph field does every frame by construction; not a defect measure.
+- *"lets /wrap and discuss this fix first thing on the next session"* (20:05) ⇒ WRAPPED. The wind fix (the vista's
+  leaf density and the fire re-roll at high level) is the first discussion next session; my recommendation and the
+  review-page offer stand in the 20:00 reply. The record committed; the product work stays UNCOMMITTED at the
+  standing rule (his word), installed dirty, listed in RESUME with the proposed cuts.

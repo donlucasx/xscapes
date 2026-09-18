@@ -3,34 +3,44 @@
 **Copy-paste this prompt into a fresh session:**
 
 ```
-Session 40, thread 2 (2026-09-17 16:00–17:15), KIMI COMPATIBILITY BUILT AND
-UNCOMMITTED, his calls pending. Six probe runs on Kimi (raw hooks captured)
-measured every payload gap; his four answers at 16:50 (Esc = quiet turn end ·
-context + spend from Kimi's session files · the site gets small branded
-per-agent install sections + "coming soon: codex" and two more · the friend
-holds until the Kimi release). BUILT test-first, suite 13/13 green: the
-first-run bind fix (ALL agents: SetCurrent ran before run/ existed, so the
-first session on a fresh machine never bound), event.Interrupt, the
-translator on Kimi's shapes (prompt parts, error object, TodoList,
-AskUserQuestion = the ask), the reducer's Kimi rules (profile → instances; a
-Stop with a sub-agent open is the sub-agent's), spend + moon off wire.jsonl,
-`xscapes kimi`/`xscapes hermes`, the installer refuses hand-written hooks,
-event.Answered (PermissionResult takes the ask down), README, the page's
-Install section (four captioned boxes + coming soon; looked at desktop +
-phone). ⚠ The building thread died at 17:01 mid-edit; its state came back
-from its transcript. ⭐ SHIPPED 17:20–17:40 at his four answers: COMMITTED as
-five cuts + the record (`ddde8c4` … `2bcc155`, each verified alone in a
-worktree, 13/13) · TAGGED + RELEASED v0.4.3 (four binaries; the friend's
-install line verified from a clean HOME yields stamp 2bcc155 with `xscapes
-kimi`) · PUSHED (origin/main == v0.4.3 == 2bcc155) · INSTALLED clean (inode
-87010523) · PUBLISHED at his word "Publish now" (judging Sep 17–20 proxies
-gh-pages live; his call) (verified from outside 10 s later: live == local byte for byte). His pick of the agent-name mark: V3 STATUS CHIP
-(from https://claude.ai/artifact/KwTovNHfX9sgU2LuqETGsi), live as `4c1e02c`
-(verified from outside: live == local). NEXT: his Kimi report · send the friend the message (drafted in the 17:20 reply: restore his
-backup, re-run the install line, `xscapes install kimi --apply`, `xscapes
-kimi`) · his own Kimi look on the eleven-step script in the 17:55 reply,
-then Hermes (wired, never run; a probe if it misbehaves) · running scapes hold the old binary until restarted · cards: install.sh's
-next-step text names only Claude; Hermes never run live.
+Session 40, thread 2 (2026-09-17 16:00–20:10), WRAPPED at his word "lets /wrap
+and discuss this fix first thing on the next session". FIRST THING NEXT: THE
+WIND FIX. Kimi's report (notes/kimi-session-report-2026-09-17.md, verified
+against the code) explains the "art flickering" he saw during multi-agent
+Kimi runs: the vista's wind carries leaves over rows 4..bandTop at a constant
+20 cols/s with density 0.004+0.05*level (forest.go:852-871, 13x at level 1)
+and the fire re-rolls 6/s with the same scaling; the reducer sat at level
+0.99 in his five-agent wave and 0.6-0.85 for the rest of the run (~9 leaves
+in the air idle, ~65 at 0.5, ~120 at level 1 on 131x24). My recommendation on
+the table: halve the density ceiling, keep the leaves below the far ranges,
+keep the speed, make the fire re-roll coherent; the offer: four intensities
+at full level on one review page for his pick (the snow pattern, s38).
+⚠ NOT explained by that: the scape's TOP ROWS (the token counter's row) went
+BLANK in his 18:57 screenshot; Kimi's own bytes are clean (no ED, no CUP, no
+DECSTBM; profile in _FEEDBACK); the instrument is a trace of HIS run
+(`XSCAPES_TRACE=1` added to his export line), replayed through the screen
+model. STATE: HEAD == origin/main (ec7803f + the wrap commit); the page is
+LIVE and verified: the theme toggle · status chips · the eye colour on light
+· the index (left; "companion states"; an "index" chip under 1200px) · the
+close "Protocol" · the blurb's "An event protocol with a scene on top."
+v0.4.3 released (the friend's install line verified from a clean HOME).
+⚠ UNCOMMITTED PRODUCT WORK, installed dirty (inode 87060467): the launcher
+refuses to start without hooks · kimi/hermes install backups · AgentSwarm =
+sub-agent work · the answered question takes the ask down (+2 real payloads
+in the fixture, 43 now) · XSCAPES_HOOKLOG (raw payload + an outcome line) ·
+XSCAPES_EVENTLOG (every event the reducer applied + drop counts) ·
+hookTranslate + kimilog_replay_test.go · Kimi's flickerprobe_test.go (0.7 s,
+kept) · README. Proposed cuts: (1) the launcher + backups, (2) AgentSwarm +
+the answered question, (3) the two logs + the replay, (4) the notes. Then
+v0.4.4 for the friend and his message (restore his backup → the install
+line → `xscapes install kimi --apply` → `xscapes kimi`). KIMI: his third run
+matched end to end (103 emitted over the socket == 103 applied, 0 dropped;
+five owlets confirmed by him); Kimi's two reports verified (3 claims refuted
+in the first, 2 corrected in the second). Open cards: the cream cat faint on
+light · the right-hand rail (redundant with the index) · Hermes never run
+live · F1 (a continued session never rebinds; this window's scape held the
+dead session's socket all evening) · install.sh's next-step text names only
+Claude · his Kimi session in the other window is still running.
 
 Session 40 (2026-09-17 afternoon), LIVE at his word "can you do it?". THE FIRST
 OUTSIDE INSTALL FAILED: his friend followed the page, `go install` put the

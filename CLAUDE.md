@@ -2,24 +2,24 @@
 
 *(Renamed end to end on 2026-09-03: directory, env vars, state path and hook marker. Two names are kept on purpose and are not leftovers -- `internal/envx` still reads `ASCIISCAPES_*` and warns, and `install.go` still RECOGNISES the `# asciiscapes:v1` marker so the hooks it wrote before the rename can be found and removed.)*
 
-> **Session 40, thread 2 (2026-09-17 16:00–17:40): KIMI COMPATIBILITY, MEASURED ON THE MACHINE, BUILT ON HIS FOUR
-> ANSWERS, THEN SHIPPED AT HIS WORD: six commits (`ddde8c4` … `2bcc155`, each verified alone) · v0.4.3 TAGGED AND
-> RELEASED · PUSHED · INSTALLED clean · PUBLISHED ("Publish now", his call during judging); the friend's install line
-> verified from a clean HOME yields the new build.** Six probe runs on Kimi (raw hooks captured; configs restored byte for
-> byte): Kimi's TUI is inline; hosted inside the scape it BOUND and rang. Payload gaps measured and each one now
-> handled: array prompt · object error · `agent_name` = profile (instances minted per profile) · NO sub-agent marker on
-> tool/Stop events (a Stop with a sub-agent open is the sub-agent's; tools during a foreground Agent call are its) ·
-> TodoList/"done" lights the stars · AskUserQuestion is the ask · PermissionResult takes it down (`event.Answered`) ·
-> Esc = Interrupt in place of Stop (`event.Interrupt`, quiet, his ruling) · no transcript_path (spend + the moon read
-> `agents/*/wire.jsonl` via session_index.jsonl). `xscapes kimi`; the installer refuses hand-written `xscapes hook`
-> entries (his friend's agent wrote twelve). ⚠⚠ **FIRST-RUN BUG FOR EVERY AGENT, FIXED: `SetCurrent` wrote `run/current`
-> before `run/` existed, so the first session on a fresh machine never bound** (his friend's would have; v0.4.2 still
-> has it). README + the page's Install section rebuilt (four per-agent boxes, "Coming soon: Codex CLI, Gemini CLI,
-> OpenCode"; the agent names are STATUS CHIPS, his pick 17:58 from three marks, `4c1e02c`) and published (verified
-> from outside: live == local byte for byte). ⏰ Commons closed 16:59; judging (Sep 17–20) proxies gh-pages live. ⚠ The
-> building thread died at 17:01 before reporting; its state was recovered from its transcript. NEXT: the friend's
-> message (drafted) · his live look (`xscapes install kimi --apply && xscapes kimi`). Record: `_FEEDBACK.md` §Session
-> 40 thread 2 (+ continued, + go-live).
+> **Session 40, thread 2 (2026-09-17 16:00–20:10), WRAPPED: KIMI COMPATIBILITY MEASURED, BUILT ON HIS FOUR ANSWERS,
+> SHIPPED (six commits `ddde8c4`…`2bcc155`, v0.4.3 released, the friend's install line verified from a clean HOME),
+> THEN THE EVENING'S SITE WORK LIVE (`cca9f49` theme toggle · `4c1e02c` status chips · `3e53ded` the eye colour on
+> light · `b35d9c8` the index + the close as "Protocol" + the blurb's "An event protocol with a scene on top." ·
+> `ec7803f`), every publish verified from outside.** Kimi's payload gaps measured and handled (array prompt, object
+> error, profile-named sub-agents minted as instances, a Stop with a sub-agent open is the sub-agent's, TodoList,
+> AskUserQuestion = the ask and its answer takes it down, Esc = a quiet Interrupt, spend + moon off wire.jsonl).
+> ⚠⚠ **FIRST-RUN BIND BUG FOR EVERY AGENT, FIXED** (`SetCurrent` before `run/` existed; v0.4.2 still has it). His three
+> live Kimi runs: the first had NO HOOKS (the install never landed; the launcher now REFUSES to start without them,
+> uncommitted); the second lost six owlets at 18:22 for a cause never placed (the six real payloads injected into the
+> live scape drew six); the third, with both logs on, matched end to end (103 over the socket == 103 applied).
+> ⭐ **FIRST THING NEXT SESSION: THE WIND FIX.** Kimi's verified report: the vista's leaves (`forest.go:852-871`,
+> density 13x at level 1, 20 cols/s over the whole sky) and the fire's 6/s re-roll are the "art flickering" he saw
+> under five agents; recommendation and a review-page offer in `RESUME.md`. ⚠ The BLANK TOP ROWS of the scape in
+> his 18:57 screenshot are a different defect: Kimi's bytes are clean; a trace of his run (`XSCAPES_TRACE=1`) is the
+> instrument. ⚠ UNCOMMITTED, installed dirty: the launcher refusal · kimi/hermes backups · AgentSwarm · the answered
+> question · `XSCAPES_HOOKLOG`/`XSCAPES_EVENTLOG` · the replay test; cuts proposed in `RESUME.md`, then v0.4.4 and
+> the friend's message. Record: `_FEEDBACK.md` §Session 40 thread 2.
 
 > **Session 40 (2026-09-17 afternoon), SHIPPED at his word: THE FIRST OUTSIDE INSTALL FAILED, AND IT WAS OURS.** His friend
 > followed the page and got `zsh: command not found: xscapes`: `go install` drops the binary in `~/go/bin`, which is
