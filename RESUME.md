@@ -4,7 +4,8 @@
 
 ```
 Session 41 (2026-09-17 evening, ~20:15-21:00): THREE SITE UPDATES at his ask,
-BUILT, COMMITTED (`44d8d1f` the build fix, `60e93d9` the site), PUSHED
+BUILT, COMMITTED (`44d8d1f` the build fix, `60e93d9` the site, `b6d953c`
+the title "xscapes · a thinking screen for terminal agents"), PUSHED
 (origin/main == HEAD). PUBLISH REFUSED by the auto-mode classifier
 ("Production Deploy", as in s39): his one command from the repo root,
 `sh site/publish.sh`, then verify from outside (live bytes == site/index.html;

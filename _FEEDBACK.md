@@ -4486,3 +4486,8 @@ binary and the tyastie one an older one: **a restart is what shows the afternoon
 - COMMITTED `44d8d1f` (the fix) · `60e93d9` (the site); PUSHED (origin/main == HEAD). ⚠ `sh site/publish.sh` REFUSED by
   the auto-mode permission classifier ("Production Deploy"), as in s39: his one command, then the verification from
   outside. The product's uncommitted work (s40) untouched.
+- *"also, the name of the site it self should read " xscapes  - a thinking screen for terminal agents " (or use a better
+  icon than -)'"* (~20:50) ⇒ `<title>` and the card's `og:title`/`twitter:title` = "xscapes · a thinking screen for
+  terminal agents": the middle dot is the separator the page already uses (the foot, the spinner's clock); the card
+  descriptions stop repeating the tagline and carry the headline's sentence. COMMITTED `b6d953c`, PUSHED; the publish
+  still his.

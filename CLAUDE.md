@@ -3,7 +3,7 @@
 *(Renamed end to end on 2026-09-03: directory, env vars, state path and hook marker. Two names are kept on purpose and are not leftovers -- `internal/envx` still reads `ASCIISCAPES_*` and warns, and `install.go` still RECOGNISES the `# asciiscapes:v1` marker so the hooks it wrote before the rename can be found and removed.)*
 
 > **Session 41 (2026-09-17 evening), THREE SITE UPDATES at his ask, COMMITTED (`44d8d1f` the build fix · `60e93d9` the
-> site) and PUSHED; ⚠ PUBLISH REFUSED by the auto-mode classifier ("Production Deploy", as in s39): his one command,
+> site · `b6d953c` the title "xscapes · a thinking screen for terminal agents") and PUSHED; ⚠ PUBLISH REFUSED by the auto-mode classifier ("Production Deploy", as in s39): his one command,
 > `sh site/publish.sh`, then verify from outside.** (a) A COPY button on every `$` line, 12 (the command alone; "copied"
 > for a moment in the toggle's pressed look; keyboard, a live region, a selection fallback; none on the events list).
 > (b) THE PROBLEM on his opener "You enter a prompt in the terminal and your agent gets to work…", his two sentences in,
