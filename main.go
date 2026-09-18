@@ -15,6 +15,7 @@ import (
 	"github.com/donlucasx/xscapes/internal/envx"
 	"github.com/donlucasx/xscapes/internal/notify"
 	"github.com/donlucasx/xscapes/internal/scape"
+	"github.com/donlucasx/xscapes/internal/scenes"
 	"github.com/donlucasx/xscapes/internal/term"
 )
 
@@ -53,6 +54,15 @@ func main() {
 	// cell there. Every HTML writer saves and restores this: the published
 	// page must not change with the terminal it was built from.
 	term.NoSplitCells = term.DetectNoSplit(os.Getenv("TERM_PROGRAM"))
+	// XSCAPES_WIND=<n> picks the vista's wind style for one run (the A/B on
+	// his glass, 2026-09-18); the pick itself is scenes.WindPick.
+	scenes.WindSeam = envx.Lookup("WINDSEAM") == "1"
+	if v := envx.Lookup("WIND"); v != "" {
+		n := -1
+		if _, err := fmt.Sscanf(v, "%d", &n); err == nil && n >= 0 && n < len(scenes.WindStyles) {
+			scenes.WindPick = n
+		}
+	}
 
 	// Subcommands are checked before the flag set is parsed. The renderer has
 	// twenty demo flags and the adapters have their own; keeping them in

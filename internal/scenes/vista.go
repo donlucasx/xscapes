@@ -95,6 +95,13 @@ func (v *Vista) Layout() (owlX, owlY, grassY, bandTop int) {
 // BandTop is the first row of the writing.
 func (v *Vista) BandTop() int { return v.lay.bandTop }
 
+// Rows is the frame's horizontal bands after the last Update: the lake's
+// first row, the meadow's first row and the writing's. Above the lake is
+// the sky and the ranges. The wind probe splits its counts on them.
+func (v *Vista) Rows() (lakeTop, meadowTop, bandTop int) {
+	return v.lay.lakeTop, v.lay.meadowTop, v.lay.bandTop
+}
+
 // BandColor is the writing's ground at its first row, for the sand's ink to
 // be sampled from when a row cannot be read back.
 func (v *Vista) BandColor() term.RGB { return v.band[0] }

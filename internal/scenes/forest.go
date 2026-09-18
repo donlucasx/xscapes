@@ -515,6 +515,7 @@ func paintVistaL(c *canvas.Canvas, lay vistaLayout, tod, t, level float64, seed 
 	l := lit(p)
 	glow := glowAt(tod)
 	warm := term.RGB{R: 255, G: 135, B: 95}
+	tRaw := t
 	t = loopPhase(t)
 	frame := int(math.Round(t * 6))
 	far, mid, near := c.Far(), c.Mid(), c.Near()
@@ -849,25 +850,64 @@ func paintVistaL(c *canvas.Canvas, lay vistaLayout, tod, t, level float64, seed 
 			plot(mid, x, y, g, scrub, 0.85)
 		}
 	}
-	// What the wind carries, blown right at twenty columns a second through
-	// a pattern the frame's width, so the loop closes.
+	// What the wind carries, blown right through a pattern the frame's
+	// width. The study's clip keeps today's field and today's clock: twenty
+	// columns a second on the looped clock closes exactly on the four-second
+	// loop at 80 wide, which is the width the clip is guarded at. Live, the
+	// field is the pick's and runs on the UNLOOPED clock modulo the width,
+	// because at any other width the looped clock made every leaf jump 80
+	// columns at once when it wrapped (his 131-column window, 2026-09-17:
+	// the worst frame in the air was the seam, see windprobe_test.go).
 	if wind {
-		d := 0.004 + 0.05*level
+		style := 0
+		if live != nil {
+			style = WindPick
+		}
+		speed, top, d := 20.0, 4, 0.004+0.05*level
+		streak, flyTop, flyD := false, 0, 0.0
+		switch style {
+		case 1:
+			speed, top, d = 12, farBase/2, 0.004+0.025*level
+		case 2:
+			speed, top, d, streak = 12, midBase/2, 0.003+0.01*level, true
+			flyTop, flyD = 4, 0.003*math.Max(0, level-0.6)/0.4
+		case 3:
+			speed, d = 6, 0.004+0.0125*level
+		}
 		shift := int(math.Round(t * 20))
+		if live != nil && !WindSeam {
+			shift = int(math.Round(tRaw*speed)) % c.W
+		}
 		leaf := term.Lerp(grey(10), cube(135, 175, 0), l)
-		for y := 4; y < bandTop; y++ {
-			for x := 0; x < c.W; x++ {
-				h := scape.HashF(((x-shift)%c.W+c.W)%c.W, y, seed+50)
-				if h < d {
+		blow := func(y0, y1 int, dens float64, seedK int64, streaks bool) {
+			for y := y0; y < y1; y++ {
+				for x := 0; x < c.W; x++ {
+					h := scape.HashF(((x-shift)%c.W+c.W)%c.W, y, seedK)
+					if h >= dens {
+						continue
+					}
 					g := '\''
-					if h < d*0.4 {
+					if h < dens*0.4 {
 						g = ','
-					} else if h < d*0.7 {
+					} else if h < dens*0.7 {
 						g = '-'
+					}
+					if streaks {
+						// A streak is two cells: the leaf and the trail it
+						// leaves behind it, so each carries its own motion.
+						plot(mid, x, y, '-', leaf, 0.7)
+						if x+1 < c.W {
+							plot(mid, x+1, y, g, leaf, 0.7)
+						}
+						continue
 					}
 					plot(mid, x, y, g, leaf, 0.7)
 				}
 			}
+		}
+		blow(top, bandTop, d, seed+50, streak)
+		if flyD > 0 {
+			blow(flyTop, top, flyD, seed+51, false)
 		}
 	}
 
@@ -1145,6 +1185,30 @@ var SnowStyles = []struct{ Name, Note string }{
 	{"heavy cover, subtle", "the snowline at 30%; the same colour"},
 	{"medium cover, faint", "the snowline at 42%; the lit rock lifted 22% at night, 42% by noon"},
 }
+
+// WindStyle is one way the wind shows what it carries through the air.
+type WindStyle struct{ Name, Note string }
+
+// WindStyles are the candidates for his pick of 2026-09-17, after his
+// report of a flicker in the art under five agents (the leaf field, counted
+// in windprobe_test.go). Style 0 is today's field.
+var WindStyles = []WindStyle{
+	{"today", "single glyphs over the whole air from row 4, 0.4% of the cells idle to 5.4% at full stretch, twenty columns a second"},
+	{"half, grounded", "the same glyphs from the far range's foot down, the ceiling halved (2.9% at full stretch), twelve columns a second: one cell a frame at the live rate, no judder"},
+	{"streaks in the near air", "two-cell streaks from the massif's foot down, a fifth of the ceiling, and a few single leaves higher up only near full stretch; twelve columns a second"},
+	{"sparse and slow", "the whole air as today at a quarter of the ceiling (1.4% at full stretch), six columns a second: one cell every other frame"},
+}
+
+// WindPick is the wind the live vista draws; 0 is today. The study's clip on
+// the page keeps today's whatever the pick.
+var WindPick = 0
+
+// WindSeam puts the looped clock back under the live leaves, the way v0.4.3
+// ran them: at any width but 80 the whole field jumps 80 columns every four
+// seconds. An instrument only (XSCAPES_WINDSEAM=1), for the A/B on his
+// glass of 2026-09-18: neither the standalone A/B nor the traced Kimi session
+// had the jump, so neither had tested it. Never shipped on.
+var WindSeam = false
 
 // SnowPick is the snow the live vista draws; 0 is today. HIS PICK, 2026-09-16
 // 21:40: "i like S1", light cover, subtle. TestThePickedSnowIsByName holds it.
