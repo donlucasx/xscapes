@@ -26,7 +26,13 @@
 > FIXED with mutation-checked tests. INSTALLED dirty (inode 87217050). UNCOMMITTED at his word. ⭐⭐ **HIS A/B RESULT: "none has the flicker" ⇒ THE WIND IS
 > NOT THE FLICKER** (whole frames at full stretch, standalone, on his Terminal.app: nothing); Kimi's diagnosis and my
 > recommendation WITHDRAWN as the fix, the wind page a taste question; what remains is the HOSTED path under a real agent
-> (the blank top rows). NEXT: his Kimi session with the trace + both logs on, then the replay (the s40 block below).
+> (the blank top rows). ⭐ HIS TRACED KIMI SESSION (01:52) SETTLED THE RESIZE HALF: **Kimi clears the
+> whole screen and the scrollback on every resize step** (`ESC[2J ESC[H ESC[3J`; 21 steps, 21 clears, none during
+> work; Claude Code sends no ED); ED ignores the region, so every clear wiped every scape row and the row-diff tracker
+> left the still rows blank. The paint/agent interleaving race is REFUTED on the same trace (5,605 paints, 0 inside).
+> FIXED in the host's Filter (an agent's ED confined to the band; 3J dropped, the scrollback is the mirror's), held by
+> `TestAnAgentsEraseStaysInItsBand` and `TestReplayTraceAgentClears` on his bytes (1076/1076 blank → 0/1076). INSTALLED.
+> STILL OPEN: the working flicker (his five-agent wave pending) and the blank top rows (the s40 block below).
 
 > **Session 40, thread 2 (2026-09-17 16:00–20:10), WRAPPED: KIMI COMPATIBILITY MEASURED, BUILT ON HIS FOUR ANSWERS,
 > SHIPPED (six commits `ddde8c4`…`2bcc155`, v0.4.3 released, the friend's install line verified from a clean HOME),

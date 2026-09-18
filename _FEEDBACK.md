@@ -4619,3 +4619,41 @@ binary and the tyastie one an older one: **a restart is what shows the afternoon
   taste question only. The 80-column jump stays fixed (a real defect regardless). NEXT: the Kimi session with
   `XSCAPES_TRACE=1` + both logs, today's wind, a five-agent wave; replay the trace through the screen model for the
   rows.
+- HIS NOTES ON THE FIRST FULL CUT, verbatim (2026-09-18 ~02:00): *"i would try harder cuts (either fast zoom ins or
+  fast crop ins) instead of the longer zooms. instead of "the wind is the work" say "see how hard your agent is
+  working". first shot after the title should start on a closeup of the terminal first prompt. Then pull to a wide of
+  the entire terminal/xscape and let the first wide shot run a bit longer until the owlets start coming out. jump cut
+  to a closeup on the owlets, and jump cut back to the wide shot of the mountain scape as the owlets hide, before we
+  cut to the shore. let the night set in the vista for a beat before we cut. do a zoom in into the moon "the moon is
+  your context" (instead of to the companion, and after that cut back to a wide shot, let the companion prompt, get
+  closer to the screen and then after that jump cut into a closeup of the crab prompt - animate the eyes with another
+  of the variants for fun."* ⇒ TWO OF THESE NEED THE MONTAGE'S OWN CLOCK CHANGED (in H1 the owlets come at 1.75 s
+  and the vista ends at dusk), so the trailer has its OWN montage now (`trailerMontage` in trailer_test.go, the site's
+  H1 untouched): the fan-out after the edit and the write (4.25 s), the owlets' dwell halved for the render
+  (`reduce.KittenDwell` 60 → 30 s, restored) so they hide at 8.0 before the finish at 9.25, the night set in by the
+  cut at 12.0 (stops 0.36 → 0.93 → 1.25), the shore opening at night with the ask at 16.0, the finish at dawn 22.5.
+  The eyes: `companion.StudyNearEyeAlert` (the study override nothing in the product sets) cycles the four rotating
+  variants every 0.55 s while the ask holds. The camera: closeup on the first prompt (free of the window's edge) ·
+  0.4 s pull to wide · wide until the owlets come · CUT closeup on the owlets · CUT wide as they hide · the night ·
+  the cut · 0.35 s zoom to the moon · CUT wide for the walk-up · CUT closeup on the ask · CUT wide for dawn.
+- *"testing a session in the root directory - so far so good, will report back. Can tell you theres a resize issue
+  where the xscape flickers (new issue, the entire art flickers in and out). This does not happen when running xscapes
+  claude"* (~01:55, 09-18; the traced Kimi session, `~/.config/xscapes/traces/20260918-015235.bin`) ⇒ READ OFF HIS
+  TRACE while it ran: its `.log` holds 32 size marks in two drags; in the second drag (offsets 50.30M-51.28M, 21 steps)
+  every step is followed ~20 KB later by `ESC[?2026h ESC[2J ESC[H ESC[3J` and Kimi's box repaint (truecolor, OSC 8):
+  **KIMI CODE CLI CLEARS THE WHOLE SCREEN AND THE SCROLLBACK ON EVERY RESIZE STEP; Claude Code never sends an ED**
+  (measured s13; 0 of 30 clears in this trace fall outside a resize). ED is not bounded by DECSTBM, so each clear wipes
+  the scape's rows; the host's damage tracker (a row diff, full refresh every 50 frames) then repaints only rows whose
+  content changes, so the still rows stay blank: the art "flickers in and out". ⚠ The race I had suspected is REFUTED
+  on the same trace: 5,605 host paints, 0 agent bytes inside any (h.write holds one lock and a paint is one write; the
+  46 hits were the host's own `ESC[2K` in resize/mirror sequences). FIX in the host's agent-output Filter (which already
+  strips the agent's DECSTBM): an ED is rewritten into the band's own rows (`ESC[2J` → home + erase-line/CUD × band
+  rows, under the band's margin; `ESC[J` → erase-to-end-of-line + the band rows below; `ESC[1J` passes; `ESC[3J` is
+  DROPPED because the scrollback is the host's mirror). `Filter.Band` follows resizes. Tests: `TestAnAgentsEraseStaysIn
+  ItsBand` (RED against a pass-through, mutation-checked) and `TestReplayTraceAgentClears` on HIS trace window
+  49.5M-51.4M: 42 erases, raw 1076 of 1076 scape rows blank right after an erase, confined 0 of 1076. Host package (its
+  replay suite, 16.8 s) + whole suite 13/13 + vet + fmt green. INSTALLED (new inode 87233437-ish, see ls -i in the
+  session), dirty. His running Kimi session keeps the old binary; the next `xscapes kimi` gets the fix. ⚠ Not yet
+  explained by this: the WORKING flicker under five agents (no clears during work in this trace so far; his wave
+  pending) and the BLANK TOP ROWS of 18:57 (if Kimi ever clears mid-work, this fix covers it; the trace of his wave will
+  say).

@@ -101,6 +101,23 @@ screen_test's replay) to see what those rows were sent. Suspects: the host's
 paint interleaving with the agent's redraws (the cursor left in the scape's
 rows when the agent erases a line: an erase fills with the current
 background, s13), reallocBand's race (s38), a band re-allocation on output.
+⭐⭐ HIS TRACED KIMI SESSION (01:52, trace 20260918-015235.bin) ANSWERED THE
+RESIZE HALF: "the entire art flickers in and out" while dragging, not under
+`xscapes claude`. Read off the trace live: KIMI CLEARS THE WHOLE SCREEN AND
+THE SCROLLBACK (`ESC[2J ESC[H ESC[3J`, in a ?2026 block) ON EVERY RESIZE STEP
+(21 steps, 21 clears; 0 clears outside a resize; Claude Code sends no ED);
+ED ignores the region, so every clear wiped every scape row and the damage
+tracker (a row diff) left the still rows blank. The interleaving race is
+REFUTED on the same trace (5,605 paints, 0 agent bytes inside). FIXED in the
+host's Filter: an agent's ED is confined to the band (2J, J/0J rewritten; 1J
+passes; 3J dropped: the scrollback is the mirror's), Band follows resizes;
+TestAnAgentsEraseStaysInItsBand (mutation-checked) + TestReplayTraceAgentClears
+on HIS bytes (42 erases: raw 1076/1076 scape rows blank, confined 0/1076).
+Suite 13/13 + host replay suite green. INSTALLED (new inode); his running
+Kimi session keeps the old binary. STILL OPEN: the WORKING flicker (his
+five-agent wave in the traced session is pending; no clears during work so
+far) and the blank top rows. UNCOMMITTED now also: internal/host/filter.go,
+host.go, erase_test.go, agentclear_replay_test.go.
 
 Session 40, thread 2 (2026-09-17 16:00–20:10), WRAPPED at his word "lets /wrap
 and discuss this fix first thing on the next session". FIRST THING NEXT: THE
