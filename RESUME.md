@@ -162,10 +162,18 @@ sentence + README/page say Mac and Linux, WSL untested · refreshEvery 50 →
 the parallel session's untracked files dirty the main tree; four binaries
 clean at 72954b3) · main pushed · the page published + verified outside ·
 the install line from an empty HOME with no Go fetched v0.4.4 · the release
-binary installed here (inode 87384167). NEXT: Kimi's remaining cards
-(KIMI_CODE_HOME in the installer · the dropped Done behind an open
-sub-agent · HOOKLOG=1 as a path · reallocBand's region + cursor, measured
-first) · count agent EDs into the event log.
+binary installed here (inode 87384167). ⭐ THEN HIS TWELVE RULINGS (13:00, "prompt me for all
+of the open items"), ALL BUILT, one cut each, each test RED first where
+there was old behaviour: leftovers `643b0d8` `291849f` `a643943` ·
+KIMI_CODE_HOME `193ac1b` · the held Done `10d43dd` (KimiStopClaim 2 s) ·
+the docs `587d3ba` · logPath `129f586` · reallocBand `c87577b` · hygiene ×4
+`4b86a5a` · the erase count `9711a9f` · F1 `b405adc` (event.CurrentSince) ·
+the rail gone `c6807b6` (PUBLISHED, verified outside). The trace truncated
+to 260 MB. Suite 13/13 green; INSTALLED clean (87405520). NOT PUSHED: his
+word. Not now (his ruling): Hermes live · the cream cat. NEXT: push · his
+restart of the three-day scape · the minor Kimi leftovers (the fixture
+through hookTranslate · a cross-log matcher · the attribution heuristic ·
+the refusal's edge cases).
 
 Session 40, thread 2 (2026-09-17 16:00–20:10), WRAPPED at his word "lets /wrap
 and discuss this fix first thing on the next session". FIRST THING NEXT: THE

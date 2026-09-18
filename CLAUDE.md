@@ -60,8 +60,11 @@
 > IS A LIVE PROXY of gh-pages (measured): every publish since the deadline reached it; HIS DECISION "push as many fixes as
 > I can in case they test it on kimi" ⇒ the installer/README/page say Mac and Linux (WSL untested) · refreshEvery 50 → 12
 > · ⭐ **v0.4.4 TAGGED + RELEASED** (four binaries clean at `72954b3`), main pushed, the page published + verified, the
-> install line from an empty HOME fetches v0.4.4, the release binary installed here. NEXT: Kimi's remaining cards
-> (KIMI_CODE_HOME · the dropped Done · HOOKLOG=1 · reallocBand, measured first) (the s40 block below).
+> install line from an empty HOME fetches v0.4.4, the release binary installed here. ⭐ HIS TWELVE RULINGS (13:00) ALL BUILT, one cut each with
+> a red-first test: KIMI_CODE_HOME · the held Done (KimiStopClaim) · the docs · logPath · reallocBand pinned + restored ·
+> hygiene ×4 · the erase count in the event log · F1 (event.CurrentSince: a resumed session binds) · the rail gone
+> (PUBLISHED, verified); the trace truncated to 260 MB; suite green; INSTALLED clean (87405520). NOT PUSHED, his word.
+> NEXT: push · the minor Kimi leftovers (the s40 block below).
 
 > **Session 40, thread 2 (2026-09-17 16:00–20:10), WRAPPED: KIMI COMPATIBILITY MEASURED, BUILT ON HIS FOUR ANSWERS,
 > SHIPPED (six commits `ddde8c4`…`2bcc155`, v0.4.3 released, the friend's install line verified from a clean HOME),

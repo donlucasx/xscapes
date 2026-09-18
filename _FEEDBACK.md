@@ -4837,3 +4837,4 @@ binary and the tyastie one an older one: **a restart is what shows the afternoon
   Not taken up at his ruling: Hermes live, the cream cat on light. Still open from Kimi's list (unruled, minor): the
   fixture test folding through `hookTranslate`, a cross-log matcher, the foreground-Agent attribution heuristic,
   the refusal's edge cases.
+- The rail's publish verified from outside: live == local byte for byte, no rail element on the live page.
