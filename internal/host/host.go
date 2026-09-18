@@ -346,9 +346,10 @@ func (h *Host) Run() error {
 	// closes when the pty runs dry, which is how the exit path knows the
 	// agent's last bytes are out before anything is printed after them.
 	fwdDone := make(chan struct{})
+	f := &Filter{}
+	f.Band.Store(int32(agentRows))
 	go func() {
 		defer close(fwdDone)
-		var f Filter
 		buf := make([]byte, 8192)
 		for {
 			n, err := p.master.Read(buf)
@@ -454,6 +455,7 @@ func (h *Host) Run() error {
 				// The screen was just touched behind the tracker's back.
 				dmg.reset()
 				p.SetSize(cols, agentRows)
+				f.Band.Store(int32(agentRows))
 			}
 			h.mirror(rows, agentRows)
 			if scapeRows <= 0 || h.Paint == nil {

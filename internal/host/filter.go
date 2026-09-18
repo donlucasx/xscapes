@@ -1,7 +1,13 @@
 package host
 
+import (
+	"strings"
+	"sync/atomic"
+)
+
 // Filter strips the scroll-region reset out of a hosted agent's output on its
-// way to the real terminal.
+// way to the real terminal, and keeps the agent's erase-display inside its
+// band.
 //
 // The host splits the window: the agent gets a band anchored at row 1, held
 // there by DECSTBM, and the scape paints the rows below it. Claude Code emits
@@ -15,6 +21,16 @@ package host
 // forwarded untouched, so nothing the filter fails to understand can be
 // corrupted by it.
 type Filter struct {
+	// Band is the agent's rows. An erase-display (ED) is not bounded by the
+	// scroll region: ESC[2J clears the whole terminal, scape included, and
+	// ESC[J clears from the cursor to the bottom of the screen. Kimi Code
+	// CLI sends ESC[2J ESC[H ESC[3J on every step of a window drag (his
+	// trace of 2026-09-18: 21 steps, 21 clears; none during work), Claude
+	// Code never sends an ED, and that was the whole difference between the
+	// scape blinking in and out under one and holding still under the
+	// other. The filter rewrites an ED into the band's own rows, using the
+	// band's bottom margin to stop it. Set by the host, followed on resize.
+	Band atomic.Int32
 	// pend holds an escape sequence that a read cut in half. A read from a
 	// PTY ends wherever the kernel's buffer ended, which is regularly inside
 	// a sequence: without this, ESC[ would be forwarded and the r that
@@ -56,12 +72,57 @@ func (f *Filter) Filter(in []byte) []byte {
 			i++
 			continue
 		}
-		if final != 'r' { // 'r' is DECSTBM, the one the host keeps for itself
+		switch final {
+		case 'r': // DECSTBM, the one the host keeps for itself
+		case 'J':
+			out = append(out, f.confineErase(buf[i:end+1])...)
+		default:
 			out = append(out, buf[i:end+1]...)
 		}
 		i = end + 1
 	}
 	return out
+}
+
+// confineErase rewrites an agent's ED so it reaches only the band. The
+// rewrite runs in the agent's own stream, under the band's region and origin
+// mode, where CUD stops at the bottom margin; the cursor is saved and put
+// back around it, as ED leaves the cursor where it was.
+//
+//	ESC[J, ESC[0J  from the cursor down: the rest of this line, then every
+//	               band row below it
+//	ESC[2J         every band row
+//	ESC[1J         above the cursor: already the band's own rows, passed
+//	ESC[3J         the scrollback: DROPPED. The terminal's scrollback is the
+//	               host's, where the mirror writes the agent's rows as they
+//	               leave the band (Host.History); an agent clearing it on
+//	               every resize would erase that record.
+func (f *Filter) confineErase(seq []byte) []byte {
+	band := int(f.Band.Load())
+	p := strings.TrimPrefix(string(seq[2:len(seq)-1]), "?")
+	if band <= 0 && p != "3" {
+		return seq
+	}
+	var b strings.Builder
+	switch p {
+	case "", "0":
+		b.WriteString("\x1b[K\x1b7")
+		for k := 0; k < band; k++ {
+			b.WriteString("\x1b[1B\x1b[2K")
+		}
+		b.WriteString("\x1b8")
+	case "2":
+		b.WriteString("\x1b7\x1b[H")
+		for k := 0; k < band; k++ {
+			b.WriteString("\x1b[2K\x1b[1B")
+		}
+		b.WriteString("\x1b8")
+	case "3":
+		return nil
+	default:
+		return seq
+	}
+	return []byte(b.String())
 }
 
 // Flush releases anything held back, for the end of the stream.
