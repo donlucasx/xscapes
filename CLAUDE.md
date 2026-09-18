@@ -63,7 +63,7 @@
 > install line from an empty HOME fetches v0.4.4, the release binary installed here. ⭐ HIS TWELVE RULINGS (13:00) ALL BUILT, one cut each with
 > a red-first test: KIMI_CODE_HOME · the held Done (KimiStopClaim) · the docs · logPath · reallocBand pinned + restored ·
 > hygiene ×4 · the erase count in the event log · F1 (event.CurrentSince: a resumed session binds) · the rail gone
-> (PUBLISHED, verified); the trace truncated to 260 MB; suite green; INSTALLED clean (87405520). NOT PUSHED, his word.
+> (PUBLISHED, verified); the trace truncated to 260 MB; suite green; INSTALLED clean (87405520). PUSHED at his word (`4a2842d`+).
 > NEXT: push · the minor Kimi leftovers (the s40 block below).
 
 > **Session 40, thread 2 (2026-09-17 16:00–20:10), WRAPPED: KIMI COMPATIBILITY MEASURED, BUILT ON HIS FOUR ANSWERS,

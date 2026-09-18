@@ -4838,3 +4838,4 @@ binary and the tyastie one an older one: **a restart is what shows the afternoon
   fixture test folding through `hookTranslate`, a cross-log matcher, the foreground-Agent attribution heuristic,
   the refusal's edge cases.
 - The rail's publish verified from outside: live == local byte for byte, no rail element on the live page.
+- *"push"* (~14:40) ⇒ PUSHED: origin/main = `4a2842d` (the twelve rulings' cuts + the record), verified with ls-remote.

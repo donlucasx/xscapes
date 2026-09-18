@@ -169,8 +169,8 @@ KIMI_CODE_HOME `193ac1b` · the held Done `10d43dd` (KimiStopClaim 2 s) ·
 the docs `587d3ba` · logPath `129f586` · reallocBand `c87577b` · hygiene ×4
 `4b86a5a` · the erase count `9711a9f` · F1 `b405adc` (event.CurrentSince) ·
 the rail gone `c6807b6` (PUBLISHED, verified outside). The trace truncated
-to 260 MB. Suite 13/13 green; INSTALLED clean (87405520). NOT PUSHED: his
-word. Not now (his ruling): Hermes live · the cream cat. NEXT: push · his
+to 260 MB. Suite 13/13 green; INSTALLED clean (87405520). PUSHED at his word (origin/main
+`4a2842d`+). Not now (his ruling): Hermes live · the cream cat. NEXT: push · his
 restart of the three-day scape · the minor Kimi leftovers (the fixture
 through hookTranslate · a cross-log matcher · the attribution heuristic ·
 the refusal's edge cases).
