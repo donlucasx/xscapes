@@ -326,11 +326,44 @@ html[data-theme="light"] .tab[aria-selected="true"]{color:#eeeeee}
 .tbtn[aria-pressed="true"]{background:var(--d);color:var(--g);cursor:default}
 .tbtn:focus-visible{outline:2px solid var(--acc);outline-offset:2px}
 @media (prefers-reduced-motion:reduce){.theme,.theme.show{transition:none}}
+/* The index: the sections as small links, fixed at the left on a wide window,
+   the current one marked with the warm cell the feature kickers carry. It
+   appears with the theme toggle, once the splash has scrolled out. Under
+   1200px the page's column leaves no gutter for it, so it folds into an
+   "index" chip at the bottom left that opens the same list (phones too). */
+.sec,#top{scroll-margin-top:16px}
+.toc{position:fixed;left:14px;top:50%;transform:translateY(-50%);z-index:30;font:12px/1.9 var(--mono);
+  opacity:0;visibility:hidden;pointer-events:none;transition:opacity .25s,visibility 0s .25s}
+.toc.show{opacity:1;visibility:visible;pointer-events:auto;transition:opacity .25s,visibility 0s}
+.toc ul{list-style:none;margin:0;padding:0}
+.toc li{margin:0;padding:0;border:0;background:none}
+.toc a{display:block;position:relative;padding-left:2ch;color:var(--d);text-decoration:none;border:0;white-space:nowrap}
+.toc a:hover,.toc a:focus-visible{color:var(--dd);outline:none}
+.toc a.on{color:var(--i)}
+.toc a.on::before{content:"";position:absolute;left:0;top:.5em;width:1ch;height:1em;background:var(--warm)}
+.tocbtn{display:none}
+@media (max-width:1199px){
+  .toc{top:auto;bottom:14px;transform:none}
+  .tocbtn{display:inline-block;background:var(--d);color:var(--g);border:0;font:700 12.5px/1.6 var(--mono);letter-spacing:.06em;padding:0 1ch;border-radius:1px;cursor:pointer}
+  .tocbtn:focus-visible{outline:2px solid var(--acc);outline-offset:2px}
+  .toc ul{display:none;position:absolute;left:0;bottom:calc(100% + 8px);background:var(--g);border:1px solid var(--ln);border-radius:2px;padding:6px 1.5ch 6px 1ch;min-width:22ch}
+  .toc.open ul{display:block}
+}
+@media (prefers-reduced-motion:reduce){.toc,.toc.show{transition:none}}
 </style>
 </head>
 <body>
 
 <div class="rail" id="rail" aria-hidden="true"></div>
+<nav class="toc" id="toc" aria-label="Sections"><button type="button" class="tocbtn" id="tocbtn" aria-expanded="false">index</button><ul>
+<li><a href="#s-problem">the problem</a></li>
+<li><a href="#top">xscapes</a></li>
+<li><a href="#s-features">features</a></li>
+<li><a href="#s-companions">companions</a></li>
+<li><a href="#s-install">install</a></li>
+<li><a href="#s-scapes">scapes and companions</a></li>
+<li><a href="#s-protocol">protocol</a></li>
+</ul></nav>
 <div class="theme" id="theme" aria-label="Colour theme"><button type="button" class="tbtn" data-theme="dark" aria-pressed="true">dark</button><button type="button" class="tbtn" data-theme="light" aria-pressed="false">light</button></div>
 
 <section class="cover">
@@ -343,7 +376,7 @@ html[data-theme="light"] .tab[aria-selected="true"]{color:#eeeeee}
 
 <main>
 
-<div class="sec" data-title="The problem"><div class="boxtop" aria-hidden="true"></div></div>
+<div class="sec" id="s-problem" data-title="The problem"><div class="boxtop" aria-hidden="true"></div></div>
 <section id="problem">
 <div class="bgfx spin" aria-hidden="true">{{bg:problem}}</div>
 <div class="win wait" id="problem-win" data-title="claude"><div class="boxtop" aria-hidden="true"></div>
@@ -359,7 +392,7 @@ html[data-theme="light"] .tab[aria-selected="true"]{color:#eeeeee}
 <section id="top">
 <h1>Cozy ASCII scenes that react to your agent while it works<span class="cur"></span></h1>
 
-<p class="lead">Your agent's session, drawn as a landscape. Each element carries one thing you would otherwise read for: activity, the last tool call, the helpers, failures, context left, and the moment it needs you. Same window, any terminal agent.</p>
+<p class="lead">Your agent's session, drawn as a landscape. Each element carries one thing you would otherwise read for: activity, the last tool call, the helpers, failures, context left, and the moment it needs you. Same window, any terminal agent. An event protocol with a scene on top.</p>
 
 <div class="win" data-title="xscapes claude" data-right="one session, two turns, sped up"><div class="boxtop" aria-hidden="true"></div>
   <div class="stage" aria-hidden="true"><div class="fx" id="hero-fx"></div></div>
@@ -368,7 +401,7 @@ html[data-theme="light"] .tab[aria-selected="true"]{color:#eeeeee}
 <p class="cap">One session, sped up. The agent runs untouched in the top rows; everything under it is drawn from what it is doing. The first turn is the owl's, on the mountain vista; at the second prompt the scape is the shore and the crab takes it. Either is one command, and a running scape switches on its next frame.</p>
 </section>
 
-<div class="sec" data-title="Features"><div class="boxtop" aria-hidden="true"></div></div>
+<div class="sec" id="s-features" data-title="Features"><div class="boxtop" aria-hidden="true"></div></div>
 <section>
 <div class="bgfx sea" aria-hidden="true">{{bg:wait}}</div>
 <ul class="feats lead grid">
@@ -383,7 +416,7 @@ html[data-theme="light"] .tab[aria-selected="true"]{color:#eeeeee}
 </ul>
 </section>
 
-<div class="sec" data-title="Companion states"><div class="boxtop" aria-hidden="true"></div></div>
+<div class="sec" id="s-companions" data-title="Companion states"><div class="boxtop" aria-hidden="true"></div></div>
 <section>
 <p class="sub">The owl on its own, in its five states. Press one. The crab has the same five, its own way.</p>
 <div class="tabs" role="tablist" id="st-tabs"></div>
@@ -391,7 +424,7 @@ html[data-theme="light"] .tab[aria-selected="true"]{color:#eeeeee}
 <p class="reads" id="st-note"></p>
 </section>
 
-<div class="sec" data-title="Install"><div class="boxtop" aria-hidden="true"></div></div>
+<div class="sec" id="s-install" data-title="Install"><div class="boxtop" aria-hidden="true"></div></div>
 <section>
 <div class="bgfx term" aria-hidden="true">{{bg:get}}</div>
 <p class="sub wide">Three commands, no app, no tab, no tmux, nothing to build. The install writes the agent's hooks after a backup; then the agent runs on top and the scape underneath, in the same window, so you never look away from the work to see the work.</p>
@@ -409,7 +442,7 @@ html[data-theme="light"] .tab[aria-selected="true"]{color:#eeeeee}
 <a class="boxlink" href="https://github.com/donlucasx/xscapes"><span aria-hidden="true">┌──────────────────────────────┐</span><span>│ github.com/donlucasx/xscapes │</span><span aria-hidden="true">└──────────────────────────────┘</span></a>
 </section>
 
-<div class="sec" data-title="Scapes and companions"><div class="boxtop" aria-hidden="true"></div></div>
+<div class="sec" id="s-scapes" data-title="Scapes and companions"><div class="boxtop" aria-hidden="true"></div></div>
 <section>
 <div class="bgfx rain" aria-hidden="true">{{bg:layer}}</div>
 <p class="sub wide">xscapes is a set of ASCII landscapes and companions that react as your agents work. Every scape carries the same six things: a light, a sky, something that moves with the work, a surface, somewhere the work piles up, and someone who lives there. So any of them tells the same story.</p>
@@ -430,10 +463,17 @@ html[data-theme="light"] .tab[aria-selected="true"]{color:#eeeeee}
 <span class="pr">$</span> xscapes companion cat       <span class="c"># or crab</span></div>
 </section>
 
-<div class="sec" data-title="Different every session"><div class="boxtop" aria-hidden="true"></div></div>
+<div class="sec" id="s-protocol" data-title="Protocol"><div class="boxtop" aria-hidden="true"></div></div>
 <section>
 <div class="bgfx star" aria-hidden="true">{{bg:month}}</div>
-<p class="sub wide">It is not a loop. The sea is your agent's work, the sand is its last few actions and the sky is your clock, so no two sessions draw the same picture. It asks nothing of you, and the agent's own output reaches your terminal byte for byte, so it can never get in the way of the work it is drawing.</p>
+<p class="sub wide">Underneath the scene is an event protocol. An adapter turns what an agent does into a few events on a socket; the engine draws the session from those alone and knows nothing about any agent.</p>
+<div class="cmd" data-title="events">session_start  session_end  prompt  tool_start  tool_end  error
+test_pass  test_fail  compact  needs_input  answered  done
+sub_start  sub_end  todo  context  interrupt</div>
+<p class="sub wide">Claude Code, Kimi Code CLI and Hermes Agent ship with adapters made of their own hooks; anything else is watched through its output. A new adapter is whatever emits the events:</p>
+<div class="cmd"><span class="pr">$</span> xscapes emit tool_end -tool Read -target internal/auth/handler.go
+<span class="pr">$</span> xscapes emit needs_input -text "allow Bash?"</div>
+<p class="sub wide">And it is not a loop: the sea is the work, the sand the last few actions, the sky your own clock, so no two sessions draw the same picture. It asks nothing of you, and the agent's output reaches your terminal byte for byte, never in the way of the work.</p>
 </section>
 
 <p class="foot">Every scene on this page is the real renderer folding the events a Claude Code session emits &mdash; text, not video, drawn by the same code that runs in your terminal. Nothing is posed. The page shows the scenes in truecolor; in a terminal the same scenes run on the 256-colour cube, on every terminal alike. <a href="https://github.com/donlucasx/xscapes">github.com/donlucasx/xscapes</a> &middot; MIT</p>
@@ -744,6 +784,33 @@ html[data-theme="light"] .tab[aria-selected="true"]{color:#eeeeee}
       rail.innerHTML = s2;
     }
   }
+  // ---- the index: which section is under the reader -------------------------
+  var tocEl = document.getElementById("toc"), tocBtn = document.getElementById("tocbtn");
+  var tocLinks = tocEl ? [].slice.call(tocEl.querySelectorAll("a")) : [];
+  var tocTargets = tocLinks.map(function(a){ return document.getElementById(a.getAttribute("href").slice(1)); });
+  function tocActive(){
+    var y = window.scrollY + window.innerHeight * 0.35, on = -1;
+    for(var i = 0; i < tocTargets.length; i++){
+      if(!tocTargets[i]) continue;
+      // Measured from the window, not the column: offsetTop is relative to
+      // the positioned column, which starts a whole splash down the page.
+      var top = tocTargets[i].getBoundingClientRect().top + window.scrollY;
+      if(top <= y) on = i;
+    }
+    // At the foot of the page the last section can never reach the reading
+    // line, so the bottom of the page is the last entry.
+    if(window.scrollY + window.innerHeight >= document.documentElement.scrollHeight - 2) on = tocLinks.length - 1;
+    for(var j = 0; j < tocLinks.length; j++) tocLinks[j].classList.toggle("on", j === on);
+  }
+  if(tocBtn){
+    tocBtn.addEventListener("click", function(){
+      var open = !tocEl.classList.contains("open");
+      tocEl.classList.toggle("open", open); tocBtn.setAttribute("aria-expanded", open ? "true" : "false");
+    });
+    tocLinks.forEach(function(a){ a.addEventListener("click", function(){ tocEl.classList.remove("open"); tocBtn.setAttribute("aria-expanded", "false"); }); });
+  }
+  var onScroll0 = onScroll;
+  onScroll = function(){ onScroll0(); tocActive(); };
   onScroll();
   window.addEventListener("scroll", onScroll, {passive:true});
   window.addEventListener("resize", onScroll);
@@ -764,7 +831,11 @@ html[data-theme="light"] .tab[aria-selected="true"]{color:#eeeeee}
     setTheme(document.documentElement.getAttribute("data-theme") === "light" ? "light" : "dark", false);
     for(var j = 0; j < tbtns.length; j++) tbtns[j].addEventListener("click", function(){ setTheme(this.getAttribute("data-theme"), true); });
     function pastSplash(){ return cover ? window.scrollY > cover.offsetHeight - 40 : true; }
-    function showTheme(on){ themeBox.classList.toggle("show", on); themeBox.setAttribute("aria-hidden", on ? "false" : "true"); }
+    var toc = document.getElementById("toc");
+    function showTheme(on){
+      themeBox.classList.toggle("show", on); themeBox.setAttribute("aria-hidden", on ? "false" : "true");
+      if(toc){ toc.classList.toggle("show", on); if(!on) toc.classList.remove("open"); }
+    }
     if(cover && "IntersectionObserver" in window){
       new IntersectionObserver(function(es){ showTheme(!es[0].isIntersecting); }, {threshold:0}).observe(cover);
     } else {
