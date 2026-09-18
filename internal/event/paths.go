@@ -7,6 +7,7 @@ import (
 	"os"
 	"path/filepath"
 	"strings"
+	"time"
 
 	"github.com/donlucasx/xscapes/internal/envx"
 )
@@ -156,6 +157,25 @@ func Current() string {
 		return ""
 	}
 	return strings.TrimSpace(string(b))
+}
+
+// CurrentSince is the session pointer only if it was WRITTEN after t, which
+// is how a launcher tells the session it just started from the one that ran
+// before it. The launchers used to wait for an id that DIFFERED from the
+// pointer at launch; a resumed session (--resume, --continue) writes the
+// same id again, so it was never bound: a restart by id showed the watcher
+// instead of the hooks, and the next SessionStart from another window could
+// bind the scape to that window's session instead (F1, session 38).
+func CurrentSince(t time.Time) string {
+	p, err := currentPath()
+	if err != nil {
+		return ""
+	}
+	st, err := os.Stat(p)
+	if err != nil || !st.ModTime().After(t) {
+		return ""
+	}
+	return Current()
 }
 
 // SessionFromEnv is how a scape launched inside the agent's own environment

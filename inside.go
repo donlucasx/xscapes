@@ -121,11 +121,13 @@ With no command, runs claude.
 			rows, host.MinAgentRows+host.MinScapeRows, argv[0])
 	}
 
-	// Remember the session pointer that is already there. The agent has not
-	// started yet, so whatever it names is the last session to run -- binding
-	// to it succeeds and shows a session that ended yesterday underneath a
-	// live one. Take the first session that differs.
-	stale := event.Current()
+	// The agent has not started yet, so the session pointer names the last
+	// session to run -- binding to it would show a session that ended
+	// yesterday underneath a live one. Bind to the first pointer WRITTEN
+	// after this moment, whatever it says: a resumed session writes the
+	// same id again, and waiting for a different one never bound it (F1,
+	// session 38; event.CurrentSince).
+	launched := time.Now()
 
 	fr := newFrames(cols, max(scapeRows, 1), *seed, *ascii, *mirror, *ctxUsed, *tod)
 	defer func() {
@@ -191,7 +193,7 @@ With no command, runs claude.
 			// unless -watch=on says otherwise.
 			if *watchMode != "on" && unbound() && now.After(nextBind) {
 				nextBind = now.Add(time.Second)
-				if cur := event.Current(); cur != "" && cur != stale {
+				if cur := event.CurrentSince(launched); cur != "" {
 					if b, err := event.Listen(cur); err == nil {
 						fr.follow(b, reduce.New(cur))
 					}

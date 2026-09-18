@@ -122,12 +122,11 @@ func runLive(seed int64, fps float64, wIn, hIn int, ctxUsed, tod float64, ascii 
 	// pointer left behind by whatever ran last is exactly the wrong thing to
 	// follow. Binding to it succeeds -- Listen happily opens a socket for a
 	// session that is over -- and the scape then runs beside a live agent
-	// showing a session that ended yesterday. Remember it instead, and take
-	// the first session that differs.
-	stale := ""
-	if await {
-		stale = event.Current()
-	} else {
+	// showing a session that ended yesterday. Take the first pointer WRITTEN
+	// after this moment instead, whatever it says: a resumed session writes
+	// the same id again (F1, session 38; event.CurrentSince).
+	launched := time.Now()
+	if !await {
 		bind(session)
 	}
 	defer func() {
@@ -206,7 +205,7 @@ func runLive(seed int64, fps float64, wIn, hIn int, ctxUsed, tod float64, ascii 
 		// the demo beside a live session for the rest of the day.
 		if !f.following() && await && now.After(nextBind) {
 			nextBind = now.Add(time.Second)
-			if cur := event.Current(); cur != "" && cur != stale {
+			if cur := event.CurrentSince(launched); cur != "" {
 				bind(cur)
 			}
 		}
