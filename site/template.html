@@ -88,8 +88,6 @@ p{max-width:var(--measure);margin:0 0 var(--lh)}
 .cover .line{position:relative;color:var(--dd);margin:10px 0 0;font-size:clamp(13px,1.6vw,17px);letter-spacing:.02em;text-align:center}
 .cover .scrolltip{position:absolute;bottom:22px;color:var(--d);font-size:12px;letter-spacing:.1em;white-space:pre;line-height:1.1;text-align:center;font-family:var(--mono)}
 
-/* the reading rail: how far down the page you are, drawn the way the scape
-   draws anything -- in cells. */
 .cover,main{position:relative;z-index:1}
 
 /* Each section's backdrop: a quiet moving field of glyphs, one per section,
@@ -111,10 +109,6 @@ main section>*{position:relative;z-index:1}
 .bgfx.rain pre{color:#9fb4c8}
 .bgfx.star pre{color:#f2e6c8}
 @media (prefers-reduced-motion:reduce){.bgfx pre{animation:none}.bgfx pre:first-child{opacity:1}}
-.rail{position:fixed;top:50%;right:14px;transform:translateY(-50%);z-index:30;font-size:11px;line-height:1.05;
-  color:var(--ln);white-space:pre;-webkit-user-select:none;user-select:none;pointer-events:none}
-.rail b{color:var(--acc);font-weight:400}
-@media (max-width:860px){.rail{display:none}}
 
 h1{font-weight:700;font-size:clamp(23px,3.4vw,38px);line-height:1.22;letter-spacing:-.02em;margin:0 0 12px;max-width:20em}
 /* the headline sits two lines clear of the problem window's bottom rule
@@ -378,7 +372,6 @@ html[data-theme="light"] .tab[aria-selected="true"]{color:#eeeeee}
 </head>
 <body>
 
-<div class="rail" id="rail" aria-hidden="true"></div>
 <nav class="toc" id="toc" aria-label="Sections"><button type="button" class="tocbtn" id="tocbtn" aria-expanded="false">index</button><ul>
 <li><a href="#s-problem">the problem</a></li>
 <li><a href="#top">xscapes</a></li>
@@ -837,18 +830,9 @@ sub_start  sub_end  todo  context  interrupt</div>
     }
   }
 
-  // ---- the rail, and the drift ------------------------------------------
-  var rail = document.getElementById("rail");
-  var N = 18;
-  function onScroll(){
-    var h = document.documentElement.scrollHeight - window.innerHeight;
-    var p = h > 0 ? Math.min(1, Math.max(0, window.scrollY / h)) : 0;
-    if(rail){
-      var at = Math.round(p * (N-1)), s2 = "";
-      for(var i=0;i<N;i++) s2 += (i===at ? "<b>█</b>" : "│") + (i<N-1 ? "\n" : "");
-      rail.innerHTML = s2;
-    }
-  }
+  // The reading rail that stood here said what the index says (his ruling,
+  // 2026-09-18: drop it); the index is the page's one position indicator.
+  function onScroll(){}
   // ---- the index: which section is under the reader -------------------------
   var tocEl = document.getElementById("toc"), tocBtn = document.getElementById("tocbtn");
   var tocLinks = tocEl ? [].slice.call(tocEl.querySelectorAll("a")) : [];
