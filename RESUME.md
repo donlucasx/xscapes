@@ -141,6 +141,17 @@ logs, the replay (its empty-log panic guarded) · `c355e9d` the wind ·
 confined · `9e55428` the instruments. NOT PUSHED. The tree holds only his
 parallel session's trailer files. Installed binary = inode 87309990 (built
 from the pre-commit tree, same content).
+⭐⭐ HIS SEAM A/B (11:00): "they both look fine" ⇒ THE JUMP IS EXONERATED TOO.
+Every wind hypothesis is now refuted on his glass (density, jump). What the
+09-17 report leaves is the one mechanism with physical evidence, the blank
+top rows: an agent's ED reaching the scape + the tracker's 4.2 s
+persistence, which Kimi is measured to send on every resize and which the
+Filter now confines whenever it comes (`ef602ab`). STATUS: the 09-17 flicker
+is CLOSED on that mechanism; not reproducible on the current binary under
+any condition tried. The wind stays today's field; the page is taste only.
+NEXT (cheap insurance, one card): refreshEvery 50 → 12 · count agent EDs
+into the event log · reallocBand's region + cursor hazard (the trace shows
+the cursor left on the scape's first row at a mark). Then push at his word.
 
 Session 40, thread 2 (2026-09-17 16:00–20:10), WRAPPED at his word "lets /wrap
 and discuss this fix first thing on the next session". FIRST THING NEXT: THE

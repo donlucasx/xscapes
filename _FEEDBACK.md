@@ -4691,3 +4691,28 @@ binary and the tyastie one an older one: **a restart is what shows the afternoon
   XSCAPES_WINDSEAM, the probe + page) · `5f6f4a1` `-live -level` · `7c4be94` the tall window (pines, the dip) ·
   `ef602ab` the erase confined to the band · `9e55428` the two trace instruments. NOT PUSHED (his word). Left in the
   tree: his parallel session's `trailer_test.go` and `notes/trailer/`.
+- HIS NOTES ON THE SECOND CUT, verbatim (2026-09-18 ~10:40): *"looking good- general notes: a) the intro should
+  happen a bit faster, the reveal of the logo that is. b) we need to hold the wide shots of the xscapes a bit longer.
+  b) tilt the camera up a tad on the closeup of the owlets. c) can we have the cat companion appear at the very end
+  underneat the logo/website and emote?"* ⇒ THE THIRD CUT (~10:50), `xscapes-trailer-16x9-v3.mp4`, 38.3 s: (a) the
+  opener's logo 1.1 s sooner (the cell at 1.8 blinking at a 1.0 s period, the x at 3.8 as the fifth band lands, the
+  slogan in by 5.9, out at 7.6; the sea's pace untouched; opener 10.0 → 8.4 s) · (b) the wides: the first 3.3 → 4.3 s
+  (the fan-out at a(40)), the night on the vista 3.2 → 4.45 s (the cut at 106), the shore's opening 0.7 → 1.5 s, the
+  walk-up 2.9 → 3.0 s, the dawn 2.9 → 3.4 s; the ask holds 5 s of clip so the closeup ends before "> yes" · (b') the
+  owlets' closeup two rows higher (row 35) · (c) THE CAT ON THE END CARD under the URL: the cast clip's portrait
+  (`trailerCat`, siteframes.go's portrait machinery, the transparent ground, one crop for both poses) working 1.6 s
+  then its finished face; the product's drop rings at the face (`catDoneAt`); its palette scoped under #cat so the
+  hero's classes cannot collide. Sheet tiled and looked at.
+- *"they both look fine"* (~11:00, 09-18; the seam A/B: `XSCAPES_WINDSEAM=1` against the current clock, both at
+  full stretch, window still) ⇒ ⭐ **THE JUMP IS EXONERATED TOO.** With that, every wind hypothesis is refuted on his
+  glass: the density (the first A/B), the 80-column jump (this one). What his 09-17 report leaves is ONE mechanism with
+  physical evidence, the BLANK TOP ROWS of 18:57: an agent's erase reaching the scape's rows and the row-diff tracker
+  leaving the still ones blank for up to 4.2 s while the moving rows came back, which reads as the art flickering. Kimi
+  is measured to send exactly that clear on every resize step; whether it also clears mid-work on some path the traced
+  session did not exercise is unknown, and no longer matters: the Filter confines every ED whenever it comes. STATUS:
+  the 09-17 flicker is CLOSED ON THE MECHANISM THE EVIDENCE SUPPORTS, prevented since `ef602ab`, and cannot be
+  reproduced on the current binary under any condition tried (standalone at full stretch, either clock, either field;
+  hosted Kimi at level 1.00 with five owlets: 12,434 paints, 0 wiped rows). The wind stays today's field; the page
+  (Ng2uUanTJ8TAwLbZ86rMhP) is a taste question only. NEXT, cheap insurance for the same class: `refreshEvery` 50 → 12
+  (an unfiltered wipe heals in 1 s, ~30 KB/s), a count of agent EDs in the event log so the next one is attributed, and
+  reallocBand's region + cursor hazard (measured in the trace at a mark).
