@@ -27,6 +27,11 @@ type Tally struct {
 	files map[string]*tail
 	seen  map[string]struct{}
 	total int64
+	// ctxUsed and ctxWindow come only from a transcript that records them
+	// (Kimi's wire, kimi.go); the Claude transcript leaves them zero and the
+	// moon reads the status line instead.
+	ctxUsed   int64
+	ctxWindow int
 }
 
 type tail struct {
@@ -45,22 +50,29 @@ func (t *Tally) Total() int64 { return t.total }
 // Poll reads what the main transcript and any subagent transcripts beside
 // it have written since the last poll: bytes past each file's last offset
 // only, so a poll every couple of seconds costs nothing on an idle session.
-// A missing file is a session that has not written yet.
+// A missing file is a session that has not written yet. A DIRECTORY is a
+// Kimi session (kimi.go).
 func (t *Tally) Poll(main string) {
 	if main == "" {
 		return
 	}
-	t.read(main)
+	if st, err := os.Stat(main); err == nil && st.IsDir() {
+		t.pollKimi(main)
+		return
+	}
+	t.read(main, t.line)
 	dir := strings.TrimSuffix(main, ".jsonl") + "/subagents"
 	_ = filepath.WalkDir(dir, func(p string, d fs.DirEntry, err error) error {
 		if err == nil && !d.IsDir() && strings.HasSuffix(p, ".jsonl") {
-			t.read(p)
+			t.read(p, t.line)
 		}
 		return nil
 	})
 }
 
-func (t *Tally) read(path string) {
+// read feeds the bytes a file has gained since the last poll, line by line,
+// to the format's line reader.
+func (t *Tally) read(path string, line func([]byte)) {
 	f, err := os.Open(path)
 	if err != nil {
 		return
@@ -85,7 +97,7 @@ func (t *Tally) read(path string) {
 		if i < 0 {
 			break
 		}
-		t.line(b[:i])
+		line(b[:i])
 		b = b[i+1:]
 	}
 	st.rest = append([]byte(nil), b...)
