@@ -3,6 +3,28 @@
 **Copy-paste this prompt into a fresh session:**
 
 ```
+Session 40, thread 2 (2026-09-17 16:00–17:15), KIMI COMPATIBILITY BUILT AND
+UNCOMMITTED, his calls pending. Six probe runs on Kimi (raw hooks captured)
+measured every payload gap; his four answers at 16:50 (Esc = quiet turn end ·
+context + spend from Kimi's session files · the site gets small branded
+per-agent install sections + "coming soon: codex" and two more · the friend
+holds until the Kimi release). BUILT test-first, suite 13/13 green: the
+first-run bind fix (ALL agents: SetCurrent ran before run/ existed, so the
+first session on a fresh machine never bound), event.Interrupt, the
+translator on Kimi's shapes (prompt parts, error object, TodoList,
+AskUserQuestion = the ask), the reducer's Kimi rules (profile → instances; a
+Stop with a sub-agent open is the sub-agent's), spend + moon off wire.jsonl,
+`xscapes kimi`/`xscapes hermes`, the installer refuses hand-written hooks,
+event.Answered (PermissionResult takes the ask down), README, the page's
+Install section (four captioned boxes + coming soon; looked at desktop +
+phone), site rebuilt NOT published. ⚠ The building thread died at 17:01
+mid-edit; its state came back from its transcript. ⏰ Commons closed 16:59;
+judging Sep 17–20 proxies gh-pages LIVE, so a publish changes the judged page.
+NEXT, his word: commit (five cuts proposed) · tag v0.4.3 + sh site/release.sh
++ push (the friend's fix; his install line reads the latest release) · publish
+or hold · the "coming soon" names · the friend's message · his live look:
+`xscapes install kimi --apply && xscapes kimi`.
+
 Session 40 (2026-09-17 afternoon), LIVE at his word "can you do it?". THE FIRST
 OUTSIDE INSTALL FAILED: his friend followed the page, `go install` put the
 binary in ~/go/bin, which no Mac has on PATH (measured: /etc/paths,

@@ -4147,3 +4147,102 @@ binary and the tyastie one an older one: **a restart is what shows the afternoon
   v0.4.2` · `gh auth switch --user donlucasx && git push origin main` · `sh site/publish.sh`.** The release must
   exist before the page, or the live script falls back to `go install`.
 - *"can you do it?"* ⇒ **DONE, in that order, ~16:00 PDT:** COMMITTED `6555300`, TAGGED v0.4.2, RELEASED (four binaries + checksums on GitHub), PUSHED (main and the tag verified with ls-remote), PUBLISHED (gh-pages == the build byte for byte on the first check), and VERIFIED end to end: the LIVE line run in a clean HOME with PATH=/usr/bin:/bin installed v0.4.2 stamped `6555300`, wrote the one rc line, and the printed next step ran as printed. The Go proxy's `@latest` still answered v0.4.1 at 16:05 PDT (its cache; the installer does not use it).
+
+### Session 40, second thread — 2026-09-17 ~16:00–16:45: Kimi, fully compatible (INVESTIGATED, plan pending his go)
+
+- *"ok great- what do we need to do to make xscapes fully compatible with kimi- you can pull a kimi agent to help you with that"*
+  ⇒ **MEASURED on this machine (Kimi 0.39.1), not read off docs**, with a temporary probe block appended to
+  `~/.kimi-code/config.toml` (raw hooks → a timestamped log AND `xscapes hook <Event> kimi`) and `tui.toml`
+  (`[status_line] command`), both restored byte for byte after every run (cmp), six short Kimi runs (`-p` and the TUI
+  under a pty, then `xscapes inside kimi` under a pty with typed prompts). Packet + Kimi's answers:
+  `~/Documents/kimi/xscapes-kimi-compat-2026-09-17/` (CONTEXT.md, ANSWER.md; K3, 422 s).
+  **Hosting works**: Kimi's TUI is inline and bottom-anchored (no alternate screen, no absolute cursor moves, 0 of
+  each in 9 KB of startup bytes; it sends DA and the kitty query); hosted inside the scape it BOUND (socket, `current`),
+  the Bash approval reached the companion as `needs_input "allow Bash?"` (Enter approved it: `PermissionResult
+  decision=approved`), `Stop` → done, `/exit` → `SessionEnd reason=exit`, Esc → `Interrupt reason=cancelled` and NO
+  Stop (Interrupt fires in place of Stop). Every hook payload captured verbatim (kimiprobe1–6 in the scratchpad).
+  **Kimi's payload, measured**: base keys `hook_event_name`, `session_id`, `cwd`, `client_type`, plus `session_title`
+  after the first prompt; NO `transcript_path`, NO `agent_id` except on PermissionRequest/Result (`"main"`);
+  `UserPromptSubmit.prompt` is an ARRAY of parts (our string field drops the text); `PostToolUseFailure.error` is an
+  OBJECT `{code,message}` (our string field drops the detail; a non-zero Bash exit IS a failure); `Read` uses `path`
+  (handled); `tool_output` not `tool_response`; `SubagentStart/Stop.agent_name` is the PROFILE ("explore" for both of
+  two parallel sub-agents) not an id; a sub-agent's own tool events and its `Stop` carry NOTHING that says sub-agent
+  (3 Stops for one prompt with two sub-agents; each sub Stop ~30 ms before its SubagentStop); `TodoList` (not
+  TodoWrite) with `todos[].status ∈ pending|in_progress|done`, and Kimi actually uses it; `Notification` means a
+  background task changed (`task.completed`), never "needs you"; `AskUserQuestion` is a plain tool (disabled in `-p`);
+  `SessionEnd` never fires in `-p`. Transcript: `~/.kimi-code/sessions/wd_*/session_<id>/agents/{main,agent-N}/wire.jsonl`
+  with `usage.record {inputOther,output,inputCacheRead,inputCacheCreation}` per LLM step and `token_counting.measured
+  {tokens}` + `llm.request.maxTokens` (the context window), `session_index.jsonl` maps id → dir; Kimi's docs call the
+  wire "local debug materials". Status line snapshot (measured, TUI only, `version 2.0.0`): `{model,cwd,gitBranch,
+  permissionMode,planMode,contextUsage,contextTokens,maxContextTokens,sessionId,version}`.
+  ⚠⚠ **A FIRST-RUN BUG, NOT KIMI'S, found because the probes used a FRESH state dir: `event.SetCurrent` writes
+  `run/current` before anything has created `run/`, fails silently, and the scape never binds in the first session
+  on a new machine** (the spool creates the dir afterwards, so the SECOND session binds). Reproduced with the Claude
+  path as the control. His friend would have hit it on his first session after today's install fix. One line
+  (`EnsureRunDir` in `SetCurrent`) plus the scape ensuring the dir at start. Also my own trap: a scratchpad
+  `XSCAPES_HOME` makes the socket path 156 bytes, over the 104 macOS allows; `ErrPathTooLong` exists and the scape
+  says nothing on screen.
+  **Kimi consult (verify-the-auditor tally)**: every checkable claim held (Agent `run_in_background`, AskUserQuestion
+  `background`, Interrupt in place of Stop, `session_title`, `SessionEnd` reasons `exit|archive`, no env vars for
+  hooks, `KIMI_CODE_HOME` relocates everything, `TaskStarted {task_id,description,detached}`); 0 refuted; the status
+  line schema it called undocumented was measured here instead; unverifiable: Ctrl-C's mapping. Its useful pointer:
+  the `kimi web` server API has per-agent identity but is explicitly experimental (recommended against).
+  ⇒ **THE PLAN, presented for his go (in the 16:45 reply): (1) the first-run bind fix · (2) the translator on
+  Kimi's shapes (prompt parts, error object, TodoList → stars, AskUserQuestion → ask, Interrupt → quiet turn end,
+  PermissionResult clears the ask, Interrupt/PermissionResult/TaskStarted registered) · (3) reducer rules for Kimi
+  (a Stop with a sub-agent open is the sub-agent's; tool events while a foreground Agent call is open are sub-agent
+  work; same-name sub-agents as a multiset) · (4) spend + context off the wire files via session_index.jsonl,
+  honouring KIMI_CODE_HOME, defensively · (5) `xscapes kimi`, installer text, README, site · (6) his live look.**
+
+#### Thread 2, continued — 16:45–17:15: his four answers, the build, the thread that died mid-edit, the friend's report
+
+- *"[Image #2] this is what my friend reported back when trying to run xscapes on kimi before we did any work- recap your
+  learnings and prompt me for any/all open calls. Ideally, xscapes and all its features work on kimi as simply as they do
+  on claude"* (16:45, with a screenshot of his friend's agent's report; re-sent at 17:03 to a fresh session after the
+  first one died at 17:01 mid-edit, below).
+  **The friend's agent's report, verbatim from the screenshot:** *"Done — xscapes is wired to Kimi Code. It was already
+  installed (v0.4.1, binary at ~/go/bin/xscapes), and it turned out no code changes were needed: Kimi's hook events use
+  the same names and the same stdin payload schema (hook_event_name, tool_name, tool_input…) that xscapes' adapter reads,
+  so I pointed Kimi's hooks straight at it."* · *"Added 12 [[hooks]] entries to ~/.kimi-code/config.toml (SessionStart/End,
+  UserPromptSubmit, Pre/PostToolUse, PostToolUseFailure, PermissionRequest, Notification, Stop, SubagentStart/Stop,
+  PreCompact), each piping the payload to xscapes hook <Event>. Backup of your old config at
+  ~/.kimi-code/config.toml.bak-xscapes."* · *"How to use it: xscapes inside kimi"* · caveats: *"The context moon won't
+  track automatically … Kimi has no equivalent context-usage hook"*, *"Kimi's Notification types (task.completed etc.)
+  aren't in xscapes' allowlist … PermissionRequest and Stop cover the 'needs you' / 'done' knocks"*, *"Uninstall is just
+  deleting that block"*.
+  ⇒ Against the measurements above, that setup would have given him: a FIRST session that never binds (the run/ bug) ·
+  done ringing at every sub-agent finish · Esc leaving the scene working up to 30 min · the prompt text and the error
+  detail lost · two explores as one kitten · no stars · no moon, no spend · and twelve entries with no marker, calling
+  the ~/go/bin v0.4.1 binary, over which `xscapes install kimi --apply` would fire every event twice.
+- **HIS FOUR ANSWERS (AskUserQuestion, 16:50), verbatim:** Esc → *"Quiet turn end (Recommended)"* · context + spend →
+  *"Kimi's session files (Recommended)"* · the site → *"yes, on the install section we should have small branded
+  sections for each agents install commands, as well as a brief mention of coming soon: codex (and whichever other 2 top
+  agents we should consider)"* · the friend → *"Hold until the Kimi release (Recommended)"*.
+  ⇒ BUILT 16:51–17:00 by that thread, test-first, suite green: the first-run bind fix (`SetCurrent` makes run/;
+  `TestTheFirstSessionOnAFreshMachineIsAnnounced`) · `event.Interrupt` (quiet turn end) · the translator on Kimi's
+  shapes (prompt parts, error object, TodoList/"done", AskUserQuestion → the ask on Kimi only, Interrupt; `Src` set from
+  the hook command's own argument, never the payload) · the reducer's Kimi rules (profile → instance keys, a Stop with a
+  sub-agent open is the sub-agent's, tool events during a foreground Agent call are the sub-agent's) ·
+  `internal/spend/kimi.go` (wire.jsonl via session_index.jsonl, KIMI_CODE_HOME honoured; usage.record summed; the main
+  agent's token_counting.measured / llm.request.maxTokens give the moon when no status line did; `State.ContextKnown`) ·
+  `xscapes kimi` / `xscapes hermes` · the installer REFUSES hand-written `xscapes hook` entries outside its block
+  (`TestInstallRefusesHooksWrittenByHand`) · `testdata/kimi/session.jsonl`, 41 real payloads stitched into one session,
+  through translate + reduce (`TestARealKimiSessionThroughThePipeline`).
+  ⚠ **That thread ended at 17:01 ("continued-in") in the middle of its README + page edit, before reporting; the record
+  stood at 16:41 ("no code changed yet") while the tree held 390 lines.** The continuation had no memory of it; the
+  build state, his answers and the friend's words were recovered from the dead thread's transcript
+  (`~/.claude/projects/-Users-lucasgarzoli-Documents-claude-xscapes/c126e104-….jsonl`). **When the tree is ahead of the
+  record, the previous session's transcript is the record of last resort; read it before writing anything.**
+- **FINISHED 17:05–17:15 (this thread):** `event.Answered`: Kimi's PermissionResult takes the ask down on the user's
+  word, before the approved command has run (Claude Code has no such event; there the next tool start clears it);
+  `TestAnAnswerClearsTheAskAndNothingElse` and the pipeline test's check of that moment, written failing first ·
+  `PermissionResult` registered in the Kimi block · README: one install line, then one line per agent, Adapter 3
+  rewritten on the measurements · the page: the Install section is the install line, then four small captioned boxes
+  (Claude Code · Kimi Code CLI · Hermes Agent · Anything else) and *"Coming soon: Codex CLI, Gemini CLI, OpenCode."*
+  (my pick of the "other 2", his call), looked at on desktop and phone (Playwright; the first cut clipped its box
+  comments, trimmed). Site rebuilt, 15.5 MB / 1.17 MB gz; NOT published, NOTHING committed. Suite 13/13 + vet + fmt
+  green. Carded, not built: `ErrPathTooLong` is returned and never shown on screen.
+  ⏰ **Commons closed at 16:59 PDT while this ran; judging is Sep 17–20 and the entry proxies gh-pages live (600 s
+  cache), so a publish now changes the judged page.** Open calls put to him in the 17:20 reply: commit (five cuts) ·
+  v0.4.3 (tag → release.sh → push; the friend's install line reads the latest release, no publish needed) · publish or
+  hold through judging · the "coming soon" names · the friend's message (drafted) · his live look.
