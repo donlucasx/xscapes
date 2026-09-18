@@ -35,7 +35,37 @@ TERM_PROGRAM the rebuild == the committed page byte for byte. sitePage pins
 both switches; TestThePageDoesNotChangeWithTheTerminal fails without the
 fix. Suite 13/13 + vet + fmt green. The uncommitted product work below is
 untouched. His PARALLEL session is cutting a Twitter trailer (its
-`trailer_test.go` sits untracked in this tree; not ours). NEXT: the wind fix.
+`trailer_test.go` sits untracked in this tree; not ours).
+THEN THE WIND ROUND (his word "lets start w the kimi fix", ~21:25): MEASURED
+FIRST at his 131x24 at the live 12 fps (windprobe_test.go, TestTheWindsChurn:
+cells changed per frame by band, the owl's box left out; leaves counted above
+the meadow; "tracks kept" = leaves that held or stepped 0-3 cells). TODAY at
+full stretch: 216 cells change a frame (air 72 + lake/meadow 78 + the fire's
+columns 59), ten times idle (21); SEVEN IN TEN ARE THE LEAVES; the fire's own
+churn is ~30 once leaves stop crossing its columns, so Kimi's "fire re-roll"
+is NOT the problem. ⭐ A SECOND DEFECT FOUND: paintVistaL loops its clock on
+4 s and the leaf shift (round(t*20)) closes on that loop only at 80 columns
+(20x4); on his 131-column window every leaf JUMPED 80 columns every four
+seconds (a change count cannot see it: a teleport changes the same two cells
+as a step; the tracks metric can). FIXED for every live style: the shift runs
+on the UNLOOPED clock modulo the width (tRaw); the study clip keeps its
+looped clock and stays byte-identical (fingerprint guard green). BUILT:
+scenes.WindStyles / WindPick (0 today; live-gated like SnowPick): W1 half,
+grounded (from the far range's foot, ceiling halved, 12 cols/s = one cell a
+frame) · W2 streaks in the near air (two-cell streaks from the massif's foot,
+a fifth of the ceiling, rare high flyers near full stretch, 12 cols/s) · W3
+sparse and slow (whole air, a quarter, 6 cols/s). Churn at full stretch:
+216 → 88 (W1) → 65 (W2) → 55 (W3). REVIEW PAGE, his pick pending:
+https://claude.ai/artifact/Ng2uUanTJ8TAwLbZ86rMhP
+(each style: full stretch night · half night · full stretch noon, three
+seconds at 12 fps, 131x24, + the count table; XSCAPES_WINDPAGE=<file> go test
+-run TestWindPage .). MY RECOMMENDATION: W2 (the sky and the ranges are the
+world's channel and stay clean; the carry reads as wind low over the lake and
+meadow where the eye is; one cell a frame is the only smooth speed at 12 fps;
+tracks kept 95%). UNCOMMITTED, not installed: forest.go (styles + the clock),
+vista.go (Rows()), windprobe_test.go. Suite 13/13 + vet + fmt green. NOT
+touched: the BLANK TOP ROWS (needs his trace). NEXT: his pick → WindPick,
+a churn gate in the probe, install, his look live.
 
 Session 40, thread 2 (2026-09-17 16:00–20:10), WRAPPED at his word "lets /wrap
 and discuss this fix first thing on the next session". FIRST THING NEXT: THE

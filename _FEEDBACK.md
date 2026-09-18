@@ -4540,3 +4540,16 @@ binary and the tyastie one an older one: **a restart is what shows the afternoon
   spaces bind the phrase (`at&nbsp;a&nbsp;glance`), so the wrap falls before it: measured at 1920/1280/700/390/351/320,
   "at a glance" is the last line at every width. COMMITTED `481263e`, PUSHED, PUBLISHED, VERIFIED from outside (live ==
   local byte for byte).
+- *"lets start w the kimi fix"* (~21:25) ⇒ MEASURED before drawing (`windprobe_test.go`, `TestTheWindsChurn`: the live
+  vista at his 131x24, 12 fps, six seconds, cells changed per frame by band with the owl's box left out; leaves counted
+  above the meadow; "tracks kept" = leaves that held their cell or stepped 0-3 cells since the frame before). Today at
+  full stretch, night: air 72 + lake/meadow 78 + the fire's columns 59 = 216 cells a frame (idle: 21); 49 leaves above
+  the meadow; the fire's columns fall to ~30 in every candidate, so the fire's re-roll is not the flicker, the leaves
+  are (seven in ten). ⭐ SECOND DEFECT: `paintVistaL` loops `t` on 4 s and the leaf shift `round(t*20)` closes on that
+  loop only at 80 columns; at his 131 every leaf jumped 80 columns every four seconds (a change count cannot see a
+  teleport; the tracks metric can: ~15% kept at the wrap against ~85% on a step). Fixed for every live style: the shift
+  runs on the unlooped clock modulo the width; the study clip keeps its clock (fingerprint green). BUILT
+  `scenes.WindStyles`/`WindPick` (live-gated like `SnowPick`): W1 half, grounded · W2 streaks in the near air · W3
+  sparse and slow; churn at full stretch 216 → 88 → 65 → 55. PAGE for his pick: https://claude.ai/artifact/Ng2uUanTJ8TAwLbZ86rMhP
+  (12.7 MB; 36 frames a clip to stay under the artifact's 16 MB). Recommendation: W2. UNCOMMITTED, not installed;
+  suite 13/13 + vet + fmt green.

@@ -13,8 +13,13 @@
 > the problem posed right above it (his reason), his lean to the shortest of four offered edits; "at a glance" bound as the last line (`481263e`, live, verified). ⭐ FOUND: a page built from a Claude Code shell
 > inside Terminal.app CHANGED THE ART: `term.NoSplitCells` from TERM_PROGRAM reaches the shore's FLAT CAPS at paint time,
 > before any HTML writer's save/restore (139 shore frames); `sitePage` pins both switches,
-> `TestThePageDoesNotChangeWithTheTerminal`. Suite 13/13 green. Record: `_FEEDBACK.md` §Session 41. His PARALLEL session cuts a Twitter trailer (`trailer_test.go`, untracked here, not ours). NEXT: the wind fix
-> (the s40 block below).
+> `TestThePageDoesNotChangeWithTheTerminal`. Suite 13/13 green. Record: `_FEEDBACK.md` §Session 41. His PARALLEL session cuts a Twitter trailer (`trailer_test.go`, untracked here, not ours). ⭐ **THEN THE WIND
+> ROUND, MEASURED FIRST** (`windprobe_test.go`, his 131x24 at 12 fps): at full stretch 216 cells change a frame, ten times
+> idle, SEVEN IN TEN THE LEAVES; the fire is NOT it (~30 on its own). ⭐ A SECOND DEFECT: the painter's 4-s looped clock made
+> every leaf JUMP 80 columns every four seconds at any width but 80; FIXED live (the unlooped clock modulo the width; the
+> study clip byte-identical). Three candidates built behind `scenes.WindPick` (W1 half+grounded 88 · W2 streaks in the near
+> air 65 · W3 sparse+slow 55 cells/frame) on one page for his pick: https://claude.ai/artifact/Ng2uUanTJ8TAwLbZ86rMhP ; my
+> recommendation W2. UNCOMMITTED, not installed. NEXT: his pick, then install and his look live (the s40 block below).
 
 > **Session 40, thread 2 (2026-09-17 16:00–20:10), WRAPPED: KIMI COMPATIBILITY MEASURED, BUILT ON HIS FOUR ANSWERS,
 > SHIPPED (six commits `ddde8c4`…`2bcc155`, v0.4.3 released, the friend's install line verified from a clean HOME),
