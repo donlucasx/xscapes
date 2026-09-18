@@ -4781,3 +4781,7 @@ binary and the tyastie one an older one: **a restart is what shows the afternoon
   on the PATH fetched the v0.4.4 binary (revision 72954b3, clean); (7) the same release binary installed here (inode
   87384167). Still on Kimi's list: KIMI_CODE_HOME in the installer, the dropped Done behind an open sub-agent, the
   HOOKLOG=1 path, reallocBand's region + cursor.
+- WRAPPED 2026-09-18 ~12:35 PDT at his word ("lets /wrap"). HEAD == origin/main (`d1d1981`, the site thread's
+  commits); the trailer's two paths (`trailer_test.go`, `notes/trailer/`) are UNTRACKED, his word to commit; nothing
+  of the product changed; the deliverables live on his Desktop (`xscapes-trailer/`: four cuts, two openers, four
+  GIFs). OPEN: the entry's link card on X (the platform's edge, not our tags) · the square track · the post's numbers.

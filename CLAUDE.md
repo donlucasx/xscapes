@@ -2,6 +2,22 @@
 
 *(Renamed end to end on 2026-09-03: directory, env vars, state path and hook marker. Two names are kept on purpose and are not leftovers -- `internal/envx` still reads `ASCIISCAPES_*` and warns, and `install.go` still RECOGNISES the `# asciiscapes:v1` marker so the hooks it wrote before the rename can be found and removed.)*
 
+> **Session 41, thread 2 (2026-09-17 20:00 → 2026-09-18 12:30, parallel to the site thread): THE X TRAILER, CUT FOUR
+> TIMES ON HIS NOTES AND POSTED.** https://x.com/donlucas/status/2101029250996617468 . Eight rulings first (one take
+> with a camera over the montage · 16:9, square later · the product's cues + a quiet bed, no VO · four lowercase
+> captions · the brand's lowercase), then the opener on his storyboard (the splash's sea painted in band by band from
+> stars, every glyph lit on arrival, the cell blinking alone, the x, "scapes" typed, the slogan), then the film: from
+> black the terminal TYPES the first prompt, hard cuts (the wide until the owlets come · their closeup · wide as they
+> hide · the night · the moon at 2.6x · the walk-up in the wide · the ask's closeup with the eyes cycling · dawn), the
+> end card in beats (the mark with the cursor · the Commons URL typed · the cat working then its finished face, the
+> drop). ⭐ **THE SAND STEPS, MEASURED**: the beach's tone is cube-exact by design and jumps 94 → 137 in one frame
+> between hours 1.1284 and 1.1295; a trailer's night is twelve seconds, so the shore's clock now hits 1.129 ON the cut
+> frame. **Nothing of the product changed**: `trailer_test.go` (gated export, the trailer's OWN montage, three render
+> liberties restored on return) and `notes/trailer/` (the browser stage, the camera file, the score, the record) are
+> UNTRACKED, his word to commit. Deliverables `~/Desktop/xscapes-trailer/`. ⚠ The entry's link renders NO card on X
+> although its tags and image check out (measured); the vista timelapse GIF stood in. NEXT: the post's numbers · the
+> square track if he wants a phone-first cut. Record: `notes/trailer/README.md`, `_FEEDBACK.md` §Session 41 thread 2.
+
 > **Session 41 (2026-09-17 evening), THREE SITE UPDATES at his ask, COMMITTED (`44d8d1f` the build fix · `60e93d9` the
 > site · `b6d953c` the title "xscapes · a thinking screen for terminal agents") and PUSHED; PUBLISHED at his word "Push all the changes live" (the first attempt refused by the classifier as in s39,
 > the second went through), gh-pages from `af39e5d`, VERIFIED from outside byte for byte.** (a) A COPY button on every `$` line, 12 (the command alone; "copied"

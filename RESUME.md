@@ -349,6 +349,24 @@ falling star cost his flight floors (88.6 → 84.3%); counting crossings
 Do NOT drive Terminal.app (osascript, System Events) without asking me first.
 ```
 
+## Session 41, thread 2 — the X trailer (2026-09-17 20:00 → 09-18 12:35, WRAPPED, parallel to the site thread)
+
+**Resume from:** `notes/trailer/README.md` (the shot list, the pipeline, how to run it) and `_FEEDBACK.md` §Session 41,
+thread 2 (every ruling verbatim). **Posted 2026-09-18 12:25 PDT:** https://x.com/donlucas/status/2101029250996617468 ,
+the v4 trailer as the post, the entry link + the vista timelapse GIF on the reply. **Nothing of the product changed.**
+UNTRACKED, his word to commit: `trailer_test.go` (gated `XSCAPES_TRAILER=<dir>`; parts cover · hero (the trailer's OWN
+montage) · cat · vista; three render liberties, all restored on return: `reduce.KittenDwell` 60 → 30 s, the crab's ask
+eye cycled through `companion.StudyNearEyeAlert`, the pane's first line typed) and `notes/trailer/` (render.mjs = the
+browser stage over the installed Chrome; opener.json + shots.json = every number he tunes; audio.py; assemble.sh; the
+fonts). The workbench (node_modules, frames, renders, 778 MB) is the session scratchpad and is disposable; deliverables
+are `~/Desktop/xscapes-trailer/` (openers v1-v2, trailer v1-v4, four GIFs).
+**Measured, do not re-derive:** the sand's tone jumps cube 94 → 137 in one frame between hours 1.1284 and 1.1295 (the
+shore's clock in the trailer hits 1.129 on the cut frame) · the entry serves X's crawler correct card tags at byte 1797
+with a 200 image and a <2 s fetch, and X still renders no card (the platform's edge is the suspect) · X ranks a post
+with a body link lower and shows one card per post, from the LAST link.
+**▶ NEXT:** the post's numbers · the square track (a second camera over the same frames, a phone-first cut) · commit
+the two paths at his word.
+
 ## ▶ NEXT (session 39, 2026-09-16 night into 09-17, WRAPPED 15:30 PDT: the whole day live on both addresses; HEAD == origin == the build, `f643ac9`)
 
 **State (after "commit", ~15:10 PDT):** HEAD `76dbfb3`, tree clean, four cuts on top of the snow (`c240bcd` the band ·
