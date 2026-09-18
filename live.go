@@ -76,7 +76,7 @@ func winSize(fd uintptr) (cols, rows int, ok bool) {
 // With a session to follow it renders that session. Without one it runs the
 // demo cycle, which is what every frame in assets/frames was made from and
 // what you want when showing the thing to somebody with no agent running.
-func runLive(seed int64, fps float64, wIn, hIn int, ctxUsed, tod float64, ascii bool, session string, mirror bool, await bool) {
+func runLive(seed int64, fps float64, wIn, hIn int, ctxUsed, tod float64, ascii bool, session string, mirror bool, await bool, level float64) {
 	w, h := wIn, hIn
 	if w <= 0 || h <= 0 {
 		w, h = termSize()
@@ -94,6 +94,7 @@ func runLive(seed int64, fps float64, wIn, hIn int, ctxUsed, tod float64, ascii 
 	}
 
 	f := newFrames(w, h, seed, ascii, mirror, ctxUsed, tod)
+	f.level = level
 
 	// bind attaches to a session, or reports that there is nothing to attach
 	// to yet. Split out because -await calls it again every second: the
@@ -273,6 +274,19 @@ func compose(w int, catW int, mirror bool) layout {
 		SandFrom: margin, SandTo: catX - 1 - span,
 		MoonX: 0.28, Mirror: true,
 	}
+}
+
+// pinnedState is the demo held at one level: working at that level, or
+// resting at zero, three of five todos, nothing else moving. -live -level.
+func pinnedState(level, ctxUsed, tod float64) reduce.State {
+	st := reduce.State{
+		Act:  scape.Activity{Working: level > 0, Level: level, ContextUsed: ctxUsed, TimeOfDay: tod, TodoTotal: 5, TodoDone: 3},
+		Pose: companion.Working,
+	}
+	if level == 0 {
+		st.Pose = companion.Resting
+	}
+	return st
 }
 
 // demoState is the state cycle used when no session is attached: it swings

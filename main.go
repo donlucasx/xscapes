@@ -78,7 +78,7 @@ func main() {
 		frames  = flag.Int("frames", 1, "how many frames to render")
 		plain   = flag.Bool("plain", false, "glyphs only, no colour")
 		working = flag.Bool("working", false, "render the working state")
-		level   = flag.Float64("level", -1, "activity level 0..1 (default: 0 resting, 0.7 working)")
+		level   = flag.Float64("level", -1, "activity level 0..1 (default: 0 resting, 0.7 working); with -live, pin the scape at this level instead of the demo cycle")
 		seed    = flag.Int64("seed", 7, "scene seed")
 		asciiG  = flag.Bool("ascii", false, "ASCII glyphs only, no Unicode")
 		fps     = flag.Float64("fps", 20, "time step between rendered frames")
@@ -176,7 +176,7 @@ func main() {
 		if isSet("h") {
 			hl = *height
 		}
-		runLive(*seed, *fps, wl, hl, *ctxUsed, *tod, *asciiG, *session, *mirror, *await)
+		runLive(*seed, *fps, wl, hl, *ctxUsed, *tod, *asciiG, *session, *mirror, *await, *level)
 		return
 	}
 

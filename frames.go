@@ -44,7 +44,11 @@ type frames struct {
 	knocker notify.Knocker
 
 	ctxUsed, tod float64
-	start        time.Time
+	// level pins the demo at one activity level when >= 0 (-live -level):
+	// the instrument for looking at the scape at full stretch with no
+	// agent in the loop (his A/B on the wind, 2026-09-18). -1 is the cycle.
+	level float64
+	start time.Time
 
 	// nextCompanionCheck paces refreshCompanion; see it for why this is not
 	// read every frame.
@@ -120,7 +124,7 @@ func newFrames(w, h int, seed int64, ascii, mirror bool, ctxUsed, tod float64) *
 	f := &frames{
 		c: c, sh: sh, cat: cat, lay: lay, ccw: ccw, chh: chh,
 		mirror: mirror, profile: term.DetectProfile(), seed: seed,
-		player: notify.New(), ctxUsed: ctxUsed, tod: tod, start: time.Now(),
+		player: notify.New(), ctxUsed: ctxUsed, tod: tod, level: -1, start: time.Now(),
 		ascii: ascii, scapeName: ScapeShore,
 		evlog: envx.Lookup("EVENTLOG"),
 	}
@@ -179,6 +183,9 @@ func (f *frames) state(now time.Time, t float64) reduce.State {
 		tod := f.tod
 		if tod == 0 {
 			tod = timeOfDay(now)
+		}
+		if f.level >= 0 {
+			return pinnedState(f.level, f.ctxUsed, tod)
 		}
 		return demoState(t, f.ctxUsed, tod)
 	}
