@@ -4675,7 +4675,7 @@ binary and the tyastie one an older one: **a restart is what shows the afternoon
   FOR THE WORKING FLICKER, and NEITHER earlier test had it: the standalone A/B ("none has the flicker") and this Kimi
   session both ran the unlooped clock, so they tested the density, not the jump. The 09-17 binary jumped every leaf 80
   columns every 4 s, ~140 leaves at level 1 on his width. Built the instrument: `XSCAPES_WINDSEAM=1` puts the looped
-  clock back under the live leaves (scenes.WindSeam; never shipped on), INSTALLED (inode 87270301-see ls -i). The
+  clock back under the live leaves (scenes.WindSeam; never shipped on), INSTALLED (inode 87309990). The
   blank top rows of 18:57 fit Kimi's ED on a resize (his 18:57 window was being arranged) + the tracker's 4.2 s
   persistence, now prevented by the Filter. KIMI'S ASSESSMENT (`notes/kimi-multiagent-assessment-2026-09-18.md`)
   VERIFIED on six claims, 6 of 6 true: the unguarded `all[len(all)-1]` in kimilog_replay_test.go:79 (a panic on an
