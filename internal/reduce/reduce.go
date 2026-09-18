@@ -210,6 +210,15 @@ type Reducer struct {
 	// litter counts two and a Stop with any of them open is not the turn's.
 	kimiOpen map[string][]string
 	kimiSeq  int
+	// A Done dropped while instances were open is held: kimiPending until a
+	// SubagentStop claims it as that sub-agent's (they come within the
+	// second), kimiTurnDone once KimiStopClaim has passed unclaimed, which
+	// makes it the turn's own Stop with agents in the background. It rings
+	// when the last open instance closes; a new prompt or a real Done moots
+	// it. TestABackgroundAgentsTurnRingsWhenTheLastOneIsIn.
+	kimiPending   *event.Event
+	kimiPendingAt time.Time
+	kimiTurnDone  *event.Event
 
 	worried    bool
 	needsInput bool
@@ -266,8 +275,10 @@ func New(session string) *Reducer {
 //   - SubStart/SubEnd: the profile name becomes an instance key ("explore#3"),
 //     ended oldest first, so a fan-out of one profile is a litter of that size.
 //   - Done while an instance is open is a SUBAGENT's Stop, not the turn's:
-//     dropped. (A background subagent keeps the turn open a little longer
-//     than it strictly is; the cue rings when the last of them is in.)
+//     dropped. Unless nothing claims it: a sub-agent's Stop is followed by
+//     its SubagentStop within the second, and a Done still unclaimed after
+//     KimiStopClaim is the turn's own with agents in the background; it is
+//     held and rings when the last of them is in.
 //   - A tool event with no agent while a FOREGROUND Agent call is in flight
 //     is the subagent's work: it is marked so it neither paces the companion
 //     nor worries it (his ruling: main-thread errors only). The Agent call's
@@ -284,6 +295,8 @@ func (r *Reducer) kimi(e event.Event) (event.Event, bool) {
 		r.kimiOpen[name] = append(r.kimiOpen[name], key)
 		e.Agent, e.AgentType = key, name
 	case event.SubEnd:
+		// A pending Done this close to a SubagentStop was the sub-agent's.
+		r.kimiPending = nil
 		name := e.Agent
 		if open := r.kimiOpen[name]; len(open) > 0 {
 			e.Agent, e.AgentType = open[0], name
@@ -295,8 +308,13 @@ func (r *Reducer) kimi(e event.Event) (event.Event, bool) {
 		}
 	case event.Done:
 		if len(r.kimiOpen) > 0 {
+			held := e
+			r.kimiPending, r.kimiPendingAt = &held, r.last
 			return e, false
 		}
+		r.kimiPending, r.kimiTurnDone = nil, nil
+	case event.Prompt:
+		r.kimiPending, r.kimiTurnDone = nil, nil
 	case event.ToolStart, event.ToolEnd, event.Error, event.TestPass, event.TestFail:
 		if e.Agent == "" {
 			for id, f := range r.flight {
@@ -487,6 +505,14 @@ func (r *Reducer) Apply(e event.Event, now time.Time) {
 			}
 		}
 		r.heat += Impulse
+		// The last one in: the turn's own Stop, held since it was dropped,
+		// rings now. It goes back through Apply, so a Done with no instance
+		// open takes its ordinary path.
+		if len(r.kimiOpen) == 0 && r.kimiTurnDone != nil {
+			held := *r.kimiTurnDone
+			r.kimiTurnDone = nil
+			r.Apply(held, now)
+		}
 
 	case event.Compact:
 		r.heat += Impulse
@@ -624,7 +650,16 @@ func starTotal(todoOf int) int {
 // every frame.
 func (r *Reducer) Tick(now time.Time) { r.decay(now) }
 
+// KimiStopClaim is how long a Done dropped behind open instances waits for
+// the SubagentStop that would make it a sub-agent's own. The fixture's are
+// claimed within the second; a turn's Stop with agents in the background is
+// followed by nothing for minutes.
+const KimiStopClaim = 2 * time.Second
+
 func (r *Reducer) decay(now time.Time) {
+	if r.kimiPending != nil && now.Sub(r.kimiPendingAt) >= KimiStopClaim {
+		r.kimiTurnDone, r.kimiPending = r.kimiPending, nil
+	}
 	if r.heatAt.IsZero() {
 		r.heatAt = now
 		return
