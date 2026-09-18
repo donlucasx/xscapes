@@ -3,6 +3,34 @@
 **Copy-paste this prompt into a fresh session:**
 
 ```
+SESSION 41 WRAPPED 2026-09-18 ~14:50 at his word. STATE: HEAD == origin/main
+(`f809834`+), tree clean (the trailer thread's paths committed), suite 13/13
++ vet + fmt green, INSTALLED clean (inode 87405520 = HEAD), the page LIVE
+and verified byte for byte, v0.4.4 RELEASED (four binaries clean at
+72954b3; the install line fetches it from an empty HOME) -- ⚠ the release
+PREDATES today's twelve cards; v0.4.5 is his call. THE FLICKER REPORT OF
+09-17 IS CLOSED: not the wind (density and the 80-column jump both
+exonerated on his glass, `-live -level 1` with and without
+XSCAPES_WINDSEAM=1); the one mechanism with evidence is an agent's
+erase-display reaching the scape (Kimi clears the screen on every resize
+step; the blank top rows), confined by the host's Filter since `ef602ab`
+and proven on his trace (1076/1076 → 0/1076); the tracker's full refresh
+is one second. The Commons entry is a live proxy of gh-pages; he chose to
+carry on publishing. Windows: not native (the pty is raw ioctls), WSL
+untested. HIS TWELVE RULINGS ALL BUILT (KIMI_CODE_HOME · the held Done ·
+docs · logPath · reallocBand · hygiene ×4 · erase count · F1 · the rail).
+OPEN (his): v0.4.5 · restart the three-day `xscapes claude` (old binary) ·
+Hermes live · the cream cat on light · Windows/WSL. OPEN (minor, unruled,
+from Kimi's assessment): the fixture through hookTranslate · a cross-log
+matcher · the foreground-attribution heuristic · the refusal's edge cases.
+INSTRUMENTS this session: windprobe_test.go (churn + tracks + rows), the
+wind page (Ng2uUanTJ8TAwLbZ86rMhP, taste only), levelfold_test.go (the
+level from an event log), internal/host: agentclear_replay_test.go +
+blankrows_replay_test.go (a trace through the model), XSCAPES_WIND /
+XSCAPES_WINDSEAM / -live -level. The traces dir holds 506 MB (the 09-18
+trace cut to 260 MB). Record: _FEEDBACK.md §Session 41 (three rounds of
+rulings verbatim). The history of the session follows.
+
 Session 41 (2026-09-17 evening, ~20:15-21:00): THREE SITE UPDATES at his ask,
 BUILT, COMMITTED (`44d8d1f` the build fix, `60e93d9` the site, `b6d953c`
 the title "xscapes · a thinking screen for terminal agents"), PUSHED

@@ -4839,3 +4839,7 @@ binary and the tyastie one an older one: **a restart is what shows the afternoon
   the refusal's edge cases.
 - The rail's publish verified from outside: live == local byte for byte, no rail element on the live page.
 - *"push"* (~14:40) ⇒ PUSHED: origin/main = `4a2842d` (the twelve rulings' cuts + the record), verified with ls-remote.
+- Catch-up, verbatim, unlogged until the wrap: *"guide me through the XSCAPES_WINDSEAM=1 test"* (two runs, window
+  still, what to report) · *"what are the commands again for the first test?"* · *"should I run a new kimi test
+  session"* (⇒ yes, after the one-minute check, with the recorders on) · *"ok I wrapped the trailer session, what else
+  is open here"* (⇒ the ranked list he then prompted through). WRAPPED 2026-09-18 ~14:50 at his word `/wrap`.

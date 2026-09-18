@@ -18,6 +18,14 @@
 > although its tags and image check out (measured); the vista timelapse GIF stood in. NEXT: the post's numbers · the
 > square track if he wants a phone-first cut. Record: `notes/trailer/README.md`, `_FEEDBACK.md` §Session 41 thread 2.
 
+> **Session 41 (2026-09-17 20:15 → 2026-09-18 14:50), WRAPPED at his word. HEAD == origin/main `f809834`+, tree
+> clean, suite 13/13 green, INSTALLED clean (87405520), the page LIVE and verified, v0.4.4 RELEASED (⚠ it predates
+> today's twelve cards; v0.4.5 is his call). THE 09-17 FLICKER IS CLOSED: not the wind (density and the 80-column jump
+> both exonerated on his glass); an agent's erase-display reaching the scape is the mechanism with evidence, confined
+> since `ef602ab` and proven on his trace; the full refresh is one second. His twelve rulings all built, one cut each.
+> OPEN: v0.4.5 · his restart of the three-day scape · Hermes live · the cream cat · Windows/WSL untested · Kimi's minor
+> leftovers. Entry point: `RESUME.md`'s first block.**
+>
 > **Session 41 (2026-09-17 evening), THREE SITE UPDATES at his ask, COMMITTED (`44d8d1f` the build fix · `60e93d9` the
 > site · `b6d953c` the title "xscapes · a thinking screen for terminal agents") and PUSHED; PUBLISHED at his word "Push all the changes live" (the first attempt refused by the classifier as in s39,
 > the second went through), gh-pages from `af39e5d`, VERIFIED from outside byte for byte.** (a) A COPY button on every `$` line, 12 (the command alone; "copied"
