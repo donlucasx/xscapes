@@ -1,0 +1,35 @@
+{
+  "_": "The camera over the montage and the captions, in CLIP seconds of the TRAILER montage (trailer_test.go trailerMontage, session seconds / 8). v4 (his notes 2026-09-18 ~11:30): the montage opens from black on the terminal typing its first prompt (0.5-1.8), the owlets come at 6.75 and hide from 10.5, the first finish at 11.0, the night sets in by the cut to the shore at 15.0, the crab asks at 19.4 and walks up, '> yes' at 24.4, the finish at 26.4, the pane clears at 27.4. col/row are window cells (124 x 44); zoom 1 is the whole window fitted to the frame's height; cut:true is an instant jump; free:true lets the frame leave the window. A caption's dx shifts it from the centre (px) so it clears the fire.",
+  "camera": [
+    { "t": 0.0,   "col": 21,  "row": 0.6, "zoom": 2.8, "free": 1 },
+    { "t": 2.3,   "col": 21,  "row": 0.6, "zoom": 2.8, "free": 1 },
+    { "t": 2.7,   "col": 62,  "row": 22,  "zoom": 1.0 },
+    { "t": 7.45,  "col": 62,  "row": 22,  "zoom": 1.0 },
+    { "t": 7.45,  "col": 100, "row": 35,  "zoom": 3.0, "cut": true },
+    { "t": 10.55, "col": 100, "row": 35,  "zoom": 3.0 },
+    { "t": 10.55, "col": 62,  "row": 22,  "zoom": 1.0, "cut": true },
+    { "t": 16.5,  "col": 62,  "row": 22,  "zoom": 1.0 },
+    { "t": 16.85, "col": 34,  "row": 23,  "zoom": 2.6 },
+    { "t": 19.15, "col": 34,  "row": 23,  "zoom": 2.6 },
+    { "t": 19.15, "col": 62,  "row": 22,  "zoom": 1.0, "cut": true },
+    { "t": 22.15, "col": 62,  "row": 22,  "zoom": 1.0 },
+    { "t": 22.15, "col": 104, "row": 36,  "zoom": 2.4, "cut": true },
+    { "t": 24.25, "col": 104, "row": 36,  "zoom": 2.4 },
+    { "t": 24.25, "col": 62,  "row": 22,  "zoom": 1.0, "cut": true },
+    { "t": 27.6,  "col": 62,  "row": 22,  "zoom": 1.0 }
+  ],
+  "captions": [
+    { "t0": 3.4,  "t1": 7.0,  "text": "an ascii scene that reacts as your agents work", "dx": 270 },
+    { "t0": 7.75, "t1": 10.25, "text": "agents and subagents" },
+    { "t0": 17.05, "t1": 18.95, "text": "the moon is your context" },
+    { "t0": 19.65, "t1": 21.95, "text": "it pings you when it needs you" }
+  ],
+  "captionPx": 28,
+  "end": {
+    "_": "his beats (2026-09-18 ~11:30): the montage to black, the logo fades in with the cursor blinking, the URL types under it, then the cat appears and emotes",
+    "toBlack": 0.6, "logoIn": 0.6, "blink": 1.0, "urlAfter": 0.4, "urlCPS": 30, "catAfter": 0.4, "catIn": 0.3,
+    "hold": 2.0, "fade": 0.6,
+    "url": "xscapes.vibe.commonsmade.com", "urlPx": 36,
+    "cat": { "px": 22, "gap": 44 }
+  }
+}

@@ -1,0 +1,17 @@
+{
+  "_": "The opener's timeline, seconds from the first frame. Every number here is what Lucas tunes; render.mjs only reads it. v4 (2026-09-18 ~11:30, his 'the intro wipe should be quicker (the ascii animation + Xscapes logo)' and 'fade to black and THEN the terminal should start typing'): the stars in 1.0 s, the sea's bands 0.35 s apart (the sea's own frames still step at 0.7), the cell at 1.4 blinking at 0.9 s, the x at 3.2 as the last band lands, the letters by 4.0, the slogan in by 5.1, settled at 5.0, held to 6.6, then a fade to black and 0.4 s of black before the terminal.",
+  "fps": 30,
+  "W": 1920,
+  "H": 1080,
+  "sea": { "px": 19, "font": "JetBrains Mono", "grey": "#333333", "step": 0.7 },
+  "stars": { "start": 0.0, "dur": 1.0, "ease": 1.6, "shine": 0.55, "seed": 3 },
+  "wipe": { "start": 0.9, "bands": 6, "band": 0.35, "sweep": 0.3, "jitter": 0.1, "shine": 0.4, "seed": 5 },
+  "shine": { "lift": 0.9, "halo": 5, "glow": 14 },
+  "drain": { "start": 3.9, "dur": 1.1 },
+  "cell": { "start": 1.4, "period": 0.9, "settle": 5.0, "px": 160 },
+  "x": { "at": 3.2 },
+  "letters": { "start": 3.35, "gaps": [0.12, 0.095, 0.13, 0.10, 0.115, 0.105] },
+  "line": { "start": 4.2, "dur": 0.9, "px": 44, "text": "a thinking screen for terminal agents" },
+  "out": { "start": 6.6, "dur": 0.6 },
+  "end": 7.6
+}
