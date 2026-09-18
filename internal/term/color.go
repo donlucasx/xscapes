@@ -114,7 +114,9 @@ var LowerHalf bool
 // Bare, with NO initialiser, and never read from the ambient TERM_PROGRAM at
 // package init: `go test` runs with TERM_PROGRAM=Apple_Terminal in this very
 // project, and a self-initialising flag would make the suite collapse here and
-// split in CI. main() assigns it; the HTML writers save and restore it.
+// split in CI. main() assigns it; the HTML writers save and restore it, and
+// sitePage pins it for a whole page render, because the shore's flat caps are
+// decided when the scene PAINTS (shore.go, FlatCaps), before any writer runs.
 var NoSplitCells bool
 
 // DetectNoSplit picks NoSplitCells for the terminal in TERM_PROGRAM. It has its

@@ -13,6 +13,7 @@ import (
 	"github.com/donlucasx/xscapes/internal/canvas"
 	"github.com/donlucasx/xscapes/internal/event"
 	"github.com/donlucasx/xscapes/internal/scape"
+	"github.com/donlucasx/xscapes/internal/term"
 )
 
 // turnBeat is one moment of the demo turn: seconds from the prompt, a note,
@@ -101,6 +102,16 @@ func demoTurn() []turnBeat {
 // The page used to carry five stills lifted from the same fold; his
 // direction of 2026-09-05: animated clips, no still screens.
 func sitePage(seed int64, dir string) (string, error) {
+	// The page must not change with the terminal it is built from. The HTML
+	// writers save and restore term.NoSplitCells around their own output,
+	// but the shore decides its disc's flat caps when it PAINTS (FlatCaps in
+	// shore.go), before any writer runs: built from a shell inside
+	// Terminal.app, every shore clip came out with a flat-capped sun
+	// (2026-09-17). Both switches are pinned to the no-terminal values for
+	// the whole render; TestThePageDoesNotChangeWithTheTerminal holds it.
+	wasN, wasL := term.NoSplitCells, term.LowerHalf
+	term.NoSplitCells, term.LowerHalf = false, false
+	defer func() { term.NoSplitCells, term.LowerHalf = wasN, wasL }()
 	tmpl, err := os.ReadFile(filepath.Join(dir, "template.html"))
 	if err != nil {
 		return "", err
