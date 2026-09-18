@@ -2,6 +2,19 @@
 
 *(Renamed end to end on 2026-09-03: directory, env vars, state path and hook marker. Two names are kept on purpose and are not leftovers -- `internal/envx` still reads `ASCIISCAPES_*` and warns, and `install.go` still RECOGNISES the `# asciiscapes:v1` marker so the hooks it wrote before the rename can be found and removed.)*
 
+> **Session 41 (2026-09-17 evening), THREE SITE UPDATES at his ask, COMMITTED (`44d8d1f` the build fix · `60e93d9` the
+> site) and PUSHED; ⚠ PUBLISH REFUSED by the auto-mode classifier ("Production Deploy", as in s39): his one command,
+> `sh site/publish.sh`, then verify from outside.** (a) A COPY button on every `$` line, 12 (the command alone; "copied"
+> for a moment in the toggle's pressed look; keyboard, a live region, a selection fallback; none on the events list).
+> (b) THE PROBLEM on his opener "You enter a prompt in the terminal and your agent gets to work…", his two sentences in,
+> the middle made accurate (a transcript scrolls past; the old "nothing else" was not true); the typed box is reserved
+> by a HIDDEN TWIN of the text at every width (the three measured breakpoints are gone; 1280→320 measured, no growth).
+> (c) The headline is his sentence; four edits offered, his pick pending. ⭐ FOUND: a page built from a Claude Code shell
+> inside Terminal.app CHANGED THE ART: `term.NoSplitCells` from TERM_PROGRAM reaches the shore's FLAT CAPS at paint time,
+> before any HTML writer's save/restore (139 shore frames); `sitePage` pins both switches,
+> `TestThePageDoesNotChangeWithTheTerminal`. Suite 13/13 green. Record: `_FEEDBACK.md` §Session 41. NEXT: his publish +
+> the verification from outside · the wind fix (the s40 block below).
+
 > **Session 40, thread 2 (2026-09-17 16:00–20:10), WRAPPED: KIMI COMPATIBILITY MEASURED, BUILT ON HIS FOUR ANSWERS,
 > SHIPPED (six commits `ddde8c4`…`2bcc155`, v0.4.3 released, the friend's install line verified from a clean HOME),
 > THEN THE EVENING'S SITE WORK LIVE (`cca9f49` theme toggle · `4c1e02c` status chips · `3e53ded` the eye colour on

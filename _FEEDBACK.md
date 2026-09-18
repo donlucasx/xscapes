@@ -4440,3 +4440,49 @@ binary and the tyastie one an older one: **a restart is what shows the afternoon
   leaf density and the fire re-roll at high level) is the first discussion next session; my recommendation and the
   review-page offer stand in the 20:00 reply. The record committed; the product work stays UNCOMMITTED at the
   standing rule (his word), installed dirty, listed in RESUME with the proposed cuts.
+
+## Session 41 — 2026-09-17 evening (~20:15): three site updates before the wind fix
+
+- *"resume work on xscapes. We are working on xscapes for kimi agents, and the art flickering fix. Before we dive into
+  that, Id like to push 3 quick updates to the site: a) add a ‘copy’ icon/button next to (or within) each command line
+  in the site so the user can simply copy it to its clipboard with a click. Follow best ui/ux  b) update THE PROBLEM
+  blurb to read “You enter a prompt in the terminal and your agent gets to work…” instead of “A user sends a prompt in
+  the terminal and the agent goes quiet”.  Analyze the rest of the blurb- is it accurate? can we sprinkle “you squint
+  and scan through the matrix to try figure out whats happening. You tab away, and come back late.”  b) lets update the
+  xscapes main headline to ‘the xscapes are cozy ASCII scenes that react to your agent while it works, and tell you
+  whats happening, at a glance’ - lmk if you have any good edits or suggestions on it"* ⇒ BUILT, all three, and looked
+  at (Playwright, 1280/700/401/390/351/320; a real click and a keyboard Enter read back off the clipboard):
+  (a) every line with a `$` prompt gets a `copy` button the script adds (12; the events list is not a command and has
+  none): the command alone goes to the clipboard, the button reads `copied` for 1.6 s in the theme toggle's pressed
+  look, an `aria-label` names the command, a live region says it to a screen reader, and where there is no clipboard the
+  line is selected and the button says `selected`. A word, not an icon: the page has no icons and the word needs no
+  tooltip; always visible, because a hover affordance does not exist on a phone; outside the line's own scroll, so a
+  long install line slides under a button that keeps its place. The "no hooks needed" comment moved into the
+  Anything-else caption because the button cut it to "# no h" at desktop width.
+  (b) The problem: his opener verbatim, his two sentences verbatim ("to try figure out" → "to try to figure out"). The
+  analysis of the old middle: "a spinner, a verb… and nothing else" was NOT accurate, the transcript does scroll past
+  with the tool calls and a failure in it, which is exactly what his "squint and scan through the matrix" line is
+  about; rewritten as "a transcript scrolling past: tool calls, file paths, a failed command somewhere in the middle";
+  "no ETA" and "context left" kept (both true; Claude Code warns about compaction only near the end). The typed box's
+  reserve: three measured row counts (4/9/10) at three breakpoints, wrong for the longer text and wrong between the
+  breakpoints (13 rows needed at 401px, 9 reserved) ⇒ a hidden twin of the whole text (`.ghost`) in the same box holds
+  the exact height at every width; measured 1280→320 the box is its final size before the first character and never
+  grows; the typing pauses on the ellipsis as on a full stop.
+  (c) The headline is his sentence verbatim with "what's" and a capital; 4 rows at 1280px (the old was 2), 4 on a
+  390px phone, 6 at 351. Four edits offered in the reply; his pick pending.
+- ⭐ FOUND ON THE WAY, and it would have shipped silently: **a page built from THIS shell (Claude Code inside
+  Terminal.app, `TERM_PROGRAM=Apple_Terminal`) came out 34 KB smaller than the committed page, and every SHORE clip had
+  a flat-capped sun.** `main()` sets `term.NoSplitCells` from `TERM_PROGRAM` before dispatch; the canvas HTML writers
+  save and restore it around their own output (the comment in `color.go` says so and it is true), but `shore.go`
+  decides the disc's FLAT CAPS when it PAINTS, before any writer runs, so the guard could never reach it. Measured
+  rather than inferred: every clip's frames differed textually (one extra palette class shifts every later index), but
+  resolving classes to colours left 139 frames different, all on the shore (the hero's last 3, the narrow hero's shore
+  half, the shore clip); a rebuild with `TERM_PROGRAM` unset matched the committed page byte for byte. Fixed at the
+  seam: `sitePage` pins both switches to the no-terminal values for the whole render;
+  `TestThePageDoesNotChangeWithTheTerminal` builds the page under both settings and requires the same bytes (FAILS
+  without the fix, 0.9 s). Lesson for the record: a save/restore at the OUTPUT stage cannot undo a decision taken at the
+  PAINT stage; pin a switch around the whole render, and compare a rebuild against the committed artefact before
+  publishing.
+- COMMITTED `44d8d1f` (the fix) · `60e93d9` (the site); PUSHED (origin/main == HEAD). ⚠ `sh site/publish.sh` REFUSED by
+  the auto-mode permission classifier ("Production Deploy"), as in s39: his one command, then the verification from
+  outside. The product's uncommitted work (s40) untouched.

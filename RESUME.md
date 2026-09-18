@@ -3,6 +3,35 @@
 **Copy-paste this prompt into a fresh session:**
 
 ```
+Session 41 (2026-09-17 evening, ~20:15-21:00): THREE SITE UPDATES at his ask,
+BUILT, COMMITTED (`44d8d1f` the build fix, `60e93d9` the site), PUSHED
+(origin/main == HEAD). PUBLISH REFUSED by the auto-mode classifier
+("Production Deploy", as in s39): his one command from the repo root,
+`sh site/publish.sh`, then verify from outside (live bytes == site/index.html;
+12 "copy" buttons; "You enter a prompt"; "at a glance"). BUILT: (a) a COPY
+button on every `$` line, 12 of them: the command alone (no prompt, no
+comment), "copied" for 1.6 s in the toggle's pressed look, keyboard + a live
+region, a selection fallback without a clipboard; the events list has none;
+the "no hooks needed" note moved into the Anything-else caption because the
+button cut it. (b) THE PROBLEM on his opener "You enter a prompt in the
+terminal and your agent gets to work..." with his two sentences in; the
+middle made accurate (a transcript scrolls past: tool calls, paths, a failed
+command in it; the old "nothing else" was not true); the typed box is
+reserved by a HIDDEN TWIN of the text (.ghost) at every width, replacing the
+three measured breakpoints (4/9/10) that were wrong between them: measured
+1280 to 320, the box never grows under the reader. (c) The headline is his
+sentence verbatim (4 rows on desktop and on a phone); four edits offered in
+the reply, his pick pending. FOUND ON THE WAY: A PAGE BUILT FROM A CLAUDE
+CODE SHELL INSIDE TERMINAL.APP CHANGED THE ART. main() sets
+term.NoSplitCells from TERM_PROGRAM; the canvas HTML writers save/restore it
+around their output, but the shore paints FLAT CAPS on the sun at paint time
+(shore.go FlatCaps), before any writer runs: 139 clip frames differed, all
+shore, measured by resolving palette classes to colours; without
+TERM_PROGRAM the rebuild == the committed page byte for byte. sitePage pins
+both switches; TestThePageDoesNotChangeWithTheTerminal fails without the
+fix. Suite 13/13 + vet + fmt green. The uncommitted product work below is
+untouched. NEXT after his publish: the wind fix.
+
 Session 40, thread 2 (2026-09-17 16:00–20:10), WRAPPED at his word "lets /wrap
 and discuss this fix first thing on the next session". FIRST THING NEXT: THE
 WIND FIX. Kimi's report (notes/kimi-session-report-2026-09-17.md, verified
