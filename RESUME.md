@@ -24,7 +24,8 @@ three measured breakpoints (4/9/10) that were wrong between them: measured
 your agent is doing, at a glance" (`af39e5d`): it starts with the name
 because the problem is posed right before it, so it reads as the answer; the
 body is his lean to the shortest of four offered edits; 3 rows on desktop,
-4 on a phone. FOUND ON THE WAY: A PAGE BUILT FROM A CLAUDE
+4 on a phone; "at a glance" bound with non-breaking spaces so it is always
+the last line (his note; `481263e`, published and verified). FOUND ON THE WAY: A PAGE BUILT FROM A CLAUDE
 CODE SHELL INSIDE TERMINAL.APP CHANGED THE ART. main() sets
 term.NoSplitCells from TERM_PROGRAM; the canvas HTML writers save/restore it
 around their output, but the shore paints FLAT CAPS on the sun at paint time

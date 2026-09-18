@@ -10,7 +10,7 @@
 > the middle made accurate (a transcript scrolls past; the old "nothing else" was not true); the typed box is reserved
 > by a HIDDEN TWIN of the text at every width (the three measured breakpoints are gone; 1280→320 measured, no growth).
 > (c) The headline RULED: "xscapes are cozy ASCII scenes that show what your agent is doing, at a glance", the answer to
-> the problem posed right above it (his reason), his lean to the shortest of four offered edits. ⭐ FOUND: a page built from a Claude Code shell
+> the problem posed right above it (his reason), his lean to the shortest of four offered edits; "at a glance" bound as the last line (`481263e`, live, verified). ⭐ FOUND: a page built from a Claude Code shell
 > inside Terminal.app CHANGED THE ART: `term.NoSplitCells` from TERM_PROGRAM reaches the shore's FLAT CAPS at paint time,
 > before any HTML writer's save/restore (139 shore frames); `sitePage` pins both switches,
 > `TestThePageDoesNotChangeWithTheTerminal`. Suite 13/13 green. Record: `_FEEDBACK.md` §Session 41. His PARALLEL session cuts a Twitter trailer (`trailer_test.go`, untracked here, not ours). NEXT: the wind fix

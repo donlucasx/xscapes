@@ -4536,3 +4536,7 @@ binary and the tyastie one an older one: **a restart is what shows the afternoon
   390px phone), COMMITTED `af39e5d`, PUSHED; `sh site/publish.sh` went through on the second attempt (the first was
   refused by the classifier); VERIFIED from outside: the live page == `site/index.html` byte for byte. The
   `trailer_test.go` in the tree is his parallel session's; untouched. NEXT: the wind fix.
+- *"ok, for the headline, can you break "at a glance " as the last line instead of "a glance""* (~21:20) ⇒ non-breaking
+  spaces bind the phrase (`at&nbsp;a&nbsp;glance`), so the wrap falls before it: measured at 1920/1280/700/390/351/320,
+  "at a glance" is the last line at every width. COMMITTED `481263e`, PUSHED, PUBLISHED, VERIFIED from outside (live ==
+  local byte for byte).
