@@ -4246,3 +4246,16 @@ binary and the tyastie one an older one: **a restart is what shows the afternoon
   cache), so a publish now changes the judged page.** Open calls put to him in the 17:20 reply: commit (five cuts) ·
   v0.4.3 (tag → release.sh → push; the friend's install line reads the latest release, no publish needed) · publish or
   hold through judging · the "coming soon" names · the friend's message (drafted) · his live look.
+- **GO-LIVE 17:20–17:40, his four answers to the prompt in the 17:20 reply, verbatim:** commit → *"Yes, five cuts
+  (Recommended)"* · release → *"Yes, after the commit (Recommended)"* · the page → *"Publish now"* (over my
+  recommendation to hold through judging; his call) · coming soon → *"Gemini CLI + OpenCode (Recommended)"*.
+  ⇒ COMMITTED as `ddde8c4` the first-run bind fix · `11950e0` spend + moon off Kimi's files · `d0666fb` the reducer's
+  rules, Interrupt, Answered · `1898cef` the translator + the 41-payload fixture · `62b6565` `xscapes kimi|hermes`, the
+  installer guard, README, page · `2bcc155` the record; **each cut checked out alone in a worktree and built, vetted and
+  tested: 13/13 at every one.** TAGGED `v0.4.3` at `2bcc155` · RELEASED (`sh site/release.sh v0.4.3`: four binaries +
+  checksums, stamped `2bcc155` modified=false) · PUSHED (`origin/main` == `v0.4.3` == `2bcc155`, ls-remote) · INSTALLED
+  from the clean tree (inode 87010523, stamp `2bcc155`) · **the friend's line verified from a clean HOME: the live
+  install.sh downloaded v0.4.3, stamp `2bcc155`, `xscapes kimi` in its help** · PUBLISHED (`sh site/publish.sh` from
+  `2bcc155`; VERIFIED from outside 10 s later: gh-pages == the local build byte for byte (sha256 9295e680…), the four agent boxes and the coming-soon line live).
+  Carded: the installer's "next commands" text still names only Claude (`site/install.sh`); Kimi's `-p` mode never
+  fires SessionEnd; Hermes has still never run live. Running scapes hold the old binary until restarted.

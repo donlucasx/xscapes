@@ -17,13 +17,18 @@ Stop with a sub-agent open is the sub-agent's), spend + moon off wire.jsonl,
 `xscapes kimi`/`xscapes hermes`, the installer refuses hand-written hooks,
 event.Answered (PermissionResult takes the ask down), README, the page's
 Install section (four captioned boxes + coming soon; looked at desktop +
-phone), site rebuilt NOT published. ⚠ The building thread died at 17:01
-mid-edit; its state came back from its transcript. ⏰ Commons closed 16:59;
-judging Sep 17–20 proxies gh-pages LIVE, so a publish changes the judged page.
-NEXT, his word: commit (five cuts proposed) · tag v0.4.3 + sh site/release.sh
-+ push (the friend's fix; his install line reads the latest release) · publish
-or hold · the "coming soon" names · the friend's message · his live look:
-`xscapes install kimi --apply && xscapes kimi`.
+phone). ⚠ The building thread died at 17:01 mid-edit; its state came back
+from its transcript. ⭐ SHIPPED 17:20–17:40 at his four answers: COMMITTED as
+five cuts + the record (`ddde8c4` … `2bcc155`, each verified alone in a
+worktree, 13/13) · TAGGED + RELEASED v0.4.3 (four binaries; the friend's
+install line verified from a clean HOME yields stamp 2bcc155 with `xscapes
+kimi`) · PUSHED (origin/main == v0.4.3 == 2bcc155) · INSTALLED clean (inode
+87010523) · PUBLISHED at his word "Publish now" (judging Sep 17–20 proxies
+gh-pages live; his call) (verified from outside 10 s later: live == local byte for byte). NEXT: send the friend the message
+(drafted in the 17:20 reply: restore his backup, re-run the install line,
+`xscapes install kimi --apply`, `xscapes kimi`) · his own live look the same
+way · running scapes hold the old binary until restarted · cards: install.sh's
+next-step text names only Claude; Hermes never run live.
 
 Session 40 (2026-09-17 afternoon), LIVE at his word "can you do it?". THE FIRST
 OUTSIDE INSTALL FAILED: his friend followed the page, `go install` put the

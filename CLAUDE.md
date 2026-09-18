@@ -2,8 +2,10 @@
 
 *(Renamed end to end on 2026-09-03: directory, env vars, state path and hook marker. Two names are kept on purpose and are not leftovers -- `internal/envx` still reads `ASCIISCAPES_*` and warns, and `install.go` still RECOGNISES the `# asciiscapes:v1` marker so the hooks it wrote before the rename can be found and removed.)*
 
-> **Session 40, thread 2 (2026-09-17 16:00–17:15): KIMI COMPATIBILITY, MEASURED ON THE MACHINE, THEN BUILT ON HIS FOUR
-> ANSWERS; UNCOMMITTED, his calls pending.** Six probe runs on Kimi (raw hooks captured; configs restored byte for
+> **Session 40, thread 2 (2026-09-17 16:00–17:40): KIMI COMPATIBILITY, MEASURED ON THE MACHINE, BUILT ON HIS FOUR
+> ANSWERS, THEN SHIPPED AT HIS WORD: six commits (`ddde8c4` … `2bcc155`, each verified alone) · v0.4.3 TAGGED AND
+> RELEASED · PUSHED · INSTALLED clean · PUBLISHED ("Publish now", his call during judging); the friend's install line
+> verified from a clean HOME yields the new build.** Six probe runs on Kimi (raw hooks captured; configs restored byte for
 > byte): Kimi's TUI is inline; hosted inside the scape it BOUND and rang. Payload gaps measured and each one now
 > handled: array prompt · object error · `agent_name` = profile (instances minted per profile) · NO sub-agent marker on
 > tool/Stop events (a Stop with a sub-agent open is the sub-agent's; tools during a foreground Agent call are its) ·
@@ -12,9 +14,11 @@
 > `agents/*/wire.jsonl` via session_index.jsonl). `xscapes kimi`; the installer refuses hand-written `xscapes hook`
 > entries (his friend's agent wrote twelve). ⚠⚠ **FIRST-RUN BUG FOR EVERY AGENT, FIXED: `SetCurrent` wrote `run/current`
 > before `run/` existed, so the first session on a fresh machine never bound** (his friend's would have; v0.4.2 still
-> has it). README + the page's Install section rebuilt (four per-agent boxes, "coming soon"), NOT published: ⏰ Commons
-> closed 16:59 and judging (Sep 17–20) proxies gh-pages live. ⚠ The building thread died at 17:01 before reporting; its
-> state was recovered from its transcript. Record: `_FEEDBACK.md` §Session 40 thread 2 (+ continued).
+> has it). README + the page's Install section rebuilt (four per-agent boxes, "Coming soon: Codex CLI, Gemini CLI,
+> OpenCode") and published (verified from outside: live == local byte for byte). ⏰ Commons closed 16:59; judging (Sep 17–20) proxies gh-pages live. ⚠ The
+> building thread died at 17:01 before reporting; its state was recovered from its transcript. NEXT: the friend's
+> message (drafted) · his live look (`xscapes install kimi --apply && xscapes kimi`). Record: `_FEEDBACK.md` §Session
+> 40 thread 2 (+ continued, + go-live).
 
 > **Session 40 (2026-09-17 afternoon), SHIPPED at his word: THE FIRST OUTSIDE INSTALL FAILED, AND IT WAS OURS.** His friend
 > followed the page and got `zsh: command not found: xscapes`: `go install` drops the binary in `~/go/bin`, which is
