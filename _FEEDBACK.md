@@ -4806,3 +4806,34 @@ binary and the tyastie one an older one: **a restart is what shows the afternoon
 - The three-day-old `xscapes claude` on an old binary ⇒ **"I'll restart it myself"**.
 - The wind ⇒ **"Keep today's field"** (the candidates stay behind the switch as instruments).
 - Commits ⇒ **"Commit the leftovers now, then one cut per item as it lands"**; he says push.
+
+### Session 41 — 2026-09-18 13:00–14:30: the twelve rulings built, one cut each
+
+- Leftovers first (his word): `643b0d8` the trailer thread's record · `291849f` the trailer's export + notes ·
+  `a643943` the twelve rulings. The 4.4 GB trace truncated to its first 260 MB (the two drags + the wave; the replay
+  tests point there).
+- `193ac1b` KIMI_CODE_HOME: the installer's Kimi path and the launcher's check go through `spend.KimiHome()`; a test
+  under the variable, RED against the old path.
+- `10d43dd` the held Done: a Done dropped behind open instances is `kimiPending`; a SubagentStop within
+  `KimiStopClaim` (2 s) claims it as that sub-agent's; past the window it is the turn's (`kimiTurnDone`) and rings when
+  the last instance closes; a new prompt or a real Done moots it. `kimi_done_test.go` covers background, the fixture's
+  foreground shape, the new prompt; RED without the ring; the fixture test unchanged.
+- `587d3ba` the docs: install.sh's next steps name Claude, Kimi and Hermes in both branches (the test's pins hold);
+  the README says the launcher refuses without hooks and names `-watch=on`; the message names it.
+- `129f586` `logPath`: HOOKLOG/EVENTLOG `=1|true|yes` → `~/.config/xscapes/hooks.jsonl` / `events.jsonl`; README's
+  verbatim warning.
+- `c87577b` reallocBand: `saveCursor` first, `EnterBand(first-1)` + `restoreCursor` last, one write; the model test
+  RED on all four counts against the old bytes (cursor at row 0, origin off, region reset, colour lost). Amended once
+  for gofmt before any push.
+- `4b86a5a` hygiene: the near test sets `companion.Near = 0` itself (renamed `TestWithTheNearPoseOff…`); TestMain
+  unsets HOOKLOG/EVENTLOG; `StopFailure` + `is_interrupt` → Interrupt (test); installsh's Go-in-/usr/bin case skips.
+- `9711a9f` the erase count: `Filter.Erases` → `Host.AgentErases()` → `frames.erases` → the event log's stats line
+  (`"erased"`), tests on the filter and the line; an older test's call updated to the new signature.
+- `b405adc` F1: `event.CurrentSince(t)` (the pointer's write time, not its text); both launchers bind on a pointer
+  written after launch; test: a resume (same id) binds, the pre-launch pointer does not.
+- `c6807b6` the rail removed (styles, element, script); the page rebuilt, checked in the browser (no errors, the
+  index tracks, 12 copies), PUBLISHED.
+- Suite 13/13 + vet + fmt green at HEAD; INSTALLED clean (inode 87405520, stamp c6807b6). NOT PUSHED (his word).
+  Not taken up at his ruling: Hermes live, the cream cat on light. Still open from Kimi's list (unruled, minor): the
+  fixture test folding through `hookTranslate`, a cross-log matcher, the foreground-Agent attribution heuristic,
+  the refusal's edge cases.
