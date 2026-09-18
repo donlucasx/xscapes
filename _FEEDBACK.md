@@ -4785,3 +4785,24 @@ binary and the tyastie one an older one: **a restart is what shows the afternoon
   commits); the trailer's two paths (`trailer_test.go`, `notes/trailer/`) are UNTRACKED, his word to commit; nothing
   of the product changed; the deliverables live on his Desktop (`xscapes-trailer/`: four cuts, two openers, four
   GIFs). OPEN: the entry's link card on X (the platform's edge, not our tags) · the square track · the post's numbers.
+
+## Session 41 — 2026-09-18 ~13:00: every open item prompted through, his twelve rulings
+
+*"prompt me for all of the open items, starting w the kimi cards"* ⇒ three rounds of four, each with a recommendation:
+- KIMI_CODE_HOME (installer + launcher hardcode the path; spend honours the variable) ⇒ **"Fix it now"**.
+- A Done dropped while a background sub-agent is open, never re-emitted ⇒ **"Implement the promise"** (ring when the last
+  open sub-agent ends).
+- Three Kimi doc gaps (install.sh's next steps name only Claude · the launcher refusal in no user doc · `-watch=on` not
+  in the message) ⇒ **"All three"**.
+- `XSCAPES_HOOKLOG=1` writes a file named 1 · the log's raw payloads undocumented ⇒ **"Both"**.
+- reallocBand leaves the region reset and the cursor on the scape's first row until the next paint ⇒ **"Measured fix
+  now"**.
+- Count agent erase-displays into the event log ⇒ **"Yes"**.
+- Hygiene (the dead NEAR test · HOOKLOG/EVENTLOG unscrubbed in TestMain · StopFailure ignores is_interrupt · installsh
+  test where Go lives in /usr/bin) ⇒ **"All four"**.
+- Older cards ⇒ **"Drop the right-hand rail"** and **"F1: resumed session rebinds"**; Hermes live and the cream cat on
+  light NOT now.
+- The 4.2 GB trace ⇒ **"Truncate to 260 MB"**.
+- The three-day-old `xscapes claude` on an old binary ⇒ **"I'll restart it myself"**.
+- The wind ⇒ **"Keep today's field"** (the candidates stay behind the switch as instruments).
+- Commits ⇒ **"Commit the leftovers now, then one cut per item as it lands"**; he says push.
