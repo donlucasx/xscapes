@@ -4491,3 +4491,48 @@ binary and the tyastie one an older one: **a restart is what shows the afternoon
   terminal agents": the middle dot is the separator the page already uses (the foot, the spinner's clock); the card
   descriptions stop repeating the tagline and carry the headline's sentence. COMMITTED `b6d953c`, PUSHED; the publish
   still his.
+
+## Session 41, thread 2 — 2026-09-17 evening (~20:00, parallel to the site thread): the X trailer
+
+- HIS ASK, verbatim: *"we are currently working on another parallel terminal on xscapes, here id like to work on a lil
+  video trailer to post as an announcement/release on X ----- lookup best practices for videos on X, heres a rough idea
+  of what I want: Screen all black, the xscapes logo cursor starts blinking on its own- shortly after the X appears and
+  the cursor types the rest of the name: XSCAPES, and the cursor remains blinking on the X as the slogan underneath
+  glows into the screen "a thinking screen for terminal agents". screen fades into the vista scene animation we made
+  for the website (the one that starts at the vista and moves onto the coast. Aspect ratio may be different so let's
+  analyze the best way to approach it. ---- ask me any/all questions before you start so we dial it and plan properly
+  before getting to work. Some other thoughts- should we include audio? a vo? a minimal cozy soundscape? titles or
+  subtitles depicting the features as they happen?"*
+- Measured first: X = MP4 H.264 + AAC, 1920x1080, 30 fps, 8-12 Mbps, ≤2:20 free, <60 s loops, ~80% muted, the tile is
+  an early frame. The hero H1 is 124x44 = 1.69:1, within 5% of 16:9 (cell 15x24 px at 1920x1080, 30/12 px margins).
+  Two brand conflicts surfaced (caps; the lockup never blinks).
+- ROUND 1, his answers verbatim: format *"considering the xscapes are close to 16:9, but the whole terminal scene is
+  more squareish, should we do square? im also open to doing 16:9 and incorporating movement within the frame
+  (scrolling up and down the terminal to showcase a terminal running xscapes)."* · montage *"leaning to H1, but could
+  also be cool for the trailer to build up and have jump cuts between scenes, companions, times of the day, etc. to
+  depict breadth"* · transcript *"leaning to the full window but look at my comment before about movement within the
+  screen- the frame can move up and down the terminal window, do zoom/crop ins on specific details, etc"* · caps *"go w
+  1, always stick to the brand manual unless I specify otherwise"* (lowercase).
+- ROUND 2, his picks (each the recommended option): ONE TAKE WITH A CAMERA over H1 · 16:9 NOW, SQUARE AS A SECOND TRACK
+  after approval · THE PRODUCT'S CUES PLUS A QUIET BED, NO VO · THREE OR FOUR SHORT LOWERCASE CAPTIONS at the feature
+  moments. Set by me, stated, not objected to: the cell in ink not gold; the cell blinks through the slogan (his spec)
+  then settles solid (the brand); the end card = the mark + the URL, the install line in the post text.
+- THEN, verbatim (~20:30): *"lets make sure to add the ascii animation that we have currently on the site's splash page.
+  Lets begin with it- I imagine the water animation at the very beginning, appearing on screen, fading in from left to
+  right quickly as if painted by a giant brush stroke, or shone by the sun into existence (we dont see it) in full
+  color, shinning on the right edge as it appears (lasts not much longer than 1sec) Makes sense? Then color fades into
+  B&w and "the cell blinks alone twice..." Above it… (same placement as the splash page)"*
+- BUILT (the opener, v1, on his Desktop `~/Desktop/xscapes-trailer/opener-v1.mp4`, 7.8 s, 1920x1080, 30 fps, six key
+  ticks): `trailer_test.go` (gated export: the splash's sea in its own inks + plain, H1 at 30 fps with ask/done/cut
+  times) · `notes/trailer/` (render.mjs = Playwright over the installed Chrome, one HTML stage, every state a function
+  of t; opener.json = the timeline he tunes; audio.py; assemble.sh; the fonts). Every frame looked at on a contact
+  sheet before handing over. ⚠ The "full colour" at the splash's hour (22:19) is the night's own: muted blue and grey
+  with warm sand dots; a warmer hour is one number. Nothing committed; the site thread's tree untouched.
+- *"yes- im running a parallel claude session, we are working on a twitter trailer for xscapes. --- regarding the
+  headline, it sould start with 'xscapes are cozy ASCII scenes...' because right before, we postulate the problem, so
+  naturally this headline should sound like a solution to that problem- Im leaning to a version of 3 "... that show what
+  your agent is doing, at a glance". -- Push all the changes live"* (~21:05) ⇒ the headline is "xscapes are cozy ASCII
+  scenes that show what your agent is doing, at a glance" (lowercase, the name's own spelling; 3 rows at 1280px, 4 on a
+  390px phone), COMMITTED `af39e5d`, PUSHED; `sh site/publish.sh` went through on the second attempt (the first was
+  refused by the classifier); VERIFIED from outside: the live page == `site/index.html` byte for byte. The
+  `trailer_test.go` in the tree is his parallel session's; untouched. NEXT: the wind fix.
