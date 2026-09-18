@@ -340,12 +340,22 @@ func RebindShrinkAltFollow(shrink, bandShrink, agentRows int) string {
 // Only worth doing when the WIDTH changed. A height-only resize leaves every
 // row's tail exactly as it was, so this would be a band-wide flicker for
 // nothing.
+//
+// And it hands the terminal back as it found it: the agent's cursor and
+// colours saved first and restored last, the band pinned again with origin
+// mode on before the restore, so the restored row is inside the region it is
+// restored into. It used to end with the region reset, origin mode off and
+// the cursor on the scape's first row until the next paint (his trace of
+// 2026-09-18 at a size mark); in that gap an agent's scroll moved the whole
+// screen, and the paint's restore under origin mode then put the agent's
+// cursor at the band's top-left. TestReallocBandLeavesTheAgentWhereItWas.
 func reallocBand(first, last int) string {
 	n := last - first + 1
 	if n <= 0 {
 		return ""
 	}
 	var b strings.Builder
+	b.WriteString(saveCursor)
 	// Origin mode off first: the region is about to move and DECSTBM homes the
 	// cursor, so every position below is absolute.
 	b.WriteString(originOff + "\x1b[0m")
@@ -353,5 +363,7 @@ func reallocBand(first, last int) string {
 	fmt.Fprintf(&b, "\x1b[%d;1H", first)        // its top row
 	fmt.Fprintf(&b, "\x1b[%dM", n)              // delete them all; blanks shift in
 	b.WriteString(regionReset)
+	b.WriteString(EnterBand(first - 1))
+	b.WriteString(restoreCursor)
 	return b.String()
 }
