@@ -5,6 +5,7 @@ import (
 	"errors"
 	"flag"
 	"fmt"
+	"github.com/donlucasx/xscapes/internal/spend"
 	"os"
 	"path/filepath"
 	"regexp"
@@ -79,13 +80,18 @@ type agentAdapter struct {
 
 var adapters = map[string]agentAdapter{
 	"kimi": {
-		name:   "Kimi Code CLI",
-		path:   func() (string, error) { return homePath(".kimi-code", "config.toml") },
+		name: "Kimi Code CLI",
+		// Kimi's home is $KIMI_CODE_HOME, else ~/.kimi-code: the same
+		// answer the spend counter reads (spend.KimiHome). It was hardcoded
+		// here, so with the variable set the hooks went into a file Kimi
+		// never reads and the launcher's check passed on that same file
+		// (Kimi's assessment, 2026-09-18, F1 of the adapter section).
+		path:   func() (string, error) { return filepath.Join(spend.KimiHome(), "config.toml"), nil },
 		add:    addKimiHooks,
 		remove: removeKimiHooks,
 		after: "Verify with `kimi doctor config`. Then run Kimi inside the scape:\n\n" +
 			"  xscapes kimi\n",
-		missing: "Kimi Code CLI writes ~/.kimi-code/config.toml on first run; run `kimi` once, then install.",
+		missing: "Kimi Code CLI writes config.toml under $KIMI_CODE_HOME (else ~/.kimi-code) on first run; run `kimi` once, then install.",
 	},
 	"hermes": {
 		name:   "Hermes Agent",

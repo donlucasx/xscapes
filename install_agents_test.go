@@ -328,3 +328,39 @@ func TestTheLauncherKnowsWhenHooksAreMissing(t *testing.T) {
 		}
 	}
 }
+
+// TestKimiInstallHonoursKimiCodeHome: the installer and the launcher's check
+// read Kimi's config where Kimi reads it. $KIMI_CODE_HOME relocates Kimi's
+// home (the spend counter honoured it; the installer hardcoded ~/.kimi-code,
+// so with the variable set the hooks went into a file Kimi never read and
+// the launcher's check passed on that same file).
+func TestKimiInstallHonoursKimiCodeHome(t *testing.T) {
+	dir := t.TempDir()
+	t.Setenv("KIMI_CODE_HOME", dir)
+	path, err := adapters["kimi"].path()
+	if err != nil {
+		t.Fatal(err)
+	}
+	if want := filepath.Join(dir, "config.toml"); path != want {
+		t.Fatalf("kimi config path %q, want %q", path, want)
+	}
+	if ok, where := hooksInstalled("kimi"); ok || where != path {
+		t.Fatalf("with no config: installed %v at %q", ok, where)
+	}
+	if err := os.WriteFile(path, []byte(kimiFixture), 0o600); err != nil {
+		t.Fatal(err)
+	}
+	if ok, _ := hooksInstalled("kimi"); ok {
+		t.Fatal("a config with no hooks counts as installed")
+	}
+	out, _, err := addKimiHooks([]byte(kimiFixture), "/opt/xscapes/bin/xscapes")
+	if err != nil {
+		t.Fatal(err)
+	}
+	if err := os.WriteFile(path, out, 0o600); err != nil {
+		t.Fatal(err)
+	}
+	if ok, _ := hooksInstalled("kimi"); !ok {
+		t.Fatal("the hooks written under KIMI_CODE_HOME are not seen by the launcher's check")
+	}
+}
