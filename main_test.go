@@ -20,6 +20,10 @@ func TestMain(m *testing.M) {
 		panic(err)
 	}
 	os.Setenv("XSCAPES_HOME", dir)
+	// The log switches too: a test that follows a live bus would otherwise
+	// append to the real logs of whoever runs the suite inside a scape.
+	os.Unsetenv("XSCAPES_HOOKLOG")
+	os.Unsetenv("XSCAPES_EVENTLOG")
 	code := m.Run()
 	os.RemoveAll(dir)
 	os.Exit(code)

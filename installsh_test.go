@@ -92,7 +92,7 @@ func TestTheInstallScriptPutsTheBinaryOnThePath(t *testing.T) {
 	srv := httptest.NewServer(http.FileServer(http.Dir(dir)))
 	defer srv.Close()
 	if exec.Command("/bin/sh", "-c", "PATH="+systemPath+" command -v go").Run() == nil {
-		t.Fatalf("the restricted PATH %q can see go; the fallback tests would not be testing the fallback", systemPath)
+		t.Skipf("the restricted PATH %q can see go (a distro-packaged Go); the fallback tests cannot test the fallback here", systemPath)
 	}
 
 	t.Run("download, then the rc line once, then the full-path next step", func(t *testing.T) {

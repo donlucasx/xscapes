@@ -542,10 +542,13 @@ func TestTheSandKeepsClearOfTheCompanionAndStillHasRoom(t *testing.T) {
 // and again here, and the set that differs is EXACTLY the set where the pose is
 // held and the companion was not standing at home. 0 of 1,512 resting and
 // working frames differ; 0 differ for any reason but the teleport fix.
-func TestWithXscapesNearUnsetTheCompanionKeepsItsShippedBox(t *testing.T) {
-	if companion.Near != 0 {
-		t.Skipf("XSCAPES_NEAR is set to %d in this environment", companion.Near)
-	}
+func TestWithTheNearPoseOffTheCompanionKeepsItsShippedBox(t *testing.T) {
+	// The pose is OFF here by hand: unset XSCAPES_NEAR has meant rung 2
+	// since 2026-09-11, so a guard that skipped whenever Near != 0 skipped
+	// every run of the suite (Kimi's assessment, 2026-09-18).
+	was := companion.Near
+	companion.Near = 0
+	defer func() { companion.Near = was }()
 	for _, name := range []string{"crab", "cat"} {
 		cat := companion.New(name)
 		cat.FaceLeft(true)

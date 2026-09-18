@@ -90,3 +90,17 @@ func TestABackgroundAgentsTurnRingsWhenTheLastOneIsIn(t *testing.T) {
 		t.Fatal("the old turn's held Done rang into the new turn")
 	}
 }
+
+// A StopFailure flagged as an interrupt is the user's Esc, not a failure:
+// the owl must not worry over it (PostToolUseFailure already read the flag;
+// StopFailure did not).
+func TestAStopFailureThatIsAnInterruptStaysSilent(t *testing.T) {
+	evs := hookTranslate([]string{"StopFailure", "kimi"}, []byte(`{"hook_event_name":"StopFailure","session_id":"s","is_interrupt":true,"error":"interrupted"}`))
+	if len(evs) != 1 || evs[0].Kind != event.Interrupt {
+		t.Fatalf("an interrupted StopFailure became %+v, want one Interrupt", evs)
+	}
+	evs = hookTranslate([]string{"StopFailure", "kimi"}, []byte(`{"hook_event_name":"StopFailure","session_id":"s","is_interrupt":false,"error":"provider error"}`))
+	if len(evs) != 1 || evs[0].Kind != event.Error {
+		t.Fatalf("a real StopFailure became %+v, want one Error", evs)
+	}
+}

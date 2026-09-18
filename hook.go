@@ -514,7 +514,11 @@ func translate(p hookPayload) []event.Event {
 		// The turn ended in a failure of the agent itself (a provider error,
 		// a model that would not answer): the companion worries, and the
 		// sand says why. Interrupt is the user pressing escape and stays
-		// silent, as PostToolUseFailure's is_interrupt does.
+		// silent, as PostToolUseFailure's is_interrupt does; the flag is
+		// checked here too, or an Esc would be a worried owl.
+		if p.IsInterrupt {
+			return []event.Event{{Kind: event.Interrupt}}
+		}
 		return []event.Event{{Kind: event.Error, Detail: p.errorText()}}
 
 	case "Interrupt":
