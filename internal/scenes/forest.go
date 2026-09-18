@@ -170,8 +170,11 @@ func pineSilhouette(c *canvas.Canvas, cu, tip, base int, col term.RGB, seed int6
 		w += (scape.HashF(v, 5, seed) - 0.5) * 1.2
 		return w
 	}
+	// The columns a pine can reach follow its height: the skirt is d/2.6
+	// wide at the foot, plus the hash's 0.6. 14 at 80x24, as it was.
+	half := max(14, int(math.Ceil(float64(base-tip)/2.6+1.2))+2)
 	for y := tip / 2; y <= base/2 && y < c.H; y++ {
-		for x := max(0, (cu-14)/2); x <= (cu+14)/2 && x < c.W; x++ {
+		for x := max(0, (cu-half)/2); x <= (cu+half)/2 && x < c.W; x++ {
 			var mask uint8
 			for _, q := range []struct {
 				u, v int
@@ -642,9 +645,17 @@ func paintVistaL(c *canvas.Canvas, lay vistaLayout, tod, t, level float64, seed 
 		// measures it on the frame. The study keeps the outright top: at
 		// 80x24 a column or two of the span is raised a little under the
 		// owl, and the page's clip is held byte-identical (vista_unchanged).
+		// And only where the head is IN the trees: at a tall window the owl
+		// sits rows below the near range, and dipping the treeline to its
+		// top row put the top below the range's own base, which deleted the
+		// range in the owl's span (his 132x41 and 71x39, 2026-09-18: a
+		// blank behind the owl that moved with it on a resize).
+		// TestTheTreelineStaysWhereTheOwlIsBelowIt.
 		if OwlPlace == 0 && u >= 2*owlX-2 && u < 2*(owlX+12)+2 {
 			if live != nil {
-				nearTop[u] = max(nearTop[u], 2*owlY)
+				if 2*owlY < nearBase {
+					nearTop[u] = max(nearTop[u], 2*owlY)
+				}
 			} else {
 				nearTop[u] = 2 * owlY
 			}
@@ -698,10 +709,18 @@ func paintVistaL(c *canvas.Canvas, lay vistaLayout, tod, t, level float64, seed 
 		shore[u] = int(math.Round(math.Max(float64(2*lakeTop), sh)))
 	}
 	paintRange(c, shore, mTop, meadowTop, nil)
-	// Two pines at the left edge, in silhouette.
+	// Two pines at the left edge, in silhouette. Drawn at 80x24 with their
+	// feet on the meadow's last row (sub-row 41) and tips at sub-rows 13
+	// and 19; every other element follows the layout, and these did not,
+	// so at his 132x41 (2026-09-18) they stood 7 rows above the lake. Their
+	// feet are the meadow's last row at any height now and their heights
+	// scale with the scene's (the rows above the writing, 21 at 80x24),
+	// which reproduces the old numbers exactly at 80x24.
 	pineCol := term.Lerp(nearCol, grey(0), 0.35)
-	pineSilhouette(c, 9, 13, 41, pineCol, seed+61)
-	pineSilhouette(c, 23, 19, 41, pineCol, seed+62)
+	pineBase := 2*bandTop - 1
+	pineScale := float64(bandTop) / 21
+	pineSilhouette(c, 9, pineBase-int(math.Round(28*pineScale)), pineBase, pineCol, seed+61)
+	pineSilhouette(c, 23, pineBase-int(math.Round(22*pineScale)), pineBase, pineCol, seed+62)
 
 	// The fire, on the meadow.
 	cx, base := lay.fireX, meadowTop+3

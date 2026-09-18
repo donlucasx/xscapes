@@ -68,7 +68,9 @@ func TestVistaShots(t *testing.T) {
 		t.Fatal(err)
 	}
 	const style = `<meta charset="utf-8"><style>html,body{margin:0;padding:12px;background:#000;color:#ccc;font:13px Menlo,monospace}pre{margin:0;font-family:Menlo,"SF Mono",monospace;line-height:1;letter-spacing:0}.row{display:flex;gap:10px;align-items:flex-start;margin-bottom:10px}.lab{width:150px;padding-top:50px;font-weight:bold}h2{font:bold 14px Menlo,monospace;color:#eee;margin:18px 0 8px;border-top:1px solid #333;padding-top:10px}</style>`
-	for _, g := range [][2]int{{80, 24}, {125, 28}, {124, 30}, {60, 20}, {40, 12}} {
+	// 132x41 and 71x39 are his standalone windows of 2026-09-18, where the
+	// pines and the dip behind the owl were seen wrong.
+	for _, g := range [][2]int{{80, 24}, {125, 28}, {124, 30}, {60, 20}, {40, 12}, {132, 41}, {71, 39}} {
 		var b strings.Builder
 		b.WriteString(style)
 		for _, hr := range []float64{0, 0.78, 0.5} {
