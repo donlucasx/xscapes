@@ -15,7 +15,8 @@
 > entries (his friend's agent wrote twelve). ⚠⚠ **FIRST-RUN BUG FOR EVERY AGENT, FIXED: `SetCurrent` wrote `run/current`
 > before `run/` existed, so the first session on a fresh machine never bound** (his friend's would have; v0.4.2 still
 > has it). README + the page's Install section rebuilt (four per-agent boxes, "Coming soon: Codex CLI, Gemini CLI,
-> OpenCode") and published (verified from outside: live == local byte for byte). ⏰ Commons closed 16:59; judging (Sep 17–20) proxies gh-pages live. ⚠ The
+> OpenCode"; the agent names are STATUS CHIPS, his pick 17:58 from three marks, `4c1e02c`) and published (verified
+> from outside: live == local byte for byte). ⏰ Commons closed 16:59; judging (Sep 17–20) proxies gh-pages live. ⚠ The
 > building thread died at 17:01 before reporting; its state was recovered from its transcript. NEXT: the friend's
 > message (drafted) · his live look (`xscapes install kimi --apply && xscapes kimi`). Record: `_FEEDBACK.md` §Session
 > 40 thread 2 (+ continued, + go-live).

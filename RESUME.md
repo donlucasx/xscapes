@@ -24,10 +24,12 @@ worktree, 13/13) · TAGGED + RELEASED v0.4.3 (four binaries; the friend's
 install line verified from a clean HOME yields stamp 2bcc155 with `xscapes
 kimi`) · PUSHED (origin/main == v0.4.3 == 2bcc155) · INSTALLED clean (inode
 87010523) · PUBLISHED at his word "Publish now" (judging Sep 17–20 proxies
-gh-pages live; his call) (verified from outside 10 s later: live == local byte for byte). NEXT: send the friend the message
-(drafted in the 17:20 reply: restore his backup, re-run the install line,
-`xscapes install kimi --apply`, `xscapes kimi`) · his own live look the same
-way · running scapes hold the old binary until restarted · cards: install.sh's
+gh-pages live; his call) (verified from outside 10 s later: live == local byte for byte). His pick of the agent-name mark: V3 STATUS CHIP
+(from https://claude.ai/artifact/KwTovNHfX9sgU2LuqETGsi), live as `4c1e02c`
+(verified from outside: live == local). NEXT: his Kimi report · send the friend the message (drafted in the 17:20 reply: restore his
+backup, re-run the install line, `xscapes install kimi --apply`, `xscapes
+kimi`) · his own Kimi look on the eleven-step script in the 17:55 reply,
+then Hermes (wired, never run; a probe if it misbehaves) · running scapes hold the old binary until restarted · cards: install.sh's
 next-step text names only Claude; Hermes never run live.
 
 Session 40 (2026-09-17 afternoon), LIVE at his word "can you do it?". THE FIRST

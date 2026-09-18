@@ -4259,3 +4259,19 @@ binary and the tyastie one an older one: **a restart is what shows the afternoon
   `2bcc155`; VERIFIED from outside 10 s later: gh-pages == the local build byte for byte (sha256 9295e680…), the four agent boxes and the coming-soon line live).
   Carded: the installer's "next commands" text still names only Claude (`site/install.sh`); Kimi's `-p` mode never
   fires SessionEnd; Hermes has still never run live. Running scapes hold the old binary until restarted.
+- *"is xscapes ready for hermes? is it fully compatible with kimi now? Any way we can brand "calude code" "kimi code cli"
+  "hermes agent" in a subtle way so they stand out?"* (17:45) ⇒ Answered: Hermes is WIRED, NEVER RUN (fields read off
+  its source; v0.14.0 is installed here; no worried pose, no stars, no moon/spend by construction); Kimi handled on
+  every measured gap, unverified on background sub-agents / compaction / StopFailure / Ctrl-C, known limits F1 (a resume
+  never binds, all agents), headless never ends, the moon reads a file Kimi calls internal. Three in-system treatments
+  offered (kicker · box title · status chip), vendor colours ruled out (one warm accent; the brand guide).
+  *"yeah do that, and also lmk what to test for hermes and kimi. lets start w kimi"* ⇒ **REVIEW PAGE, his pick pending:
+  https://claude.ai/artifact/KwTovNHfX9sgU2LuqETGsi** (V1 kicker · V2 box title · V3 status chip, each desktop + phone,
+  on the site's own CSS; looked at once: the local look mojibaked V2's rules because the generator wrote real UTF-8 into
+  the script and the local server sent no charset, the recorded trap; rewritten ASCII-only, zero non-ASCII asserted).
+  The Kimi test script (his live look, eleven steps) and the Hermes one are in the 17:55 reply; a Hermes probe with
+  raw capture is offered if the first Hermes look misbehaves.
+- ⭐ **RULED 17:58: *"I like v3 status chip, push it live. Will proceed to testing on kimi now"*** ⇒ the four agent
+  names are status chips (reverse video in the dim grey, dark text; grey not gold, the gold reverse is the brand's;
+  no new token). Template edited, site rebuilt, looked at once (desktop: matches the mock), COMMITTED `4c1e02c`,
+  PUSHED, PUBLISHED; VERIFIED from outside 10 s later: live == local byte for byte, four chips on the page. He is on the Kimi script now.
