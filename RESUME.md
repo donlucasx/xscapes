@@ -150,9 +150,22 @@ persistence, which Kimi is measured to send on every resize and which the
 Filter now confines whenever it comes (`ef602ab`). STATUS: the 09-17 flicker
 is CLOSED on that mechanism; not reproducible on the current binary under
 any condition tried. The wind stays today's field; the page is taste only.
-NEXT (cheap insurance, one card): refreshEvery 50 → 12 · count agent EDs
-into the event log · reallocBand's region + cursor hazard (the trace shows
-the cursor left on the scape's first row at a mark). Then push at his word.
+PUSHED at his word (origin/main `9fd5d16`, then `72954b3`).
+⭐ WINDOWS (his question): measured with the compiler, NOT supported
+natively (the pty is raw ioctls; SIGWINCH); WSL should work as Linux,
+untested. ⭐ THE COMMONS ENTRY IS A LIVE PROXY of gh-pages, not a snapshot
+(measured): every publish since the deadline (16:59 PDT 09-17) reached the
+judged entry. HIS DECISION: "push as many fixes as I can in case they test
+it on kimi". DONE 12:40: the installer refuses non-darwin/linux with a
+sentence + README/page say Mac and Linux, WSL untested · refreshEvery 50 →
+12 · ⭐ v0.4.4 TAGGED + RELEASED (release.sh inside a worktree at the tag:
+the parallel session's untracked files dirty the main tree; four binaries
+clean at 72954b3) · main pushed · the page published + verified outside ·
+the install line from an empty HOME with no Go fetched v0.4.4 · the release
+binary installed here (inode 87384167). NEXT: Kimi's remaining cards
+(KIMI_CODE_HOME in the installer · the dropped Done behind an open
+sub-agent · HOOKLOG=1 as a path · reallocBand's region + cursor, measured
+first) · count agent EDs into the event log.
 
 Session 40, thread 2 (2026-09-17 16:00–20:10), WRAPPED at his word "lets /wrap
 and discuss this fix first thing on the next session". FIRST THING NEXT: THE

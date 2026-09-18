@@ -4717,3 +4717,67 @@ binary and the tyastie one an older one: **a restart is what shows the afternoon
   (an unfiltered wipe heals in 1 s, ~30 KB/s), a count of agent EDs in the event log so the next one is attributed, and
   reallocBand's region + cursor hazard (measured in the trace at a mark).
 - *"push"* (~11:05, 09-18) ⇒ PUSHED: origin/main = `08b4510` (the seven cuts + the record), verified with ls-remote.
+- HIS NOTES ON THE THIRD CUT, verbatim (2026-09-18 ~11:20): *"couple more notes: a) the intro wipe should be quicker
+  (the ascii animation + Xscapes logo) b) should fade to black and THEN the terminal should start typing, like the
+  beginning of the Matrix. c) instead of "see how hard your agent is working" say "an ascii scene that reacts as your
+  agents work" - at 00:12 the subtitles overlap with the fireplace, which is the indicator of 'how hard its working'
+  d) instead of 'owlets are subagents' say 'agents and subagents'. e) "it pings you when it needs you" d) when we do a
+  crop into the crab prompting, the sand changes color abruptly (an issue in the original animation?) can we fix it?
+  e) final logo lockup should feature the commonsmade url, and show up in beats: first the logo fades in, with the
+  animated cursor, then quickly the url gets typed underneath, and last the cat companion appears, and emotes"*
+  ⇒ THE FOURTH CUT (~11:50), `xscapes-trailer-16x9-v4.mp4`, 42.3 s: (a) the sea's bands 0.35 s apart (its own frames
+  still step at 0.7), the x at 3.2, settled at 5.0, the opener 8.4 → 7.6 s · (b) the opener fades to ITS OWN black,
+  0.4 s of black, then the terminal closeup with the first prompt TYPED at 30 characters a second from 0.5 s
+  (`trailerTyped`, a bare cursor blinking first; the montage's first beat lands after) · (c)(d)(e) the three captions
+  reworded; the first shifted 270 px right so it clears the fire · (d') THE SAND: MEASURED, not inferred. The beach's
+  tone is cube-exact by design (s27), and as the palette runs from midnight to dawn the sand jumps from the night ochre
+  (cube 94) to the dawn tan (137) in ONE frame, between hours 1.1284 and 1.1295 (traced on the exported frames, row 41's
+  dominant ground). A real night takes hours to cross that; the trailer's takes twelve seconds, and in v3 it landed
+  inside the closeup. The shore's clock now reaches 1.129 on the cut to the wide (stops 120:0.93 · 194:1.129 ·
+  219:1.25) and the step is ON the cut frame (728), verified by the same trace. Not a product change. · (e') the end
+  card in his beats: the montage to black (0.6), the logo in (0.6) with the cell blinking (1.0 s) until the cat comes,
+  `xscapes.vibe.commonsmade.com` typed at 30 cps 0.4 s later with key ticks, the cat 0.4 s after that (fades in
+  0.3 s, works 1.6 s, its finished face with the drop), hold 2.0, fade 0.6.
+- THE X POST (2026-09-18 ~11:30–12:15), his drafts audited in five rounds: the link out of the post (X demotes external
+  links; one card per post, from the LAST link, which is why GitHub's card beat the entry's) · the brief as the first
+  line with @commonsmade tagged (never a post that STARTS with a handle) · "Works with Claude Code + Kimi Code CLI"
+  as plain text (the names are what search matches) · the CTA above the 280-character fold · "good luck" moved up
+  beside the ask. MEASURED, not guessed: the entry serves X's crawler the right card tags (at byte 1797), the share
+  image is 200 from github.io, the fetch is under 2 s, and X still shows no card for any link, so the platform's
+  edge is the suspect; the fallback is media in the reply. No Premium: no thumbnail choice (Media Studio is the only
+  native way). *"i turn on the made with AI on by choice"* (his). GIFs cut for the reply: the crab's walk-up, the
+  owlets, the night, and `gif-vista-timelapse.gif` (V1, the vista over a whole day, 15 s, 4.2 MB; `render.mjs clip`
+  + `XSCAPES_TRAILER_PART=vista`). His call on the reply: the blurb stays, the install line does not ("users can
+  find it on the page").
+- ⭐ THE POST IS LIVE, 2026-09-18 ~12:25 PDT: https://x.com/donlucas/status/2101029250996617468 . The main post (273
+  characters): the brief with @commonsmade tagged · "So I built xscapes: Cozy ASCII scenes that show what your agent
+  is doing at a glance 👀" · "Works with Claude Code + Kimi Code CLI. Free, open source" · "Work in a terminal? Give it
+  a shot and lmk what you think 👇" · the v4 trailer, "Made with AI" on by his choice. The reply: his line ("more so
+  building from within it!"), good luck, the entry link, the blurb with the four captions' words, "Under it, an event
+  protocol any agent can feed.", the vista timelapse GIF attached (no card renders for the entry on X; measured, the
+  page's tags are right).
+- *"let me ask you in the meanwhile, is xscapes compatible with windows terminal? or mac only? we ve never tested on
+  windows"* (~11:30, 09-18) ⇒ MEASURED with the compiler: `GOOS=windows go build ./...` fails in internal/host (the
+  pty is raw ioctls: SYS_IOCTL, TIOCSWINSZ/TIOCGWINSZ; live.go's size ioctl and SIGWINCH). Native Windows = a port
+  (ConPTY, the console size API, a size poll, a sound player) plus a Windows machine to measure the terminal on. WSL =
+  a Linux box, should work as one, untested; Windows Terminal draws block elements itself since 1.19; its alt-screen
+  resize rule is unmeasured (the host has rules per TERM_PROGRAM, measured on Terminal.app and Ghostty). The release
+  targets are darwin/linux × arm64/amd64.
+- *"the hackathon submission has ended. Are we still able to update the site from here?"* (~12:00) ⇒ MEASURED: the
+  Commons entry is a LIVE proxy of gh-pages (it served last night's page byte for byte plus the injected analytics
+  line, `cache-control: max-age=600`), NOT a snapshot. So every publish since the deadline (23:59 UTC 09-17 = 16:59
+  PDT; the last pre-deadline publish was the installer that afternoon) reached the judged entry: the theme toggle,
+  chips, the index, the Protocol close (s40 evening) and the copy buttons, the blurb, the headline and the title (s41).
+  Three options put to him: stop now · restore the deadline build until the 20th · carry on.
+- *"there are no specific guidelines, I feel like I rather push as many fixes as I can in case they test it on kimi.
+  Currently nothing says its not windows ready"* (~12:20) ⇒ HIS DECISION: carry on. DONE: (1) the installer refuses
+  anything but darwin/linux with a sentence (it fell through to a 404 on an unrecognisable binary name), the README
+  and the page say Mac and Linux, WSL untested (`72954b3`'s parent); (2) `refreshEvery` 50 → 12 (the insurance from
+  Kimi's list: anything unfiltered heals in a second, ~30 KB/s); (3) ⭐ **v0.4.4 TAGGED AND RELEASED** (release.sh run
+  inside a worktree at the tag, because his parallel session's untracked files make the main tree "dirty" to the
+  script; four binaries, vcs.modified=false at 72954b3) so the install line serves this week's fixes to a judge who
+  installs; (4) main PUSHED (72954b3); (5) the page PUBLISHED and verified from outside (live == local byte for byte;
+  the Windows line on the page and in the live install.sh); (6) the install line run from an empty HOME with no Go
+  on the PATH fetched the v0.4.4 binary (revision 72954b3, clean); (7) the same release binary installed here (inode
+  87384167). Still on Kimi's list: KIMI_CODE_HOME in the installer, the dropped Done behind an open sub-agent, the
+  HOOKLOG=1 path, reallocBand's region + cursor.

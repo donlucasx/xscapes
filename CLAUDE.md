@@ -40,8 +40,12 @@
 > `7c4be94` · `ef602ab` · `9e55428`), each built + vetted alone; **PUSHED at his word** (origin/main = `08b4510`+). ⭐⭐ HIS SEAM A/B: "they both look fine" ⇒ THE JUMP IS EXONERATED TOO; every
 > wind hypothesis refuted on his glass. The 09-17 flicker is CLOSED on the one mechanism with evidence, an agent's ED
 > reaching the scape (the blank top rows) + the tracker's 4.2 s persistence, confined since `ef602ab`; not reproducible
-> on the current binary. NEXT: refreshEvery 50 → 12 · count agent EDs · reallocBand's region + cursor hazard · push at
-> his word (the s40 block below).
+> on the current binary. PUSHED. ⭐ WINDOWS: not supported natively (the compiler says so: the pty is raw ioctls); WSL untested. ⭐ THE COMMONS ENTRY
+> IS A LIVE PROXY of gh-pages (measured): every publish since the deadline reached it; HIS DECISION "push as many fixes as
+> I can in case they test it on kimi" ⇒ the installer/README/page say Mac and Linux (WSL untested) · refreshEvery 50 → 12
+> · ⭐ **v0.4.4 TAGGED + RELEASED** (four binaries clean at `72954b3`), main pushed, the page published + verified, the
+> install line from an empty HOME fetches v0.4.4, the release binary installed here. NEXT: Kimi's remaining cards
+> (KIMI_CODE_HOME · the dropped Done · HOOKLOG=1 · reallocBand, measured first) (the s40 block below).
 
 > **Session 40, thread 2 (2026-09-17 16:00–20:10), WRAPPED: KIMI COMPATIBILITY MEASURED, BUILT ON HIS FOUR ANSWERS,
 > SHIPPED (six commits `ddde8c4`…`2bcc155`, v0.4.3 released, the friend's install line verified from a clean HOME),
