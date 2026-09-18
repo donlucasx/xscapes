@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"os"
 	"path/filepath"
+	"strings"
 	"time"
 
 	"github.com/donlucasx/xscapes/internal/event"
@@ -16,6 +17,25 @@ import (
 // swarm, where six sub-agent starts were in the hook log and no owlet was
 // on the scape, and nothing recorded which side had lost them. Errors are
 // swallowed: a diagnostic must never cost a frame.
+
+// logPath resolves XSCAPES_HOOKLOG and XSCAPES_EVENTLOG: a path as given, or
+// for 1, true or yes a file of the given name under xscapes's home, the way
+// XSCAPES_TRACE=1 picks its own path. The value was taken as a path whatever
+// it said, and =1 wrote a file named "1" into the agent's working directory,
+// which for the hook is the user's project (Kimi's assessment, 2026-09-18).
+func logPath(v, name string) string {
+	switch strings.ToLower(strings.TrimSpace(v)) {
+	case "":
+		return ""
+	case "1", "true", "yes":
+		home, err := event.Home()
+		if err != nil {
+			return ""
+		}
+		return filepath.Join(home, name)
+	}
+	return v
+}
 
 func appendEventLog(path string, e event.Event, now time.Time) {
 	writeEventLogLine(path, map[string]interface{}{

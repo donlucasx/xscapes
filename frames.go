@@ -126,7 +126,7 @@ func newFrames(w, h int, seed int64, ascii, mirror bool, ctxUsed, tod float64) *
 		mirror: mirror, profile: term.DetectProfile(), seed: seed,
 		player: notify.New(), ctxUsed: ctxUsed, tod: tod, level: -1, start: time.Now(),
 		ascii: ascii, scapeName: ScapeShore,
-		evlog: envx.Lookup("EVENTLOG"),
+		evlog: logPath(envx.Lookup("EVENTLOG"), "events.jsonl"),
 	}
 	f.refreshScape(time.Time{})
 	return f

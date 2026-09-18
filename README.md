@@ -222,6 +222,8 @@ XSCAPES_SCAPE=vista …      # override the scape for one run, without saving it
 XSCAPES_SILENT=1 …         # mute
 XSCAPES_HOOKLOG=file …     # the hook command appends every raw payload and where it went (adapter debugging)
 XSCAPES_EVENTLOG=file …    # the scape appends every event its reducer applied (the other end of the same question)
+XSCAPES_HOOKLOG=1 …        # =1 picks ~/.config/xscapes/hooks.jsonl (and events.jsonl), like XSCAPES_TRACE=1
+                           # ⚠ the hook log holds every payload verbatim: your prompts, commands and paths
 ```
 
 `xscapes claude -print` shows you how the window will be split and what will be

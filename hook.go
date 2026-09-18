@@ -265,7 +265,7 @@ func runHook(args []string) {
 	// XSCAPES_HOOKLOG=<file>: every raw payload, as received, one JSON line
 	// each. The instrument for an adapter question -- what does this agent
 	// actually fire, in what order -- read off a live run instead of a probe.
-	path := envx.Lookup("HOOKLOG")
+	path := logPath(envx.Lookup("HOOKLOG"), "hooks.jsonl")
 	if path != "" {
 		logRaw(path, src, args, b)
 	}
