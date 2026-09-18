@@ -4652,8 +4652,7 @@ binary and the tyastie one an older one: **a restart is what shows the afternoon
   DROPPED because the scrollback is the host's mirror). `Filter.Band` follows resizes. Tests: `TestAnAgentsEraseStaysIn
   ItsBand` (RED against a pass-through, mutation-checked) and `TestReplayTraceAgentClears` on HIS trace window
   49.5M-51.4M: 42 erases, raw 1076 of 1076 scape rows blank right after an erase, confined 0 of 1076. Host package (its
-  replay suite, 16.8 s) + whole suite 13/13 + vet + fmt green. INSTALLED (new inode 87233437-ish, see ls -i in the
-  session), dirty. His running Kimi session keeps the old binary; the next `xscapes kimi` gets the fix. ⚠ Not yet
+  replay suite, 16.8 s) + whole suite 13/13 + vet + fmt green. INSTALLED (new inode 87257601), dirty. His running Kimi session keeps the old binary; the next `xscapes kimi` gets the fix. ⚠ Not yet
   explained by this: the WORKING flicker under five agents (no clears during work in this trace so far; his wave
   pending) and the BLANK TOP ROWS of 18:57 (if Kimi ever clears mid-work, this fix covers it; the trace of his wave will
   say).
