@@ -608,6 +608,12 @@ type HTMLPalette struct {
 	// own ground. The submission page's portraits use it -- "no background
 	// whatsoever", his note of 2026-09-15 -- with a colour no scene paints.
 	Transparent *term.RGB
+	// Vars names ink colours the CSS writes as var(--name, #hex): the page
+	// may then re-ink them per theme while every frame stays as rendered.
+	// The companions' eye glyphs are the first (siteframes.go): they sit in
+	// holes that show the page's own ground, and mint on a light ground is
+	// nothing (his note, 2026-09-17).
+	Vars map[term.RGB]string
 }
 
 // palKey is one stylesheet class: a text run's ink and ground, or, when mask
@@ -648,7 +654,13 @@ func (h *HTMLPalette) CSS() string {
 			writeBlockCSS(&b, k.fg, k.bg, k.mask, h.Transparent)
 		} else {
 			b.WriteString("color:")
-			writeHex(&b, k.fg)
+			if name, ok := h.Vars[k.fg]; ok {
+				b.WriteString("var(--" + name + ",")
+				writeHex(&b, k.fg)
+				b.WriteString(")")
+			} else {
+				writeHex(&b, k.fg)
+			}
 			b.WriteString(";background:")
 			writeGround(&b, k.bg, h.Transparent)
 		}

@@ -441,3 +441,7 @@ func (c *Cat) walkTail(b *Bitmap, wag float64, bob int) {
 		b.Set(x, y+1)
 	}
 }
+
+// EyeInk is the companions' eye glyph colour, for a page that re-inks it
+// per theme (the submission page's portraits; canvas.HTMLPalette.Vars).
+func EyeInk() term.RGB { return eyeCol }

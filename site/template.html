@@ -23,7 +23,7 @@
 <meta name="twitter:image" content="https://donlucasx.github.io/xscapes/og.png">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&family=Geist+Mono:wght@400;700&display=swap">
 <style>
-:root{--g:#121212;--s:#1a1a1a;--ln:#2e2e2e;--ln2:#242424;--d:#8a8a8a;--dd:#bcbcbc;--i:#eeeeee;--acc:#87afff;--warm:#d7af5f;--sea:#333;
+:root{--g:#121212;--s:#1a1a1a;--ln:#2e2e2e;--ln2:#242424;--d:#8a8a8a;--dd:#bcbcbc;--i:#eeeeee;--acc:#87afff;--warm:#d7af5f;--sea:#333;--eye:#a8ecb0;
 --mono:"JetBrains Mono",ui-monospace,"SF Mono",Menlo,monospace;
 /* One line unit. Every vertical measure on this page is a multiple of it, so
    the page sits on the same grid the scape does. */
@@ -306,6 +306,11 @@ ul.feats.lead li{font-size:var(--body)}
 html{color-scheme:dark}
 html[data-theme="light"]{color-scheme:light;
   --g:#eeeeee;--s:#e4e4e4;--ln:#d0d0d0;--ln2:#dcdcdc;--d:#626262;--dd:#303030;--i:#121212;--acc:#005f87;--warm:#875f00;--sea:#c6c6c6}
+/* The companions' eye glyphs (var(--eye) in the frame palette) sit in holes
+   that show the page's ground; in the cast, which floats on that ground,
+   the light theme inks them dark green (cube 22). Everywhere else they stay
+   the moonlit mint, because every other frame sits on its own night. */
+html[data-theme="light"] .cast{--eye:#005f00}
 html[data-theme="light"] .stage{--g:#121212;--s:#1a1a1a;--ln:#2e2e2e;--ln2:#242424;--d:#8a8a8a;--dd:#bcbcbc;--i:#eeeeee;--acc:#87afff;--warm:#d7af5f}
 html[data-theme="light"] .bgfx pre{color:#3a3a3a}
 html[data-theme="light"] .bgfx.spin pre{color:var(--warm)}

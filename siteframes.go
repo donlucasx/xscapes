@@ -582,7 +582,9 @@ func castClips(pal *canvas.HTMLPalette) []fxClip {
 // renderFX renders every embedded animation and returns the page's script
 // payload and the stylesheet the frames share.
 func renderFX(seed int64) (js, css string, err error) {
-	pal := &canvas.HTMLPalette{Transparent: &portraitGround}
+	// The eye glyphs go through a variable (--eye) so the light theme can
+	// darken them where the portraits sit on the page's own ground.
+	pal := &canvas.HTMLPalette{Transparent: &portraitGround, Vars: map[term.RGB]string{companion.EyeInk(): "eye"}}
 	out := map[string]fxPayload{}
 	for _, cl := range allFX(pal) {
 		frames, cols, rows, fps, err := framesOf(seed, cl)
