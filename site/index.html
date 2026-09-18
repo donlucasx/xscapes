@@ -245,9 +245,27 @@ h3{font-size:14px;font-weight:700;margin:0 0 4px}
 .boxlink{display:inline-block;margin:var(--lh) 0 0;font-size:var(--meta);line-height:1.15;color:var(--dd);border:0;white-space:pre}
 .boxlink span{display:block}
 .boxlink:hover{color:var(--g);background:var(--i);border:0}
-.cmd{font-size:var(--meta);background:var(--s);border:1px solid var(--ln);border-radius:2px;padding:calc(var(--lh)*.5) 2ch;margin:var(--lh) 0 0;overflow-x:auto;white-space:pre;line-height:1.75;color:var(--dd)}
+.cmd{font-size:var(--meta);background:var(--s);border:1px solid var(--ln);border-radius:2px;padding:calc(var(--lh)*.5) 2ch;margin:var(--lh) 0 0;line-height:1.75;color:var(--dd)}
+.cmd.pre{overflow-x:auto;white-space:pre}
 .cmd .c{color:var(--d)}
 .cmd .pr{color:var(--warm)}
+/* COPY, ON EVERY COMMAND LINE (his ask, 2026-09-17). The rule: a line with a
+   prompt is a command and gets a button; the events list is not a command
+   and has none. The script adds the button, so the markup stays the command.
+   It copies the command alone, no prompt and no comment, says "copied" for a
+   moment in the toggle's pressed look, and sits outside the line's own
+   scroll, so a long install line slides under a button that keeps its
+   place. A word, not an icon: the page has no icons, and a word needs no
+   tooltip. Always shown: a copy that appears on hover does not exist on a
+   phone. Without a clipboard (an old browser, a plain http: page) the line
+   is selected instead and the button says so. */
+.cmd .cl{display:flex;align-items:center;gap:1ch}
+.cmd .cs{flex:1 1 auto;min-width:0;display:block;white-space:pre;overflow-x:auto;overflow-y:hidden;font:inherit}
+.cmd .cp{flex:none;background:none;border:1px solid var(--ln);margin:0;padding:0 1ch;font:700 12.5px/1.6 var(--mono);letter-spacing:.06em;color:var(--d);cursor:pointer;border-radius:1px;user-select:none;-webkit-user-select:none}
+.cmd .cp:hover{color:var(--i);border-color:var(--d)}
+.cmd .cp:focus-visible{outline:2px solid var(--acc);outline-offset:2px}
+.cmd .cp[data-done]{background:var(--d);border-color:var(--d);color:var(--g)}
+.sr{position:absolute;width:1px;height:1px;margin:-1px;padding:0;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap;border:0}
 ul.feats{list-style:none;padding:0;margin:22px 0 0;display:grid;gap:11px;max-width:var(--measure)}
 ul.feats li small{display:block;font-size:12.5px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--warm);margin:0 0 4px}
 /* the three cues, playable: a judge should hear what "one sound" means
@@ -278,9 +296,15 @@ ul.feats b{color:var(--i)}
    one; measured 2026-09-17: 300 characters wrap to 9 lines at 390px). */
 .wait .term{padding:calc(var(--lh)*.5) 2ch calc(var(--lh)*.75);color:var(--dd);font-size:13.5px;line-height:var(--lh)}
 .wait .line{white-space:pre-wrap;min-height:var(--lh)}
-.wait .ask{padding-left:2ch;text-indent:-2ch;min-height:calc(var(--lh)*4)}
-@media (max-width:720px){.wait .ask{min-height:calc(var(--lh)*9)}}
-@media (max-width:400px){.wait .ask{min-height:calc(var(--lh)*10)}}
+/* The height is reserved by a hidden twin of the whole text in the same
+   box, so the window is its final size at every width before a character
+   is typed and never grows under the reader. It replaces three measured
+   row counts (4 / 9 / 10 at three breakpoints) that had to be re-measured
+   whenever the text changed and were wrong between the breakpoints. */
+.wait .ask{position:relative}
+.wait .ask .live{position:absolute;top:0;left:0;right:0}
+.wait .ask .live,.wait .ask .ghost{display:block;padding-left:2ch;text-indent:-2ch}
+.wait .ask .ghost{visibility:hidden}
 .wait .think{visibility:hidden;margin-top:var(--lh)}
 .wait.typed .think{visibility:visible}
 .wait .tc{display:inline-block;width:.62ch;height:1.05em;background:var(--dd);vertical-align:-.17em;margin-left:.1em}
@@ -1413,7 +1437,7 @@ html[data-theme="light"] .tab[aria-selected="true"]{color:#eeeeee}
 </pre></div>
 <div class="win wait" id="problem-win" data-title="claude"><div class="boxtop" aria-hidden="true"></div>
   <div class="stage"><div class="term">
-<div class="line ask"><span class="pr">&gt;</span> <span id="typed" data-text="A user sends a prompt in the terminal and the agent goes quiet. A spinner, a verb that changes every few seconds, and nothing else: not whether this is a five-second read or a five-minute refactor, not that a command just failed, not how much context is left before it compacts. So they tab away, and come back late."></span><span class="tc" id="tcur" aria-hidden="true"></span></div>
+<div class="line ask"><span class="live"><span class="pr">&gt;</span> <span id="typed" data-text="You enter a prompt in the terminal and your agent gets to work&hellip; A spinner, a verb that changes every few seconds, and a transcript scrolling past: tool calls, file paths, a failed command somewhere in the middle. Nothing says whether this is a five-second read or a five-minute refactor, or how much context is left before it compacts. You squint and scan through the matrix to try to figure out what's happening. You tab away, and come back late."></span><span class="tc" id="tcur" aria-hidden="true"></span></span><span class="ghost" aria-hidden="true"></span></div>
 <div class="line think" id="think"><span class="sp" id="spin">&#10035;</span> Thinking&hellip; <span class="t">(esc to interrupt &middot; <span id="spin-t">0m 00s</span>)</span></div>
 <div class="line"></div>
 </div></div>
@@ -1422,7 +1446,7 @@ html[data-theme="light"] .tab[aria-selected="true"]{color:#eeeeee}
 </section>
 
 <section id="top">
-<h1>Cozy ASCII scenes that react to your agent while it works<span class="cur"></span></h1>
+<h1>The xscapes are cozy ASCII scenes that react to your agent while it works, and tell you what's happening, at a glance<span class="cur"></span></h1>
 
 <p class="lead">Your agent's session, drawn as a landscape. Each element carries one thing you would otherwise read for: activity, the last tool call, the helpers, failures, context left, and the moment it needs you. Same window, any terminal agent. An event protocol with a scene on top.</p>
 
@@ -2660,15 +2684,12 @@ $
 
 </pre></div>
 <p class="sub wide">Three commands, no app, no tab, no tmux, nothing to build. The install writes the agent's hooks after a backup; then the agent runs on top and the scape underneath, in the same window, so you never look away from the work to see the work.</p>
-<div class="cmd" data-title="install"><span class="pr">$</span> curl -fsSL https://donlucasx.github.io/xscapes/install.sh | sh   <span class="c"># Mac or Linux, with or without Go</span></div>
+<div class="cmd" data-title="install"><div class="cl"><code class="cs"><span class="pr">$</span> curl -fsSL https://donlucasx.github.io/xscapes/install.sh | sh   <span class="c"># Mac or Linux, with or without Go</span></code></div></div>
 <div class="grid2 agents">
-<div><p class="cap"><span class="chip">Claude Code</span></p><div class="cmd"><span class="pr">$</span> xscapes install claude --apply
-<span class="pr">$</span> xscapes claude</div></div>
-<div><p class="cap"><span class="chip">Kimi Code CLI</span></p><div class="cmd"><span class="pr">$</span> xscapes install kimi --apply
-<span class="pr">$</span> xscapes kimi</div></div>
-<div><p class="cap"><span class="chip">Hermes Agent</span></p><div class="cmd"><span class="pr">$</span> xscapes install hermes --apply
-<span class="pr">$</span> xscapes hermes</div></div>
-<div><p class="cap"><span class="chip">Anything else</span></p><div class="cmd"><span class="pr">$</span> xscapes inside &lt;any command&gt;   <span class="c"># no hooks needed</span></div></div>
+<div><p class="cap"><span class="chip">Claude Code</span></p><div class="cmd"><div class="cl"><code class="cs"><span class="pr">$</span> xscapes install claude --apply</code></div><div class="cl"><code class="cs"><span class="pr">$</span> xscapes claude</code></div></div></div>
+<div><p class="cap"><span class="chip">Kimi Code CLI</span></p><div class="cmd"><div class="cl"><code class="cs"><span class="pr">$</span> xscapes install kimi --apply</code></div><div class="cl"><code class="cs"><span class="pr">$</span> xscapes kimi</code></div></div></div>
+<div><p class="cap"><span class="chip">Hermes Agent</span></p><div class="cmd"><div class="cl"><code class="cs"><span class="pr">$</span> xscapes install hermes --apply</code></div><div class="cl"><code class="cs"><span class="pr">$</span> xscapes hermes</code></div></div></div>
+<div><p class="cap"><span class="chip">Anything else</span> no hooks needed</p><div class="cmd"><div class="cl"><code class="cs"><span class="pr">$</span> xscapes inside &lt;any command&gt;</code></div></div></div>
 </div>
 <p class="cap">Coming soon: Codex CLI, Gemini CLI, OpenCode.</p>
 <a class="boxlink" href="https://github.com/donlucasx/xscapes"><span aria-hidden="true">┌──────────────────────────────┐</span><span>│ github.com/donlucasx/xscapes │</span><span aria-hidden="true">└──────────────────────────────┘</span></a>
@@ -3291,8 +3312,7 @@ $
 <div><div class="win" data-title="the rainy window &middot; with the cat"><div class="boxtop" aria-hidden="true"></div><div class="stage" aria-hidden="true"><div class="fx" data-clip="rain"></div></div><div class="boxbot" aria-hidden="true"></div></div><p class="cap"><b>The rainy window, with the cat.</b> Rain on the glass is the work: harder as the agent gets busy, then easing. The city behind it carries the hour. Drawn; next.</p></div>
 <div><div class="win" data-title="the aquarium &middot; with the frog"><div class="boxtop" aria-hidden="true"></div><div class="stage" aria-hidden="true"><div class="fx" data-clip="aquarium"></div></div><div class="boxbot" aria-hidden="true"></div></div><p class="cap"><b>The aquarium, with the frog.</b> More fish come out as the work picks up, the tank's lamp is the light, and the gravel is where it settles. Drawn; next.</p></div>
 </div>
-<div class="cmd"><span class="pr">$</span> xscapes scape shore          <span class="c"># or vista, the default</span>
-<span class="pr">$</span> xscapes companion cat       <span class="c"># or crab</span></div>
+<div class="cmd"><div class="cl"><code class="cs"><span class="pr">$</span> xscapes scape shore          <span class="c"># or vista, the default</span></code></div><div class="cl"><code class="cs"><span class="pr">$</span> xscapes companion cat       <span class="c"># or crab</span></code></div></div>
 </section>
 
 <div class="sec" id="s-protocol" data-title="Protocol"><div class="boxtop" aria-hidden="true"></div></div>
@@ -3899,12 +3919,11 @@ $
       .        +
 </pre></div>
 <p class="sub wide">Underneath the scene is an event protocol. An adapter turns what an agent does into a few events on a socket; the engine draws the session from those alone and knows nothing about any agent.</p>
-<div class="cmd" data-title="events">session_start  session_end  prompt  tool_start  tool_end  error
+<div class="cmd pre" data-title="events">session_start  session_end  prompt  tool_start  tool_end  error
 test_pass  test_fail  compact  needs_input  answered  done
 sub_start  sub_end  todo  context  interrupt</div>
 <p class="sub wide">Claude Code, Kimi Code CLI and Hermes Agent ship with adapters made of their own hooks; anything else is watched through its output. A new adapter is whatever emits the events:</p>
-<div class="cmd"><span class="pr">$</span> xscapes emit tool_end -tool Read -target internal/auth/handler.go
-<span class="pr">$</span> xscapes emit needs_input -text "allow Bash?"</div>
+<div class="cmd"><div class="cl"><code class="cs"><span class="pr">$</span> xscapes emit tool_end -tool Read -target internal/auth/handler.go</code></div><div class="cl"><code class="cs"><span class="pr">$</span> xscapes emit needs_input -text "allow Bash?"</code></div></div>
 <p class="sub wide">And it is not a loop: the sea is the work, the sand the last few actions, the sky your own clock, so no two sessions draw the same picture. It asks nothing of you, and the agent's output reaches your terminal byte for byte, never in the way of the work.</p>
 </section>
 
@@ -4165,6 +4184,50 @@ sub_start  sub_end  todo  context  interrupt</div>
     });
   }
 
+  // ---- copy, on every command line -------------------------------------
+  // The command alone goes to the clipboard: the prompt and the comment are
+  // dropped. The button says what happened for a moment; a live region says
+  // it to a screen reader. No clipboard: the line is selected, for cmd-C.
+  var live = document.createElement("span");
+  live.className = "sr"; live.setAttribute("aria-live", "polite");
+  document.body.appendChild(live);
+  function cmdText(cs){
+    var c = cs.cloneNode(true), rm = c.querySelectorAll(".pr,.c");
+    for(var i = 0; i < rm.length; i++) rm[i].parentNode.removeChild(rm[i]);
+    return c.textContent.trim();
+  }
+  function fallbackCopy(s){
+    var ta = document.createElement("textarea"), ok = false;
+    ta.value = s; ta.setAttribute("readonly", ""); ta.setAttribute("aria-hidden", "true");
+    ta.style.position = "fixed"; ta.style.top = "-1000px";
+    document.body.appendChild(ta); ta.select();
+    try{ ok = document.execCommand("copy"); }catch(e){}
+    document.body.removeChild(ta);
+    return ok;
+  }
+  [].forEach.call(document.querySelectorAll(".cmd .cl"), function(row){
+    var cs = row.querySelector(".cs"), cmd = cs ? cmdText(cs) : "";
+    if(!cmd) return;
+    var b = document.createElement("button"), t = 0;
+    b.type = "button"; b.className = "cp"; b.textContent = "copy";
+    b.setAttribute("aria-label", "copy " + cmd);
+    function said(what){
+      b.textContent = what; b.setAttribute("data-done", "");
+      live.textContent = what === "copied" ? "copied " + cmd : "no clipboard; the command is selected";
+      clearTimeout(t); t = setTimeout(function(){ b.textContent = "copy"; b.removeAttribute("data-done"); }, 1600);
+    }
+    function selected(){
+      try{ var r = document.createRange(); r.selectNodeContents(cs); var sel = window.getSelection(); sel.removeAllRanges(); sel.addRange(r); }catch(e){}
+      said("selected");
+    }
+    function copied(){ fallbackCopy(cmd) ? said("copied") : selected(); }
+    b.addEventListener("click", function(){
+      if(navigator.clipboard && window.isSecureContext) navigator.clipboard.writeText(cmd).then(function(){ said("copied"); }, copied);
+      else copied();
+    });
+    row.appendChild(b);
+  });
+
   // ---- the splash arrow, in ASCII: a chevron drips down three rows ---------
   var tip = document.getElementById("scrolltip");
   if(tip && !reduce){
@@ -4180,6 +4243,8 @@ sub_start  sub_end  todo  context  interrupt</div>
   var spin = document.getElementById("spin"), spinT = document.getElementById("spin-t");
   if(pwin && typed && spin && spinT){
     var text = typed.getAttribute("data-text") || "", started = false;
+    var ghost = pwin.querySelector(".ghost");
+    if(ghost) ghost.textContent = "> " + text;
     function wait(){
       pwin.classList.add("typed");
       if(reduce) return;
@@ -4194,7 +4259,7 @@ sub_start  sub_end  todo  context  interrupt</div>
         if(i >= text.length){ setTimeout(wait, 500); return; }
         var ch = text.charAt(i++);
         typed.textContent += ch;
-        setTimeout(step, ch === "." || ch === "?" ? 220 : (ch === "," ? 120 : 22));
+        setTimeout(step, ch === "." || ch === "?" || ch === "\u2026" ? 220 : (ch === "," ? 120 : 22));
       })();
     }
     if(reduce || !("IntersectionObserver" in window)){ typed.textContent = text; wait(); }
