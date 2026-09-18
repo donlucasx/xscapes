@@ -31,6 +31,14 @@ fail() { printf 'xscapes: %s\n' "$*" >&2; exit 1; }
 
 os=$(uname -s | tr '[:upper:]' '[:lower:]')
 arch=$(uname -m)
+# macOS and Linux only. The host runs the agent on a Unix pseudo-terminal,
+# which Windows does not have; inside WSL this is a Linux box and works as
+# one (untested, 2026-09-18). Said here rather than as a 404 on a binary
+# name nobody would recognise.
+case "$os" in
+  darwin|linux) ;;
+  *) echo "xscapes: runs on macOS and Linux; Windows is not supported natively (inside WSL, run this line in the WSL shell)." >&2; exit 1 ;;
+esac
 case $arch in
   arm64 | aarch64) arch=arm64 ;;
   x86_64 | amd64) arch=amd64 ;;

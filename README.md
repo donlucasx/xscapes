@@ -24,7 +24,9 @@ agent in its own tmux pane, the scape in the next one.
 
 ## Install
 
-One command, on a Mac or Linux, with or without Go:
+One command, on a Mac or Linux, with or without Go. Windows is not supported
+natively: the host runs the agent on a Unix pseudo-terminal. Inside WSL it is
+a Linux box and should work as one; nobody has tested it yet.
 
 ```sh
 curl -fsSL https://donlucasx.github.io/xscapes/install.sh | sh
