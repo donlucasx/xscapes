@@ -4593,3 +4593,29 @@ binary and the tyastie one an older one: **a restart is what shows the afternoon
   `XSCAPES_SCAPE=vista xscapes -live -level 1` (today's wind) against `XSCAPES_WIND=2 XSCAPES_SCAPE=vista xscapes -live
   -level 1`. UNCOMMITTED (his word): forest.go · vista.go · frames.go · live.go · main.go · vista_shots_test.go ·
   windprobe_test.go · vista_tall_test.go.
+- HIS WORD ON v2 (2026-09-18 ~01:05): *"much better. "a thinking screen for terminal agents" should linger for another
+  beat before it starts to fade, lets move on"* ⇒ the hold after the settle is two seconds now (out at 9.2, end 10.0);
+  the opener is APPROVED and the montage cut begins.
+- THE FIRST FULL CUT (2026-09-18 ~01:45): `~/Desktop/xscapes-trailer/xscapes-trailer-16x9-v1.mp4`, 35.6 s, 1920x1080,
+  30 fps, H.264 + AAC. The film stage (`render.mjs film`): the opener DISSOLVES into the montage at its 9.2 s (the
+  opener's own layer fading over the vista's first frame); the H1 window (124x44, cell 14.78x24.55 px, fitted to the
+  frame's height, 45 px of black at the sides at zoom 1) under a camera track in `shots.json` (keyframes in clip
+  seconds, eased, one cut); four captions in Geist Mono 28 px on a surface box, one at the top when the subject fills
+  the bottom; the end card (the mark solid + the URL in dim) by a 0.8 s dissolve at 31.7, 2.5 s hold, 0.6 s fade. The
+  score (`audio.py film`): the six keys, a wind bed under the vista and the sea's wash under the shore crossfaded at
+  the cut (RMS -33 dB), the SHIPPED ask.wav at 24.95 and done.wav at 19.95 and 31.2 (video seconds), read from
+  internal/notify/sounds, not re-synthesised. The camera: wide 3 s · push to 1.9x on the owl and owlets by 7 · drift
+  to 2.1x on the finish · CUT wide on the shore at 11.25 · slow push to 1.5x by 15.5 · push to 2.4x on the crab's walk
+  up by 17.6 · hold through "> yes" · pull out to wide by 22.5. Two adjustments from the stills before the render: the
+  shore push at 1.4x clipped the transcript's last row mid-word (1.5x, a row lower, leaves it out); the crab's caption
+  covered its legs (moved to the top). Every key frame looked at; the whole cut tiled on a sheet.
+- *"none has the flicker"* (~01:20, 09-18; the A/B on his glass, window still: today's wind at full stretch and the
+  streaks, both `-live -level 1`) ⇒ ⭐ **THE WIND IS NOT THE FLICKER.** The standalone painter writes the WHOLE frame
+  every tick (41 rows at 12 fps, more bytes than the hosted path's dirty rows) with today's leaves at full stretch, on
+  his Terminal.app, and does not flicker. So the churn is not it and terminal throughput is not it; what remains is
+  the HOSTED path under a real agent: the scape and the agent sharing one terminal (the host's paint with its cursor
+  save/restore and the region, the agent's own redraws between frames; the BLANK TOP ROWS of 18:57 are the visible
+  form). Kimi's diagnosis and my s40 recommendation are WITHDRAWN as the fix for his report; the wind page stands as a
+  taste question only. The 80-column jump stays fixed (a real defect regardless). NEXT: the Kimi session with
+  `XSCAPES_TRACE=1` + both logs, today's wind, a five-agent wave; replay the trace through the screen model for the
+  rows.

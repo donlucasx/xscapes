@@ -23,8 +23,10 @@
 > he saw is inferred (the BLANK TOP ROWS of 18:57 are untraced and read as flicker too); the A/B on his glass decides.
 > `-live -level N` now pins the demo and `XSCAPES_WIND=<n>` picks a style; his first (rest-state) run showed TWO
 > TALL-WINDOW DEFECTS (the pines at fixed rows, the dip deleting the range behind the owl at 132x41/71x39/124x30), both
-> FIXED with mutation-checked tests. INSTALLED dirty (inode 87217050). UNCOMMITTED at his word. NEXT: his A/B, his pick
-> (the s40 block below).
+> FIXED with mutation-checked tests. INSTALLED dirty (inode 87217050). UNCOMMITTED at his word. ⭐⭐ **HIS A/B RESULT: "none has the flicker" ⇒ THE WIND IS
+> NOT THE FLICKER** (whole frames at full stretch, standalone, on his Terminal.app: nothing); Kimi's diagnosis and my
+> recommendation WITHDRAWN as the fix, the wind page a taste question; what remains is the HOSTED path under a real agent
+> (the blank top rows). NEXT: his Kimi session with the trace + both logs on, then the replay (the s40 block below).
 
 > **Session 40, thread 2 (2026-09-17 16:00–20:10), WRAPPED: KIMI COMPATIBILITY MEASURED, BUILT ON HIS FOUR ANSWERS,
 > SHIPPED (six commits `ddde8c4`…`2bcc155`, v0.4.3 released, the friend's install line verified from a clean HOME),

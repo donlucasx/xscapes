@@ -86,6 +86,21 @@ dip only where 2*owlY < nearBase), mutation-checked tests
 `XSCAPES_WIND=2` (or 1, 3), in Terminal.app at his size. UNCOMMITTED at his
 word: forest.go · vista.go · frames.go · live.go · main.go ·
 vista_shots_test.go · windprobe_test.go · vista_tall_test.go.
+⭐⭐ HIS A/B RESULT (01:20): "none has the flicker". THE WIND IS NOT THE
+FLICKER: today's leaves at full stretch, whole frames at 12 fps on his
+Terminal.app, standalone, do not flicker; neither do the streaks. Kimi's
+diagnosis and my recommendation are WITHDRAWN as the fix; the wind page is a
+taste question now, not urgent; the 80-column jump stays fixed. What remains
+is the HOSTED path under a real agent (the scape and the agent sharing one
+terminal; the BLANK TOP ROWS of 18:57 are its visible form). NEXT: his Kimi
+session with `XSCAPES_TRACE=1 XSCAPES_HOOKLOG=~/.config/xscapes/kimi-hooks.jsonl
+XSCAPES_EVENTLOG=~/.config/xscapes/kimi-events.jsonl xscapes kimi`, today's
+wind, a five-agent wave, a screenshot + the clock time when it shows, no
+resize; then replay the trace through the screen model (internal/host
+screen_test's replay) to see what those rows were sent. Suspects: the host's
+paint interleaving with the agent's redraws (the cursor left in the scape's
+rows when the agent erases a line: an erase fills with the current
+background, s13), reallocBand's race (s38), a band re-allocation on output.
 
 Session 40, thread 2 (2026-09-17 16:00–20:10), WRAPPED at his word "lets /wrap
 and discuss this fix first thing on the next session". FIRST THING NEXT: THE
