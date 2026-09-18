@@ -2,6 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
+<script>try{if(localStorage.getItem("xscapes-theme")==="light")document.documentElement.setAttribute("data-theme","light")}catch(e){}</script>
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>xscapes</title>
 <meta name="description" content="A thinking screen for terminal agents. Cozy ASCII scenes that react to your agent while it works: the tide rises as it gets busy, crablets walk into the water when subagents report back, and the moon thins as the context fills.">
@@ -22,7 +23,7 @@
 <meta name="twitter:image" content="https://donlucasx.github.io/xscapes/og.png">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&family=Geist+Mono:wght@400;700&display=swap">
 <style>
-:root{--g:#121212;--s:#1a1a1a;--ln:#2e2e2e;--ln2:#242424;--d:#8a8a8a;--dd:#bcbcbc;--i:#eeeeee;--acc:#87afff;--warm:#d7af5f;
+:root{--g:#121212;--s:#1a1a1a;--ln:#2e2e2e;--ln2:#242424;--d:#8a8a8a;--dd:#bcbcbc;--i:#eeeeee;--acc:#87afff;--warm:#d7af5f;--sea:#333;
 --mono:"JetBrains Mono",ui-monospace,"SF Mono",Menlo,monospace;
 /* One line unit. Every vertical measure on this page is a multiple of it, so
    the page sits on the same grid the scape does. */
@@ -71,7 +72,7 @@ p{max-width:var(--measure);margin:0 0 var(--lh)}
 /* the cover: the mark over the shore's own glyphs, six frames of the real sea stepping */
 .cover{position:relative;min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;overflow:hidden;padding:20px}
 .cover .sea{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;pointer-events:none}
-.cover .sea pre{position:absolute;margin:0;font:700 14px/1 var(--mono);color:#333;letter-spacing:0;white-space:pre;opacity:0;animation:step 4.2s steps(1) infinite}
+.cover .sea pre{position:absolute;margin:0;font:700 14px/1 var(--mono);color:var(--sea);letter-spacing:0;white-space:pre;opacity:0;animation:step 4.2s steps(1) infinite}
 .cover .sea.m{display:none}
 /* The desktop cover is a fixed 168 columns. On a phone that is a 1400px
    picture behind a 390px window, so it shows the middle of the sea rather
@@ -294,11 +295,38 @@ ul.feats.lead li{font-size:var(--body)}
 .sub.wide{max-width:var(--measure)}
 {{fxcss}}
 @media (prefers-reduced-motion:reduce){.cover .sea pre{animation:none}.cover .sea pre:first-child{opacity:1}.cur{animation:none}html{scroll-behavior:auto}}
+/* ---- light, his ask of 2026-09-17. Dark stays the default; the choice is the
+   visitor's, kept in localStorage, and it lands on <html> before the first
+   paint (the script in the head). The values are the brand guide's light
+   table (assets/brand/README.md: ground 255, surface 254, line 252, dim 241,
+   ink 233, dawn 24 as the accent); the warm accent goes to 94, the darkest
+   gold that still reads as gold, because 179 on a light ground is a whisper.
+   Every terminal stays a terminal: .stage re-declares the dark tokens, so the
+   frames, the typed problem and the study windows keep their own night. */
+html{color-scheme:dark}
+html[data-theme="light"]{color-scheme:light;
+  --g:#eeeeee;--s:#e4e4e4;--ln:#d0d0d0;--ln2:#dcdcdc;--d:#626262;--dd:#303030;--i:#121212;--acc:#005f87;--warm:#875f00;--sea:#c6c6c6}
+html[data-theme="light"] .stage{--g:#121212;--s:#1a1a1a;--ln:#2e2e2e;--ln2:#242424;--d:#8a8a8a;--dd:#bcbcbc;--i:#eeeeee;--acc:#87afff;--warm:#d7af5f}
+html[data-theme="light"] .bgfx pre{color:#3a3a3a}
+html[data-theme="light"] .bgfx.spin pre{color:var(--warm)}
+html[data-theme="light"] .tab[aria-selected="true"]{color:#eeeeee}
+/* The toggle: two words in the status-chip style, the current one in reverse
+   video, fixed top right. It appears once the splash has scrolled away and
+   stays; on the splash there is nothing to read it against. */
+.theme{position:fixed;top:14px;right:14px;z-index:40;display:flex;font:700 12.5px/1.6 var(--mono);letter-spacing:.06em;
+  border:1px solid var(--ln);border-radius:2px;background:var(--g);opacity:0;visibility:hidden;pointer-events:none;
+  transition:opacity .25s,visibility 0s .25s}
+.theme.show{opacity:1;visibility:visible;pointer-events:auto;transition:opacity .25s,visibility 0s}
+.tbtn{background:none;border:0;margin:0;padding:2px 1ch;font:inherit;color:var(--d);cursor:pointer;border-radius:1px}
+.tbtn[aria-pressed="true"]{background:var(--d);color:var(--g);cursor:default}
+.tbtn:focus-visible{outline:2px solid var(--acc);outline-offset:2px}
+@media (prefers-reduced-motion:reduce){.theme,.theme.show{transition:none}}
 </style>
 </head>
 <body>
 
 <div class="rail" id="rail" aria-hidden="true"></div>
+<div class="theme" id="theme" aria-label="Colour theme"><button type="button" class="tbtn" data-theme="dark" aria-pressed="true">dark</button><button type="button" class="tbtn" data-theme="light" aria-pressed="false">light</button></div>
 
 <section class="cover">
 <div class="sea d">{{cover}}</div>
@@ -714,6 +742,31 @@ ul.feats.lead li{font-size:var(--body)}
   onScroll();
   window.addEventListener("scroll", onScroll, {passive:true});
   window.addEventListener("resize", onScroll);
+
+  // ---- the theme toggle -----------------------------------------------------
+  // Dark is the default and needs no attribute; light is data-theme="light"
+  // on <html>, set before the first paint by the head script when the visitor
+  // chose it before. The toggle shows once the splash has scrolled out.
+  var themeBox = document.getElementById("theme"), cover = document.querySelector(".cover");
+  if(themeBox){
+    var tbtns = themeBox.querySelectorAll(".tbtn");
+    function setTheme(name, save){
+      if(name === "light") document.documentElement.setAttribute("data-theme", "light");
+      else document.documentElement.removeAttribute("data-theme");
+      for(var i = 0; i < tbtns.length; i++) tbtns[i].setAttribute("aria-pressed", tbtns[i].getAttribute("data-theme") === name ? "true" : "false");
+      if(save){ try{ localStorage.setItem("xscapes-theme", name); }catch(e){} }
+    }
+    setTheme(document.documentElement.getAttribute("data-theme") === "light" ? "light" : "dark", false);
+    for(var j = 0; j < tbtns.length; j++) tbtns[j].addEventListener("click", function(){ setTheme(this.getAttribute("data-theme"), true); });
+    function pastSplash(){ return cover ? window.scrollY > cover.offsetHeight - 40 : true; }
+    function showTheme(on){ themeBox.classList.toggle("show", on); themeBox.setAttribute("aria-hidden", on ? "false" : "true"); }
+    if(cover && "IntersectionObserver" in window){
+      new IntersectionObserver(function(es){ showTheme(!es[0].isIntersecting); }, {threshold:0}).observe(cover);
+    } else {
+      window.addEventListener("scroll", function(){ showTheme(pastSplash()); }, {passive:true});
+    }
+    showTheme(pastSplash());
+  }
 })();
 </script>
 </body>
