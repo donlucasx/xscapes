@@ -105,6 +105,8 @@ if [ $on_path = yes ]; then
   say "Next:"
   say "  xscapes install claude --apply   # writes its hooks, after a backup"
   say "  xscapes claude                   # the agent on top, the scape underneath"
+  say "  xscapes install kimi --apply && xscapes kimi       # Kimi Code CLI"
+  say "  xscapes install hermes --apply && xscapes hermes   # Hermes Agent"
 else
   if [ -n "$rc" ]; then
     say "Every new terminal will find it by name (one line added to ~${rc#"$HOME"})."
@@ -114,4 +116,6 @@ else
   say "In this window, use the path:"
   say "  $short/xscapes install claude --apply   # writes its hooks, after a backup"
   say "  $short/xscapes claude                   # the agent on top, the scape underneath"
+  say "  $short/xscapes install kimi --apply && $short/xscapes kimi       # Kimi Code CLI"
+  say "  $short/xscapes install hermes --apply && $short/xscapes hermes   # Hermes Agent"
 fi

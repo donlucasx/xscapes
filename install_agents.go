@@ -281,8 +281,8 @@ Without them the scape only watches %s's output: no tool names, no asks, no sub-
   xscapes install %s --apply    # writes the hooks (without --apply it prints the plan)
   xscapes %s                    # then this again
 
-To run without hooks anyway: xscapes inside %s
-`, name, where, name, agent, agent, agent)
+To run without hooks anyway: xscapes %s -watch=on   (or: xscapes inside %s)
+`, name, where, name, agent, agent, agent, agent)
 }
 
 // writeConfig replaces path with out through a temp file in the same

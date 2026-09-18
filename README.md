@@ -43,7 +43,10 @@ xscapes inside <any command>                        # anything else, no hooks
 
 `xscapes install <agent>` without `--apply` prints the plan and writes nothing;
 with it, the hooks go in after a backup, and `uninstall` takes out exactly
-what was written.
+what was written. The launcher refuses to start without the agent's hooks
+and prints that install line instead; `xscapes <agent> -watch=on` runs on
+the output watcher without them, which sees work and prompts but no tool
+names, asks or sub-agents.
 
 The script puts the release binary in `~/.local/bin`. If that directory is
 not on your PATH it adds one line to your shell's rc file for every new
