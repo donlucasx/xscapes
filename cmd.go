@@ -41,6 +41,10 @@ func dispatch(args []string) bool {
 		runNotify(args[1:])
 	case "claude":
 		runClaude(args[1:])
+	case "kimi", "hermes":
+		// The same thing `xscapes claude` is: the agent on top, the scape
+		// underneath, its hooks bound as they announce the session.
+		runInside(args[1:], args[0])
 	case "inside":
 		runInside(args[1:], "")
 	case "shades":
@@ -78,6 +82,8 @@ func usage(w io.Writer) {
   xscapes install kimi    the same for Kimi Code CLI (~/.kimi-code/config.toml)
   xscapes install hermes  the same for Hermes Agent (~/.hermes/config.yaml)
   xscapes uninstall claude|kimi|hermes
+  xscapes kimi            run Kimi Code CLI inside the scape (after 'install kimi')
+  xscapes hermes          run Hermes Agent inside the scape (after 'install hermes')
   xscapes emit <kind>     send one event by hand (for testing)
   xscapes replay <file>   feed a recorded event log to a running scape
   xscapes notify [kind]   play the knock sounds (ask, done, worried, or all three)

@@ -45,7 +45,7 @@ import (
 var kimiHookEvents = []string{
 	"SessionStart", "SessionEnd", "UserPromptSubmit",
 	"PreToolUse", "PostToolUse", "PostToolUseFailure",
-	"PermissionRequest", "Notification", "Stop", "StopFailure",
+	"PermissionRequest", "PermissionResult", "Notification", "Stop", "StopFailure", "Interrupt",
 	"SubagentStart", "SubagentStop", "PreCompact",
 }
 
@@ -83,7 +83,7 @@ var adapters = map[string]agentAdapter{
 		add:    addKimiHooks,
 		remove: removeKimiHooks,
 		after: "Verify with `kimi doctor config`. Then run Kimi inside the scape:\n\n" +
-			"  xscapes inside kimi\n",
+			"  xscapes kimi\n",
 		missing: "Kimi Code CLI writes ~/.kimi-code/config.toml on first run; run `kimi` once, then install.",
 	},
 	"hermes": {
@@ -95,7 +95,7 @@ var adapters = map[string]agentAdapter{
 			"remembers it in ~/.hermes/shell-hooks-allowlist.json. To answer once for all\n" +
 			"of them, run `hermes hooks doctor` now; `hermes hooks list` shows the result.\n" +
 			"(hooks_auto_accept in config.yaml is your switch; this program does not touch it.)\n\n" +
-			"Then run Hermes inside the scape:\n\n  xscapes inside hermes\n",
+			"Then run Hermes inside the scape:\n\n  xscapes hermes\n",
 		missing: "Hermes writes ~/.hermes/config.yaml on `hermes setup`; run that first, then install.",
 	},
 }
@@ -244,6 +244,24 @@ func hookCommand(bin, ev, agent string) string {
 
 var kimiInlineHooks = regexp.MustCompile(`(?m)^\s*hooks\s*=`)
 
+// foreignHook matches a hook entry that calls this program from OUTSIDE the
+// marked block: one written by hand, or by an agent asked to "wire up
+// xscapes" (the first outside tester's Kimi config had twelve of them,
+// 2026-09-17). Installing over them would fire every event twice, and a
+// doubled SubagentStart is two kittens for one subagent.
+var foreignHook = regexp.MustCompile(`xscapes["']?\s+hook\b`)
+
+// refuseForeignHooks is the error for a file that already carries such
+// entries. The way out is theirs: the entries were not written by this
+// program, so it does not remove them.
+func refuseForeignHooks(rest []byte, file string) error {
+	n := len(foreignHook.FindAll(rest, -1))
+	if n == 0 {
+		return nil
+	}
+	return fmt.Errorf("%s already carries %d hook entr%s calling `xscapes hook` outside the xscapes block (written by hand, or by an agent?). Remove them, or restore the backup they came with, then run install again; installed over them, every event would fire twice", file, n, map[bool]string{true: "y", false: "ies"}[n == 1])
+}
+
 // tomlString quotes s as a TOML basic string.
 func tomlString(s string) string {
 	s = strings.ReplaceAll(s, `\`, `\\`)
@@ -273,6 +291,9 @@ func addKimiHooks(src []byte, bin string) ([]byte, []string, error) {
 	}
 	if kimiInlineHooks.Match(out) {
 		return nil, nil, errors.New("config.toml already sets `hooks = [...]` inline; add the xscapes entries to that array by hand, or move it to [[hooks]] tables and run install again")
+	}
+	if err := refuseForeignHooks(out, "config.toml"); err != nil {
+		return nil, nil, err
 	}
 	if len(out) > 0 && !bytes.HasSuffix(out, []byte("\n")) {
 		out = append(out, '\n')
@@ -425,6 +446,9 @@ func hooksSpan(lines []string) (start, end int, inline string, found bool) {
 func addHermesHooks(src []byte, bin string) ([]byte, []string, error) {
 	out, had, err := removeHermesItems(src)
 	if err != nil {
+		return nil, nil, err
+	}
+	if err := refuseForeignHooks(out, "config.yaml"); err != nil {
 		return nil, nil, err
 	}
 	lines := strings.Split(string(out), "\n")

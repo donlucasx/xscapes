@@ -208,3 +208,29 @@ func TestHermesInstallMergesAndIsReversible(t *testing.T) {
 		}
 	}
 }
+
+// The first outside tester's Kimi config (2026-09-17) carried twelve
+// `[[hooks]]` entries an agent had written by hand, each calling
+// `xscapes hook <Event>` with no marker around them. Installing over them
+// would fire every event twice. The installer refuses and says why; it does
+// not remove what it did not write.
+func TestInstallRefusesHooksWrittenByHand(t *testing.T) {
+	hand := "default_model = \"kimi-code/k3\"\n\n" +
+		"[[hooks]]\nevent = \"SessionStart\"\ncommand = \"/Users/h/go/bin/xscapes hook SessionStart\"\ntimeout = 5\n\n" +
+		"[[hooks]]\nevent = \"Stop\"\ncommand = \"/Users/h/go/bin/xscapes hook Stop\"\ntimeout = 5\n"
+	if _, _, err := addKimiHooks([]byte(hand), "/usr/local/bin/xscapes"); err == nil || !strings.Contains(err.Error(), "2 hook entries") {
+		t.Fatalf("kimi: hand-written hooks were installed over: err=%v", err)
+	}
+	// Our own block, however many times, is fine: it is rewritten.
+	own, _, err := addKimiHooks([]byte("default_model = \"x\"\n"), "/usr/local/bin/xscapes")
+	if err != nil {
+		t.Fatal(err)
+	}
+	if _, _, err := addKimiHooks(own, "/usr/local/bin/xscapes"); err != nil {
+		t.Fatalf("our own block was refused as foreign: %v", err)
+	}
+	handY := "hooks:\n  SessionStart:\n    - command: xscapes hook SessionStart hermes\n      timeout: 5\n"
+	if _, _, err := addHermesHooks([]byte(handY), "/usr/local/bin/xscapes"); err == nil || !strings.Contains(err.Error(), "1 hook entry") {
+		t.Fatalf("hermes: hand-written hooks were installed over: err=%v", err)
+	}
+}

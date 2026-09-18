@@ -28,10 +28,20 @@ One command, on a Mac or Linux, with or without Go:
 
 ```sh
 curl -fsSL https://donlucasx.github.io/xscapes/install.sh | sh
-
-xscapes install claude          # prints a plan, writes nothing
-xscapes install claude --apply  # writes the hooks, after a backup
 ```
+
+Then wire it to your agent and run the agent inside the scape:
+
+```sh
+xscapes install claude --apply && xscapes claude    # Claude Code
+xscapes install kimi --apply   && xscapes kimi      # Kimi Code CLI
+xscapes install hermes --apply && xscapes hermes    # Hermes Agent
+xscapes inside <any command>                        # anything else, no hooks
+```
+
+`xscapes install <agent>` without `--apply` prints the plan and writes nothing;
+with it, the hooks go in after a backup, and `uninstall` takes out exactly
+what was written.
 
 The script puts the release binary in `~/.local/bin`. If that directory is
 not on your PATH it adds one line to your shell's rc file for every new
@@ -164,8 +174,16 @@ on by default until an agent's hooks announce a session, and `-watch=on|off`
 forces it either way.
 
 **Adapter 3: Kimi Code CLI**, via its shell hooks. `xscapes install kimi`
-appends the hooks to `~/.kimi-code/config.toml` as a marked block; Kimi's
-event names are Claude Code's, read off its own binary.
+appends the hooks to `~/.kimi-code/config.toml` as a marked block, and
+`xscapes kimi` runs Kimi inside the scape. Kimi's event names are Claude
+Code's, but its payloads differ where it matters, and each was measured on
+Kimi itself (2026-09-17) rather than assumed: the prompt arrives as parts and the error
+as an object (both read); its todo tool is `TodoList` (it lights the stars);
+its permission prompt is the ask and its answer takes the ask down; Esc
+sends an interrupt in place of a finish (the scene settles, no cue); a
+subagent's own finish carries no mark, so a finish while one is open is not
+the turn's; and the spend counter and the moon read Kimi's own session
+files, since its hooks name no transcript.
 
 **Adapter 4: Hermes Agent**, via its shell hooks. `xscapes install hermes`
 merges them into `~/.hermes/config.yaml`. Hermes asks for consent the first
@@ -182,7 +200,9 @@ xscapes companion crab     # choose the animal: crab (default) or cat
 xscapes scape shore        # choose the scape: vista (default) or shore; a running scape switches
 xscapes inside <command>   # host any command inside the scape, not just claude
 xscapes install kimi       # Kimi Code CLI hooks (a plan; --apply writes)
+xscapes kimi               # Kimi Code CLI inside the scape
 xscapes install hermes     # Hermes Agent hooks (a plan; --apply writes)
+xscapes hermes             # Hermes Agent inside the scape
 xscapes claude -beside     # the older side by side layout, in tmux
 xscapes claude -scape 24   # give the shoreline more rows (default: two fifths)
 xscapes claude -fps 8      # slow the scape down
