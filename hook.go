@@ -11,6 +11,7 @@ import (
 	"time"
 
 	"github.com/donlucasx/xscapes/internal/event"
+	"github.com/donlucasx/xscapes/internal/spend"
 )
 
 // hookPayload is the subset of Claude Code's hook input we read. The full
@@ -48,14 +49,91 @@ type hookPayload struct {
 	NotificationType string `json:"notification_type"`
 	Message          string `json:"message"`
 
-	Error       string `json:"error"`
-	IsInterrupt bool   `json:"is_interrupt"`
+	// Error is a string from Claude Code and an OBJECT {code, message} from
+	// Kimi Code CLI (measured 2026-09-17); errorText reads either.
+	Error       json.RawMessage `json:"error"`
+	IsInterrupt bool            `json:"is_interrupt"`
 
 	LastAssistant string `json:"last_assistant_message"`
-	Prompt        string `json:"prompt"`
-	Source        string `json:"source"`
-	Reason        string `json:"reason"`
-	Trigger       string `json:"trigger"`
+	// Prompt is a string from Claude Code and, on Kimi's UserPromptSubmit,
+	// an ARRAY of parts [{type: "text", text}] (measured); promptText reads
+	// either. As a string field the array failed to parse and the prompt
+	// reached the sand with no words.
+	Prompt  json.RawMessage `json:"prompt"`
+	Source  string          `json:"source"`
+	Reason  string          `json:"reason"`
+	Trigger string          `json:"trigger"`
+	// Decision is PermissionResult's verdict on Kimi ("approved" or
+	// "denied"); Claude Code has no such event.
+	Decision string `json:"decision"`
+
+	// Src names whose hooks these are ("claude", "kimi", "hermes"). It comes
+	// from the installed command's own argument, never from the payload, so
+	// an agent cannot claim to be another one.
+	Src string `json:"-"`
+}
+
+// promptText is the prompt as one string, whichever shape carried it.
+func (p hookPayload) promptText() string {
+	if len(p.Prompt) == 0 {
+		return ""
+	}
+	var s string
+	if json.Unmarshal(p.Prompt, &s) == nil {
+		return s
+	}
+	var parts []struct {
+		Type string `json:"type"`
+		Text string `json:"text"`
+	}
+	if json.Unmarshal(p.Prompt, &parts) != nil {
+		return ""
+	}
+	var b strings.Builder
+	for _, part := range parts {
+		if part.Type == "text" && part.Text != "" {
+			if b.Len() > 0 {
+				b.WriteByte(' ')
+			}
+			b.WriteString(part.Text)
+		}
+	}
+	return b.String()
+}
+
+// errorText is the error's first line, whichever shape carried it.
+func (p hookPayload) errorText() string {
+	if len(p.Error) == 0 {
+		return ""
+	}
+	var s string
+	if json.Unmarshal(p.Error, &s) == nil {
+		return firstLine(s)
+	}
+	var o struct {
+		Message string `json:"message"`
+		Code    string `json:"code"`
+	}
+	if json.Unmarshal(p.Error, &o) != nil {
+		return ""
+	}
+	if o.Message != "" {
+		return firstLine(o.Message)
+	}
+	return o.Code
+}
+
+// firstQuestion is what AskUserQuestion is asking, for the balloon.
+func firstQuestion(raw json.RawMessage) string {
+	var in struct {
+		Questions []struct {
+			Question string `json:"question"`
+		} `json:"questions"`
+	}
+	if json.Unmarshal(raw, &in) != nil || len(in.Questions) == 0 {
+		return ""
+	}
+	return firstLine(in.Questions[0].Question)
 }
 
 // needsYouTypes are the notification types that mean a human is actually being
@@ -178,6 +256,13 @@ func runHook(args []string) {
 	if p.Session == "" {
 		p.Session = event.SessionFromEnv()
 	}
+	p.Src = src
+	// Kimi's hooks carry no transcript path; its session directory stands in
+	// for one (internal/spend/kimi.go), resolved on every event because the
+	// index that names it is written a moment after SessionStart.
+	if src == "kimi" && p.Transcript == "" {
+		p.Transcript = spend.KimiSessionDir(p.Session)
+	}
 	// Kimi spells two keys differently; fold them in so translate reads one
 	// shape.
 	if p.ToolUseID == "" {
@@ -240,14 +325,21 @@ func translate(p hookPayload) []event.Event {
 		return []event.Event{{Kind: event.SessionEnd, Text: p.Reason}}
 
 	case "UserPromptSubmit":
-		return []event.Event{{Kind: event.Prompt, Text: p.Prompt}}
+		return []event.Event{{Kind: event.Prompt, Text: p.promptText()}}
 
 	case "PreToolUse":
 		op, target := classify(p.ToolName, p.ToolInput)
-		return []event.Event{{
+		start := event.Event{
 			Kind: event.ToolStart, Op: op, Tool: p.ToolName,
 			Target: target, ID: p.ToolUseID,
-		}}
+		}
+		// Kimi's question to the user is a plain tool call and fires no
+		// Notification (measured 2026-09-17), so the tool starting IS the
+		// ask. After the start, because a tool starting clears the balloon.
+		if p.Src == "kimi" && p.ToolName == "AskUserQuestion" {
+			return []event.Event{start, {Kind: event.NeedsInput, Text: firstQuestion(p.ToolInput)}}
+		}
+		return []event.Event{start}
 
 	case "PostToolUse":
 		op, target := classify(p.ToolName, p.ToolInput)
@@ -278,7 +370,7 @@ func translate(p hookPayload) []event.Event {
 		}
 		return []event.Event{{
 			Kind: kind, Op: op, Tool: p.ToolName, Target: target,
-			ID: p.ToolUseID, MS: p.DurationM, Detail: firstLine(p.Error),
+			ID: p.ToolUseID, MS: p.DurationM, Detail: p.errorText(),
 		}}
 
 	case "PermissionRequest":
@@ -287,6 +379,11 @@ func translate(p hookPayload) []event.Event {
 			Kind: event.NeedsInput, Op: op, Tool: p.ToolName, Target: target,
 			Text: "allow " + p.ToolName + "?",
 		}}
+
+	case "PermissionResult":
+		// Kimi's word that the approval was answered, either way: the ask
+		// comes down now, not at the next tool start or the turn's end.
+		return []event.Event{{Kind: event.Answered, Text: p.Decision}}
 
 	case "Notification":
 		// The whole 60-second-nag problem, solved by reading a field.
@@ -326,7 +423,13 @@ func translate(p hookPayload) []event.Event {
 		// a model that would not answer): the companion worries, and the
 		// sand says why. Interrupt is the user pressing escape and stays
 		// silent, as PostToolUseFailure's is_interrupt does.
-		return []event.Event{{Kind: event.Error, Detail: firstLine(p.Error)}}
+		return []event.Event{{Kind: event.Error, Detail: p.errorText()}}
+
+	case "Interrupt":
+		// Esc. Kimi fires this IN PLACE OF Stop (measured), so without it
+		// the turn would stay open until TurnSilence. Quiet, his ruling of
+		// 2026-09-17: the person who pressed the key is already here.
+		return []event.Event{{Kind: event.Interrupt, Text: p.Reason}}
 
 	// Hermes Agent. pre_llm_call and post_llm_call fire ONCE PER TURN
 	// (hooks.md: "before the tool-calling loop" / "after the tool-calling
@@ -383,7 +486,7 @@ func translate(p hookPayload) []event.Event {
 // It counts "completed" and treats everything else as outstanding, so a status
 // value nobody anticipated lands on "not done" rather than on "done".
 func todoCounts(tool string, in json.RawMessage) (done, total int, ok bool) {
-	if tool != "TodoWrite" || len(in) == 0 {
+	if (tool != "TodoWrite" && tool != "TodoList") || len(in) == 0 {
 		return 0, 0, false
 	}
 	var p struct {
@@ -395,7 +498,8 @@ func todoCounts(tool string, in json.RawMessage) (done, total int, ok bool) {
 		return 0, 0, false
 	}
 	for _, t := range p.Todos {
-		if strings.EqualFold(t.Status, "completed") {
+		// Claude Code says "completed"; Kimi's TodoList says "done".
+		if strings.EqualFold(t.Status, "completed") || strings.EqualFold(t.Status, "done") {
 			done++
 		}
 	}
@@ -416,6 +520,10 @@ type toolInput struct {
 	Description string `json:"description"`
 	SubagentTyp string `json:"subagent_type"`
 	Prompt      string `json:"prompt"`
+	// Questions is AskUserQuestion's input, Claude Code's and Kimi's alike.
+	Questions []struct {
+		Question string `json:"question"`
+	} `json:"questions"`
 }
 
 // classify puts a tool into one of the coarse ops and finds its subject.
@@ -474,8 +582,13 @@ func classify(tool string, raw json.RawMessage) (event.Op, string) {
 			s = firstLine(in.Description)
 		}
 		return event.OpSub, s
-	case "TodoWrite":
+	case "TodoWrite", "TodoList":
 		return event.OpTodo, ""
+	case "AskUserQuestion":
+		if len(in.Questions) > 0 {
+			return event.OpOther, trimTo(firstLine(in.Questions[0].Question), 40)
+		}
+		return event.OpOther, ""
 	}
 	if strings.HasPrefix(tool, "mcp__") {
 		return event.OpMCP, strings.TrimPrefix(tool, "mcp__")
