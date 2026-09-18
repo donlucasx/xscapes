@@ -234,3 +234,97 @@ func TestInstallRefusesHooksWrittenByHand(t *testing.T) {
 		t.Fatalf("hermes: hand-written hooks were installed over: err=%v", err)
 	}
 }
+
+// `xscapes install kimi|hermes --apply` keeps the config as it was, beside the
+// Claude settings backups. Uninstall removes what was written; a copy of the
+// original is what "restore" means, and the page has promised one.
+func TestAgentInstallBacksUpTheOriginal(t *testing.T) {
+	home := t.TempDir()
+	t.Setenv("HOME", home)
+	dir := filepath.Join(home, ".kimi-code")
+	if err := os.MkdirAll(dir, 0o755); err != nil {
+		t.Fatal(err)
+	}
+	path := filepath.Join(dir, "config.toml")
+	orig := []byte("default_model = \"kimi-code/k3\"\n")
+	if err := os.WriteFile(path, orig, 0o644); err != nil {
+		t.Fatal(err)
+	}
+	runInstallAgent("kimi", []string{"--apply", "--config", path, "--bin", "/usr/local/bin/xscapes"})
+	baks, _ := filepath.Glob(filepath.Join(home, ".config", "xscapes", "backups", "kimi-config.*.toml"))
+	if len(baks) != 1 {
+		t.Fatalf("backups: %v, want one kimi-config.<stamp>.toml", baks)
+	}
+	if b, _ := os.ReadFile(baks[0]); !bytes.Equal(b, orig) {
+		t.Fatalf("the backup is not the original:\n%s", b)
+	}
+	if now, _ := os.ReadFile(path); !bytes.Contains(now, []byte("[[hooks]]")) {
+		t.Fatalf("the config was not written")
+	}
+}
+
+// `xscapes kimi` (claude, hermes) refuses to start when that agent's hooks are
+// not installed, because the scape would run half-blind on the output watcher
+// and nothing on screen would say so. His first Kimi run, 2026-09-17: no
+// owlets, no spend, no tool names, and the config had no hooks at all.
+func TestTheLauncherKnowsWhenHooksAreMissing(t *testing.T) {
+	home := t.TempDir()
+	t.Setenv("HOME", home)
+	for _, agent := range []string{"claude", "kimi", "hermes"} {
+		if ok, _ := hooksInstalled(agent); ok {
+			t.Fatalf("%s: installed with no config file at all", agent)
+		}
+	}
+	// Kimi: a config without the block, then with it.
+	kp := filepath.Join(home, ".kimi-code", "config.toml")
+	os.MkdirAll(filepath.Dir(kp), 0o755)
+	os.WriteFile(kp, []byte("default_model = \"x\"\n"), 0o644)
+	if ok, where := hooksInstalled("kimi"); ok || where != kp {
+		t.Fatalf("kimi without the block: ok=%v where=%q", ok, where)
+	}
+	out, _, err := addKimiHooks([]byte("default_model = \"x\"\n"), "/usr/local/bin/xscapes")
+	if err != nil {
+		t.Fatal(err)
+	}
+	os.WriteFile(kp, out, 0o644)
+	if ok, _ := hooksInstalled("kimi"); !ok {
+		t.Fatalf("kimi with the block: not seen")
+	}
+	// Hermes.
+	hp := filepath.Join(home, ".hermes", "config.yaml")
+	os.MkdirAll(filepath.Dir(hp), 0o755)
+	os.WriteFile(hp, []byte("model: x\n"), 0o644)
+	if ok, _ := hooksInstalled("hermes"); ok {
+		t.Fatalf("hermes without items: seen")
+	}
+	hout, _, err := addHermesHooks([]byte("model: x\n"), "/usr/local/bin/xscapes")
+	if err != nil {
+		t.Fatal(err)
+	}
+	os.WriteFile(hp, hout, 0o644)
+	if ok, _ := hooksInstalled("hermes"); !ok {
+		t.Fatalf("hermes with items: not seen")
+	}
+	// Claude Code, through its own marker.
+	cp := filepath.Join(home, ".claude", "settings.json")
+	os.MkdirAll(filepath.Dir(cp), 0o755)
+	os.WriteFile(cp, []byte("{}\n"), 0o644)
+	if ok, _ := hooksInstalled("claude"); ok {
+		t.Fatalf("claude with empty settings: seen")
+	}
+	cout, _, err := addHooks([]byte("{}\n"), "/usr/local/bin/xscapes")
+	if err != nil {
+		t.Fatal(err)
+	}
+	os.WriteFile(cp, cout, 0o644)
+	if ok, _ := hooksInstalled("claude"); !ok {
+		t.Fatalf("claude with the marked entries: not seen")
+	}
+	// The message names the agent, the install line and the way around.
+	msg := missingHooks("kimi", kp)
+	for _, want := range []string{"Kimi Code CLI", "xscapes install kimi --apply", "xscapes inside kimi", kp} {
+		if !strings.Contains(msg, want) {
+			t.Fatalf("message lacks %q:\n%s", want, msg)
+		}
+	}
+}

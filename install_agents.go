@@ -9,6 +9,7 @@ import (
 	"path/filepath"
 	"regexp"
 	"strings"
+	"time"
 )
 
 // THE SECOND AND THIRD ADAPTERS: Kimi Code CLI and Hermes Agent.
@@ -155,6 +156,11 @@ func runInstallAgent(target string, args []string) {
 		fmt.Println("Run again with --apply to write it.")
 		return
 	}
+	bak, err := backupConfig(target, path, orig)
+	if err != nil {
+		die(err)
+	}
+	fmt.Println("backup    " + bak)
 	if err := writeConfig(path, out); err != nil {
 		die(err)
 	}
@@ -198,6 +204,79 @@ func runUninstallAgent(target string, args []string) {
 		die(err)
 	}
 	fmt.Println("Removed.")
+}
+
+// backupConfig keeps the agent's config exactly as it was before this
+// program touched it, beside the Claude settings backups. Uninstall removes
+// what was written; a copy of the original is what "restore" means, and it
+// is what the page promises ("after a backup"). Until 2026-09-17 only the
+// Claude installer kept one.
+func backupConfig(target, path string, orig []byte) (string, error) {
+	dir, err := homePath(".config", "xscapes", "backups")
+	if err != nil {
+		return "", err
+	}
+	if err := os.MkdirAll(dir, 0o700); err != nil {
+		return "", err
+	}
+	stamp := time.Now().UTC().Format("20060102-150405")
+	bak := filepath.Join(dir, target+"-config."+stamp+filepath.Ext(path))
+	if err := os.WriteFile(bak, orig, 0o600); err != nil {
+		return "", err
+	}
+	return bak, nil
+}
+
+// hooksInstalled says whether this program's hooks are in the agent's config,
+// and where it looked. `xscapes claude|kimi|hermes` asks before starting:
+// without hooks the scape runs on the output watcher, half-blind, and nothing
+// on screen says so (his first Kimi run, 2026-09-17: no owlets, no spend, no
+// tool names, and the config had no hooks at all).
+func hooksInstalled(agent string) (bool, string) {
+	var path string
+	var err error
+	if agent == "claude" {
+		path, err = settingsPath("")
+	} else if ad, ok := adapters[agent]; ok {
+		path, err = ad.path()
+	} else {
+		return true, ""
+	}
+	if err != nil {
+		return false, path
+	}
+	src, err := os.ReadFile(path)
+	if err != nil {
+		return false, path
+	}
+	var n int
+	switch agent {
+	case "claude":
+		_, n, err = removeHooks(src)
+	case "kimi":
+		_, n, err = removeKimiHooks(src)
+	case "hermes":
+		_, n, err = removeHermesHooks(src)
+	}
+	return err == nil && n > 0, path
+}
+
+// missingHooks is what the launcher prints instead of starting.
+func missingHooks(agent, where string) string {
+	name := agent
+	if ad, ok := adapters[agent]; ok {
+		name = ad.name
+	} else if agent == "claude" {
+		name = "Claude Code"
+	}
+	return fmt.Sprintf(`xscapes: %s's hooks are not installed (nothing of xscapes in %s).
+Without them the scape only watches %s's output: no tool names, no asks, no sub-agents.
+
+  xscapes install %s --apply    # writes the hooks (without --apply it prints the plan)
+  xscapes %s                    # then this again
+
+To run without hooks anyway: xscapes inside %s
+`, name, where, name, agent, agent, agent)
 }
 
 // writeConfig replaces path with out through a temp file in the same
