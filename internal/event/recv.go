@@ -2,6 +2,7 @@ package event
 
 import (
 	"bytes"
+	"encoding/json"
 	"errors"
 	"io"
 	"net"
@@ -53,7 +54,25 @@ type Bus struct {
 }
 
 // Listen binds the session's socket and starts following its spool file.
+// The spool is followed from its END: everything already in it was written
+// while no engine was listening, which makes it history, not news.
 func Listen(session string) (*Bus, error) {
+	return listen(session, time.Time{})
+}
+
+// ListenSince is Listen for a scape that was already running when the
+// session began: the hosted launcher, which binds to the session its agent
+// announces within its one-second poll. The hooks that fire in that window
+// spool, and Listen would skip them as history; here every line stamped at
+// or after `since` is news and is delivered first, in order. Written for a
+// Hermes one-shot whose session start and first prompt, six milliseconds
+// apart, both spooled while the scape applied only the session end (his
+// hooks log, 2026-09-18).
+func ListenSince(session string, since time.Time) (*Bus, error) {
+	return listen(session, since)
+}
+
+func listen(session string, since time.Time) (*Bus, error) {
 	if _, err := EnsureRunDir(); err != nil {
 		return nil, err
 	}
@@ -82,12 +101,11 @@ func Listen(session string) (*Bus, error) {
 
 	if sp, err := SpoolPath(session); err == nil {
 		if f, err := os.Open(sp); err == nil {
-			// Start at the end. Everything already in the file was written
-			// while no engine was listening, which makes it history, not
-			// news -- replaying it would rewrite the last hour of weather
-			// into the next two seconds. `xscapes replay` exists for
-			// when you actually want the history.
-			if off, err := f.Seek(0, io.SeekEnd); err == nil {
+			// Start at the end, or at the first line since the launch.
+			// Replaying an unlistened hour would rewrite its weather into
+			// the next two seconds; `xscapes replay` exists for when you
+			// actually want the history.
+			if off, err := spoolStart(f, since); err == nil {
 				b.spool, b.off = f, off
 			} else {
 				f.Close()
@@ -193,6 +211,32 @@ func (b *Bus) readSock() {
 		}
 		b.deliver(buf[:n])
 	}
+}
+
+// spoolStart is the offset a bus follows the spool from: the end when since
+// is zero, else the start of the first line whose ts is at or after since
+// (the end when there is none). A line with no ts, or one that does not
+// parse, is history.
+func spoolStart(f *os.File, since time.Time) (int64, error) {
+	if since.IsZero() {
+		return f.Seek(0, io.SeekEnd)
+	}
+	src, err := io.ReadAll(f)
+	if err != nil {
+		return 0, err
+	}
+	cut := since.UnixMilli()
+	var off int64
+	for _, line := range bytes.SplitAfter(src, []byte("\n")) {
+		var e struct {
+			TS int64 `json:"ts"`
+		}
+		if json.Unmarshal(bytes.TrimSpace(line), &e) == nil && e.TS != 0 && e.TS >= cut {
+			return off, nil
+		}
+		off += int64(len(line))
+	}
+	return int64(len(src)), nil
 }
 
 func (b *Bus) readSpool() {

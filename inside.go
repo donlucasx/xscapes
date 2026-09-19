@@ -198,7 +198,10 @@ With no command, runs claude.
 			if *watchMode != "on" && unbound() && now.After(nextBind) {
 				nextBind = now.Add(time.Second)
 				if cur := event.CurrentSince(launched); cur != "" {
-					if b, err := event.Listen(cur); err == nil {
+					// Since the launch: the hooks that fired between the
+					// pointer and this poll spooled, and they are news
+					// (a one-shot's first prompt is in that second).
+					if b, err := event.ListenSince(cur, launched); err == nil {
 						fr.follow(b, reduce.New(cur))
 					}
 				}
