@@ -2,6 +2,19 @@
 
 *(Renamed end to end on 2026-09-03: directory, env vars, state path and hook marker. Two names are kept on purpose and are not leftovers -- `internal/envx` still reads `ASCIISCAPES_*` and warns, and `install.go` still RECOGNISES the `# asciiscapes:v1` marker so the hooks it wrote before the rename can be found and removed.)*
 
+> **Session 42 (2026-09-18 ~15:30–22:00), CHECKPOINTED: THE STATUS REPORT, THEN EVERY OPEN ITEM RULED ON, ONE PROMPT
+> EACH.** ⭐ **LINUX RAN FOR THE FIRST TIME** (his catch, *"but linux is untested too"*): Debian containers on both chips,
+> the install line, both scapes on the cube, a hosted command, the installers, the refusal, the bell; all pass. ⭐ **v0.4.5
+> RELEASED** at `c05cb2c`, verified from an empty HOME. ⭐ **The refusal's edge cases built red-first, COMMITTED `d65ccd4`**:
+> none / partial ("only 3 of 15") / full, hand-written hooks count, comments cut before any scan, Kimi's inline key only
+> at the top level. ⭐ **Hermes live, partly**: hooks on his real config (backup kept), 3 of 10 events end to end, the model
+> call refused by his provider (his own full run later). ⭐ **FOUND + FIXED at his word: the hosted launcher dropped the
+> hooks that fired before its one-second bind** (`Listen` follows the spool from its end by design; a one-shot's session
+> start and first prompt spooled and were lost) ⇒ `event.ListenSince(session, launched)`; A/B with a fake one-shot: v0.4.5
+> applied done+end, the fix all four; COMMITTED `5424570` at his word, the record after it, installed clean, NOT PUSHED. Rulings:
+> the tyastie scape stays · the cream cat: leave · the trailer: parked. CARDED: a drain at exit · a sub-second session
+> never binds · the watcher's events never reach the event log. Record: `_FEEDBACK.md` §Session 42, `RESUME.md` first block.
+
 > **Session 41, thread 2 (2026-09-17 20:00 → 2026-09-18 12:30, parallel to the site thread): THE X TRAILER, CUT FOUR
 > TIMES ON HIS NOTES AND POSTED.** https://x.com/donlucas/status/2101029250996617468 . Eight rulings first (one take
 > with a camera over the montage · 16:9, square later · the product's cues + a quiet bed, no VO · four lowercase

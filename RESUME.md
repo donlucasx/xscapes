@@ -3,6 +3,35 @@
 **Copy-paste this prompt into a fresh session:**
 
 ```
+SESSION 42 (2026-09-18 ~15:30-22:00), CHECKPOINTED. Opened on his "give me a
+project status report" (everything in the record held) then "prompt me here
+for each open item"; four rounds of rulings, verbatim in _FEEDBACK.md
+§Session 42. DONE: ⭐ LINUX RUN FOR THE FIRST TIME on both chips in Docker
+(his catch: "but linux is untested too"): install line, both scapes on the
+cube, a hosted command, installers, refusal, bell fallback all pass ·
+⭐ v0.4.5 RELEASED at c05cb2c and verified from an empty HOME · ⭐ the
+refusal's edge cases (Kimi F5) built red-first and COMMITTED d65ccd4:
+hooksState none/partial/full, hand-written hooks count, comments cut before
+any scan, Kimi's inline key only at the top level, README · ⭐ HERMES LIVE,
+PARTLY: hooks installed on his real config (backup kept), 3 of 10 events end
+to end, the model call refused by his provider (third-party usage off on his
+Claude plan; he will run a full test himself) · ⭐ FOUND + FIXED at his word:
+the hosted launcher dropped the hooks that fired before its bind (a one-shot's
+session start + first prompt): event.ListenSince(session, launched) replays
+the spool from the launch; A/B with a fake one-shot: v0.4.5 applied
+done+end, the fix all four. STATE: HEAD = the record commit after 5424570 (the spool
+cut), tree clean; suite 13/13 + vet + fmt green; INSTALLED clean from the
+committed tree; NOT PUSHED at his word (origin/main = c05cb2c); v0.4.5
+predates d65ccd4 and 5424570. HIS RULINGS ON THE REST: the tyastie
+scape stays (old binary, his restart) · the cream cat on light: leave ·
+the trailer: parked. CARDED: a drain at exit (events in the agent's last
+~100 ms are not applied; a one-shot's done can be lost) · a sub-second
+session never binds (below the one-second poll) · the watcher's events are
+never in the event log (README overclaims) · the Go proxy @latest one behind.
+NEXT: push (his word) · v0.4.6 when he wants the two cuts out · his own Hermes run · Kimi's three other leftovers
+(fixture through hookTranslate, cross-log matcher, attribution heuristic).
+The history of the sessions follows.
+
 SESSION 41 WRAPPED 2026-09-18 ~14:50 at his word. STATE: HEAD == origin/main
 (`f809834`+), tree clean (the trailer thread's paths committed), suite 13/13
 + vet + fmt green, INSTALLED clean (inode 87405520 = HEAD), the page LIVE

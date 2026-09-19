@@ -4843,3 +4843,58 @@ binary and the tyastie one an older one: **a restart is what shows the afternoon
   still, what to report) · *"what are the commands again for the first test?"* · *"should I run a new kimi test
   session"* (⇒ yes, after the one-minute check, with the recorders on) · *"ok I wrapped the trailer session, what else
   is open here"* (⇒ the ranked list he then prompted through). WRAPPED 2026-09-18 ~14:50 at his word `/wrap`.
+
+## Session 42 — 2026-09-18 ~15:30–22:00: the status report, then every open item prompted through
+
+**His opening:** *"resume work on xscapes, give me a project status report"* ⇒ built by checking the record against git,
+the suite, the binary, the processes and both live addresses (everything held; the one gap was v0.4.4 seventeen commits
+behind the tree, with F1 and the held Done unreleased). Then: *"instead of a page, prompt me here for each open item with
+a brief and simple description and options to move forward"* ⇒ four rounds of AskUserQuestion, his answers verbatim:
+- v0.4.5: **"Cut it now (Recommended)"** · the three-day tyastie scape on an old binary: **"Leave it (Recommended)"** ·
+  Hermes live: **"Test it live now"** · the cream cat on light: **"Leave it"**.
+- Windows/WSL (offered as "leave it as stated: Mac and Linux"): **"but linux is untested too"** ⇒ he was right, the
+  release cross-compiles Linux and no Linux binary had ever run; Docker is on the machine ⇒ offered a Docker test:
+  **"Test in Docker, then cut v0.4.5 (Recommended)"** · Kimi's four leftovers: **"Only the refusal's edge cases
+  (Recommended)"** · the trailer: **"Park the trailer"**.
+- Hermes after the run (the model call refused by his provider): **"leaning to option 1. I have a hermes account and can
+  run a test as needed"** (option 1 = accept the partial result, hooks stay) · the spool finding: **"Replay since launch
+  (Recommended)"** · the refusal work: **"Commit as one cut (Recommended)"**.
+
+**⭐ LINUX RUN FOR THE FIRST TIME, both chips, in Debian containers** (`docker create -t` + `docker cp` + `docker exec`;
+a bind mount of the scratchpad came up empty): the live install line from an empty HOME lands the v0.4.4 binary and, with
+SHELL=/bin/bash, one line in .bashrc that an interactive bash honours (with SHELL unset it prints the fallback path, by
+design); `-live -level 1` renders both scapes on the cube (arm64 vista 43,273 cube-bg sequences, 0 truecolor, 0 index
+below 16; shore 6,629), exits clean on SIGINT; `xscapes inside` hosts a command in a pty and shows its output; the
+three installers' plans, the launcher refusal, `emit` with no scape and `notify` with no player (terminal bell) all
+behave. The event log stays empty under the watcher (Kimi's §6 F3: watch-synth events are never logged; a doc overclaim,
+not a Linux fault). The lesson is memory `feedback_cross_compiled_is_not_supported_until_run.md`.
+
+**⭐ v0.4.5 TAGGED + RELEASED** at `c05cb2c` (four binaries + checksums, clean stamp), the install line from an empty
+HOME fetched it on the first try, the release binary installed here (inode 87449486). The Go proxy's @latest still says
+v0.4.3; the installer never asks it.
+
+**⭐ THE REFUSAL'S EDGE CASES (Kimi F5), built red-first (`TestTheLauncherChecksMoreThanTheMarker`, ten failures before the
+fix, one per bullet), COMMITTED at his word `d65ccd4`:** `hooksState` = none / partial (n of the events the installer
+writes; the message counts them, "only 3 of 15", and points at a re-install or at `xscapes inside <agent>`) / full, which
+hand-written hooks also reach (they fire; "not installed" over them was a false positive) · `uncommented()` cuts TOML/YAML
+comments before any scan (a comment naming `xscapes hook` refused the install; a commented-out entry would have counted)
+· Kimi's `hooks = [...]` only at the top level (under a `[table]` it is that table's key) · the message names the
+--config case · README. ⚠ The old round-trip test put its inline key AFTER the fixture's last table and asserted the
+refusal: it encoded the bug. His real Claude and Kimi configs pass the check as full.
+
+**⭐ HERMES LIVE, PARTLY.** `xscapes install hermes --apply` on his real config (backup
+`~/.config/xscapes/backups/hermes-config.20260918-235544.yaml`; `hermes hooks list` shows all 10, not yet allowlisted).
+One-shot `xscapes hermes chat -q "Reply with exactly the word ok" --accept-hooks -Q` on a pty: on_session_start,
+pre_llm_call and on_session_finalize fired and were logged; the model call FAILED on his provider (claude-opus-4-7 via
+anthropic: *"Third-party apps now draw from your extra usage, not your plan limits"*, no fallback configured), so 3 of 10
+events ran end to end; the rest keep their schema tests. ⭐ **FOUND: the two events before the bind were DROPPED**:
+`event.Listen` follows the spool from its END by design (an unlistened hour is history), and the hosted launcher binds
+within a one-second poll, so a one-shot's session start and first prompt (6 ms apart) spooled and only the session end
+was applied. **FIXED at his word:** `event.ListenSince(session, launched)` starts at the first spool line stamped at or
+after the launch (`TestABindReplaysWhatArrivedSinceTheLaunch`, red first: nothing delivered; a replay-everything
+mutation would deliver the hour-old line too and fail). **A/B on the real path with a fake one-shot agent firing the real
+hook command:** v0.4.5 applied `done, session_end`; the fixed build `session_start, prompt, done, session_end`.
+COMMITTED at his word **"Commit both, no push (Recommended)"** as `5424570`, the record after it; INSTALLED clean from the committed tree; NOT PUSHED (his word).
+⚠ **CARDED, not built:** events fired in the agent's last ~100 ms before it exits are not applied on either binary
+(the scape leaves with the agent; a one-shot's done cue can be lost; a drain at exit would close it) · the second Hermes
+run ended in 0.5 s, before the first bind poll, so nothing bound at all (a sub-second session is below the poll).
