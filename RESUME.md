@@ -3,7 +3,8 @@
 **Copy-paste this prompt into a fresh session:**
 
 ```
-SESSION 43 (2026-09-19), THE QT CARD, DELIVERED. His ask: art for a quote
+SESSION 43 (2026-09-19), THE QT CARD: DELIVERED, POSTED, WRAPPED 14:55 PDT at
+his word ("great work /wrap"). His ask: art for a quote
 post of the trailer, "similar to the SCAPES AND COMPANIONS section of the
 site: 16:9, header with ascii separator on the top, underneath 4 companions,
 animated, on a loop, maybe a gif? best practices for max reach?". BUILT
@@ -13,9 +14,11 @@ cast portraits (crab, cat, owl moving, frog) + the site's captions, 1920x1080
 every animal; the owl's clock offset 4 s, the crab's and cat's 0.5 s so
 neither starts mid-blink on the breath's zero crossing). DELIVERED
 ~/Desktop/xscapes-qt/: the MP4 (post this), a 1280 GIF, a still, post.md
-(captions + reach notes). UNTRACKED, his word to commit: qt_test.go (gated,
-XSCAPES_QT=<dir>) and notes/qt/ (README with the seam table, render-card.mjs,
-card.json, fonts). Nothing of the product changed; tree otherwise clean.
+(captions + reach notes). STATE: HEAD = this wrap's record commit on e154e15, PUSHED (verified with
+ls-remote); the ONLY untracked files are qt_test.go (gated, XSCAPES_QT=<dir>)
+and notes/qt/ (README with the seam table, render-card.mjs, card.json, fonts),
+his word to commit as the trailer's were. Nothing of the product changed; the
+new tests skip without XSCAPES_QT; vet + gofmt clean; the suite not re-run.
 POSTED 11:20 PDT by the parallel session xscapes-17, verified in his Chrome:
 https://x.com/donlucas/status/2101375821940392422 (rulings: no Unicode italics,
 no extra link in the body). NEXT: his notes on the card if any (title,

@@ -4951,6 +4951,10 @@ verified it: https://x.com/donlucas/status/2101375821940392422 . His two rulings
 the post are in that session's bullet below (no Unicode "italics" from a
 formatter, the name must stay searchable; no extra link in the body, the quoted
 trailer's second post carries it).
+
+WRAPPED 14:55 PDT at his word, verbatim: *"great work /wrap"*. The record is
+the wrap commit; `qt_test.go` and `notes/qt/` left UNTRACKED for his word, as
+the trailer's files were (they are tracked now, 20 files).
 - **2026-09-19 morning, the CAST POST.** His draft used a "Twitter text formatter" for italics on *xscapes* and the
   hackathon's name; his question *"is it a bad idea to use italics? or formatted text?"* ⇒ yes: those are Unicode math
   letters, not italics (the name stops being searchable or copyable, screen readers spell it out, some clients show
