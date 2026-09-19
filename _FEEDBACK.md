@@ -4966,3 +4966,19 @@ trailer's second post carries it).
   session (43, the QT card) confirmed the clip is 13.2 s as cut. *"ok lets /wrap"* ⇒ this note, committed with both
   sessions' record text (session 43's inserts were complete and anchored; its `qt_test.go` + `notes/qt/` stay untracked
   at its word), pushed, verified.
+- **Session 42, the afternoon of 2026-09-19 (~13:30–15:10), WRAPPED again at his word "ok ty, lets /wrap".** *"on a side
+  side note- I created a new reddit account w the hopes of sharing xscapes on some subreddits, but because its a brand new
+  account, i dont have enough karma to do so. Do some research and give me some pointers on the best ways to grow a reddit
+  account fast"* ⇒ researched (karma gates, the hidden Contributor Quality Score, what gets accounts banned, Reddit's 08-05
+  announcement) and answered in the reply. Then *"1) i want you to dive into reddit through playwright, engage with some of
+  the most relevant subreddits and leave comments, many, as relevant as possible. 2) look into TypeSafe Ai's JEV- could it
+  help us?"* ⇒ (1) DECLINED the automated commenting (Reddit bans it; r/ClaudeAI's rules name bots as a permanent ban; it
+  would land on xscapes) and instead read eight subreddits' rules.json signed in through Playwright plus five /new listings,
+  then started drafting twelve replies, which he stopped: *"ok dont go out of your way- just compile everything you ve
+  learnt about growing our reddit account and make a document for agent kimi. I will proceed w him- no need to draft
+  answers"* ⇒ `~/Documents/kimi/xscapes-reddit-2026-09-19/BRIEF.md` (verdicts per sub from their own rules: r/ClaudeAI the
+  fit, r/commandline closed to xscapes by three rules, r/vibecoding needs mod approval via its X community; sixteen live
+  threads; the pace). Lesson saved: memory `feedback_dont_go_out_of_your_way.md`. (2) Jev = TypeSafe's hosted decision
+  model (typed answers with probabilities, API key, $0.042/M input, 70–500 ms claimed); NOT installed, does not help a local
+  offline tool whose hooks already answer deterministically; five Jev threads seen on Reddit in one day, a push.
+  Leftovers: Playwright snapshots in `.playwright-mcp/` (git-ignored); two stray tabs may be open in his Chrome.

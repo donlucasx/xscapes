@@ -23,7 +23,9 @@
 > start and first prompt spooled and were lost) ⇒ `event.ListenSince(session, launched)`; A/B with a fake one-shot: v0.4.5
 > applied done+end, the fix all four; COMMITTED `5424570` at his word, the record after it, installed clean, PUSHED at his word "you push it" (origin/main `7b14289`+). Rulings:
 > the tyastie scape stays · the cream cat: leave · the trailer: parked. CARDED: a drain at exit · a sub-second session
-> never binds · the watcher's events never reach the event log. Record: `_FEEDBACK.md` §Session 42, `RESUME.md` first block.
+> never binds · the watcher's events never reach the event log. THE 09-19 AFTERNOON: the Reddit brief for Kimi
+> (`~/Documents/kimi/xscapes-reddit-2026-09-19/BRIEF.md`; automated commenting DECLINED; r/ClaudeAI fits, r/commandline is
+> closed to xscapes) and TypeSafe's Jev assessed, not installed. Record: `_FEEDBACK.md` §Session 42, `RESUME.md` first block.
 
 > **Session 41, thread 2 (2026-09-17 20:00 → 2026-09-18 12:30, parallel to the site thread): THE X TRAILER, CUT FOUR
 > TIMES ON HIS NOTES AND POSTED.** https://x.com/donlucas/status/2101029250996617468 . Eight rulings first (one take

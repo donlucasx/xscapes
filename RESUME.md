@@ -52,6 +52,12 @@ the trailer: parked. CARDED: a drain at exit (events in the agent's last
 ~100 ms are not applied; a one-shot's done can be lost) · a sub-second
 session never binds (below the one-second poll) · the watcher's events are
 never in the event log (README overclaims) · the Go proxy @latest one behind.
+THE 09-19 AFTERNOON: his new Reddit account cannot post yet; research done,
+the automated-commenting ask DECLINED (bans), the brief for Kimi written at
+~/Documents/kimi/xscapes-reddit-2026-09-19/BRIEF.md (per-sub verdicts from
+their rules: r/ClaudeAI fits, r/commandline is closed to xscapes, r/vibecoding
+wants mod approval via X; sixteen threads); Kimi runs it. TypeSafe's Jev
+assessed and NOT installed (hosted, keyed, no help to a local tool).
 NEXT: v0.4.6 when he wants the two cuts out (the install line serves v0.4.5
 without them) · his own Hermes run · Kimi's three other leftovers (fixture
 through hookTranslate, cross-log matcher, attribution heuristic) · session
