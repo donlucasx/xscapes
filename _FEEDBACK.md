@@ -4898,3 +4898,4 @@ COMMITTED at his word **"Commit both, no push (Recommended)"** as `5424570`, the
 ⚠ **CARDED, not built:** events fired in the agent's last ~100 ms before it exits are not applied on either binary
 (the scape leaves with the agent; a one-shot's done cue can be lost; a drain at exit would close it) · the second Hermes
 run ended in 0.5 s, before the first bind poll, so nothing bound at all (a sub-second session is below the poll).
+- *"you push it"* (~22:10) ⇒ PUSHED: origin/main = `7b14289` (+ this note), verified with ls-remote after `gh auth switch --user donlucasx`.

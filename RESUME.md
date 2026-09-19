@@ -21,14 +21,14 @@ session start + first prompt): event.ListenSince(session, launched) replays
 the spool from the launch; A/B with a fake one-shot: v0.4.5 applied
 done+end, the fix all four. STATE: HEAD = the record commit after 5424570 (the spool
 cut), tree clean; suite 13/13 + vet + fmt green; INSTALLED clean from the
-committed tree; NOT PUSHED at his word (origin/main = c05cb2c); v0.4.5
-predates d65ccd4 and 5424570. HIS RULINGS ON THE REST: the tyastie
+committed tree; PUSHED at his word "you push it" (origin/main = 7b14289 +
+this note, verified with ls-remote); v0.4.5 predates d65ccd4 and 5424570. HIS RULINGS ON THE REST: the tyastie
 scape stays (old binary, his restart) · the cream cat on light: leave ·
 the trailer: parked. CARDED: a drain at exit (events in the agent's last
 ~100 ms are not applied; a one-shot's done can be lost) · a sub-second
 session never binds (below the one-second poll) · the watcher's events are
 never in the event log (README overclaims) · the Go proxy @latest one behind.
-NEXT: push (his word) · v0.4.6 when he wants the two cuts out · his own Hermes run · Kimi's three other leftovers
+NEXT: v0.4.6 when he wants the two cuts out · his own Hermes run · Kimi's three other leftovers
 (fixture through hookTranslate, cross-log matcher, attribution heuristic).
 The history of the sessions follows.
 

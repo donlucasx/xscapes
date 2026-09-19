@@ -11,7 +11,7 @@
 > call refused by his provider (his own full run later). ⭐ **FOUND + FIXED at his word: the hosted launcher dropped the
 > hooks that fired before its one-second bind** (`Listen` follows the spool from its end by design; a one-shot's session
 > start and first prompt spooled and were lost) ⇒ `event.ListenSince(session, launched)`; A/B with a fake one-shot: v0.4.5
-> applied done+end, the fix all four; COMMITTED `5424570` at his word, the record after it, installed clean, NOT PUSHED. Rulings:
+> applied done+end, the fix all four; COMMITTED `5424570` at his word, the record after it, installed clean, PUSHED at his word "you push it" (origin/main `7b14289`+). Rulings:
 > the tyastie scape stays · the cream cat: leave · the trailer: parked. CARDED: a drain at exit · a sub-second session
 > never binds · the watcher's events never reach the event log. Record: `_FEEDBACK.md` §Session 42, `RESUME.md` first block.
 
