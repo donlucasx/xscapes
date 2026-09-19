@@ -79,8 +79,11 @@ func TestKimiInstallIsAppendedValidatedAndReversible(t *testing.T) {
 	if string(back) != kimiFixture {
 		t.Errorf("uninstall did not restore the original:\n%s", back)
 	}
-	// Refuses a file that already has the inline form.
-	if _, _, err := addKimiHooks([]byte(kimiFixture+"hooks = []\n"), bin); err == nil {
+	// Refuses a file that already has the inline form at the top level.
+	// (Until 2026-09-18 this appended the key AFTER the fixture's last
+	// table, where TOML reads it as that table's key, and the installer
+	// refused it all the same: Kimi's assessment, F5.)
+	if _, _, err := addKimiHooks([]byte("hooks = []\n"+kimiFixture), bin); err == nil {
 		t.Errorf("an inline `hooks = [...]` was not refused")
 	}
 
@@ -362,5 +365,140 @@ func TestKimiInstallHonoursKimiCodeHome(t *testing.T) {
 	}
 	if ok, _ := hooksInstalled("kimi"); !ok {
 		t.Fatal("the hooks written under KIMI_CODE_HOME are not seen by the launcher's check")
+	}
+}
+
+// TestTheLauncherChecksMoreThanTheMarker holds the four ways the launcher's
+// check and the installer's refusal could be wrong (Kimi's assessment,
+// 2026-09-18, F5 of the adapter section), each seen red before its fix:
+//
+//  1. hooks written by hand, with no marker, FIRE: the launcher must not say
+//     "not installed" over them (the installer still refuses to write over
+//     them, a different question: installed over, every event fires twice);
+//  2. a marked block missing events, trimmed by hand or written by an older
+//     xscapes that registered fewer, is partial, not installed, and the
+//     message says how many of how many;
+//  3. a comment that mentions `xscapes hook` is not a hook: the installer
+//     must not refuse over it and the launcher must not count it;
+//  4. `hooks = [...]` under a TOML table is that table's key: the Kimi
+//     installer must not refuse it as the top-level one.
+func TestTheLauncherChecksMoreThanTheMarker(t *testing.T) {
+	home := t.TempDir()
+	t.Setenv("HOME", home)
+	kp := filepath.Join(home, ".kimi-code", "config.toml")
+	hp := filepath.Join(home, ".hermes", "config.yaml")
+	cp := filepath.Join(home, ".claude", "settings.json")
+	for _, p := range []string{kp, hp, cp} {
+		os.MkdirAll(filepath.Dir(p), 0o755)
+	}
+	write := func(p, s string) {
+		t.Helper()
+		if err := os.WriteFile(p, []byte(s), 0o644); err != nil {
+			t.Fatal(err)
+		}
+	}
+	const bin = "/usr/local/bin/xscapes"
+
+	// 1. Hooks written by hand count as installed for the launcher.
+	write(kp, "default_model = \"x\"\n\n[[hooks]]\nevent = \"Stop\"\ncommand = \"/Users/h/go/bin/xscapes hook Stop kimi\"\ntimeout = 5\n")
+	write(hp, "hooks:\n  post_llm_call:\n    - command: xscapes hook post_llm_call hermes\n      timeout: 5\n")
+	write(cp, `{"hooks":{"Stop":[{"hooks":[{"type":"command","command":"xscapes hook Stop"}]}]}}`+"\n")
+	for _, agent := range []string{"kimi", "hermes", "claude"} {
+		if st, _, _, _ := hooksState(agent); st != hooksFull {
+			t.Errorf("1. %s: hooks written by hand were called not installed (state %d)", agent, st)
+		}
+	}
+
+	// 2. A block with events missing is partial, and the message counts them.
+	full, _, err := addKimiHooks([]byte("default_model = \"x\"\n"), bin)
+	if err != nil {
+		t.Fatal(err)
+	}
+	var kept []string
+	entries, in := 0, false
+	for _, l := range strings.Split(string(full), "\n") {
+		tl := strings.TrimSpace(l)
+		switch {
+		case isBlockBegin(tl):
+			in = true
+		case isBlockEnd(tl):
+			in = false
+		case in && strings.HasPrefix(tl, "[[hooks]]"):
+			entries++
+		}
+		if in && entries > 3 && !isBlockEnd(tl) {
+			continue
+		}
+		kept = append(kept, l)
+	}
+	write(kp, strings.Join(kept, "\n"))
+	if st, where, have, want := hooksState("kimi"); st != hooksPartial || have != 3 || want != len(kimiHookEvents) || where != kp {
+		t.Errorf("2. kimi trimmed to 3 events: state=%d have=%d want=%d where=%q", st, have, want, where)
+	} else {
+		msg := partialHooks("kimi", kp, have, want)
+		for _, w := range []string{"3 of 15", "xscapes install kimi --apply", "xscapes inside kimi", kp} {
+			if !strings.Contains(msg, w) {
+				t.Errorf("2. the partial message lacks %q:\n%s", w, msg)
+			}
+		}
+	}
+	if ok, _ := hooksInstalled("kimi"); ok {
+		t.Errorf("2. kimi trimmed to 3 events: hooksInstalled said yes")
+	}
+	write(hp, "model: x\nhooks:\n  pre_llm_call:\n"+strings.Join(hermesItem(bin, "pre_llm_call"), "\n")+"\n")
+	if st, _, have, want := hooksState("hermes"); st != hooksPartial || have != 1 || want != len(hermesHookEvents) {
+		t.Errorf("2. hermes with one item of %d: state=%d have=%d want=%d", len(hermesHookEvents), st, have, want)
+	}
+	write(cp, `{"hooks":{"Stop":[{"hooks":[{"type":"command","command":`+`"`+strings.ReplaceAll(command(bin, "Stop"), `"`, `\"`)+`"`+`}]}]}}`+"\n")
+	if st, _, have, want := hooksState("claude"); st != hooksPartial || have != 1 || want != len(hookEvents) {
+		t.Errorf("2. claude with one entry of %d: state=%d have=%d want=%d", len(hookEvents), st, have, want)
+	}
+	// The whole block is full, for all three.
+	hfull, _, err := addHermesHooks([]byte("model: x\n"), bin)
+	if err != nil {
+		t.Fatal(err)
+	}
+	cfull, _, err := addHooks([]byte("{}\n"), bin)
+	if err != nil {
+		t.Fatal(err)
+	}
+	write(kp, string(full))
+	write(hp, string(hfull))
+	write(cp, string(cfull))
+	for _, agent := range []string{"kimi", "hermes", "claude"} {
+		if st, _, have, want := hooksState(agent); st != hooksFull || have != want {
+			t.Errorf("2. %s with the whole block: state=%d have=%d want=%d", agent, st, have, want)
+		}
+	}
+
+	// 3. A comment is not a hook, for the installer or the launcher.
+	commented := "# to wire an xscapes hook by hand, see the README\n# command = \"xscapes hook Stop kimi\"\ndefault_model = \"x\"\n"
+	if _, _, err := addKimiHooks([]byte(commented), bin); err != nil {
+		t.Errorf("3. kimi: a comment naming xscapes hook refused the install: %v", err)
+	}
+	write(kp, commented)
+	if st, _, _, _ := hooksState("kimi"); st != hooksNone {
+		t.Errorf("3. kimi: a comment counted as a hook (state %d)", st)
+	}
+	commentedY := "# xscapes hook notes: none yet\nmodel: x\n"
+	if _, _, err := addHermesHooks([]byte(commentedY), bin); err != nil {
+		t.Errorf("3. hermes: a comment naming xscapes hook refused the install: %v", err)
+	}
+	write(hp, commentedY)
+	if st, _, _, _ := hooksState("hermes"); st != hooksNone {
+		t.Errorf("3. hermes: a comment counted as a hook (state %d)", st)
+	}
+	// A hand-written entry with a trailing comment is still an entry.
+	quoted := "[[hooks]]\nevent = \"Stop\"\ncommand = \"xscapes hook Stop kimi\" # by hand\ntimeout = 5\n"
+	if _, _, err := addKimiHooks([]byte(quoted), bin); err == nil {
+		t.Errorf("3. kimi: a hand-written entry with a trailing comment was installed over")
+	}
+
+	// 4. `hooks = [...]` under a table is that table's key.
+	if _, _, err := addKimiHooks([]byte("[tools]\nhooks = [\"a\"]\n"), bin); err != nil {
+		t.Errorf("4. kimi: hooks under [tools] refused as the top-level key: %v", err)
+	}
+	if _, _, err := addKimiHooks([]byte("hooks = []\n[tools]\n"), bin); err == nil || !strings.Contains(err.Error(), "inline") {
+		t.Errorf("4. kimi: top-level inline hooks were not refused: %v", err)
 	}
 }

@@ -83,8 +83,12 @@ With no command, runs claude.
 	// way to run on the output watcher instead; without it, a missing install
 	// is said out loud rather than shown as a scape that never fills.
 	if agent != "" && *watchMode != "on" {
-		if ok, where := hooksInstalled(agent); !ok {
+		switch st, where, have, want := hooksState(agent); st {
+		case hooksNone:
 			fmt.Fprint(os.Stderr, missingHooks(agent, where))
+			os.Exit(2)
+		case hooksPartial:
+			fmt.Fprint(os.Stderr, partialHooks(agent, where, have, want))
 			os.Exit(2)
 		}
 	}

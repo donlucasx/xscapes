@@ -239,6 +239,22 @@ func backupConfig(target, path string, orig []byte) (string, error) {
 // on screen says so (his first Kimi run, 2026-09-17: no owlets, no spend, no
 // tool names, and the config had no hooks at all).
 func hooksInstalled(agent string) (bool, string) {
+	st, where, _, _ := hooksState(agent)
+	return st == hooksFull, where
+}
+
+// hookState is how much of this program's hook set an agent's config carries.
+type hookState int
+
+const (
+	hooksNone    hookState = iota // nothing of xscapes in the file, or no file
+	hooksPartial                  // our block, with events missing
+	hooksFull                     // every event: our block, or hooks written by hand
+)
+
+// hooksState is what the launcher's check reads: the state, where it looked,
+// and for a partial block how many entries it found of how many it writes.
+func hooksState(agent string) (st hookState, where string, have, want int) {
 	var path string
 	var err error
 	if agent == "claude" {
@@ -246,35 +262,105 @@ func hooksInstalled(agent string) (bool, string) {
 	} else if ad, ok := adapters[agent]; ok {
 		path, err = ad.path()
 	} else {
-		return true, ""
+		return hooksFull, "", 0, 0
 	}
 	if err != nil {
-		return false, path
+		return hooksNone, path, 0, 0
 	}
 	src, err := os.ReadFile(path)
 	if err != nil {
-		return false, path
+		return hooksNone, path, 0, 0
 	}
 	var n int
 	switch agent {
 	case "claude":
 		_, n, err = removeHooks(src)
+		want = len(hookEvents)
 	case "kimi":
 		_, n, err = removeKimiHooks(src)
+		want = len(kimiHookEvents)
 	case "hermes":
 		_, n, err = removeHermesHooks(src)
+		want = len(hermesHookEvents)
 	}
-	return err == nil && n > 0, path
+	if err != nil {
+		return hooksNone, path, 0, want
+	}
+	switch {
+	case n >= want:
+		return hooksFull, path, n, want
+	case n > 0:
+		// Trimmed by hand, or written by an older xscapes that registered
+		// fewer events: the scape would run and miss the rest, and nothing
+		// on screen would say so.
+		return hooksPartial, path, n, want
+	}
+	// No block of ours. Hooks written by hand, or by an agent asked to wire
+	// xscapes up, fire all the same, so the launcher must not call them "not
+	// installed" (the installer refuses to write over them, which is the
+	// other question: installed over, every event would fire twice).
+	if len(foreignHook.FindAll(uncommented(src), -1)) > 0 {
+		return hooksFull, path, 0, want
+	}
+	return hooksNone, path, 0, want
+}
+
+// partialHooks is what the launcher prints for a block with events missing.
+func partialHooks(agent, where string, have, want int) string {
+	return fmt.Sprintf(`xscapes: only %d of %d of xscapes's hook entries are in %s: an older install, or a block edited by hand.
+The scape would run and miss every event that is not there.
+
+  xscapes install %s --apply    # rewrites the block with all %d
+  xscapes %s                    # then this again
+
+To run with the entries that are there: xscapes inside %s   (no check; it binds when they fire)
+`, have, want, where, agent, want, agent, agent)
+}
+
+// agentName is the agent's name for a message.
+func agentName(agent string) string {
+	if ad, ok := adapters[agent]; ok {
+		return ad.name
+	}
+	if agent == "claude" {
+		return "Claude Code"
+	}
+	return agent
+}
+
+// uncommented is src with every comment cut: from a `#` outside quotes, at
+// the start of a line or after a space or tab, to the end of that line.
+// TOML and YAML agree on that much, and it is all the scans in this file
+// need. The foreign-hook scan ran on the raw text, refused an install over
+// a comment that mentioned `xscapes hook`, and would have counted a
+// commented-out entry as a live one (Kimi's assessment, 2026-09-18, F5).
+func uncommented(src []byte) []byte {
+	lines := strings.Split(string(src), "\n")
+	for i, l := range lines {
+		var q byte
+		for j := 0; j < len(l); j++ {
+			c := l[j]
+			switch {
+			case q != 0:
+				if c == '\\' && q == '"' {
+					j++ // an escaped character inside a basic string
+				} else if c == q {
+					q = 0
+				}
+			case c == '"' || c == '\'':
+				q = c
+			case c == '#' && (j == 0 || l[j-1] == ' ' || l[j-1] == '\t'):
+				lines[i] = l[:j]
+				j = len(l)
+			}
+		}
+	}
+	return []byte(strings.Join(lines, "\n"))
 }
 
 // missingHooks is what the launcher prints instead of starting.
 func missingHooks(agent, where string) string {
-	name := agent
-	if ad, ok := adapters[agent]; ok {
-		name = ad.name
-	} else if agent == "claude" {
-		name = "Claude Code"
-	}
+	name := agentName(agent)
 	return fmt.Sprintf(`xscapes: %s's hooks are not installed (nothing of xscapes in %s).
 Without them the scape only watches %s's output: no tool names, no asks, no sub-agents.
 
@@ -282,7 +368,8 @@ Without them the scape only watches %s's output: no tool names, no asks, no sub-
   xscapes %s                    # then this again
 
 To run without hooks anyway: xscapes %s -watch=on   (or: xscapes inside %s)
-`, name, where, name, agent, agent, agent, agent)
+Installed somewhere else with --config? xscapes inside %s skips this check and binds when the hooks fire.
+`, name, where, name, agent, agent, agent, agent, agent)
 }
 
 // writeConfig replaces path with out through a temp file in the same
@@ -329,6 +416,23 @@ func hookCommand(bin, ev, agent string) string {
 
 var kimiInlineHooks = regexp.MustCompile(`(?m)^\s*hooks\s*=`)
 
+// kimiTopLevelInlineHooks says whether config.toml sets `hooks = ...` at the
+// top level, before any table header: the one place it collides with
+// `[[hooks]]` tables. Under a `[table]` the same line is that table's key
+// and no concern of ours (Kimi's assessment, 2026-09-18, F5).
+func kimiTopLevelInlineHooks(src []byte) bool {
+	for _, l := range strings.Split(string(uncommented(src)), "\n") {
+		t := strings.TrimSpace(l)
+		if strings.HasPrefix(t, "[") {
+			return false
+		}
+		if kimiInlineHooks.MatchString(t) {
+			return true
+		}
+	}
+	return false
+}
+
 // foreignHook matches a hook entry that calls this program from OUTSIDE the
 // marked block: one written by hand, or by an agent asked to "wire up
 // xscapes" (the first outside tester's Kimi config had twelve of them,
@@ -340,7 +444,7 @@ var foreignHook = regexp.MustCompile(`xscapes["']?\s+hook\b`)
 // entries. The way out is theirs: the entries were not written by this
 // program, so it does not remove them.
 func refuseForeignHooks(rest []byte, file string) error {
-	n := len(foreignHook.FindAll(rest, -1))
+	n := len(foreignHook.FindAll(uncommented(rest), -1))
 	if n == 0 {
 		return nil
 	}
@@ -374,7 +478,7 @@ func addKimiHooks(src []byte, bin string) ([]byte, []string, error) {
 	if err != nil {
 		return nil, nil, err
 	}
-	if kimiInlineHooks.Match(out) {
+	if kimiTopLevelInlineHooks(out) {
 		return nil, nil, errors.New("config.toml already sets `hooks = [...]` inline; add the xscapes entries to that array by hand, or move it to [[hooks]] tables and run install again")
 	}
 	if err := refuseForeignHooks(out, "config.toml"); err != nil {
