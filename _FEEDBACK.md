@@ -4899,3 +4899,70 @@ COMMITTED at his word **"Commit both, no push (Recommended)"** as `5424570`, the
 (the scape leaves with the agent; a one-shot's done cue can be lost; a drain at exit would close it) · the second Hermes
 run ended in 0.5 s, before the first bind poll, so nothing bound at all (a sub-second session is below the poll).
 - *"you push it"* (~22:10) ⇒ PUSHED: origin/main = `7b14289` (+ this note), verified with ls-remote after `gh auth switch --user donlucasx`.
+
+## Session 43 — 2026-09-19: the QT card
+
+Opened the day after the trailer went up. His brief, verbatim:
+
+> i posted xscapes yesterday. Today I want to do a QT of the original post w the
+> hopes it will keep reaching more people. can you make some art for me? thinking
+> a animated piece similar to the SCAPES AND COMPANIONS section of the site: 16:9,
+> header with ascii separator on the top, underneath 4 companions, animated, on a
+> loop, maybe a gif? best practices for max reach?
+
+Built without prompting him (autonomous mode; every call below is mine, stated as
+an assumption in the reply, one line each to change in `notes/qt/card.json`):
+
+- The header is the site section's own rule and title, drawn as `drawBox` draws
+  a `.sec`: `┌─ SCAPES AND COMPANIONS ───…┐`, JetBrains Mono, bold uppercase.
+- The four are the site's cast (`castClips`): the crab, the cat, the owl, the
+  frog, working pose, on the transparent ground, each cropped to its own ink
+  box, all at one cell size (46 px at 1920), the site's captions under each.
+- The owl MOVES (the legend's `DrawOwlMoving`, the picked working motion); the
+  cast's own owl is a still that blinks, which at 30 fps would be a still.
+- 1920x1080, 30 fps, 13.2 s, dark theme. Type scaled for a phone timeline (rule
+  34 px, captions 32 px), not the page's 14/13.
+- MP4 first, GIF as the fallback: X converts a GIF to MP4 on upload anyway.
+
+MEASURED, not inferred: the animals' clocks never close together exactly (crab
+and cat breath 2.2 s, the cat's wag 2.618 s, both blink on mod 5.3; the owl's
+motion 10 s + a blink on mod 7). The seam was measured as cells that differ
+between the frame after the last and the first, at eight candidate lengths
+(`TestQTPeriods`): 13.2 s is 0 · 0 · 0 · 0. Two offsets make it hold: the owl's
+clock starts 4 s in (quiet across the seam, its action at 6–9.2 s) and the
+crab's and cat's 0.5 s in, because at t = 0 both are MID-BLINK and the breath
+sits on `sin(2πt/2.2) > 0`'s zero crossing, a floating-point coin toss at every
+multiple of 2.2 (the first measurement seamed 2 cells on the crab at EVERY
+length: the eyes). On the decoded MP4 the seam step (frame 395 → 0) measures
+the same as an ordinary step.
+
+DELIVERED to `~/Desktop/xscapes-qt/`: `xscapes-companions-16x9.mp4` (187 KB, H.264
+yuv420p 30 fps, faststart, no audio), `xscapes-companions-1280.gif` (220 KB,
+1280x720, 15 fps, 128 colours, no dither), the first frame as a still, `post.md`
+(three lowercase caption options and the reach notes: native media on the QT, no
+link in the body, under 60 s loops, alt text, reply with the install line).
+Record: `notes/qt/` (README, `render-card.mjs`, `card.json`, fonts) and
+`qt_test.go` at the root, both UNTRACKED like the trailer's; his word to commit.
+Trap paid for again: `heropage_test.go` names a helper `strconv`, so a root test
+file cannot import the package (the trailer's README said so; I hit it anyway).
+
+POSTED 11:20 PDT by the parallel session (xscapes-17), which drove the post and
+verified it: https://x.com/donlucas/status/2101375821940392422 . His two rulings on
+the post are in that session's bullet below (no Unicode "italics" from a
+formatter, the name must stay searchable; no extra link in the body, the quoted
+trailer's second post carries it).
+- **2026-09-19 morning, the CAST POST.** His draft used a "Twitter text formatter" for italics on *xscapes* and the
+  hackathon's name; his question *"is it a bad idea to use italics? or formatted text?"* ⇒ yes: those are Unicode math
+  letters, not italics (the name stops being searchable or copyable, screen readers spell it out, some clients show
+  boxes, reach reportedly limited). Second draft plain; one note taken (the middle line's case, now lowercase like the
+  rest). *"do I need to add a link? Im QT the trailer that has the link on the second post"* ⇒ no for a cast post; the
+  quote carries it. POSTED 11:20 PDT, quoting the trailer: https://x.com/donlucas/status/2101375821940392422 (the
+  16:9 companions clip, 13.2 s as cut, X's player shows 0:11; 80 views in the first minutes). Verified in his Chrome: text, video and quote all there.
+- **Session 42, continued 2026-09-19 ~11:20–13:20, WRAPPED.** *"how do I install"* ⇒ the public line (v0.4.5, which
+  predates the two cuts) and, here, nothing: `~/.local/bin/xscapes` is the clean build of `7b14289`. *"do i need to re
+  install on this computer? on each folder where I run it?"* ⇒ no and no: one global binary, global hooks, state under
+  `~/.config/xscapes`; only a RUNNING scape keeps the binary it started with (this window's from 15:33 on 09-18, the
+  tyastie one from 09-15), so a restart of `xscapes claude` in a window is what picks the new one up. The parallel
+  session (43, the QT card) confirmed the clip is 13.2 s as cut. *"ok lets /wrap"* ⇒ this note, committed with both
+  sessions' record text (session 43's inserts were complete and anchored; its `qt_test.go` + `notes/qt/` stay untracked
+  at its word), pushed, verified.

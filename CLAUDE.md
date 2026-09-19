@@ -2,8 +2,18 @@
 
 *(Renamed end to end on 2026-09-03: directory, env vars, state path and hook marker. Two names are kept on purpose and are not leftovers -- `internal/envx` still reads `ASCIISCAPES_*` and warns, and `install.go` still RECOGNISES the `# asciiscapes:v1` marker so the hooks it wrote before the rename can be found and removed.)*
 
-> **Session 42 (2026-09-18 ~15:30–22:00), CHECKPOINTED: THE STATUS REPORT, THEN EVERY OPEN ITEM RULED ON, ONE PROMPT
-> EACH.** ⭐ **LINUX RAN FOR THE FIRST TIME** (his catch, *"but linux is untested too"*): Debian containers on both chips,
+> **Session 43 (2026-09-19), THE QT CARD DELIVERED.** His ask the day after the trailer: a quote post's art, "similar to
+> the SCAPES AND COMPANIONS section of the site: 16:9, header with ascii separator on the top, underneath 4 companions,
+> animated, on a loop, maybe a gif?" ⇒ BUILT autonomously on the site's own machinery: the section's header rule, the four
+> cast portraits (the owl moving), the captions; 1920x1080 30 fps, a 13.2 s SEAMLESS loop (0 cells differ at the seam on
+> every animal; two clock offsets make it hold, see `notes/qt/README.md`). `~/Desktop/xscapes-qt/`: the MP4 (post this),
+> a 1280 GIF, a still, `post.md` (three lowercase captions + reach notes: native media on the QT, no link in the body).
+> UNTRACKED, his word to commit: `qt_test.go`, `notes/qt/`. Nothing of the product changed. ⭐ **POSTED 11:20 PDT by the parallel
+> session (xscapes-17), verified: https://x.com/donlucas/status/2101375821940392422** (no Unicode italics, no extra link in the body). Record: `_FEEDBACK.md` §Session 43.
+
+> **Session 42 (2026-09-18 ~15:30–22:00, + 09-19 morning), WRAPPED at his word: THE STATUS REPORT, THEN EVERY OPEN ITEM
+> RULED ON, ONE PROMPT EACH; on 09-19 the CAST POST live (x.com/donlucas/status/2101375821940392422, no formatter
+> "italics", no extra link) and his install question answered (one global binary; a running scape needs a restart).** ⭐ **LINUX RAN FOR THE FIRST TIME** (his catch, *"but linux is untested too"*): Debian containers on both chips,
 > the install line, both scapes on the cube, a hosted command, the installers, the refusal, the bell; all pass. ⭐ **v0.4.5
 > RELEASED** at `c05cb2c`, verified from an empty HOME. ⭐ **The refusal's edge cases built red-first, COMMITTED `d65ccd4`**:
 > none / partial ("only 3 of 15") / full, hand-written hooks count, comments cut before any scan, Kimi's inline key only

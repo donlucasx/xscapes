@@ -3,7 +3,31 @@
 **Copy-paste this prompt into a fresh session:**
 
 ```
-SESSION 42 (2026-09-18 ~15:30-22:00), CHECKPOINTED. Opened on his "give me a
+SESSION 43 (2026-09-19), THE QT CARD, DELIVERED. His ask: art for a quote
+post of the trailer, "similar to the SCAPES AND COMPANIONS section of the
+site: 16:9, header with ascii separator on the top, underneath 4 companions,
+animated, on a loop, maybe a gif? best practices for max reach?". BUILT
+without prompting him (autonomous): the section's own header rule + the four
+cast portraits (crab, cat, owl moving, frog) + the site's captions, 1920x1080
+30 fps, a 13.2 s SEAMLESS loop (the seam measured as 0 differing cells on
+every animal; the owl's clock offset 4 s, the crab's and cat's 0.5 s so
+neither starts mid-blink on the breath's zero crossing). DELIVERED
+~/Desktop/xscapes-qt/: the MP4 (post this), a 1280 GIF, a still, post.md
+(captions + reach notes). UNTRACKED, his word to commit: qt_test.go (gated,
+XSCAPES_QT=<dir>) and notes/qt/ (README with the seam table, render-card.mjs,
+card.json, fonts). Nothing of the product changed; tree otherwise clean.
+POSTED 11:20 PDT by the parallel session xscapes-17, verified in his Chrome:
+https://x.com/donlucas/status/2101375821940392422 (rulings: no Unicode italics,
+no extra link in the body). NEXT: his notes on the card if any (title,
+captions, sizes: card.json); the square cut if he wants it; then the s42 list
+below.
+
+SESSION 42 (2026-09-18 ~15:30-22:00, + 09-19 ~11:20-13:20), WRAPPED at his word.
+The 09-19 morning: the CAST POST live and verified in his Chrome
+(x.com/donlucas/status/2101375821940392422, quoting the trailer; his two
+rulings: no formatter "italics", no extra link), and his install question
+(nothing to reinstall: one global binary, restart a running scape to pick
+it up). Opened 09-18 on his "give me a
 project status report" (everything in the record held) then "prompt me here
 for each open item"; four rounds of rulings, verbatim in _FEEDBACK.md
 §Session 42. DONE: ⭐ LINUX RUN FOR THE FIRST TIME on both chips in Docker
@@ -28,8 +52,11 @@ the trailer: parked. CARDED: a drain at exit (events in the agent's last
 ~100 ms are not applied; a one-shot's done can be lost) · a sub-second
 session never binds (below the one-second poll) · the watcher's events are
 never in the event log (README overclaims) · the Go proxy @latest one behind.
-NEXT: v0.4.6 when he wants the two cuts out · his own Hermes run · Kimi's three other leftovers
-(fixture through hookTranslate, cross-log matcher, attribution heuristic).
+NEXT: v0.4.6 when he wants the two cuts out (the install line serves v0.4.5
+without them) · his own Hermes run · Kimi's three other leftovers (fixture
+through hookTranslate, cross-log matcher, attribution heuristic) · session
+43's card files, untracked, at his word. Entry point: this block, then
+_FEEDBACK.md §Session 42 for the rulings verbatim.
 The history of the sessions follows.
 
 SESSION 41 WRAPPED 2026-09-18 ~14:50 at his word. STATE: HEAD == origin/main
