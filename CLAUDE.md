@@ -2,6 +2,23 @@
 
 *(Renamed end to end on 2026-09-03: directory, env vars, state path and hook marker. Two names are kept on purpose and are not leftovers -- `internal/envx` still reads `ASCIISCAPES_*` and warns, and `install.go` still RECOGNISES the `# asciiscapes:v1` marker so the hooks it wrote before the rename can be found and removed.)*
 
+> **Session 44 (2026-09-21), WRAPPED ~16:45 PDT at his word: THE FIRE CLIP DELIVERED AND POSTED, THE REDDIT PLAN, THE SHORE CLIP.**
+> HEAD = the wrap's record commit == origin; untracked and his word to commit: `qt_test.go`, `fire_test.go`, `shore_test.go`, `notes/qt/`,
+> `notes/reddit/`, `.claude/commands/reddit.md`. NEXT: he posts the shore GIF as his reply; comments by hand; the Built with Claude post
+> after ~100 comment karma. The fire clip, as it ran: His ask: the fireplace "as the context window", a caption about watching
+> the agents work while waiting for the winners; then "see the fire in context (zoom) · from nothing to WORKING · a timelapse
+> behind as the day gets darker". FLAGGED and kept true: the fire is the work, the moon the context. A 3x closeup on the still
+> fire at dusk, the prompt at 1.5 s and the flames stream, the pull to the wide by 6.3 s (v2, his "ramp up faster"), dusk into
+> night behind two turns, the gauge to 2% left, the compact. 21.5 s MP4 in `~/Desktop/xscapes-qt/`, captions in `post.md`. ⭐ **POSTED ~14:30 PDT quoting the Commons "top 25"
+> post:** https://x.com/donlucas/status/2102142846644142500 . ⭐ THEN REDDIT: his r/aiagents post removed by Reddit's filter (a two-day-old
+> account, a link, a repost; the sub's rule 2 forbids first-time product links); delivered `~/Desktop/xscapes-qt/reddit-plan-2026-09-21.md`
+> (14 subs ranked from their own rules and sizes, three value posts on his measured numbers, eight comment drafts) and the `/reddit`
+> digest command (`.claude/commands/reddit.md`, `notes/reddit/findings.md`, untracked). Reading and drafting automated; posting NOT (his
+> word asked; declined as the 09-19 session did: a scripted human account is what the subs ban for). ⭐ THEN THE SHORE CLIP for his X reply ("the tides shows you how
+> hard your agents are working on the shore scape"): `shore_test.go` + `render-fire.mjs --name shore`; v2 at his notes: whole-pixel cells (the seams were
+> fractional advances), the tide warmed to LOW before frame 0 (the shore's tide state starts HIGH), TideEase 1 s for the render, 11 s; MP4 + two GIFs in `~/Desktop/xscapes-qt/`. UNTRACKED: `fire_test.go`,
+> `notes/qt/render-fire.mjs` + `fire.json`. Record: `_FEEDBACK.md` §Session 44.
+
 > **Session 43 (2026-09-19), THE QT CARD DELIVERED, POSTED, WRAPPED 14:55 PDT at his word.** His ask the day after the trailer: a quote post's art, "similar to
 > the SCAPES AND COMPANIONS section of the site: 16:9, header with ascii separator on the top, underneath 4 companions,
 > animated, on a loop, maybe a gif?" ⇒ BUILT autonomously on the site's own machinery: the section's header rule, the four

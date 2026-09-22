@@ -4986,3 +4986,160 @@ the trailer's files were (they are tracked now, 20 files).
   model (typed answers with probabilities, API key, $0.042/M input, 70–500 ms claimed); NOT installed, does not help a local
   offline tool whose hooks already answer deterministically; five Jev threads seen on Reddit in one day, a push.
   Leftovers: Playwright snapshots in `.playwright-mcp/` (git-ignored); two stray tabs may be open in his Chrome.
+
+## Session 44 — 2026-09-21: the fire clip, for the wait on the winners
+
+Opened on "what are soe other ideas for content/promo on X for xscapes" (a list
+given in chat: replies under waiting-for-the-agent posts, one channel a day,
+sound on, build-in-public stories, polls, plain-text ASCII, real screenshots,
+the day in twenty seconds, housekeeping). Then his ask, verbatim:
+
+> can you make a cool video/animation of the fireplace as the context window
+> and pair it w a good caption- maybe something aout watching our agents work
+> while we wait for the winners to be announced
+
+Flagged before building: in the product the fire is the WORK (with the wind,
+his ruling s37) and the moon is the context (the vista's gauge on the arc);
+built so the fire is the centre of the shot and the moon carries the context,
+and the caption says which is which. His note mid-build, verbatim:
+
+> we should be able to see the fire in context (so should zoom out or zoom in
+> at some point), also should see the fire activity pickup from nothing to
+> WORKING within the scene- maybe even a timelapse behind as the day gets
+> darker
+
+⇒ all three built: the clip opens on a 3x closeup of the fire at dusk with
+still air for four seconds, the prompt lands and the flames lean and the
+smoke streams inside the closeup (the owlets land beside it at 5.5), the
+camera pulls to the wide by 11 s (alpenglow on the peaks as it goes), and the
+hour runs from dusk (0.70) into the night (1.05) behind two turns of work: the
+fire's light comes up on the meadow, the stars, the moon's gauge dropping and
+the readout counting down to 2% left at the second finish, then the compact
+that empties it (the fresh moon low on the left) so the loop can restart.
+1920x1080, 30 fps, 28 s, the vista alone at 100x34 (Menlo's advance makes
+rows x 2.95 columns fill 16:9). MP4 5.0 MB (post this), GIF 1280x720 15 fps
+10 MB (under X's 15 MB cap, over the 5 MB mobile-safe line), two stills.
+`~/Desktop/xscapes-qt/`. The seam: `fire_test.go` (gated `XSCAPES_FIRE`) with
+its own frame loop because `agentPane` cannot be zero rows (it slices the
+transcript by rows-4; the site never renders a montage without a pane);
+`notes/qt/render-fire.mjs` + `fire.json` (the trailer's camera code alone).
+Two fixes off the first stills: the second turn's context started below where
+the first ended (0.58 after 0.64: the readout went backwards) and an end
+push-in cut the owl and its finish knock off the frame (ends wide now).
+UNTRACKED like the rest of notes/qt, his word to commit.
+
+His note on the first cut (~14:00), verbatim: *"also, the video should ramp up
+faster- takes a bit too long for the bonfire to start burning and zoom out"*
+⇒ v2: the prompt at 1.5 s instead of 4, the session at speed 10 instead of 8
+(the flames stream within ~1.5 s of the prompt), the closeup held to 3.8 s and
+the wide by 6.3 s; 21.5 s, 645 frames, MP4 4.5 MB; v1 kept beside it as
+`-v1`. And his placement question (the Commons "almost down to the top 25"
+post, where his reply with the cast clip already sits): QT it with the fire
+clip, no second reply, no @ in a QT's body; a tailored caption in `post.md`.
+
+POSTED by him (~14:30 PDT, "tis done"): https://x.com/donlucas/status/2102142846644142500 , the v2 fire clip
+quoting the Commons "almost down to the top 25" post, the final caption (his
+asks: mention xscapes, tag @commonsmade; the tag never first): "almost down to
+the top 25, then judging, then the winners. we'll keep the fire going in
+xscapes while @commonsmade decides. the flames are the agents working. the
+moon is the context window." VERIFIED from outside through X's public oEmbed
+endpoint: author donlucas, the caption (he capitalised the two openers and added
+two emojis), the quote link and the video attachment all present.
+
+His question, verbatim: *"are you able to see how many times xscapes has been
+installed from its source?"* ⇒ no counter exists; the proxies, read off GitHub
+2026-09-21 ~14:40: release-binary downloads (what the curl installer fetches)
+v0.4.2 6 · v0.4.3 2 · v0.4.4 7 · v0.4.5 4 = 19 binaries, MOST OF THEM OURS
+(the clean-HOME checks, the Docker Linux runs on both chips); `go install` is
+invisible (the Go proxy serves it); clones 1017 / 366 unique in 14 days
+(the proxy, crawlers, audits; a 339 spike on 09-18) are an upper bound, not
+installs; repo views 35 / 23 unique, 21 of them from the Commons entry; stars
+0; the site's heart 16 (a few ours). Offered, not built: a one-line counter
+hit in install.sh (abacus, no PII, skippable).
+
+His report (~14:35 PDT), verbatim: *"tried posting again, post got 'removed by
+reddit's filters' :("* (r/aiagents, the 09-19 account Green-Winter9648, the
+trailer clip, the Commons link in the body, "Introducing", "Free, open source!").
+Sitewide filter, not the sub's mods: a two-day-old account with a link and a
+repost, which the 09-19 brief already ruled out (under ~100 karma and two weeks
+posts are auto-removed almost everywhere; every removal lowers the hidden CQS).
+Advised: no third try; modmail the sub to approve it from the queue; check for a
+shadowban logged out; then the brief's order (comments first, r/ClaudeAI's
+"Built with Claude" after ~100 comment karma and 7+ days, one sub at a time, no
+link in the body, GitHub over the Commons domain). Could not check the account
+from here: Reddit answers unauthenticated fetches with 302/403.
+
+His next asks (~14:45–15:00), verbatim: *"lets make some value posts"*, then
+*"lets analyze what are the higher yielding subreddits to try post xscapes in,
+and lets automate whatever work we gotta do to meet requirements- such as
+makeing higher value contributions to /aiagents"*. Ruled on my side, stated to
+him: the READING and DRAFTING are automated (the subs' about/rules/new listings
+fetched in the Playwright browser, the Chrome extension refuses reddit.com;
+threads ranked; drafts written for him to rewrite and paste); the POSTING is
+not, because comments posted by a script on a human account are what Reddit's
+filter and r/ClaudeCode's and r/LocalLLaMA's rules ban ("LLM based bots posing
+as humans are strictly not allowed"), and a ban would follow xscapes. Same line
+the 09-19 session held. Output: `~/Desktop/xscapes-qt/reddit-plan-2026-09-21.md`
+(the ranking from each sub's own rules.json and sizes, three value posts on his
+measured hook numbers, comment drafts on today's threads).
+
+His ask (~15:15): *"I have a kimi agent session open on a parallel terminal. Are
+you able to communicate this to it, or shall we write a doc"* ⇒ ListAgents shows
+only Claude Code sessions (two, neither Kimi), so a doc:
+`~/Documents/kimi/xscapes-reddit-2026-09-21/BRIEF.md` with copies of the plan and
+the findings; the no-posting rule stated for Kimi too.
+
+His ask (~16:05), verbatim: *"make a gif of the shore scape to exemplify my reply
+attached"*: his reply to @glitchfrm's "the flames really drive the vibe": "Each
+xscape has different elements- the firepit intensity is driven by how hard the
+agent/s are working on the mountain scape scene. The tides shows you how hard
+your agents are working on the shore scape:". ⇒ `shore_test.go` (gated
+`XSCAPES_SHORE`, its own frame loop like the fire's): the site's shore clip's
+session with two seconds of flat water first and three to settle after the
+finish, 80x27, late afternoon held, 14 s at 30 fps, speed 4; `render-fire.mjs`
+takes `--name shore` now (a static camera in `shore.json`). Delivered
+`~/Desktop/xscapes-qt/`: `xscapes-shore-16x9.mp4`, `xscapes-shore-1280.gif`,
+`xscapes-shore-960.gif`. Flat sea, the swells and whitecaps as the work rises,
+the tide up the beach, two crablets, the finish and the sea settling.
+
+His note on the shore GIF (~16:10), verbatim: *"render looks low quality, look
+at all the lines in the water and the crabs"*. MEASURED on the source frames:
+1-px columns at cell boundaries, 3-7% off their neighbours (a crab pixel
+(238,126,126) in a field of (255,135,135); sand 172-181 against 175), because
+the stage sizes the font from the frame's height and Menlo's advance lands on
+a fraction of a pixel (24.0875 at 40 px), so the cell edges drift across the
+row and Chrome blends the edge pixel wherever two backgrounds meet; the 1.5x
+downscale to 1280 then blurred the glyphs on top. FIXED in `render-fire.mjs`:
+the font is resized (a search over sizes, Chrome quantises advances) to the
+one whose row is exactly 80 x 24 px, the line height held at 40; the row now
+measures 1919.98 and the residual at a boundary is one unit of 255. The GIFs
+are cut with no dither and the 960 one by an exact 2x area downscale. The
+wave glyphs (~ and ≈) are the sea's texture and stay. The fire clip and the
+cast card were rendered before this fix; the fire clip is posted; re-render
+at his word.
+
+His note (~16:20), verbatim: *"fix the beginning of the animation so it starts
+with low tide, and ramps up quickly so we can see activity and focus on the
+tide-"*. FOUND IN THE CODE, not inferred: `Shore.tideAt` starts at zero
+withdrawal, which is HIGH tide, and eases toward the level's target over
+`TideEase` (3 s), so a clip opening on a quiet session opens high and recedes
+over its first seconds. Two render liberties in `shoreFrames`, restored on
+return, neither in the product: fifteen quiet seconds of `Update` before the
+first frame (each 1-s step closes two thirds of the gap) so frame 0 is low
+tide; `TideEase` 3 -> 1 s so the water arrives within two seconds of the work.
+The session at speed 6 (the site's clip runs at 4), the prompt at 1.5 s, the
+finish at 7.7, 11 s in all; the camera at zoom 1.2 on the waterline and the
+beach, centred right so the crab stays whole, the sun cut off on purpose.
+Verified on the stills: low tide at 0.3 s (the sea ends six rows higher on
+screen), full sea and the water down the beach at 4 s, receded with the done
+knock at 10.7. Files refreshed in `~/Desktop/xscapes-qt/`.
+Correction minutes later: the zoom 1.2 camera was DROPPED. At full tide the
+writing in the sand (left) and the crab (right) cannot both fit above zoom
+1.03, and the frame showed "rnal/auth/handler.go"; the tide's six rows of 27
+read at full frame, so the clip is the whole 80x27 window.
+
+WRAPPED ~16:45 PDT at his word, verbatim: *"great work lets /wrap for now"*. The
+record is the wrap commit; the shore clip is on the Desktop for his reply (not
+yet posted); the untracked pieces (qt_test.go, fire_test.go, shore_test.go,
+notes/qt/, notes/reddit/, .claude/commands/reddit.md) stay for his word, as the
+trailer's did.

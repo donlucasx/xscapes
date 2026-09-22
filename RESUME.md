@@ -3,6 +3,52 @@
 **Copy-paste this prompt into a fresh session:**
 
 ```
+SESSION 44 (2026-09-21), WRAPPED ~16:45 PDT at his word ("great work lets
+/wrap for now"): THE FIRE CLIP delivered and posted, the promo list, THE
+REDDIT PLAN + the /reddit digest command, THE SHORE CLIP delivered. STATE:
+HEAD = this wrap's record commit, PUSHED (verified with ls-remote); the
+ONLY untracked files are qt_test.go, fire_test.go, shore_test.go (all gated),
+notes/qt/, notes/reddit/ and .claude/commands/reddit.md, his word to commit.
+Nothing of the product changed; vet + gofmt clean; the suite not re-run. NEXT
+(his hand): post the shore GIF as the reply; comments by hand from the plan
+this week; the Built with Claude post after ~100 comment karma; "commit" for
+the untracked seam. ---- The session as it ran: His ask: "a cool
+video/animation of the fireplace as the context window ... watching our agents
+work while we wait for the winners", then mid-build "see the fire in context
+(zoom out or in) ... the fire activity pickup from nothing to WORKING ... a
+timelapse behind as the day gets darker". FLAGGED (the fire is the work, the
+moon is the context) and built true to the encoding: a 3x closeup on the
+fire at dusk, still air for 4 s, the prompt and the flames stream, the pull to
+the wide by 6.3 s (v2 at his "should ramp up faster": prompt 1.5 s, speed
+10), dusk into night behind two turns, the moon's gauge to 2% left, the
+compact. 1920x1080 30 fps 21.5 s, MP4 4.5 MB (+ a 10 MB GIF) in
+~/Desktop/xscapes-qt/, four captions in post.md. UNTRACKED like the rest:
+fire_test.go (gated XSCAPES_FIRE, its own frame loop because agentPane cannot
+be zero rows), notes/qt/render-fire.mjs + fire.json. POSTED by him ~14:30 PDT quoting the Commons
+"top 25" post: https://x.com/donlucas/status/2102142846644142500 (the final caption in
+post.md). Install count: none exists; 19 release-binary downloads over four
+releases, most ours; clones 1017/366 unique in 14 days are not installs
+(§Session 44). THEN REDDIT (his post on r/aiagents removed by the filter; his "value posts"
+and "automate whatever work we gotta do"): the reading and drafting automated
+(Playwright; the Chrome extension refuses reddit.com), the POSTING not (a
+scripted human account is what the subs ban for; §Session 44). Delivered
+~/Desktop/xscapes-qt/reddit-plan-2026-09-21.md: the ranking of 14 subs from
+their own rules.json and sizes (r/ClaudeCode 418K and r/ClaudeAI 1.14M first,
+r/aiagents 121K last of the open ones, r/commandline closed), three value
+posts on his measured hook numbers, eight comment drafts on threads read
+today. NEW, untracked: .claude/commands/reddit.md (the /reddit digest command)
+and notes/reddit/findings.md (the numbers a draft may cite). Nothing of the
+product changed; vet + gofmt clean. THEN THE SHORE CLIP for his X reply ("the tides shows you how hard your
+agents are working on the shore scape"): shore_test.go (gated XSCAPES_SHORE)
++ render-fire.mjs --name shore; v2 at his notes: whole-pixel cells (the seams
+he saw were fractional advances), the tide warmed to LOW before frame 0 (the
+shore's tide state starts HIGH), TideEase 1 s for the render, speed 6, 11 s,
+full frame (a zoom on the waterline cut the sand's writing; dropped);
+MP4 + two GIFs in ~/Desktop/xscapes-qt/. NEXT: he posts comments by hand this
+week; the Built with Claude post after ~100 comment karma; commit at his word
+(untracked: qt_test.go, fire_test.go, shore_test.go, notes/qt/, notes/reddit/,
+.claude/commands/reddit.md).
+
 SESSION 43 (2026-09-19), THE QT CARD: DELIVERED, POSTED, WRAPPED 14:55 PDT at
 his word ("great work /wrap"). His ask: art for a quote
 post of the trailer, "similar to the SCAPES AND COMPANIONS section of the
