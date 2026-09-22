@@ -2,7 +2,7 @@
 
 *(Renamed end to end on 2026-09-03: directory, env vars, state path and hook marker. Two names are kept on purpose and are not leftovers -- `internal/envx` still reads `ASCIISCAPES_*` and warns, and `install.go` still RECOGNISES the `# asciiscapes:v1` marker so the hooks it wrote before the rename can be found and removed.)*
 
-> **Session 44 (2026-09-21), WRAPPED ~16:45 PDT at his word: THE FIRE CLIP DELIVERED AND POSTED, THE REDDIT PLAN, THE SHORE CLIP.**
+> **Session 44 (2026-09-21), WRAPPED ~19:10 PDT at his word: THE FIRE CLIP DELIVERED AND POSTED, THE REDDIT PLAN, THE SHORE CLIP.**
 > HEAD = the wrap's record commit == origin; untracked and his word to commit: `qt_test.go`, `fire_test.go`, `shore_test.go`, `notes/qt/`,
 > `notes/reddit/`, `.claude/commands/reddit.md`. NEXT: he posts the shore GIF as his reply; comments by hand; the Built with Claude post
 > after ~100 comment karma. The fire clip, as it ran: His ask: the fireplace "as the context window", a caption about watching
