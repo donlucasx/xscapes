@@ -5439,3 +5439,37 @@ trailer's did.
     cat (`drawKitsNow`), in the clips page (V7) and the videos. ARCHIVED: `notes/rain/README.md`
     (every ruling, the files, how to regenerate, what the build must do that the mockup does
     not); the study files committed at his word "archive everythign for later implementation".
+- His draft X post (a QT of the Sep 18 submission post, the three MP4s attached), *"wyt?"*: *"We're
+  still patiently waiting for the @commonsmade jury to work through all the submissions 🫰 While I
+  wait, I drafted some new potential scenes for xscapes. What do you think of this rainy window?
+  "The Block", "The Park" & "The Harbour" What other kinds of xscapes would you enjoy?"*
+  ⇒ My read in the reply: post it; two changes that matter (a line saying what the rain and the
+    kittens ARE, and the cover frame set to a working moment since the clips open on the dry
+    idle pane), one optional (the park first).
+- Posted 12:11 PDT with the three MP4s attached, then *"i dont love the way the videos are
+  cropped/thumbnailed. Can I delete and repost? will my reach suffer?"* and *"maybe one video as
+  the hero and the other two as comments on the same thread?"* ⇒ X lays two or more videos out
+  as a carousel of tall tiles and crops 16:9 to the middle. Told him: delete and repost, eleven
+  seconds old is no reach lost; his thread is the right shape (one video a post shows whole and
+  gets its own cover). A 48 s join of the three (no labels: this ffmpeg has no drawtext) left in
+  `~/Desktop/xscapes-qt/xscapes-rain-three-16x9.mp4` as the single-video alternative.
+- *"what other functionality have we scoped or can we scope for the harbour and the park? If the
+  rain shows how hard is working and the cats the sub agents, what other relevant features can we
+  name on each sub post? gonna lead w the block"* (12:15) ⇒ Listed in the reply: what the clips
+  show in all three (rain = work, dry at idle · kittens = subagents · the disc = the context ·
+  todos = stars · the cat's step closer and knock · the desk's tail · the clock), the park's
+  fountain and sway, the harbour's traffic as the world; scoped-not-shown (the spend, the worried
+  face); carded-not-promised (spend as city light, todos as floors, sounds, weather). Two caption
+  lines drafted for each reply.
+- ⭐ **POSTED ~12:20 PDT, the block as the hero, the park and the harbour as replies on the thread:
+  https://x.com/donlucas/status/2103565032613437942** (his text: "While we wait for the
+  @commonsmade jury, I drafted a new scene for xscapes: a Rainy Window, three ways. The rain is
+  your agent working; the kittens are its subagents 👷 The Block, The Park, The Harbour. Which is
+  your fav? What other xscapes would you enjoy? 🌆").
+- *"lets /wrap and then give me an opinion/edit on this post. Tryna comment on the latest
+  commonmade post and include a link to the post we just made"* (12:22; his draft reply to the
+  Commons "top 25" post: *"Agents are powered by token. Some of us need that java ☕ [the link]"*).
+
+WRAPPED 2026-09-25 ~12:30 PDT at his word. The study is committed (`d5ecef9` + the wrap commit),
+NOT pushed; the clips page V7 and the stills page V9 live; the MP4s on the Desktop; the X thread
+up. The Commons reply is his hand after the edit in the wrap's summary.

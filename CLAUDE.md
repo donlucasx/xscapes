@@ -14,11 +14,15 @@
 > frame painted wood. DELIVERED: the stills page https://claude.ai/artifact/EXLsGMYpEhe6nbpbQjW9nJ (V9, every round in its
 > history) · the clips page https://claude.ai/artifact/MFWAbAVzQ2MxWJvNPYbPtQ (V7; 16 s arcs at 10 fps, the frames as three
 > files beside the page) · `~/Desktop/xscapes-qt/xscapes-rain-{block,park,harbour}-16x9.mp4` (30 fps, re-rendered) +
-> `post-rain.md`. ARCHIVED: `notes/rain/README.md` is the record for the build; the study painters `internal/scenes/
-> rain_{study,views,park,anim}.go` and the tool `notes/rainshots/` COMMITTED at his word ("archive"); NOTHING WIRED: the
-> arc is a script, the disc a mockup; the build implements `scape.Scape` off the reducer as the vista did. NEXT: his X
-> posts · the default view · the spec from `notes/rain/README.md` · then the build. Still untracked from s43-44:
-> `qt_test.go`, `fire_test.go`, `shore_test.go`, `notes/qt/`, `notes/reddit/`, `.claude/commands/reddit.md`.
+> `post-rain.md`. ⭐ **POSTED ~12:20 PDT as a thread, the block the hero, the park and the harbour as replies:
+> https://x.com/donlucas/status/2103565032613437942** (a first post with all three attached was deleted at eleven
+> seconds: X crops two or more videos to a carousel of tall tiles). ARCHIVED: `notes/rain/README.md` is the record for
+> the build; the study painters `internal/scenes/rain_{study,views,park,anim}.go` and the tool `notes/rainshots/`
+> COMMITTED at his word ("archive", `d5ecef9`); NOTHING WIRED: the arc is a script, the disc a mockup; the build
+> implements `scape.Scape` off the reducer as the vista did. **WRAPPED 2026-09-25 ~12:30 PDT at his word; the two
+> commits UNPUSHED.** NEXT: push at his word · his Commons reply · the default view · the spec from
+> `notes/rain/README.md` · then the build. Still untracked from s43-44: `qt_test.go`, `fire_test.go`, `shore_test.go`,
+> `notes/qt/`, `notes/reddit/`, `.claude/commands/reddit.md`.
 
 > **Session 44 (2026-09-21), WRAPPED ~19:10 PDT at his word: THE FIRE CLIP DELIVERED AND POSTED, THE REDDIT PLAN, THE SHORE CLIP.**
 > HEAD = the wrap's record commit == origin; untracked and his word to commit: `qt_test.go`, `fire_test.go`, `shore_test.go`, `notes/qt/`,

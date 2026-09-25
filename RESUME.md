@@ -3,22 +3,26 @@
 **Copy-paste this prompt into a fresh session:**
 
 ```
-SESSION 45 (2026-09-23 → 25), THE RAINY WINDOW STUDY, WRAPPED at his word
-("archive everythign for later implementation"). STATE: the study committed
-(internal/scenes/rain_{study,views,park,anim}.go, notes/rainshots/,
-notes/rain/README.md = THE RECORD FOR THE BUILD, read it first); NOTHING WIRED
+SESSION 45 (2026-09-23 → 25), THE RAINY WINDOW STUDY, WRAPPED 12:30 PDT at
+his word. STATE: the study COMMITTED (d5ecef9 + the wrap commit), NOT PUSHED
+(push = gh auth switch --user donlucasx && git push origin main, his word);
+internal/scenes/rain_{study,views,park,anim}.go, notes/rainshots/,
+notes/rain/README.md = THE RECORD FOR THE BUILD, read it first; NOTHING WIRED
 to the product; the clips are a scripted 16 s arc. DELIVERED: the stills page
 https://claude.ai/artifact/EXLsGMYpEhe6nbpbQjW9nJ (V9) · the clips page
 https://claude.ai/artifact/MFWAbAVzQ2MxWJvNPYbPtQ (V7) · three MP4s in
-~/Desktop/xscapes-qt/ (xscapes-rain-{block,park,harbour}-16x9.mp4) + post-rain.md.
+~/Desktop/xscapes-qt/ (xscapes-rain-{block,park,harbour}-16x9.mp4, + a 48 s
+join, + post-rain.md) · POSTED as a thread, the block the hero:
+https://x.com/donlucas/status/2103565032613437942.
 EVERY CHOICE RULED (verbatim in _FEEDBACK.md §Session 45): three views (the
 block, the park, the harbour; no default yet), drops on the glass born only
 while working (dry at idle), the park's fountain + sway as the work, the
 shore's disc greyed-overcast sky, todos as stars, the cat's walk-up one rung,
 kittens from inside over the sill with a wander, the park in SPRITES, the
-harbour's water = the shore's sea, the plant on the harbour only. NEXT: he posts
-the MP4s · rules the default view · the spec (notes/rain/README.md "What the
-build has to do") · the build as scape.Scape off the reducer, the vista's way.
+harbour's water = the shore's sea, the plant on the harbour only. NEXT: push at
+his word · his reply on the Commons "top 25" post · the default view · the spec
+(notes/rain/README.md "What the build has to do") · the build as scape.Scape
+off the reducer, the vista's way.
 Untracked from s43-44 still waiting his word: qt_test.go, fire_test.go,
 shore_test.go, notes/qt/, notes/reddit/, .claude/commands/reddit.md.
 
