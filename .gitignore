@@ -34,3 +34,6 @@ site/anim/*.png
 
 # release binaries, built by site/release.sh and uploaded to GitHub; never committed
 /dist
+
+# the rainy window clips page and its frame files, published from here (s45)
+notes/rainshots/out/

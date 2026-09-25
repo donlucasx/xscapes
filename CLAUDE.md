@@ -2,6 +2,24 @@
 
 *(Renamed end to end on 2026-09-03: directory, env vars, state path and hook marker. Two names are kept on purpose and are not leftovers -- `internal/envx` still reads `ASCIISCAPES_*` and warns, and `install.go` still RECOGNISES the `# asciiscapes:v1` marker so the hooks it wrote before the rename can be found and removed.)*
 
+> **Session 45 (2026-09-23 → 25), THE RAINY WINDOW STUDY, DELIVERED AND ARCHIVED at his word: THREE VIEWS ANIMATED,
+> THREE MP4s ON THE DESKTOP, EVERY CHOICE RULED.** His ask: *"lets work on the rainy window scape + cat companion. Ask me
+> any/all questions so we can dial it"*, then eleven rounds on rendered frames (`_FEEDBACK.md` §Session 45, verbatim).
+> RULED: three views go to the scape, THE BLOCK · THE PARK · THE HARBOUR (rooftops and the canyon out; no default yet,
+> *"these are all mockups for now"*) · the rain is DROPS on the glass, born only while the work reaches a column, a DRY
+> PANE AT IDLE · the park's FOUNTAIN and the trees' SWAY are the work too (water; the vista's precedent) · the sky greyed
+> toward overcast, the shore's DISC sinking · lit windows the world's, todos stars · the cat's walk-up ONE RUNG · the
+> kittens arrive FROM INSIDE (ears over the sill, the hop up) and WANDER on the sill · the park's trees and fountain are
+> SPRITES (*"go w sprites"*) · the harbour's water the shore's SeaFar/SeaNear · the plant on the harbour's sill only · the
+> frame painted wood. DELIVERED: the stills page https://claude.ai/artifact/EXLsGMYpEhe6nbpbQjW9nJ (V9, every round in its
+> history) · the clips page https://claude.ai/artifact/MFWAbAVzQ2MxWJvNPYbPtQ (V7; 16 s arcs at 10 fps, the frames as three
+> files beside the page) · `~/Desktop/xscapes-qt/xscapes-rain-{block,park,harbour}-16x9.mp4` (30 fps, re-rendered) +
+> `post-rain.md`. ARCHIVED: `notes/rain/README.md` is the record for the build; the study painters `internal/scenes/
+> rain_{study,views,park,anim}.go` and the tool `notes/rainshots/` COMMITTED at his word ("archive"); NOTHING WIRED: the
+> arc is a script, the disc a mockup; the build implements `scape.Scape` off the reducer as the vista did. NEXT: his X
+> posts · the default view · the spec from `notes/rain/README.md` · then the build. Still untracked from s43-44:
+> `qt_test.go`, `fire_test.go`, `shore_test.go`, `notes/qt/`, `notes/reddit/`, `.claude/commands/reddit.md`.
+
 > **Session 44 (2026-09-21), WRAPPED ~19:10 PDT at his word: THE FIRE CLIP DELIVERED AND POSTED, THE REDDIT PLAN, THE SHORE CLIP.**
 > HEAD = the wrap's record commit == origin; untracked and his word to commit: `qt_test.go`, `fire_test.go`, `shore_test.go`, `notes/qt/`,
 > `notes/reddit/`, `.claude/commands/reddit.md`. NEXT: he posts the shore GIF as his reply; comments by hand; the Built with Claude post

@@ -5143,3 +5143,299 @@ record is the wrap commit; the shore clip is on the Desktop for his reply (not
 yet posted); the untracked pieces (qt_test.go, fire_test.go, shore_test.go,
 notes/qt/, notes/reddit/, .claude/commands/reddit.md) stay for his word, as the
 trailer's did.
+
+## Session 45 — 2026-09-23: the rainy window, art first, then the questions
+
+- *"resume work on xscapes- lets work on the rainy window scape + cat companion. Ask me any/all
+  questions so we can dial it before we actually build it. Some ideas- rain intensity, stars, lit
+  windows in the apt. before we start breaking it down, can we develop the scene's art further a
+  bit? Add more detail to the skyline. Could there be a closer rooftop or a different type of
+  place where sub agents could roam"* (15:10)
+  ⇒ Classified ARCHITECTURAL (a third real scape off the reducer plus the cat inside it): no
+    product code until his picks and a spec. The art first, as asked. Today's painter rendered on
+    the cube at three hours (the same verdict the vista's first sketch got: one tone of building,
+    one row of lit windows, the lower half of the pane a flat grey block). Then
+    `internal/scenes/rain_study.go` (study painters, nothing wired): the skyline in THREE DEPTHS
+    (far towers in haze with a spire and a beaconed antenna · the block with unequal buildings,
+    cornices, a window grid that is glass by day and lit by night, water towers, bulkheads,
+    chimneys, antennas · the stage), and the stage drawn THREE WAYS for the kittens: A the family
+    on the sill indoors · B a lower roof across the alley (water tower, skylight, vents, a hatch,
+    puddles) · C a fire escape landing outside the glass. Seen, not inferred (`notes/rainshots`,
+    headless Chrome): the first far towers were slabs and quantised to salmon at dusk (lerp 0.55
+    toward the horizon) ⇒ slender, apart, lerp 0.35. Review page for his pick:
+    https://claude.ai/artifact/EXLsGMYpEhe6nbpbQjW9nJ . My recommendation: B. The questions put
+    to him in the reply (rain at idle · what the lit windows say · stars and the moon through
+    rain · the kittens' door · the cat's walk-up · the writing's surface · night-only or the
+    clock · lightning). Suite for the package green; nothing committed.
+- *"I dont think the buildings windows are working- currently scape feels busy, and more so when
+  the kittens overlap with the lit windows. - the water tower needs better scale/placement. -
+  maybe inspire yourself on NYC skylines? -- I like the idea of the fire escape, but needs to be
+  better achieved. Try all the approaches again."* (15:40)
+  ⇒ Round 2, all three stages again on a NYC skyline. Read as: the window grid was a
+    checkerboard (every other column, every other row, glass the sky's colour by day) and the
+    litter sat in front of it; the tanks were 3 cells wide and 4 rows tall against a two-storey
+    real one; the fire escape was a dashed line and a bar.
+  ⇒ ROUND 2 BUILT AND SEEN (three renders before the page): far towers with SETBACKS (the
+    midtown silhouette), the block as brick/rosy-brick/stone walk-ups by day and greys by night,
+    windows in COLUMNS 3-4 cells apart (dark glass by day; a third of the upper storeys lit in
+    apartment pairs by night; the street's three storeys dark, so the litter never fronts a lit
+    window), tanks at two-storey scale (6 rows above the roofline, one or two a frame; the near
+    roof's tank against the sky over a low walk-up), the fire escape rebuilt (a lit top rail,
+    posts, a lower rail, the grating with slots, braces, a STAIR down at the left end). ⚠ Tan
+    (175,135,95) was tried and DROPPED: its dusk blend quantised to mustard (135,95,0), the
+    warm-dark trap; brick's blend goes grey and rosy brick's goes brick, seen on the cube. The
+    same page republished (same link), the recommendation still B, with C as a real alternative
+    and a B+C merge (a flight of stairs down onto the roof) offered unbuilt.
+- *"some of the same issues still- on A, [screenshot: A at night, lit windows at the kittens' rows
+  and beside the cat] kittens overlapping lit windows does not read well. for B, water tanks still
+  stand out (not in a good way), they should blend in better with the skyline. on C, firescape
+  needs more details, on its way tho. -- - overall id like to see a more polished skyline, so try
+  a few more alternatives"* (17:03)
+  ⇒ Measured on his crop: the 5% floor I left on the street storeys lit cells at rows 16-17, in
+    the kittens' rows, and one beside the cat; the tanks were black silhouettes (darken 0.3 to
+    0.45, grey 0 at night) against everything. Round 3: no lit window below the stage's top row
+    (per stage), tanks in their building's own tone one step darker, the fire escape with its
+    stringers, balusters, grating lip and a stair; and THREE SKYLINES (midtown setbacks · a
+    brownstone row under a low far silhouette · a bridge), authored shapes, not random boxes.
+  ⇒ ROUND 3 BUILT AND SEEN: lit windows only above the stage's top row (12 for the sill and the
+    roof, 11 for the landing; the crop's cells are gone); tanks in their building's tone a step
+    darker (the roof's tank wood, two steps lighter than the tar); windows two cells wide, four
+    apart; a shade column on every walk-up; the fire escape with two stringers out of the top of
+    the pane, a lit top rail, balusters, the grating's lit lip, braces, a stair with its handrail.
+    THREE SKYLINES, authored (`paintFar`): MIDTOWN (an Empire with three setbacks, a mast and a
+    lit crown; a tapered crown; two slabs; the block low) · THE ROW (tall brownstones with fire
+    escapes on two facades, a low dense haze band, one Empire as the landmark) · THE BRIDGE (twin
+    arches, sagging cables with suspenders, the necklace of lights by night). ⚠ Seen and fixed
+    before the page: a black column at x 58-60 where the lower roof's edge fell inside a building
+    filled to one base (per-column base now). Page republished (same link, Version 3). My
+    recommendation: THE ROW on B; midtown the postcard if he wants it; the bridge a variant for
+    later. His pick pending.
+- *"midown looks cute. so does the bridge. Lets come up with another alternative that is less
+  specific (nor nyc nor san fran). Also make the two existing even more realistic. The firescape
+  is better but needs to be better defined so everyone gets what it is. Lastly, the 'lit windows',
+  while they dont overlap w the kittens now (good), they do stand out a lot. may b too bright? can
+  we come up with an alternative interactive element instead?"* (2026-09-24, morning)
+  ⇒ Round 4: a fourth skyline with no landmark (hills in haze, glass slabs, a telecom mast, a
+    crane); midtown and the bridge with aerial perspective (bases lighter toward the horizon),
+    two haze depths, pier texture, the bridge's fan of stays and its deck; the fire escape seen
+    AGAINST THE SKY (the block across it low) with a mid rail and the stair; the lit windows
+    dimmed to (175,135,95) and fewer. "Alternative interactive element" read as: what the lit
+    windows could CARRY, since his first list had "lit windows in the apt" beside rain intensity
+    and stars; two candidates drawn (the spend lighting the city; finished todos lighting the
+    landmark's floors) and the question put to him.
+  ⇒ ROUND 4 BUILT AND SEEN: aerial perspective on the far layer (lifted toward the horizon the
+    lower it stands; 0.35 turned the dusk band orange, 0.25 kept it a cast) · two haze depths ·
+    piers (every third column of a tower a shade darker) · the bridge's stone tower, its deck with
+    lamps, the main cables with their necklace and a fan of stays (`line`) · ANYCITY (hills in
+    haze, glass slabs, a mast with a beacon, a crane) · the fire escape AGAINST THE SKY (the
+    buildings across the left pane top 15) with a mid rail · the block's lit windows dimmed to
+    (175,135,95) and fewer (0.28) · two channel demos drawn: `RainWindows=1` the spend lighting
+    the city (`RainSpend`), `RainTodoLit` the landmark's floors lit from the bottom. Page
+    republished (Version 4). My recommendation: windows stay the world's, dimmed; todos on the
+    landmark's floors where there is one; midtown default, the bridge and anycity as picks.
+- *"all three are very similar- improving in the right direction, but give me more diverse
+  options, visually speaking"* (2026-09-24)
+  ⇒ Read as: the diversity has to be in the COMPOSITION, not in the far layer's shapes behind
+    the same block. Round 5: four views (`RainView`, `rain_views.go`): ROOFTOPS (a high floor
+    looking down over bands of roofs, the skyline small on the horizon) · THE CANYON (a low floor,
+    facades rising out of the frame, no horizon, fire escapes on them) · THE PARK (treetops under
+    a big sky, lamp posts, a terrace with a railing and pots as the stage) · THE HARBOUR (the city
+    across still water, its lights reflected, a boat, a dock as the stage; the water STILL, the
+    rain the work, flagged against the encoding rule).
+  ⇒ ROUND 5 BUILT AND SEEN: the four views render distinct at a glance. Seen and fixed before the
+    page: the rooftops' gap columns read as a row of posts (darken 0.4 over four rows ⇒ 0.22 on
+    the roof rows only, the chimneys off the mid band); the canyon all grey (one brick and one
+    rosy facade forced); the harbour's night reflections too faint (alpha 0.35 ⇒ 0.55). Flagged
+    on the page: THE CANYON HAS NO SKY, so the moon and the stars (two locked channels) have
+    nowhere to be; THE HARBOUR is a second water in a product whose rule is that the water is
+    the work. Recommendation: the rooftops as the view, the park as the second pick.
+- *"ok. keep 'the block', work 'rooftops' a bit more so its less repetitive and uniform (water
+  tanks seemed copy pasted like a pattern). Canyon is meh. Push 'the park' a bit further, I like
+  how its coming along- look at some views from central park, make it more majestic, and ensure
+  trees look dark at night (currently green seems too bright at night)"* (2026-09-24)
+  ⇒ RULED: the block KEPT · the canyon OUT · rooftops reworked for variety · the park pushed.
+  ⇒ ROUND 6 BUILT AND SEEN. MEASURED FIRST: lit at the page's night (tod 0.0245) is 0.074, so the
+    mid and near trees DID go grey; the back row stayed green because it was blended toward the
+    horizon and never toward night (`back = Lerp(green, horizon, 0.4)`), the cause of "green
+    seems too bright at night". Every green now passes through night() (toward grey 2 by 1-lit).
+    ROOFTOPS: a field of buildings at three depth rings, each with its own top, width, roof depth
+    and tone, painted far to near (sort by top), furniture off centre and varied (bulkheads,
+    chimney pairs, skylights, air units, one antenna), three tanks at most in a frame. THE PARK,
+    after the view across Central Park: two twin-towered houses and two singles on the far side
+    in haze, a far canopy of forty small crowns (a band read as a road), a lake with a shoreline
+    (rounded ends in quarter cells) taking the sky, a path with three lamps and their pools, two
+    big trees framing both edges; the dusk orange pulled back (canopy lerp 0.35 ⇒ 0.22, the lake
+    toward grey 7 by 0.35). The canyon off the page, kept in the code. Page republished (V6).
+- *"the park is looking good- push it a but further and make it look more realistic - I like the
+  idea of a plant pot on the window sill, explore it further (currently looks like a weak
+  attempt). -- im liking the harbour- can we add more activity in the water and polish the
+  overall design so it clearly a harbour? more ships, different sizes, cranes, etc"* (2026-09-24)
+  ⇒ Round 7: THE PARK toward realism (crowns as two offset ellipses with a lit side and a shade
+    side, leaf texture split by side, trunks under the shore trees, an arched bridge across the
+    lake with its reflection, the towers reflected by day, a continuous path); A POTTED PLANT ON
+    THE SILL, inside, drawn like the cat (a dome of leaves in two greens, vines trailing over a
+    terracotta pot with a rim and a saucer); THE HARBOUR: gantry cranes and container stacks on
+    the far quay, a lighthouse, a container ship, a ferry with lit windows, a tug, sailboats, a
+    moored boat at the dock, a buoy, wakes, gulls, chop on the water, crates and a lamp on the
+    dock. The water six rows deep so ships at three depths read at three sizes.
+  ⇒ ROUND 7 BUILT AND SEEN. Seen and fixed before the page: the plant at x 4 sat under the park's
+    left framing tree and the two greens merged into one mass, and it hid the harbour's moored
+    boat ⇒ the plant at x 12 (right of the frame post) in every view, the framing tree at cx 1,
+    the medium tree gone, the boat moored mid-dock, every litter's first column past the plant.
+    The cranes darkened (0.3 ⇒ 0.45 off the haze) to read at noon. Page republished (V7).
+- *"plant is looking nice, add more detail to the bush. Keep it only on the harbour variant.
+  harbour is shaping up, but the colors on the boats stand out a lot, and the window frame on the
+  foreground gets lost. Also, could add more detail to the far horizon -- the park im liking too,
+  but needs more detail in the center of the park- whats happening there? is it a fountain? a
+  fountain in the park could act similarly to the firepit in the mountainscape. - rooftops is
+  looking great, but the block is very similar and has a tad more character- do another polish
+  pass on the block, remove the plant (or try a better firescape for this one)"* (2026-09-24)
+  ⇒ RULED: the plant on the HARBOUR only · A FOUNTAIN IN THE PARK AS THE WORK (his idea; water,
+    so inside the rule, and the vista's precedent of two channels on one variable: the rain on
+    the glass and the fountain's jet both rise with the level) · the block polished with fire
+    escapes on its facades · the frame made to read (white-painted wood, two-tone).
+  ⇒ ROUND 8 BUILT AND SEEN: the plant with leaves (paired brackets on the lit side, dots on the
+    shade side, gaps into the dark of the bush, three rosy blossoms), on the harbour only · the
+    FRAME painted wood (grey 11 by night to 19 by day) with a rabbet three steps darker on the
+    glass side, in every view · the harbour's far horizon (hills, a second row of towers, two
+    stacks with a plume, a beaconed mast, a tanker on the horizon line), the containers 0.6 under
+    the haze, hulls grey 1-3, the buoy dull red · THE FOUNTAIN in the lake as the work: a basin
+    ring, a central jet 1 row at rest to 5 flat out with two side jets a row shorter, the crown
+    breaking into drops, lit from below by night; the bridge moved right · the block: sills,
+    dentils, fire escapes on alternate facades. Page republished (V8).
+- *"ok looking good. ditch 'rooftops'. Animate a version of 'the block', 'the park' and 'the
+  harbour'. Ask me any/all questions before so we can dial it as best as possible"* (2026-09-24)
+  ⇒ RULED: ROOFTOPS OUT (kept in the code, off the page). THREE VIEWS GO TO ANIMATION: the block,
+    the park, the harbour. The questions put to him in the reply before any frame is rendered:
+    what carries the work in each (the rain; the fountain; nothing extra on the block and the
+    harbour, or the harbour's traffic as the world) · the rain at idle · the sky through the rain
+    and the moon's form · what the lit windows carry · the kittens' door per view · the cat's
+    walk-up · the clip's shape (a session arc vs a fixed level; a fixed hour vs a timelapse) ·
+    the world's life per view (beacon, windows, a plane; sway and rings; ships crossing, the
+    moored boat bobbing, the lighthouse) · the default view vs a user's pick · fps and length.
+- Prompted through the open choices (his ask: *"prompt me through all open choices"*), answers
+  verbatim: clip shape = **a session arc** · the hour = **dusk into night** · frame rate = **10
+  fps** · delivery = **the review page** · the rain = **drops running down the glass** · the
+  block's life = **all four** (the beacon blinking, a window switching now and then, a plane
+  crossing with its lights, smoke drifting from a chimney) · the park: *"id love to see trees
+  moving with the wind. Also, is it a lake or a fountain?"* · the harbour = **full traffic +
+  lighthouse**.
+  Then: lake or fountain = **"2 but add some more details to the plaza"** (a fountain in a paved
+  plaza, no lake) · the wind = **the work** (still at idle, streaming at flat out, as on the
+  vista) · the kittens' door = **bulkhead · terrace side · the moored boat** · rain at idle = **a
+  dry pane, drops only while working** (against my lean; his call: the window is rainy only
+  while the agent works).
+  Then: the sky = **greyed toward overcast, the shore's disc** sinking behind the skyline · the
+  lit windows = **the world's; todos are stars** · the cat's walk-up = **one rung, to 16x9** ·
+  the default view = *"these are all mockups for now"* (no default ruled; the three clips are
+  mockups, a scripted arc, nothing wired).
+  Then: the plaza = **benches and lamp posts, a kiosk or a bandstand** · the standing assumptions
+  = **keep all** (no lightning · the writing on the desk · the plant on the harbour only · the cat
+  on the right · the layout scales as the vista's). EVERY OPEN CHOICE RULED; the animation starts.
+  ⇒ THE ANIMATED MOCKUPS BUILT (`internal/scenes/rain_anim.go`, `PaintRainFrame`): a scripted
+    arc of 16 s at 10 fps (idle · prompt at 2 s · the level to 0.8 by 5 s · three kittens out of
+    the door at 4/5.5/7 s, a 1.4 s walk · the ask at 8-10 s with the one-rung walk-up
+    (`companion.Near = 1`) and the warm balloon · the work at 0.9 · the finish at 12.5 s with the
+    dotted knock · the litter home 12-14.6 s · idle), dusk 0.78 into night 0.98, the context 0.15
+    to 0.5 on the shore's disc (a mockup disc, two halves a cell, the phase a second disc). The
+    rain as DROPS born only while the level reaches a slot's threshold, so the pane is dry at
+    idle and dries after the finish. The block's life (beacon, a switching window, the plane, the
+    smoke), the park's plaza (paving, bandstand, benches, lamps) with the fountain and the sway
+    as the work, the harbour's traffic (the ferry crossing once a loop, the tug, drifting sails,
+    the rocking mast, wheeling gulls, the lighthouse flashing every 4 s). SEEN on a beats page
+    (seven moments a view, the approach advanced frame by frame) and two close looks; fixed
+    before publishing: the sky's dusk showed through under the terrace rail as an orange band (a
+    lawn under it now); the drops' heads too loud (alpha 0.7, slots 130). The page: 17.4 MB
+    inline was over the artifact's 16 MB, so the frames are three JSON files beside the page,
+    fetched and played by a small script; a click pauses a clip.
+    PUBLISHED as its own artifact (the frame files could only be published from the working
+    directory, so `notes/rainshots/out/` holds the page and the three JSON files, ignored):
+    https://claude.ai/artifact/MFWAbAVzQ2MxWJvNPYbPtQ . The stills page stays at
+    https://claude.ai/artifact/EXLsGMYpEhe6nbpbQjW9nJ (V8). His look is next.
+- *"the park and the block are broken."* (his look at the clips page, V1)
+  ⇒ MEASURED, then fixed: each clip had its own HTMLPalette and every palette names its classes
+    .p0, .p1, ...; the three CSS blocks were concatenated and the last one written, the
+    harbour's, recoloured the block and the park (500 class names defined more than once on the
+    page; 0 after). ONE palette for the three clips now. Republished to the same link (V2).
+- *"looking better. An idea, for all of them- the kittens could poke from behind the window as
+  they appear, first poking their eyes and ears and eventually hopping on top of the window sill.
+  An issue ive noticed, when the kittens go to close to each other or overlap: [screenshot: the
+  harbour, a kitten hopping from the boat drawn over a sitter, the sitter notched] they break the
+  kitten underneath. -- The park: The plaza around the fountain should be smaller (more park), and
+  the fountain should be aligned off centered from the window so we can see it (currently covered
+  by the center window frame)."* (2026-09-24, 20:35)
+  ⇒ RULED, and it supersedes the three doors: THE KITTENS ARRIVE FROM INSIDE in every view, ears
+    and eyes over the sill's edge first, then the hop up onto the sill, and leave the way they
+    came. The notch: the mover was drawn after the sitter and its rim (PlotRim's ring, the
+    shore's occlusion rule) cut into it; with the sill arrival no kitten crosses another. The
+    park: the plaza smaller, the fountain in the left pane (fx 38 sat under the mullion at
+    39-40), the bandstand in the right pane, more trees.
+  ⇒ BUILT AND SEEN (the beats page): `sillRise` (below the sill · the ears over its edge · the
+    eyes, a held look · the hop · sitting, over 1.6 s; the exit the same in reverse), the three
+    places on the sill at x 28/38/48 left of the cat in every view, whatever hangs below the
+    sill's edge cleared so the ears show first; no kitten crosses another. The park: the plaza
+    x 18-38 (was 20-56), the fountain at x 28, the bandstand at x 52-60, four more mid crowns and
+    three shore trees, the lamps at 16/40/66. The clip page republished (V3).
+- *"better- but the kittens should be able to move around a bit after appearing. --- the park:
+  the trees lost definition, work them so it looks like a park w diverse vegetation instead of a
+  green splotch"* (2026-09-25)
+  ⇒ The kittens: a wander on the sill (each in its own lane, a new spot every few seconds, a
+    short walk to it facing the way it goes), breath and blinks as the shore's litter has. The
+    park: KINDS of tree (round crowns in four greens, conifers, a willow, a copper tree), shrubs
+    along the path, trunks, gaps of lawn between crowns (the lawn now runs under the whole middle
+    ground; the sky's colour was showing between crowns), the far canopy in three hazed greens.
+  ⇒ BUILT AND SEEN: the wander (a new spot two cells either way in the kitten's own lane every
+    3-4.5 s, a 0.8 s walk facing the way it goes with a stride), breath and blinks on their own
+    periods (`drawKittenAnim`, the shore litter's lift by two source rows). The park: the far
+    canopy in three hazed greens · a LAWN under the whole middle ground (the sky's colour had been
+    showing between crowns) with grass texture · round crowns in four greens with trunks ·
+    three conifers (quarter-cell edges, a shade side) · a willow with hanging texture · a copper
+    tree · five shrubs along the path. Clip page republished (V4).
+- *"I like how the kittens move now. For the park, vegetation isnt super clear (i liked how you
+  had bigger trees in earlier iteration), also the plaza grid looks like a transparent png- focus
+  on the fountain make it nicer and the water coming out of it should be more of the focus. -- the
+  harbour looks nice, but we need to reapproach the colors for the water- they blend w the
+  background"* (2026-09-25)
+  (resent with *"try more water-like colors"*)
+  ⇒ The harbour's water takes the shore's own SeaFar/SeaNear, cube-tuned per hour (it was the
+    horizon's colour darkened, the same colour as the skyline behind it). The park: the checker
+    paving read as a transparency grid ⇒ plain stone with a lighter ring round the pool; trees
+    back to the earlier scale (crowns rx 5-7) and fewer; the fountain rebuilt as the centre: a
+    rimmed pool of the sea's colour, a central jet to six rows with two side jets, the crowns
+    breaking into arcs that fall either side, splash and ripples in the pool, lit by night.
+  ⇒ BUILT AND SEEN (close looks at the park at 11.5 s and the harbour at 6.5 s): the water a
+    clear teal-to-blue band against the grey quay; the fountain the park's centre at night. Clip
+    page republished (V5).
+- *"looking nice- but the fountain / park needs work- its a lot of detail and currently does not
+  read great. Try a couple different approaches for the park scene and how you are generating the
+  trees and the fountain within"* (2026-09-25)
+  ⇒ Three approaches drawn as stills (`rain_park.go`, `RainParkStyle`): 1 SILHOUETTE (the
+    vista's way: a treeline of bumps in one tone a depth, quarter-cell caps, two black crowns
+    framing, a single white plume over a plain pool, no plaza) · 2 SPRITES (the animals' way:
+    authored tree bitmaps through the quadrant pipeline, round, conifer and poplar, a stone
+    fountain sprite with glyph water) · 3 GLYPHS (ASCII foliage: masses of &%@ in two greens on
+    the lawn, ^ conifers, a ~ pool and a glyph jet). The blob crowns kept as 0 for comparison.
+  ⇒ BUILT AND SEEN, on the stills page (same link, V9): the silhouette reads as a lawn with a
+    hedge behind it, calm but not a park; the SPRITES read as a park (trees you can name, a
+    fountain in stone tiers that reads before its water moves); the glyphs a strong taste. My
+    recommendation corrected on the page after looking: 2, the sprites, with two or three more
+    tree bitmaps so the crowns do not repeat. His pick pending.
+- *"go w sprites"* (2026-09-25) ⇒ RULED: the park's trees and fountain are SPRITES, the
+  animals' way. `RainParkStyle = 2` the default; three more tree bitmaps (an oak, a willow, a
+  bush) so no crown repeats; the park clip regenerated on them.
+  ⇒ BUILT AND SEEN: ten trees from six bitmaps (round, conifer, poplar, oak, willow, bush), no
+    two neighbours the same shape or green, two dark oaks framing; the stone fountain with the
+    plume. Clip page republished (V6). The park clip is on sprites from here.
+- *"looking good! Export all three videos so I can post them on X- and archive everythign for
+  later implementation"* (2026-09-25)
+  ⇒ EXPORTED: the three clips re-rendered at 30 fps (480 frames each, every frame painted,
+    not held) through the fire clip's stage (`render-fire.mjs`, Playwright + the installed
+    Chrome, a fresh `npm i playwright` in this session's scratchpad; the old scratchpad's
+    copy had lost its index.js) with a full-frame camera at zoom 0.888 (80x24 is wider than
+    16:9; a dark band above and below), assembled by `assemble.sh` (H.264, yuv420p, faststart):
+    `~/Desktop/xscapes-qt/xscapes-rain-{block,park,harbour}-16x9.mp4`, 16 s, 1.1-1.4 MB, plus a
+    still of each at the ask and `post-rain.md` with captions. SEEN on the first still: a kitten
+    mid-wander cut by the mullion ⇒ the kittens drawn after the frame, in front of it like the
+    cat (`drawKitsNow`), in the clips page (V7) and the videos. ARCHIVED: `notes/rain/README.md`
+    (every ruling, the files, how to regenerate, what the build must do that the mockup does
+    not); the study files committed at his word "archive everythign for later implementation".
