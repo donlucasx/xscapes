@@ -3,6 +3,17 @@
 **Copy-paste this prompt into a fresh session:**
 
 ```
+SESSION 46 (2026-09-25 12:40 → 13:10 PDT), THE COMMONS DM. He DM'd @Slayed_eth
+(the Commons FOUNDER, DMs open) at 13:05 asking whether xscapes is being
+considered; text verbatim in _FEEDBACK.md §Session 46. OPEN THREAD: the
+reply. Measured first: entry ✓ xscapes, "Results TBA"; he is #101 of 101 on
+the token board (4.8M of 21.9B); the top 25 is overdue (Slayed: "tmrw" on
+Sep 23); "only commons" = two PUBLIC Slayed replies on Aug 29 under a Nexory
+post, never in the rules; HE ASKED on Aug 28 under the launch post
+(x.com/donlucas/status/2093533654983340385), no answer. His ruling: no
+concession, appeal on the brief. The Commons like/RT-then-gone: his
+observation, unprovable from here. Nothing committed this session.
+
 SESSION 45 (2026-09-23 → 25), THE RAINY WINDOW STUDY, WRAPPED 12:30 PDT at
 his word. STATE: the study COMMITTED (d5ecef9 + the wrap commit), NOT PUSHED
 (push = gh auth switch --user donlucasx && git push origin main, his word);
@@ -20,7 +31,7 @@ while working (dry at idle), the park's fountain + sway as the work, the
 shore's disc greyed-overcast sky, todos as stars, the cat's walk-up one rung,
 kittens from inside over the sill with a wander, the park in SPRITES, the
 harbour's water = the shore's sea, the plant on the harbour only. NEXT: push at
-his word · his reply on the Commons "top 25" post · the default view · the spec
+his word · the default view · the spec
 (notes/rain/README.md "What the build has to do") · the build as scape.Scape
 off the reducer, the vista's way.
 Untracked from s43-44 still waiting his word: qt_test.go, fire_test.go,

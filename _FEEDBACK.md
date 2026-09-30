@@ -5473,3 +5473,81 @@ trailer's did.
 WRAPPED 2026-09-25 ~12:30 PDT at his word. The study is committed (`d5ecef9` + the wrap commit),
 NOT pushed; the clips page V7 and the stills page V9 live; the MP4s on the Desktop; the X thread
 up. The Commons reply is his hand after the edit in the wrap's summary.
+
+## Session 46 — 2026-09-25 (12:40 PDT →): is the entry in, and should he DM Slayed?
+
+His ask, verbatim: *"i want to DM one of the commonsmade team members and ask wether they
+have accepted my submission (xscapes). The issue in question here is that we built xscapes in
+claude code (mostly), not on their platform (commonsmade). But to be absolutely fair, nowhere in
+the website says its a hard requirement to use their platform- its loosely suggested on their
+brief under 'everything counts' but not really hard stipulated. [...] you should look into this
+thread too https://x.com/donlucas/status/2101035865703391349 [...] where a user shows
+screenshots of slayed saying 'only commons' which seems like a DM or a chat on a group,
+ambiguous. Analyse this- what should I do"* (with a screenshot of the Rules dialog, signed in).
+
+Measured (his Chrome, signed in to both X and Commons; Playwright signed out for profiles):
+- Commons hackathon page, signed in: **YOUR ENTRY ✓ xscapes · "Hackathon has ended. Results
+  TBA." · Winners announced: TBA.** The rules dialog matches his screenshot and the three prior
+  readings (`research/commons-submission.md` §1 and the 09-05 re-read): no on-platform sentence.
+- **Tokens spent board: 101 rows (= submitted builds). He is #101, 4.8M, of 21.89B total.**
+  R00T (@R00T_eth, the critic in the thread) is #4 at 1,303.2M.
+- **@Slayed_eth is the Commons founder** ("our token", "we've been hammering away narrowing down
+  the entries", Sep 23; the Aug 24 VibeFi vision post: "Can you imagine if Claude Code had built
+  in hackathons going 24/7? ... The harness layer (think cursor, claude code, etc) is one of the
+  most valuable layer in existence. Our harness is built specifically for builders to earn
+  from."). DMs OPEN (a Message button on the profile; he does not follow Slayed).
+- **The two screenshots R00T posted are PUBLIC X replies by Slayed, not a DM or a group:** under
+  a @Nexory96 post (background reads "Commons only - nothing external like Claude, GPT etc",
+  dated "Sat, Aug", so Aug 29), Slayed: *"Only commons!"* (1:01 AM) and *"For this one commons
+  only, it's how the vault generates apy and becomes useful for non vibe coders"*. R00T under
+  it: "He dropped it multiple times". Never on @commonsmade, never in the rules.
+- R00T's Sep 18 reply names the proxy pattern itself as the thing that does not count ("a vercel
+  host created by claude / astra. commons just redirects it's after the load"); xscapes' entry
+  IS that pattern (a Worker proxying gh-pages).
+- Timeline: @commonsmade Sep 21 "Almost down to the top 25", Sep 22 "Handpicking the top 25
+  submissions before turning it over to our judges ... back tomorrow"; Slayed Sep 23 "top 25
+  will be announced at some point tmrw". Nothing since on either account as of 12:50 PDT 09-25.
+  Judges (Sep 18): @banditxbt @SolLunix @AshleyDCan @ZachZelle. The TEAM handpicks the 25.
+- His Sep 18 public ask tagging @Slayed_eth has no reply from Slayed after 7 days. The earlier
+  question he says he asked under a @commonsmade post could not be found by X search (search
+  indexes replies poorly); not cited in the draft.
+- ⇒ Verdict given in chat: by the letter the entry is valid and IN; by the founder's stated
+  intent and the economics it is not what they mean to reward; top-25 odds low regardless. DM
+  YES, now (before the 25 drops), but NOT the "no hard rule said I had to" framing: disclose,
+  ask the one question, offer the Commons-native version (renderer → wasm, §8) for hackathon #2.
+  The DM is his hand.
+- His ruling on the draft, verbatim (12:58): *"I would rather not give in before even getting an
+  answer. id rather appeal to his common sense and hoping that he ll take in my submission
+  because of the ambiguity of his premise. I was definitely inspired by his hackathon and spent
+  a ton of time on it"* ⇒ the "if it's out, a Commons-native version for #2" fallback CUT from
+  the DM; redrafted as an appeal on the brief's own words (no limits, creativity over polish),
+  the ambiguity named plainly, the time and the inspiration stated, one ask: judge it on the
+  brief. No rules-lawyering, no concession. Still his hand to send.
+- *"ive also made a bunch of posts which the commmonsmade x account liked- I did notice they gave
+  my submission a RT and then it never showed up on their page"* (13:05) and *"heres the tweet
+  when i asked them https://x.com/donlucas/status/2093533654983340385"* (13:08) ⇒ Measured:
+  **THE QUESTION: Aug 28 7:58 PM, a reply under Commons' launch post** ("Humans spend 30 million
+  hours a day waiting on AI ... $60,000", 160K views, 148 replies): *"hey @commonsmade, do we
+  need to use the agents on your platform to participate? its not super clear, ty"*. 122 views,
+  NO answer from Commons; the one reply (Crypto Zach, Aug 30): "I keep asking the same question
+  and they don't even have any support group". Slayed's "Only commons!" is stamped 1:01 AM, i.e.
+  ~5 h later under Nexory's post, not his. **The RT: not provable from here.** The trailer post
+  (2101029250996617468) counts 10 reposts but lists 7, none @commonsmade; a removed repost also
+  removes its notification, and X hides likers, so neither the like nor the RT can be confirmed
+  or refuted. Treated as his observation. The cast post's 3 and the fire post's 3 reposters:
+  no Commons either. ⇒ DM redrafted with the Aug 28 link as the ambiguity's proof; the RT kept
+  OUT of the DM (unprovable, reads as watching them).
+- *"was gonna start with a line 'hey fren, got a checkmark so I could message u 😆'"* ⇒ keep it,
+  fold "Lucas here" in, one line of humour then plain.
+- ⭐ **SENT by him, 13:04-13:05 PDT, X DM to @Slayed_eth (screenshot 1.05.49 PM), verbatim:**
+  "hey fren, got a checkmark so I could message u 😆" / "Lucas here" / "I entered xscapes
+  (xscapes.vibe.commonsmade.com): cozy ASCII scenes that show what your agent is doing while you
+  wait, built for terminal agents like Claude Code and Kimi.
+  x.com/donlucas/status/2101029250996617468?s=20" / [link card: the Aug 28 question] / "I read
+  the rules a few times and asked under your launch post on day two whether we had to build on
+  your agents (x.com/donlucas/status/2093533654983340385). Nobody answered, and nothing said
+  Commons-only, so "no limits" read as no limits. I only saw your "only commons" reply under
+  someone else's post after I'd shipped. Your hackathon got me building and I put three weeks
+  into it. Would love to know if it's being considered 🙏". His additions over the draft: the
+  trailer link in the entry line, the question as its own link card, the 🙏. Unencrypted DM.
+  ⇒ OPEN THREAD: Slayed's reply. The top 25 is overdue (his "tmrw" was Sep 24).
