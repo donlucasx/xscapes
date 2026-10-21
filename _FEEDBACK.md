@@ -5551,3 +5551,13 @@ Measured (his Chrome, signed in to both X and Commons; Playwright signed out for
   into it. Would love to know if it's being considered 🙏". His additions over the draft: the
   trailer link in the entry line, the question as its own link card, the 🙏. Unencrypted DM.
   ⇒ OPEN THREAD: Slayed's reply. The top 25 is overdue (his "tmrw" was Sep 24).
+
+## Session 47 (2026-10-21)
+
+Resumed thinking the last session crashed; it had not (the 10-14 adoption check, hub-anchored, ended clean; this morning's crash was a Sprouts session). His rulings, verbatim:
+
+> "1. push 2. ok --- 5. slayed has not replied, and commonsmade has not made any further announcements. Can you do a deep dive on X and any other relevant channels? Situation starting to look sus as there has been no comms whatsoever after the top 25 were announced"
+
+- 1 = push the unpushed commits: DONE, `06144c6..d04a5c6` (origin == HEAD).
+- 2 = commit the s43-44 untracked seam: DONE in `d04a5c6` (qt/fire/shore tests, `notes/qt/`, `notes/reddit/`, `/reddit` command). Secret scan clean before push.
+- 5 = Commons: Slayed never replied to the 09-25 DM; no @commonsmade announcement since the top 25. Deep dive dispatched (X + other channels + $CMNS).
