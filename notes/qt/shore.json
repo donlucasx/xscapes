@@ -1,0 +1,13 @@
+{
+  "_": "The shore clip: no zoom, the whole 80x27 window. A 1.2 zoom on the waterline was tried for his 'focus on the tide' and dropped: the writing in the sand (left) and the crab (right) cannot both fit above zoom 1.03, and the tide's six rows of 27 read at full frame.",
+  "W": 1920,
+  "H": 1080,
+  "camera": [
+    {
+      "t": 0.0,
+      "col": 40,
+      "row": 13.5,
+      "zoom": 1.0
+    }
+  ]
+}

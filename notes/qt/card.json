@@ -1,0 +1,50 @@
+{
+  "_": "The QT card: the site's 'Scapes and companions' section as a 16:9 loop. Every number here is what Lucas tunes; render-card.mjs only reads it. Sizes in px at 1920x1080.",
+  "W": 1920,
+  "H": 1080,
+  "fps": 30,
+  "title": "scapes and companions",
+  "right": "",
+  "pad": {
+    "top": 130,
+    "side": 100,
+    "bottom": 70
+  },
+  "rule": {
+    "px": 34
+  },
+  "cell": {
+    "px": 46
+  },
+  "port": {
+    "h": 470,
+    "gap": 36
+  },
+  "cap": {
+    "px": 32,
+    "top": 30,
+    "lh": 1.4
+  },
+  "cast": [
+    {
+      "key": "crab",
+      "name": "Hero the crab.",
+      "line": "The shore's companion."
+    },
+    {
+      "key": "cat",
+      "name": "The cat.",
+      "line": "Came first. One command away."
+    },
+    {
+      "key": "owl",
+      "name": "The owl.",
+      "line": "The vista's companion: five faces, owlets for subagents."
+    },
+    {
+      "key": "frog",
+      "name": "The frog.",
+      "line": "Drawn for the aquarium. Next."
+    }
+  ]
+}

@@ -1,0 +1,31 @@
+{
+  "_": "The camera over the fire clip (fire_test.go fireMontage: the vista alone, 100x34, session seconds / 10), in CLIP seconds. col/row are window cells; zoom 1 is the whole window fitted to the frame's height; the frame is kept inside the window (clamped). v2 (his 'should ramp up faster'): idle until the prompt at 1.5, the work rises through 1.5-3.5 (the flames lean, the smoke streams), the owlets come at 2.7, the first finish at 9.9, the second prompt at 11.0, its finish at 19.4, the compact at 20.5. The camera: the closeup on the fire to 3.8, the pull to the wide by 6.3, the wide to the end. The hour runs from dusk into the night behind it.",
+  "W": 1920,
+  "H": 1080,
+  "camera": [
+    {
+      "t": 0.0,
+      "col": 38,
+      "row": 25.0,
+      "zoom": 3.0
+    },
+    {
+      "t": 3.8,
+      "col": 38,
+      "row": 25.0,
+      "zoom": 3.0
+    },
+    {
+      "t": 6.3,
+      "col": 50,
+      "row": 17.0,
+      "zoom": 1.01
+    },
+    {
+      "t": 21.5,
+      "col": 50,
+      "row": 17.0,
+      "zoom": 1.01
+    }
+  ]
+}
