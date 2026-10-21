@@ -5561,3 +5561,4 @@ Resumed thinking the last session crashed; it had not (the 10-14 adoption check,
 - 1 = push the unpushed commits: DONE, `06144c6..d04a5c6` (origin == HEAD).
 - 2 = commit the s43-44 untracked seam: DONE in `d04a5c6` (qt/fire/shore tests, `notes/qt/`, `notes/reddit/`, `/reddit` command). Secret scan clean before push.
 - 5 = Commons: Slayed never replied to the 09-25 DM; no @commonsmade announcement since the top 25. Deep dive dispatched (X + other channels + $CMNS).
+- Commons deep dive RETURNED 16:3x PDT: real red flags. Top 25 (Sep 25) includes donlucas; @commonsmade silent since Sep 25; Slayed's Oct 9 article = entries disparaged, "pivoting", prizes unmentioned; payout questions unanswered; $CMNS -92%. Detail in memory `reference_commons_hackathon.md`. He signed in on X for it ("signed u in on X in case its helpful"); read via Playwright, read-only.
