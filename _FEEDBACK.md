@@ -5576,3 +5576,6 @@ Resumed thinking the last session crashed; it had not (the 10-14 adoption check,
 
 **10-22, the platform edge (verbatim):** "theres an edge that I think its worth acknowleding - xscapes was not built within the commonsmade platform, yet we built the pitch within it. Dig around our memories, as we ve addressed this- there were no clear stipulations on the hackathon that the build had to be done within their platform, nor specifically for their platform- we asked publicly and privately and never got a response, yet we made it to the top25- shall we acknowledge this somehwere briefly?"
 -> Claude's recommendation: yes, in the first self-reply (1b), not the main post. Memory check: his Aug 28 public ask (x.com/donlucas/status/2093533654983340385) unanswered; Sep 25 DM to Slayed unanswered; caveat: Slayed's Aug 29 "Only commons!" replies under @Nexory96 exist (never in rules or from @commonsmade).
+
+**10-22 (verbatim):** "sounds like maybe we shouldnt mention it at all then- dont want to make a whole paragraph about it"
+-> Platform edge dropped from 1b; 1b is links only. One-line answer kept in reserve in the drafts file in case someone raises it.
