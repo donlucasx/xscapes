@@ -5601,3 +5601,5 @@ Resumed thinking the last session crashed; it had not (the 10-14 adoption check,
 
 **10-26 (verbatim):** "yes, lets deal w 1~4"
 -> Drafts v4 (notes/commons/posts-2026-10-21.md): main post + sep 25 "winner early next week" line, "no reply yet", item 3 = "the prize structure honored as published", token variant deleted; finalists reply = @0xMimmi @rookie_of_Ph only; NEW judge DM (before any public tag); finalist DM now goes BEFORE the post. Wayback still on hold.
+
+-> 10-26 (his "yes"): top-25 handles read off the orig image (evidence/x/07-commonsmade-top25-image-orig.jpg): 27 names, 17 X links; list + R00T caution in posts-2026-10-21.md; @Tezqee not on it.
