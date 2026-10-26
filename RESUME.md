@@ -3,6 +3,20 @@
 **Copy-paste this prompt into a fresh session:**
 
 ```
+SESSION 47 (2026-10-21 -> 26), THE COMMONS DISPUTE (no code). Deep dive: top 25
+posted Sep 25 (donlucas in), then @commonsmade went silent; Slayed's Oct 9
+article calls entries "flat-out uncreative", no word on prizes; judges silent;
+rules = "$60,000 total, put up by Commons", "paid in USDC", 19 places paid,
+nothing tied to $CMNS (archived notes/commons/rules-2026-10-21.md, LOCAL ONLY,
+excluded via .git/info/exclude). His rulings: call for help, not a call-out;
+props to founder first; platform edge NOT mentioned; DM FIRST. DM SENT to
+@commonsmade 10-26 ~noon (notes/commons/dm-commonsmade-2026-10-26.txt).
+NEXT: reply? If none by ~10-27/28 -> public thread from
+notes/commons/posts-2026-10-21.md (main + links reply + finalists + judges a
+few h later); verify the nine handles first. Partners (@virtuals_io) only after
+~1 wk more silence. Sprouts USDC/round-up question left unanswered (his
+switch back to xscapes).
+
 SESSION 46 (2026-09-25 12:40 → 13:10 PDT), THE COMMONS DM. He DM'd @Slayed_eth
 (the Commons FOUNDER, DMs open) at 13:05 asking whether xscapes is being
 considered; text verbatim in _FEEDBACK.md §Session 46. OPEN THREAD: the

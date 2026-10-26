@@ -2,6 +2,10 @@
 
 *(Renamed end to end on 2026-09-03: directory, env vars, state path and hook marker. Two names are kept on purpose and are not leftovers -- `internal/envx` still reads `ASCIISCAPES_*` and warns, and `install.go` still RECOGNISES the `# asciiscapes:v1` marker so the hooks it wrote before the rename can be found and removed.)*
 
+> **Session 47 (2026-10-21 → 26), THE COMMONS DISPUTE, no code.** Commons silent since the Sep 25 top 25; rules archived
+> (`notes/commons/`, local only, git-excluded). DM to @commonsmade SENT 10-26; public thread drafted, goes up ~10-27/28 if
+> no reply. See RESUME.md + `_FEEDBACK.md` §Session 47.
+
 > **Session 45 (2026-09-23 → 25), THE RAINY WINDOW STUDY, DELIVERED AND ARCHIVED at his word: THREE VIEWS ANIMATED,
 > THREE MP4s ON THE DESKTOP, EVERY CHOICE RULED.** His ask: *"lets work on the rainy window scape + cat companion. Ask me
 > any/all questions so we can dial it"*, then eleven rounds on rendered frames (`_FEEDBACK.md` §Session 45, verbatim).
