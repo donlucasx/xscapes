@@ -5594,3 +5594,6 @@ Resumed thinking the last session crashed; it had not (the 10-14 adoption check,
 
 **10-26 (verbatim):** "needed: 1. I have given you the rules screenshots multiple times, can u double check? 3. thatd be cool, lets hold off for now --- any other conclusions we can draw after all the info we ve learnt?"
 -> His 6 pasted screenshots recovered byte-exact from the session transcript into evidence/rules-screenshots/ (Claude had wrongly said they were lost; they were in the transcript all along). Wayback archiving: ON HOLD at his word.
+
+**10-26 (verbatim):** "yes, review the draft based on all the new findings. Run the anti slop skill through it. have kimi review everything we've uncovered and lmk if kimi has any other opinions/ideas/edits on our approach"
+-> Main post v3 (sep 21 "You all made really good stuff" quote, DM line, "please close out this one before the next launch"), slop-passed. Kimi packet: ~/Documents/kimi/commons-dispute-2026-10-26/ (secret scan clean: 0 hits; masked emails redacted), run launched.
