@@ -5579,3 +5579,6 @@ Resumed thinking the last session crashed; it had not (the 10-14 adoption check,
 
 **10-22 (verbatim):** "sounds like maybe we shouldnt mention it at all then- dont want to make a whole paragraph about it"
 -> Platform edge dropped from 1b; 1b is links only. One-line answer kept in reserve in the drafts file in case someone raises it.
+
+**10-25/26 (verbatim):** "back to xscapes. Thinking this message will do better as a DM directly to the commonsmade account- I think its the right thing to reach out privately before making a public post, wyt?" / "\"i asked about the results publicly\"? Did I?"
+-> DM to @commonsmade first, ~5 days, then the public thread with "i reached out privately on [date] first". Checked on X: his only public results-adjacent ask is the Oct 11 reply to Slayed ("does this mean the hackathon is done? been waiting on updates. DM'd too"); DM line corrected to that. Draft: notes/commons/dm-commonsmade-2026-10-26.txt (local, excluded).
