@@ -5609,3 +5609,4 @@ Resumed thinking the last session crashed; it had not (the 10-14 adoption check,
 
 **2026-10-26 13:49 PDT (verbatim):** "ok, ive dm'd all 4 judges from my personal @donlucas account"
 -> Judge DMs SENT (@banditxbt @SolLunix @AshleyDCan @ZachZelle; text = notes/commons/dm-judges-2026-10-26.txt as drafted unless he edited). Claude advice logged this turn: no xscapes link in the first DM; no mention of the article; if a judge hints at more, ask before quoting, treat as private by default.
+-> 10-26 (verbatim): "they were all open." All 4 judges reachable by DM; public judges reply (D) only if none answer within ~a day.
