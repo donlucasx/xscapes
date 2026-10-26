@@ -5591,3 +5591,6 @@ Resumed thinking the last session crashed; it had not (the 10-14 adoption check,
 
 **10-26 (verbatim):** "ok, is there any legal action that could be taken agaisnt commons? or are we in the wild west?" / "yes, lookup as much info as we can behind commons and its founder/s" / "also, u should make offline copies of everything relevant under a 'evidence' folder in case they start deleting posts and accounts, including a copy of their website if u must"
 -> Evidence archive built at notes/commons/evidence/ (local, git-excluded, 124M, SHA256SUMS): 38 X pages (png+html+txt), site bundle + public hackathon card + xscapes entry, Virtuals API + Solana balances. Findings in its README: no legal entity/terms anywhere; Slayed = the only accountable party; team tokens locked to 2027-08-24.
+
+**10-26 (verbatim):** "needed: 1. I have given you the rules screenshots multiple times, can u double check? 3. thatd be cool, lets hold off for now --- any other conclusions we can draw after all the info we ve learnt?"
+-> His 6 pasted screenshots recovered byte-exact from the session transcript into evidence/rules-screenshots/ (Claude had wrongly said they were lost; they were in the transcript all along). Wayback archiving: ON HOLD at his word.
