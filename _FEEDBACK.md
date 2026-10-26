@@ -5606,3 +5606,6 @@ Resumed thinking the last session crashed; it had not (the 10-14 adoption check,
 
 **10-26 (verbatim):** "should I dm the judges now, or wait?" -> Claude: now (answers land before the public post). Then: "ok, draft 4 variants for each, keep em simple and to the point, no need for \"no worries either way\", its a fair question we are asking. we can also say something along the lines we were super excited to participate and build and now just tryna figure out whats happening\" or something along those lines, run the anti ai slop skill through it and paste it on a text file, open it"
 -> 4 judge DMs, slop-passed, notes/commons/dm-judges-2026-10-26.txt (local), opened in TextEdit.
+
+**2026-10-26 13:49 PDT (verbatim):** "ok, ive dm'd all 4 judges from my personal @donlucas account"
+-> Judge DMs SENT (@banditxbt @SolLunix @AshleyDCan @ZachZelle; text = notes/commons/dm-judges-2026-10-26.txt as drafted unless he edited). Claude advice logged this turn: no xscapes link in the first DM; no mention of the article; if a judge hints at more, ask before quoting, treat as private by default.
