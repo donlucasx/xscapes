@@ -11,10 +11,12 @@ nothing tied to $CMNS (archived notes/commons/rules-2026-10-21.md, LOCAL ONLY,
 excluded via .git/info/exclude). His rulings: call for help, not a call-out;
 props to founder first; platform edge NOT mentioned; DM FIRST. DM SENT to
 @commonsmade 10-26 ~noon (notes/commons/dm-commonsmade-2026-10-26.txt).
-NEXT: reply? If none by ~10-27/28 -> public thread from
-notes/commons/posts-2026-10-21.md (main + links reply + finalists + judges a
-few h later); verify the nine handles first. Partners (@virtuals_io) only after
-~1 wk more silence. Sprouts USDC/round-up question left unanswered (his
+Judge DMs SENT 10-26 13:49 to all 4 (all open; dm-judges-2026-10-26.txt).
+Evidence archive notes/commons/evidence/ (local); Kimi: SOUND WITH CHANGES.
+NEXT: paste any replies. If silent ~10-27: finalist DMs (B, 17 verified
+handles, R00T last/skip) -> main post + 1b + C (drafts v4,
+notes/commons/posts-2026-10-21.md) -> D next day if judges silent -> partners
+(@virtuals_io) after ~1 wk. Wayback ON HOLD (his ruling). Sprouts USDC/round-up question left unanswered (his
 switch back to xscapes).
 
 SESSION 46 (2026-09-25 12:40 → 13:10 PDT), THE COMMONS DM. He DM'd @Slayed_eth
