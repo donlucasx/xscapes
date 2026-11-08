@@ -5,7 +5,7 @@ quiet, you tab away, and then you forget to come back. xscapes gives that
 dead time a face: a small living shoreline that runs beside your agent, rises
 while it works, and knocks when it wants you.
 
-![one turn, driven by real events](assets/frames/wired.png)
+![the tide rises while the agent works](assets/frames/shore.gif)
 
 It is two things. Underneath there is an **event protocol** with pluggable
 adapters, which is the part that generalises to any agent. On top there is a
