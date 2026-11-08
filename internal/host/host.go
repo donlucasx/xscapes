@@ -36,6 +36,12 @@ type Host struct {
 	// filter is the agent's output filter once Run has made it; AgentErases
 	// reads its count.
 	filter *Filter
+	// agentLeft is set when the agent switched off the alternate screen the
+	// host put it on (Filter.OnLeave). From then on the host writes nothing
+	// of its own but the replay: a scape frame or a mirror batch would land
+	// on the main screen the agent just handed back (Kimi N4, 2026-11-08:
+	// 8 and 13 frames painted over the shell after Hermes's 1049l).
+	agentLeft atomic.Bool
 	// Size reports the real terminal's size. Injected rather than measured
 	// here so there is one TIOCGWINSZ in the project, not two.
 	Size func() (cols, rows int)
@@ -124,6 +130,14 @@ func (h *Host) AgentErases() int64 {
 }
 
 func (h *Host) write(s string) {
+	if h.agentLeft.Load() {
+		return
+	}
+	h.writeAgent(s)
+}
+
+// writeAgent is write for the agent's own bytes, which pass after it left.
+func (h *Host) writeAgent(s string) {
 	if s == "" || h.muted.Load() {
 		return
 	}
@@ -292,7 +306,12 @@ func (h *Host) Run() error {
 	// anything typed meanwhile for the child.
 	var cpr chan int
 	waitDone := make(chan struct{})
-	if h.History {
+	// The model runs on every alternate-screen session, not only with
+	// History: a grow brings back the rows that left the band (pullBack), and
+	// it has to know which rows those are. Only History writes them to the
+	// terminal's scrollback (mirror). Kimi measured its cost on his 26 MB
+	// Ghostty trace: 0.4 s of CPU for the whole session.
+	if h.AltScreen {
 		h.mu.Lock()
 		// ⚠ This model deliberately does NOT take Rules.RetainsWidth, and it is
 		// the one line in the host that looks like an oversight and is not.
@@ -309,7 +328,10 @@ func (h *Host) Run() error {
 		// TestReplayTraceRetainDiff for the measurement.
 		h.model = newScreen(cols, rows)
 		h.model.capture = true
+		h.model.restoreAbsolute = !h.Rules.RestoreHomes
 		h.mu.Unlock()
+	}
+	if h.History {
 		cpr = make(chan int, 1)
 		h.wantCPR.Store(true)
 	}
@@ -364,7 +386,7 @@ func (h *Host) Run() error {
 	// closes when the pty runs dry, which is how the exit path knows the
 	// agent's last bytes are out before anything is printed after them.
 	fwdDone := make(chan struct{})
-	f := &Filter{}
+	f := &Filter{OwnsAlt: h.AltScreen, OnLeave: func() { h.agentLeft.Store(true) }}
 	f.Band.Store(int32(agentRows))
 	h.filter = f
 	go func() {
@@ -376,10 +398,10 @@ func (h *Host) Run() error {
 				if h.OnOutput != nil {
 					h.OnOutput(buf[:n])
 				}
-				h.write(string(f.Filter(buf[:n])))
+				h.writeAgent(string(f.Filter(buf[:n])))
 			}
 			if err != nil {
-				h.write(string(f.Flush()))
+				h.writeAgent(string(f.Flush()))
 				return
 			}
 		}
@@ -418,7 +440,9 @@ func (h *Host) Run() error {
 			}
 			leave()
 			if h.History && h.Replay {
-				h.write(h.replay())
+				// The replay passes even after the agent left the alternate
+				// screen itself: it is the transcript Terminal.app dropped.
+				h.writeAgent(h.replay())
 				// Nothing may write after this: a forwarder that outlived
 				// its deadline would land in the shell's screen.
 				h.muted.Store(true)
@@ -436,15 +460,20 @@ func (h *Host) Run() error {
 				agentRows, scapeRows = BandWith(rows, h.ScapeRows)
 
 				// The terminal has already moved the rows; the model follows
-				// it, and on a shrink keeps the rows the terminal destroyed
-				// so they can still be mirrored.
+				// it, by the same terminal's rules. A shrink's lost rows are
+				// NOT kept for the mirror (resizeScrolling says why).
 				h.mu.Lock()
 				if h.model != nil {
 					// What left the band before the resize is mirrored as it
-					// is, never matched against the rows a grow brings back.
-					h.held = append(h.held, h.model.takeScrolled()...)
+					// is, never matched against the rows a grow brings back,
+					// and a grow in this same tick can already bring it back.
+					taken := h.model.takeScrolled()
+					for _, row := range taken {
+						h.remember(row)
+					}
+					h.held = append(h.held, taken...)
 					if h.AltScreen {
-						h.model.resizeAlt(cols, rows)
+						h.model.resizeAltFor(h.Rules, cols, rows)
 					} else {
 						h.model.resize(cols, rows)
 					}
@@ -626,7 +655,8 @@ const maxMirrored = 10000
 
 // mirror sends the rows that left the band since the last tick to the main
 // buffer. One batch per tick, so the screen switches at most FPS times a
-// second; he watched four hundred a second and saw nothing.
+// second; he watched four hundred a second and saw nothing. Without History it
+// only keeps them for a grow to bring back.
 func (h *Host) mirror(rows, agentRows int) {
 	if h.model == nil {
 		return
@@ -634,26 +664,30 @@ func (h *Host) mirror(rows, agentRows int) {
 	h.mu.Lock()
 	kept := h.model.takeScrolled()
 	h.mu.Unlock()
-	out := h.held
+	out := h.held // remembered when they were taken
 	h.held = nil
 	for _, row := range kept {
-		// A row a grow brought back, leaving again: mirrored already.
-		if len(h.back) > 0 && rowText(h.back[0]) == rowText(row) {
+		// A row a grow brought back, leaving again: mirrored already. Cut to
+		// the leaving row's width, because a narrowing since the grow cut it
+		// on screen (Kimi N1).
+		if len(h.back) > 0 && rowText(h.back[0][:min(len(h.back[0]), len(row))]) == rowText(row) {
 			h.back = h.back[1:]
 			h.remember(row)
 			continue
 		}
-		// Anything else means the agent has drawn over them.
-		h.dropBack(len(h.back))
+		// Anything else means the agent drew over the top one. Only that
+		// one: the rows under it may still be there, and forgetting them
+		// all mirrored each of them a second time when it left (Kimi N2).
+		h.dropBack(1)
+		h.remember(row)
 		out = append(out, row)
 	}
-	if len(out) == 0 {
+	if len(out) == 0 || !h.History {
 		return
 	}
 	lines := make([]string, len(out))
 	for i, row := range out {
 		lines[i] = rowANSI(row)
-		h.remember(row)
 	}
 	h.mirrored = append(h.mirrored, lines...)
 	if len(h.mirrored) > maxMirrored {
@@ -673,20 +707,21 @@ func (h *Host) remember(row []cell) {
 }
 
 // pullBack takes up to n of the newest rows that left the band, for a grow to
-// paint back in at the band's top, cut to the width.
+// paint back in at the band's top, cut to the width, which is also how the
+// dedupe keeps them (Kimi N1).
 func (h *Host) pullBack(n, cols int) []string {
 	n = min(n, len(h.recent))
 	if n <= 0 {
 		return nil
 	}
-	rows := h.recent[len(h.recent)-n:]
+	rows := make([][]cell, n)
+	for i, row := range h.recent[len(h.recent)-n:] {
+		rows[i] = row[:min(len(row), cols)]
+	}
 	h.recent = h.recent[:len(h.recent)-n]
-	h.back = append(append([][]cell{}, rows...), h.back...)
+	h.back = append(rows, h.back...)
 	out := make([]string, n)
 	for i, row := range rows {
-		if len(row) > cols {
-			row = row[:cols]
-		}
 		out[i] = rowANSI(row)
 	}
 	return out

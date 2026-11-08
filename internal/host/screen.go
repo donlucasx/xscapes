@@ -98,7 +98,8 @@ type screen struct {
 	// restoreAbsolute switches DECRC to Ghostty's rule (read from its source,
 	// Terminal.zig restoreCursor, 2026-09-04): the saved row comes back
 	// verbatim, clamped to the screen and never homed into the region. Off,
-	// the model keeps Terminal.app's measured homing. Set by instruments only.
+	// the model keeps Terminal.app's measured homing. The host sets it from
+	// Rules.RestoreHomes.
 	restoreAbsolute bool
 
 	// pending holds a trailing partial escape sequence. Reads off a pipe
@@ -295,14 +296,34 @@ func tailPartialRune(s string) int {
 // The two helpers above move it with the content, which is the MAIN screen's
 // rule; on this screen that rule hid the split input box from every test in
 // this package.
-func (s *screen) resizeAlt(w, h int) {
+func (s *screen) resizeAlt(w, h int) { s.resizeAltFor(AppleTerminalRules, w, h) }
+
+// resizeGhostty is Ghostty's alternate screen on a resize, from its source
+// (see Rules): a shrink scrolls rows off the top and the cursor follows its
+// row; a grow with the cursor above the last row keeps the content at the top
+// and appends blank rows, cursor unchanged.
+func (s *screen) resizeGhostty(w, h int) { s.resizeAltFor(XTermRules, w, h) }
+
+// resizeAltFor is the alternate screen's resize under a terminal's Rules, so
+// the host's own model moves rows the way the terminal in front of it does.
+// It used to be resizeAlt everywhere, which was right only while the model ran
+// in Terminal.app alone: in Ghostty it put the text a whole grow below where
+// the terminal had it (Kimi N3, 2026-11-08).
+func (s *screen) resizeAltFor(r Rules, w, h int) {
 	y := s.y
 	if h > s.h {
-		s.resizeAnchoredBottom(w, h)
-	} else {
-		s.resizeScrolling(w, h)
+		if r.GrowPushesDown {
+			s.resizeAnchoredBottom(w, h)
+			s.y = clamp(y, 0, h-1)
+		} else {
+			s.resize(w, h)
+		}
+		return
 	}
-	s.y = clamp(y, 0, h-1)
+	s.resizeScrolling(w, h)
+	if r.ShrinkKeepsCursor {
+		s.y = clamp(y, 0, h-1)
+	}
 }
 
 // resize keeps what fits, which is what a terminal does when it GROWS.

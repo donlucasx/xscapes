@@ -280,10 +280,15 @@ type Rules struct {
 	// width change the old cells show through in the terminal's own side inset.
 	// Measured on Terminal.app in notes/width-audit.md; see reallocBand.
 	RetainsWidth bool
+	// RestoreHomes: DECRC under origin mode into a region that no longer
+	// holds the saved row puts the cursor on the region's first row
+	// (Terminal.app, notes/shrinkprobe). Ghostty restores the row verbatim.
+	// The hosts's screen model follows it (screen.restoreAbsolute).
+	RestoreHomes bool
 }
 
 var (
-	AppleTerminalRules = Rules{GrowPushesDown: true, ShrinkKeepsCursor: true, RetainsWidth: true}
+	AppleTerminalRules = Rules{GrowPushesDown: true, ShrinkKeepsCursor: true, RetainsWidth: true, RestoreHomes: true}
 	XTermRules         = Rules{}
 )
 

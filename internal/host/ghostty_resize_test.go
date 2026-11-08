@@ -6,18 +6,6 @@ import (
 	"testing"
 )
 
-// resizeGhostty is Ghostty's alternate screen on a resize, from its source
-// (see Rules): a shrink scrolls rows off the top and the cursor follows its
-// row; a grow with the cursor above the last row keeps the content at the top
-// and appends blank rows, cursor unchanged.
-func (s *screen) resizeGhostty(w, h int) {
-	if h < s.h {
-		s.resizeScrolling(w, h)
-		return
-	}
-	s.resize(w, h)
-}
-
 // The split input box, on Ghostty. Same shape as the Terminal.app test, with
 // the terminal's own rules in the model: DECRC restores the row verbatim, and
 // the resize moves content and cursor the way PageList.zig says. The scape is

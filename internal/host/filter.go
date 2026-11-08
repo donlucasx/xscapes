@@ -35,6 +35,13 @@ type Filter struct {
 	// dropped, for the event log: the next blank row is then attributed to
 	// a clear instead of inferred from a screenshot (his ruling, 2026-09-18).
 	Erases atomic.Int64
+	// OwnsAlt is set when the host runs the agent on the alternate screen it
+	// switched to itself. An agent that switches back to the main screen
+	// (Hermes does, at exit: ESC[?1049l) is then leaving: the sequence is
+	// forwarded, so the agent's goodbye lands on the main screen as it would
+	// in a plain terminal, and OnLeave tells the host to stop writing.
+	OwnsAlt bool
+	OnLeave func()
 	// pend holds an escape sequence that a read cut in half. A read from a
 	// PTY ends wherever the kernel's buffer ended, which is regularly inside
 	// a sequence: without this, ESC[ would be forwarded and the r that
@@ -77,6 +84,18 @@ func (f *Filter) Filter(in []byte) []byte {
 			continue
 		}
 		switch final {
+		case 'l':
+			out = append(out, buf[i:end+1]...)
+			if f.OwnsAlt && leavesAlt(buf[i:end+1]) {
+				// The band's region and origin mode are the terminal's, not
+				// the screen's: left pinned, the agent's goodbye would scroll
+				// inside the band's rows on the main screen. DECSTBM homes
+				// the cursor, so the main screen's cursor is kept around it.
+				out = append(out, "\x1b[?6l\x1b7\x1b[r\x1b8"...)
+				if f.OnLeave != nil {
+					f.OnLeave()
+				}
+			}
 		case 'r': // DECSTBM, the one the host keeps for itself
 		case 'J':
 			out = append(out, f.confineErase(buf[i:end+1])...)
@@ -128,6 +147,21 @@ func (f *Filter) confineErase(seq []byte) []byte {
 		return seq
 	}
 	return []byte(b.String())
+}
+
+// leavesAlt reports whether a DEC private mode reset switches off the
+// alternate screen: 1049, 1047 or 47 among its parameters.
+func leavesAlt(seq []byte) bool {
+	s := string(seq)
+	if !strings.HasPrefix(s, "\x1b[?") {
+		return false
+	}
+	for _, p := range strings.Split(s[3:len(s)-1], ";") {
+		if p == "1049" || p == "1047" || p == "47" {
+			return true
+		}
+	}
+	return false
 }
 
 // Flush releases anything held back, for the end of the stream.
