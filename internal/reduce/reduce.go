@@ -483,7 +483,15 @@ func (r *Reducer) Apply(e event.Event, now time.Time) {
 
 	case event.SubStart:
 		if e.Agent != "" {
-			r.subs[e.Agent] = now
+			_, running := r.subs[e.Agent]
+			_, ended := r.gone[e.Agent]
+			// A repeat start for a subagent that is still running is the same
+			// subagent announced twice (Hermes's stop re-announces the arrival
+			// for agents too old to send subagent_start): keep its real start,
+			// or its dwell would restart at the moment it ends.
+			if !running || ended {
+				r.subs[e.Agent] = now
+			}
 			delete(r.gone, e.Agent) // back in the litter, mid-swim or not
 		}
 		r.heat += Impulse

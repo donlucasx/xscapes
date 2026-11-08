@@ -55,8 +55,8 @@ var kimiHookEvents = []string{
 var hermesHookEvents = []string{
 	"on_session_start", "on_session_reset", "on_session_end", "on_session_finalize",
 	"pre_llm_call", "post_llm_call",
-	"pre_tool_call", "post_tool_call", "pre_approval_request",
-	"subagent_stop",
+	"pre_tool_call", "post_tool_call", "pre_approval_request", "post_approval_response",
+	"subagent_start", "subagent_stop",
 }
 
 const (

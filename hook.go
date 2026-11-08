@@ -384,6 +384,7 @@ type hermesExtra struct {
 	ChildRole         string `json:"child_role"`
 	ChildStatus       string `json:"child_status"`
 	ChildSessionID    string `json:"child_session_id"`
+	ChildSubagentID   string `json:"child_subagent_id"`
 	Command           string `json:"command"`
 	Reason            string `json:"reason"`
 }
@@ -550,13 +551,38 @@ func translate(p hookPayload) []event.Event {
 		return []event.Event{{Kind: event.ToolEnd, Op: op, Tool: p.ToolName, Target: target, MS: p.hermes().DurationMS}}
 	case "pre_approval_request":
 		op, target := classify(p.ToolName, p.ToolInput)
-		return []event.Event{{Kind: event.NeedsInput, Op: op, Tool: p.ToolName, Target: target, Text: "allow " + p.ToolName + "?"}}
+		// Hermes's approval carries the command being assessed, not a tool
+		// name (hooks.md: command, description, pattern_key, surface), so
+		// the balloon names the program; only the program, as the sand does.
+		what := p.ToolName
+		if what == "" {
+			what = program(p.hermes().Command)
+		}
+		return []event.Event{{Kind: event.NeedsInput, Op: op, Tool: p.ToolName, Target: target, Text: "allow " + what + "?"}}
+	case "post_approval_response":
+		// The answer, either way, as Kimi's PermissionResult: the ask comes
+		// down now rather than at the next tool start.
+		return []event.Event{{Kind: event.Answered, Text: "answered"}}
+	case "subagent_start":
+		// Newer Hermes (seen at 856e7580, 2026-11-08) announces the start,
+		// keyed by the child_session_id its stop also carries.
+		x := p.hermes()
+		id := x.ChildSessionID
+		if id == "" {
+			id = x.ChildSubagentID
+		}
+		if id == "" {
+			id = x.ChildRole
+		}
+		return []event.Event{{Kind: event.SubStart, Op: event.OpSub, Agent: id, AgentType: x.ChildRole}}
 	case "subagent_stop":
-		// Hermes has no subagent START event, only this. A litter that
-		// never gets a start never shows, so the stop is announced as a
-		// start and an end together: the reducer's dwell (KittenDwell)
+		// Hermes 0.14 had no subagent START event, only this. A litter that
+		// never gets a start never shows, so the stop is still announced as
+		// a start and an end together: the reducer's dwell (KittenDwell)
 		// keeps the arrival on screen for a minute, which is the same
 		// treatment a subagent that lived seven seconds gets from Claude.
+		// When subagent_start already arrived, the reducer leaves the
+		// running subagent's start time alone (a repeat start is no reset).
 		x := p.hermes()
 		id := x.ChildSessionID
 		if id == "" {
