@@ -537,7 +537,13 @@ func translate(p hookPayload) []event.Event {
 	case "on_session_reset":
 		_ = event.SetCurrent(p.Session)
 		return []event.Event{{Kind: event.SessionStart, Text: "clear"}}
-	case "on_session_end", "on_session_finalize":
+	case "on_session_end":
+		// NOT the session's end: Hermes fires it "at the very end of every
+		// run_conversation() call", every turn. As a SessionEnd it reset the
+		// scape the moment each turn's done landed. post_llm_call is the done.
+		return nil
+	case "on_session_finalize":
+		// The CLI or gateway tearing the session down (/new, quit).
 		return []event.Event{{Kind: event.SessionEnd}}
 	case "pre_llm_call":
 		return []event.Event{{Kind: event.Prompt, Text: firstLine(p.hermes().UserMessage)}}

@@ -87,3 +87,19 @@ func TestHermesInstallsTheNewEvents(t *testing.T) {
 		}
 	}
 }
+
+// TestHermesTurnEndIsNotTheSessionEnd: Hermes fires on_session_end "at the
+// very end of every run_conversation() call" (hooks.md), i.e. every turn. As
+// a SessionEnd it reset the reducer the instant the turn's done landed, so
+// the done knock, the litter and the stars vanished after every turn
+// (measured 2026-11-08: done and session_end in the same millisecond).
+// on_session_finalize is the session closing.
+func TestHermesTurnEndIsNotTheSessionEnd(t *testing.T) {
+	if got := translate(payload(t, `{"hook_event_name":"on_session_end","session_id":"p","extra":{}}`)); len(got) != 0 {
+		t.Fatalf("on_session_end = %+v, want nothing (it ends a turn, not the session)", got)
+	}
+	got := translate(payload(t, `{"hook_event_name":"on_session_finalize","session_id":"p","extra":{}}`))
+	if len(got) != 1 || got[0].Kind != event.SessionEnd {
+		t.Fatalf("on_session_finalize = %+v, want SessionEnd", got)
+	}
+}
