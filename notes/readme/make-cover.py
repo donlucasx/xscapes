@@ -19,21 +19,21 @@ assert len(pres) == 6, len(pres)
 PAGE = '''<!doctype html><html><head><meta charset="utf-8">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Geist+Mono:wght@400;700&family=Geist:wght@400;500;600&display=swap">
 <style>
-html,body{margin:0;width:%dpx;height:%dpx;overflow:hidden;background:#eeeeee}
+html,body{margin:0;width:%dpx;height:%dpx;overflow:hidden;background:#ffffff}
 .sea{position:absolute;inset:0;display:flex;align-items:center;justify-content:center}
 .sea pre{margin:0;font:700 16px/1 "Geist Mono",monospace;color:#b8b8b8;white-space:pre;
   -webkit-mask-image:linear-gradient(90deg,transparent,#000 12%%,#000 88%%,transparent)}
 .front{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center}
 .lockup{font:700 150px/1.2 "Geist Mono",monospace;color:#121212;letter-spacing:0}
-.blk{display:inline-block;width:1ch;line-height:1.2em;text-align:center;vertical-align:top;background:#121212;color:#eeeeee}
+.blk{display:inline-block;width:1ch;line-height:1.2em;text-align:center;vertical-align:top;background:#121212;color:#ffffff}
 .tag{margin-top:34px;font:500 38px/1.2 "Geist",sans-serif;color:#121212;letter-spacing:-0.01em;
-  background:#eeeeee;padding:6px 18px}
-.sub{margin-top:10px;font:400 22px/1.2 "Geist Mono",monospace;color:#626262;background:#eeeeee;padding:2px 12px}
+  background:#ffffff;padding:6px 18px}
+.sub{margin-top:10px;font:400 22px/1.2 "Geist Mono",monospace;color:#626262;background:#ffffff;padding:2px 12px}
 </style></head><body>
 <div class="sea"><pre>%s</pre></div>
 <div class="front">
   <div class="lockup"><span class="blk">x</span>scapes</div>
-  <div class="tag">Cozy ASCII scenes that show what your agent is doing</div>
+  <div class="tag">a thinking screen for terminal agents</div>
   <div class="sub">for Claude Code, Kimi and Hermes</div>
 </div></body></html>'''
 

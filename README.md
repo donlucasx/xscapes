@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="assets/readme/cover.gif" alt="xscapes: cozy ASCII scenes that show what your agent is doing" width="100%">
+  <img src="assets/readme/cover.gif" alt="xscapes: a thinking screen for terminal agents" width="100%">
 </p>
 
 <p align="center">
