@@ -19,7 +19,7 @@ trap 'rm -rf "$stage"' EXIT
 # which the page's Open Graph tags point at (a card scraper needs an image
 # URL, and the Commons proxy serves only the page), and install.sh, which
 # the page's install line pipes into sh.
-cp site/index.html site/og.png site/install.sh "$stage/"
+cp site/index.html site/manual.html site/og.png site/install.sh "$stage/"
 touch "$stage/.nojekyll"
 git -C "$stage" init -q -b gh-pages
 git -C "$stage" add -A

@@ -12,7 +12,7 @@ curl -fsSL https://donlucasx.github.io/xscapes/install.sh | sh
 xscapes install claude --apply && xscapes claude
 ```
 
-<p align="center"><a href="https://donlucasx.github.io/xscapes">site</a> · <a href="#install">install</a> · <a href="#what-you-are-looking-at">how to read it</a> · <a href="#the-protocol">the protocol</a></p>
+<p align="center"><a href="https://donlucasx.github.io/xscapes">site</a> · <a href="https://donlucasx.github.io/xscapes/manual.html">manual</a> · <a href="#install">install</a> · <a href="#what-you-are-looking-at">how to read it</a> · <a href="#the-protocol">the protocol</a></p>
 
 ## Waiting for an agent is dead time
 
