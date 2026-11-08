@@ -320,6 +320,52 @@ func RebindShrinkAltFollow(shrink, bandShrink, agentRows int) string {
 	return b.String()
 }
 
+// RebindGrowAlt moves the band after the window got TALLER on the alternate
+// screen, doing what a plain terminal does to a main screen that grows: the
+// rows that scrolled off the top come back in, the text moves down by as many
+// rows as came back, and the cursor goes down with its row. With no history
+// nothing moves and the band grows under the text, as before.
+//
+// Hermes (prompt_toolkit) is why: it redraws only its bottom chrome, by
+// relative moves from the cursor, so a grow that left the text at the top
+// left its prompt stranded mid-band over a gap (his trace, 2026-11-08). Claude
+// Code repaints the whole band and is indifferent.
+//
+// pushed is how far the terminal itself already pushed the content down
+// (Terminal.app: by the whole grow; Ghostty: not at all), and in neither did
+// the cursor move. back is the rows coming back, oldest first, already cut to
+// the width; there are at most the band's own grow of them. The content ends
+// up len(back) rows below where it was, so the rest of a push is scrolled back
+// up and any shortfall is scrolled down (after an SGR reset, because SD fills
+// with the current background). The old scape rows that are still inside the
+// band are cleared, and the cursor comes down while the region is still the
+// full screen, as in RebindShrinkAlt, so the final restore lands in the band.
+func RebindGrowAlt(pushed, oldRows, oldAgent, agentRows int, back []string) string {
+	pull := len(back)
+	var b strings.Builder
+	b.WriteString(saveCursor)
+	b.WriteString(originOff + regionReset + "\x1b[0m")
+	switch k := pull - pushed; {
+	case k > 0:
+		fmt.Fprintf(&b, "\x1b[%dT", k)
+	case k < 0:
+		fmt.Fprintf(&b, "\x1b[%dS", -k)
+	}
+	b.WriteString(restoreCursor)
+	if pull > 0 {
+		fmt.Fprintf(&b, "\x1b[%dB", pull)
+	}
+	b.WriteString(saveCursor)
+	b.WriteString(clearRowsBare(oldAgent+1+pull, min(agentRows, oldRows+pull)))
+	b.WriteString(originOff + regionReset)
+	for i, line := range back {
+		fmt.Fprintf(&b, "\x1b[%d;1H\x1b[2K%s\x1b[0m", i+1, line)
+	}
+	b.WriteString(EnterBand(agentRows))
+	b.WriteString(restoreCursor)
+	return b.String()
+}
+
 // reallocBand drops the cells Terminal.app retains past the visible width.
 //
 // Measured in notes/width-audit.md: a row keeps every cell it has ever had, at

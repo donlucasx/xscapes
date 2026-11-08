@@ -83,6 +83,12 @@ type Host struct {
 	mirrored []string
 	// mainRow is where the next mirrored row goes in the main buffer.
 	mainRow int
+	// recent is the last rows that left the band, as cells, newest last: what
+	// a grow brings back (pullBack). back is the rows a grow brought back that
+	// are still on screen, top first; when they scroll off again they are not
+	// mirrored twice. held is what left the band before a resize and is still
+	// to be mirrored. All three belong to Run's loop.
+	recent, back, held [][]cell
 	// wantCPR is set while the host is waiting for the terminal to answer
 	// where the shell's cursor is; the key forwarder keeps that reply.
 	wantCPR atomic.Bool
@@ -434,6 +440,9 @@ func (h *Host) Run() error {
 				// so they can still be mirrored.
 				h.mu.Lock()
 				if h.model != nil {
+					// What left the band before the resize is mirrored as it
+					// is, never matched against the rows a grow brings back.
+					h.held = append(h.held, h.model.takeScrolled()...)
 					if h.AltScreen {
 						h.model.resizeAlt(cols, rows)
 					} else {
@@ -456,7 +465,15 @@ func (h *Host) Run() error {
 					h.mainRow = rows + 1
 				}
 				h.traceSize(cols, rows, agentRows)
-				h.write(resizeSequence(h.AltScreen, h.Rules, oldRows, rows, oldAgent, agentRows))
+				var back []string
+				if h.AltScreen && rows > oldRows {
+					back = h.pullBack(agentRows-oldAgent, cols)
+				} else if h.AltScreen && agentRows < oldAgent {
+					// A shrink takes the band's top rows off the screen, and
+					// the ones a grow brought back go first.
+					h.dropBack(oldAgent - agentRows)
+				}
+				h.write(resizeSequence(h.AltScreen, h.Rules, oldRows, rows, oldAgent, agentRows, back...))
 				// A WIDTH change leaves Terminal.app holding each row's old
 				// cells past the new width, and erase cannot reach them -- the
 				// strip he has photographed at the frame's right edge. DL can:
@@ -571,23 +588,20 @@ func clearRowsBare(first, last int) string {
 // -- the trap that cost this project most of a day: notes/anchorprobe parks the
 // cursor and reads it back with DSR, so it reported "anchored top" for a screen
 // whose content was anchored bottom.
-func resizeSequence(alt bool, r Rules, oldRows, rows, oldAgent, agentRows int) string {
+func resizeSequence(alt bool, r Rules, oldRows, rows, oldAgent, agentRows int, back ...string) string {
 	// So the clear range starts where the old scape's first row LANDS.
 	drop := oldRows - rows
 	if drop < 0 {
 		drop = 0
 	}
-	// And on a GROW the push is undone before anything is painted, because the
-	// rows it pushed down are the agent's and the scape is about to paint over
-	// the ones that crossed the boundary. Alt screen only: that is where it was
-	// measured, and the main screen's grow pulls real scrollback back in, which
-	// is content a scroll would push away again.
-	// Only where the terminal pushes (Terminal.app): Ghostty keeps the content
-	// at the top on a grow, and scrolling it up there loses the transcript's
-	// first rows and leaves the agent's box a tick above its cursor.
-	grow := 0
-	if alt && r.GrowPushesDown && rows > oldRows {
-		grow = rows - oldRows
+	// A GROW on the alternate screen brings back what scrolled off the band,
+	// as a plain terminal's main screen does -- see RebindGrowAlt.
+	if alt && rows > oldRows {
+		pushed := 0
+		if r.GrowPushesDown {
+			pushed = rows - oldRows
+		}
+		return RebindGrowAlt(pushed, oldRows, oldAgent, agentRows, back)
 	}
 	from := oldAgent + 1 - drop
 	if from < 1 {
@@ -602,7 +616,7 @@ func resizeSequence(alt bool, r Rules, oldRows, rows, oldAgent, agentRows int) s
 		}
 		return RebindShrinkAltFollow(oldRows-rows, oldAgent-agentRows, agentRows)
 	}
-	return Rebind(grow, from, to, agentRows)
+	return Rebind(0, from, to, agentRows)
 }
 
 // maxMirrored caps what is kept for the replay. Terminal.app's own scrollback
@@ -620,18 +634,80 @@ func (h *Host) mirror(rows, agentRows int) {
 	h.mu.Lock()
 	kept := h.model.takeScrolled()
 	h.mu.Unlock()
-	if len(kept) == 0 {
+	out := h.held
+	h.held = nil
+	for _, row := range kept {
+		// A row a grow brought back, leaving again: mirrored already.
+		if len(h.back) > 0 && rowText(h.back[0]) == rowText(row) {
+			h.back = h.back[1:]
+			h.remember(row)
+			continue
+		}
+		// Anything else means the agent has drawn over them.
+		h.dropBack(len(h.back))
+		out = append(out, row)
+	}
+	if len(out) == 0 {
 		return
 	}
-	lines := make([]string, len(kept))
-	for i, row := range kept {
+	lines := make([]string, len(out))
+	for i, row := range out {
 		lines[i] = rowANSI(row)
+		h.remember(row)
 	}
 	h.mirrored = append(h.mirrored, lines...)
 	if len(h.mirrored) > maxMirrored {
 		h.mirrored = h.mirrored[len(h.mirrored)-maxMirrored:]
 	}
 	h.write(MirrorBatch(lines, &h.mainRow, rows, agentRows))
+}
+
+// maxRecent caps the rows a grow can bring back; no band grows by more.
+const maxRecent = 500
+
+func (h *Host) remember(row []cell) {
+	h.recent = append(h.recent, row)
+	if len(h.recent) > maxRecent {
+		h.recent = h.recent[len(h.recent)-maxRecent:]
+	}
+}
+
+// pullBack takes up to n of the newest rows that left the band, for a grow to
+// paint back in at the band's top, cut to the width.
+func (h *Host) pullBack(n, cols int) []string {
+	n = min(n, len(h.recent))
+	if n <= 0 {
+		return nil
+	}
+	rows := h.recent[len(h.recent)-n:]
+	h.recent = h.recent[:len(h.recent)-n]
+	h.back = append(append([][]cell{}, rows...), h.back...)
+	out := make([]string, n)
+	for i, row := range rows {
+		if len(row) > cols {
+			row = row[:cols]
+		}
+		out[i] = rowANSI(row)
+	}
+	return out
+}
+
+// dropBack forgets the first n rows a grow brought back, which are no longer
+// on screen: they can come back again on the next grow.
+func (h *Host) dropBack(n int) {
+	n = min(n, len(h.back))
+	for _, row := range h.back[:n] {
+		h.remember(row)
+	}
+	h.back = h.back[n:]
+}
+
+func rowText(row []cell) string {
+	r := make([]rune, len(row))
+	for i, c := range row {
+		r[i] = c.r
+	}
+	return strings.TrimRight(string(r), " ")
 }
 
 // replay is the mirrored transcript once more, for after the alternate screen
