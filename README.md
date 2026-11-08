@@ -1,23 +1,53 @@
-# xscapes
+<p align="center">
+  <img src="assets/readme/cover.gif" alt="xscapes: cozy ASCII scenes that show what your agent is doing" width="100%">
+</p>
 
-Waiting for an agent is dead time. You fire off a prompt, the terminal goes
-quiet, you tab away, and then you forget to come back. xscapes gives that
-dead time a face: a small living shoreline that runs beside your agent, rises
-while it works, and knocks when it wants you.
+<p align="center">
+  <b>Your agent works in the top of the window. A small living scene underneath shows what it is doing.</b><br>
+  The tide rises while it works, the sand records what it did, and the companion knocks when it needs you.
+</p>
 
-![the tide rises while the agent works](assets/frames/shore.gif)
-
-It is two things. Underneath there is an **event protocol** with pluggable
-adapters, which is the part that generalises to any agent. On top there is a
-**reference scape**, which is what that protocol looks like when you give it a
-sea and a crab.
-
-```
-xscapes claude
+```sh
+curl -fsSL https://donlucasx.github.io/xscapes/install.sh | sh
+xscapes install claude --apply && xscapes claude
 ```
 
-That is the whole thing. Claude Code in the top of your window, the shoreline
-underneath it, one command and no tmux.
+<p align="center"><a href="https://donlucasx.github.io/xscapes">site</a> · <a href="#install">install</a> · <a href="#what-you-are-looking-at">how to read it</a> · <a href="#the-protocol">the protocol</a></p>
+
+## Waiting for an agent is dead time
+
+You fire off a prompt, the terminal goes quiet, you tab away, and then you
+forget to come back. xscapes gives that time a face. Every element on screen
+is driven by the agent's real hook events, and each one means exactly one
+thing, so a glance from across the room is enough.
+
+<table>
+  <tr>
+    <td width="50%"><img src="assets/readme/shore.gif" alt="the shore at work"><br><b>The shore.</b> The sea rises with the work. What the agent is doing right now is written in the sand.</td>
+    <td width="50%"><img src="assets/readme/crab-pings-you.gif" alt="the crab asks for permission"><br><b>It needs you.</b> The crab walks up to the glass and asks, with its own sound. A finish sounds different.</td>
+  </tr>
+  <tr>
+    <td><img src="assets/readme/vista-timelapse.gif" alt="the mountain vista through a day"><br><b>The mountain vista.</b> The wind and the fire are the work. The sky follows your real clock.</td>
+    <td><img src="assets/readme/owlets.gif" alt="owlets arrive for subagents"><br><b>Subagents</b> arrive as owlets on the mountain and crablets on the shore, and leave when they finish.</td>
+  </tr>
+  <tr>
+    <td><img src="assets/readme/fire.gif" alt="the fire at night"><br><b>The fire is the work too</b>, from still air to a blaze. Context is the moon: it wanes and sinks as the window fills.</td>
+    <td><img src="assets/readme/owl-night.gif" alt="night on the scape"><br><b>Night falls</b> when yours does. Finished todos light up as stars.</td>
+  </tr>
+  <tr>
+    <td><img src="assets/readme/rain.gif" alt="the rainy window study"><br><b>Next: the rainy window.</b> A study for the third scape, the cat on the sill. Not shipped yet.</td>
+    <td><img src="assets/readme/companions.gif" alt="the four companions"><br><b>Companions.</b> The crab and the cat ship today (<code>xscapes companion cat</code>), the owl lives on the vista, the frog is next.</td>
+  </tr>
+</table>
+
+It works with **Claude Code, Kimi Code CLI and Hermes Agent** through their
+hooks, and with anything else that runs in a terminal through a generic
+watcher (`xscapes inside <cmd>`). macOS and Linux, one Go binary, MIT.
+
+Underneath there is an **event protocol** with pluggable adapters, which is
+the part that generalises to any agent. On top there are the **scapes**, which
+are what that protocol looks like when you give it a sea and a crab, or a
+mountain and an owl.
 
 `xscapes claude -beside` gives you the older side-by-side layout instead: the
 agent in its own tmux pane, the scape in the next one.
