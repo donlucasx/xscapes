@@ -5610,3 +5610,64 @@ Resumed thinking the last session crashed; it had not (the 10-14 adoption check,
 **2026-10-26 13:49 PDT (verbatim):** "ok, ive dm'd all 4 judges from my personal @donlucas account"
 -> Judge DMs SENT (@banditxbt @SolLunix @AshleyDCan @ZachZelle; text = notes/commons/dm-judges-2026-10-26.txt as drafted unless he edited). Claude advice logged this turn: no xscapes link in the first DM; no mention of the article; if a judge hints at more, ask before quoting, treat as private by default.
 -> 10-26 (verbatim): "they were all open." All 4 judges reachable by DM; public judges reply (D) only if none answer within ~a day.
+
+## Session 48 (2026-11-08)
+
+**11-08 (verbatim):** "resume xscapes - nobody has replied to my messages and im considering making the public tweet"
+-> No reply from @commonsmade (DM 10-26) or any of the 4 judges (DMs 10-26 13:49), 13 days. Fresh X sweep dispatched before posting (the drafts' facts date from 10-26).
+
+**11-08 (verbatim):** "ok update the draft and open it on a txt file, and after that do a deep dive across the entire internet- whats next for xscapes? could it be marketed? could it live somehwere where people could find it/ use it?"
+-> Draft v5 = notes/commons/post-final-2026-11-08.txt (v4 + dates: "six weeks later", "dm'd @commonsmade and the four judges on oct 26 ... two weeks, no replies"; D now ships with the thread; finalist DMs optional), opened in TextEdit. Pending the X sweep. Deep dive: 2 research agents (distribution channels; market/marketing/monetization). Baseline measured 11-08: 5 stars, 0 forks, no repo topics, 38 release downloads (v0.4.2-0.4.5).
+-> X sweep (11-08): nothing from @commonsmade, judges, Virtuals, Superteam; nobody claims paid. Slayed: Oct 30 "It ded" (of Commons), Oct 31 "Commons which didn't go my way", Nov 7 "If someone doesn't acquirhire my company with on a month I'm launching something new". commonsmade.com + xscapes.vibe.commonsmade.com 404 (curl). Draft v6: "i'd still love to see commons work..." line replaced; 1b drops the dead entry link.
+-> Deep dive record: research/whats-next-2026-11-08.md (untracked).
+
+**11-08 (verbatim):** "1. look into that 2. yes"
+-> 1 = Hermes plugin hackathon: verification agent dispatched. 2 = listings: DONE README hero = shore GIF (fae2214, pushed); repo topics added (10). awesome-tuis PR BLOCKED by auto mode (public surface) -> notes/launch/awesome-tuis-pr.sh for him; awesome-claude-code (human-only form, Session Monitors) + Terminal Trove texts in notes/launch/submissions-2026-11-08.txt.
+-> Hermes verified (see research/whats-next-2026-11-08.md): $10k 1st, due Nov 11 5 PM EST; needs a Python plugin shim, est 6-10 h.
+
+**11-08 (verbatim):** "regarding the github page- would love to pimp it up further- can we open with an inverse animation of what we have on the xscapes deck (the waves logo, but light themed), with more examples of other xscapes scenes underneath? we need a mini version of the deck on the github profile page so its self explanatory and enticing"
+-> Read as the REPO README (github.com/donlucasx/xscapes). BUILT + PUSHED 19738fa: assets/readme/cover.gif = the deck cover's six sea frames (site/anim/cover.html, 0.7 s) on the brand LIGHT palette (#eeeeee ground, #121212 lockup, sea #b8b8b8), tagline "Cozy ASCII scenes that show what your agent is doing" + "for Claude Code, Kimi and Hermes" (generator notes/readme/make-cover.py); then pitch, install, a 2x4 gallery (shore, crab asks, vista timelapse, owlets, fire, night, rain study [labelled not shipped], companions) cut to 640 px from ~/Desktop/xscapes-qt + xscapes-trailer. H1 dropped (the cover carries the name). Rendered via gh /markdown + headless Chrome and looked at before push. Hermes go/no-go still unanswered.
+
+**11-08 (verbatim):** "hermes: do more research- our build is 2 months old and was built for another hackathon- still counts? is our build relevant to the hackathon guidelines? How much actual work do we need to get it submission ready (we ve never tested it on hermes)"
+-> Correction to "never tested": s42 ran Hermes live PARTLY (3 of 10 events end to end; the model call refused by his provider, anthropic: "Third-party apps now draw from your extra usage"). Measured 11-08: local Hermes v0.14.0 (2026-05-16) vs latest v0.23.0 (2026-11-05); config provider = anthropic. Eligibility research agent dispatched.
+-> Eligibility: no bar found, ~70 entries (Teknium), pre-Nov-4 repos already merged; hermes-sanctuary = closest analog, merged.
+
+**11-08 (verbatim):** "i also noticed that xscapes.vibe.commonsmade.com is down- what was our other link?" -> donlucasx.github.io/xscapes (the Commons URL was only a proxy of it).
+**11-08 (verbatim):** "but we the same page hosted elsewhere, didnt we? also, for the github splash animation can we have the background be the same white as the page so it blends in, and feature the same shorter slogan we had on the site?"
+-> Checked repo docs + memory: no third host; only gh-pages and the Commons proxy (plus the local evidence-archive copy). Cover rebuilt on #ffffff with "a thinking screen for terminal agents" (the site's line), sub kept; pushed.
+
+**11-08 (verbatim):** "ok, can we host it somehwere for free and reference it on the github so there can be a full splash/site/manual on xscapes?" -> already free on GitHub Pages; repo homepage field set to it.
+**11-08 (verbatim):** "yes sure- add a manual page, keep it simple. Run the no ai slop skill through everything"
+-> site/manual.html (hand-written, site tokens, light/dark toggle shared with the site, copy buttons): install, run it, hooks, context moon (statusline), scapes and companions, sound, layout flags, debugging, troubleshooting, update and remove. Every command checked against `xscapes -h` and install.go. Linked from the site index, the install caption, the footer (template.html; rebuilt index diffs from LIVE by those 3 links only) and the README. publish.sh now ships manual.html. COMMITTED 1fb5734, PUSHED, PUBLISHED (publish.sh ran, not refused), VERIFIED live: manual + index byte-identical to local. Slop pass: README opener, manual, submissions text, Commons v6 lines (no em dashes in new copy; existing README/site prose untouched).
+
+**11-08 (verbatim):** "ok re: awesome-claude-code [Image #1] need a title- [Image #2] for the description, a need a better broader description, xscapes its not a shoreline- its much more than that"
+-> Title "[Resource]: xscapes". Description rewritten broad (scenes, not "a shoreline"; 396 chars; their rule: descriptive, not promotional, no "you"). Flagged the form's trap 6th checkbox (leave unchecked). submissions file updated.
+**11-08 (verbatim):** "keep the description brief and to the point" -> one sentence, ~200 chars.
+**11-08 (verbatim):** "do they only run under claude code? doesnt say anything about terminals, come on Claude do better" -> terminal named; Claude Code kept first (form requires Claude Code-specific), "(or any terminal agent)" added.
+**11-08 (verbatim):** "its ok, could be better. Try again- first line should be definining and the rest expand on it, keep it high level and very easy to digest, focus on what its for, what it does and how its different from the rest - keep it simpel" -> v4: defining line = the site slogan; what it does; how it differs (one meaning per element, read at a glance).
+**11-08:** awesome-claude-code issue #3547 SUBMITTED by him (https://github.com/hesreallyhim/awesome-claude-code/issues/3547): validation PASSED, trap box unchecked. Left to fix by him: title still the placeholder; description has ** bold and a 2nd paragraph (rule: one line).
+**11-08:** awesome-claude-code #3547 DONE (validation passed, title fixed; description left as he wrote it, his call). Next: Terminal Trove.
+**11-08:** Terminal Trove SUBMITTED by him ("Thank you for your submission", they test tools before listing; email reply to donlucasx@gmail.com). awesome-tuis line broadened (no "shoreline") before he runs it.
+**11-08:** awesome-tuis PR OPENED by him: https://github.com/rothgar/awesome-tuis/pull/998 (fork donlucasx/awesome-tuis). First run failed silently (script hid the fork error); fixed + rerun. All three listings submitted.
+**11-08 (verbatim):** "go- yes" -> Hermes hackathon GO; authorized: update his Hermes to v0.23 + install the Claude-subscription plugin to test (config backed up first).
+-> HERMES GO, progress 11-08 ~12:40 PDT: Hermes updated v0.14 -> v0.23 (config backup ~/.config/xscapes/backups/hermes-pre-v023-*; npm/web UI + Ink TUI build failed, classic CLI fine). Official plugin claude-subscription-directsdk installed+enabled: Hermes runs on his Claude subscription (test turn "ok", 7 s). Hooks re-installed (12 events) + gateway restarted. LIVE through the gateway, measured in the event log: session_start, prompt, tool_start/end (terminal->shell), sub_start at spawn + sub_end with the same child_session_id, done. FIXED test-first + committed LOCALLY (not pushed): e3af7bd (subagent_start arrival, repeat start keeps its start time, approval names the program, post_approval_response takes the balloon down, installer +2 events) and 7d9d39a (on_session_end fires EVERY TURN in Hermes; it was resetting the scape at each done; now only on_session_finalize ends). Installed (new inode). NOT YET: his live visual look, the plugin repo, the alert layer, the demo.
+
+**11-08 (his report):** "ok, ran it, seems to break a bit when resizing (working on ghostty rn)" + 3 screenshots (scape smeared into the agent band as alternating stripes; Hermes chrome rewrapped "sh/ell" and drawn at the window bottom). CONTROL (his run, `xscapes claude` in Ghostty, same drag): "seemed to work well" -> HERMES-SPECIFIC.
+-> Trace ~/.config/xscapes/traces/20261108-124929.bin (24 resize marks in ~1 s, 142->54->147->54 cols). MEASURED: host re-sets DECSTBM within 10 bytes of every mark, before any agent byte (race hypothesis REFUTED); Hermes sends no CPR; Hermes writes ZERO bytes during the drag and redraws only after it with RELATIVE moves (ESC[9A ... ESC[K), i.e. it repaints its bottom chrome assuming the old layout and never repaints the band above it; Claude Code repaints its whole band on resize. Root cause not yet proven (Ghostty's alt-screen behaviour on the drag is the unmeasured piece). Claude trace for comparison: 20261108-125347.bin. NOT FIXED.
+
+### s48, 2026-11-08 ~20:40 PST: the engine host (libghostty-vt), his first live look
+- His ruling on the engine question: "Ghostty's engine (Recommended)" (options he didn't pick: keep patching the band host; a pure-Go VT with no reflow, charmbracelet/x/vt).
+- Before it: "the text crop issue also happens on the terminal app" + screenshots 63-65 (Terminal.app narrow/wide crop; a plain Claude Code session for comparison, reflowing on the main screen).
+- After `xscapes hermes` on the engine build (installed inode 116680344, uncommitted): "ok seems to work well on the terminal app"
+- Ghostty not yet tested.
+- Ghostty, same build: "seems it worked too"
+
+### s48, 2026-11-09 ~00:40 PST: the harbour scape
+- His ask after the push: "Next, id love to prepare a new xscape to release w the new update. The Harbour with the cat companion"
+- After his live look (`xscapes scape harbour`): "ok seems to work ok, do any tests you can do on your end, and have kimi review all the work we've done. Make the plugin. I will do another review in the morning"
+- Build-invented choices (Claude's, not his rulings): the harbour's cat is ALWAYS the cat whatever `xscapes companion` says; the walked-up cat grows UP from the sill (not down into the desk); traffic periods 75 s (ferry) / 110 s (tug); kittens sit 16/26/36 columns left of the cat; the plant hidden under 60 columns; HarbourMinRows 16; the desk inks cream/near-black.
+
+### s48 wrap, 2026-11-09 00:54 PST
+- His word: "/wrap" (after "do any tests you can do on your end, and have kimi review all the work we've done. Make the plugin. I will do another review in the morning").
+- Done overnight without him: more engine/harbour tests (two defects fixed: a closed engine segfaulted on a late write; the session's first kitten appeared already sitting), the Hermes plugin (local repo ~/Documents/claude/hermes-xscapes, not on GitHub), the Kimi review launched (still running at the wrap).
+- The RESUME.md / CLAUDE.md session banners archived at this wrap (first wrap under the no-stacking rule): RESUME-archive-2026-11-09.md, CLAUDE-banners-archive-2026-11-09.md.

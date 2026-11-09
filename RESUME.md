@@ -3,6 +3,28 @@
 **Copy-paste this prompt into a fresh session:**
 
 ```
+SESSION 48 (2026-11-08 -> 09), ENGINE HOST + HARBOUR + HERMES PLUGIN.
+origin/main = 3bea2ef (the engine host 5565794 + revert of ab86648); LOCAL,
+unpushed: f3231a1 the harbour scape, 4a9a839 two defects + tests. The band
+host's resize could not be patched (4 rounds); RULED "Ghostty's engine": the
+agent now runs inside libghostty-vt (internal/gvt, build tag ghosttyvt,
+-engine=ghostty default in such a build) and the host draws it tmux-style, so
+text REFLOWS on resize in any terminal. He confirmed live in Terminal.app and
+Ghostty. The harbour (`xscapes scape harbour`, the cat on the sill, rain on
+the glass = the work) confirmed live: "seems to work ok". Hermes plugin built,
+NOT published: ~/Documents/claude/hermes-xscapes (local git, c67daa3; 5
+pytest + `hermes plugins validate` pass, security scan safe; end-to-end into
+the real binary verified; docs/catalog-entry.yaml draft needs the SHA). Kimi
+review of engine + harbour: ~/Documents/kimi/xscapes-engine-harbour-2026-11-09
+(AUDIT-REPORT.md; verify every finding before acting). NEXT (his morning
+review): push f3231a1+4a9a839 at his word; create github donlucasx/
+hermes-xscapes + push at his word; the release question: the engine library
+must be built per platform (release.sh cross-compiles CGO off today, so the
+install line ships the OLD band host); demo ~75 s; HE opens the catalog PR,
+replies in Teknium's thread, submits the typeform. Due WED NOV 11 5 PM EST.
+The engine lib is NOT committed (third_party/libghostty-vt/README.md rebuilds
+it); the installed binary (~/.local/bin) has it.
+
 SESSION 47 (2026-10-21 -> 26), THE COMMONS DISPUTE (no code). Deep dive: top 25
 posted Sep 25 (donlucas in), then @commonsmade went silent; Slayed's Oct 9
 article calls entries "flat-out uncreative", no word on prizes; judges silent;
