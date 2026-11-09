@@ -321,10 +321,14 @@ func (c *Cat) nearSteps() int {
 	if Near < 1 {
 		return 0
 	}
-	if Near > len(crabNearBoxes)-1 {
-		return len(crabNearBoxes) - 1
+	n := Near
+	if n > len(crabNearBoxes)-1 {
+		n = len(crabNearBoxes) - 1
 	}
-	return Near
+	if c.MaxRung > 0 && n > c.MaxRung {
+		n = c.MaxRung
+	}
+	return n
 }
 
 // nearRung is which pose is drawn this frame: 0 the shipped crab, 1 the

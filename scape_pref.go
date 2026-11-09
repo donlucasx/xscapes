@@ -21,12 +21,13 @@ import (
 // rainy window and the aquarium are drawn and on the page and are next.
 
 const (
-	ScapeShore = "shore"
-	ScapeVista = "vista"
+	ScapeShore   = "shore"
+	ScapeVista   = "vista"
+	ScapeHarbour = "harbour"
 )
 
 // ScapeNames is every scape that ships, the default first.
-func ScapeNames() []string { return []string{ScapeVista, ScapeShore} }
+func ScapeNames() []string { return []string{ScapeVista, ScapeShore, ScapeHarbour} }
 
 func scapePath() (string, error) {
 	h, err := event.Home()

@@ -64,7 +64,11 @@ type Cat struct {
 	// kind is which animal this is. The sprite data is a field rather than a
 	// hardcoded bitmap, so a second companion needs no interface and no change
 	// at any of the 25 construction sites outside this package.
-	kind    Kind
+	kind Kind
+	// MaxRung caps the come-closer walk for this animal when above zero:
+	// the harbour's cat walks up ONE rung (his ruling of 2026-09-24), on a
+	// sill where the full walk does not fit.
+	MaxRung int
 	body    *Bitmap
 	walk    *Bitmap
 	worried *Bitmap

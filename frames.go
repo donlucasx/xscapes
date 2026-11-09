@@ -67,6 +67,8 @@ type frames struct {
 	// preference names it (refreshScape). ascii is kept so a switch can
 	// build the vista the same way the shore was.
 	vista          *scenes.Vista
+	harbour        *scenes.Harbour
+	harbourCat     *companion.Cat
 	scapeName      string
 	ascii          bool
 	nextScapeCheck time.Time
@@ -145,14 +147,21 @@ func (f *frames) refreshScape(now time.Time) {
 	}
 	f.nextScapeCheck = now.Add(companionPoll)
 	name := scapePref()
-	if name == f.scapeName && (name == ScapeShore || f.vista != nil) {
+	if name == f.scapeName && (name == ScapeShore || f.vista != nil || f.harbour != nil) {
 		return
 	}
 	f.scapeName = name
-	if name == ScapeVista {
+	f.vista, f.harbour = nil, nil
+	switch name {
+	case ScapeVista:
 		f.vista = scenes.NewVista(f.seed, f.ascii)
-	} else {
-		f.vista = nil
+	case ScapeHarbour:
+		// The harbour's companion is the cat, whatever the shore's is: it
+		// sits on the sill and walks up one rung.
+		f.harbour = scenes.NewHarbour(f.seed, f.ascii)
+		f.harbourCat = companion.New(companion.NameCat)
+		f.harbourCat.FaceLeft(f.mirror)
+		f.harbourCat.MaxRung = 1
 	}
 }
 
@@ -246,7 +255,7 @@ func (f *frames) state(now time.Time, t float64) reduce.State {
 	// narrow pane loses whole pieces of a line rather than getting a path
 	// chopped mid-word. The vista's band runs the whole width.
 	budget := f.lay.SandTo - f.lay.SandFrom
-	if f.vista != nil {
+	if f.vista != nil || f.harbour != nil {
 		budget = f.c.W - 4
 	}
 	st.Tail = st.FitTail(now, budget)
@@ -302,6 +311,9 @@ func (f *frames) frame(now time.Time) string {
 	}
 	f.lastFrame = now
 	f.cat.Approach(dt, st.Pose == companion.NeedsYou)
+	if f.harbourCat != nil {
+		f.harbourCat.Approach(dt, st.Pose == companion.NeedsYou)
+	}
 
 	f.refreshScape(now)
 	f.compose(st, t)
@@ -312,6 +324,13 @@ func (f *frames) frame(now time.Time) string {
 // the vista or the shore, each through its own composer. The live frame
 // and the tests share it, so a test composes exactly what the loop draws.
 func (f *frames) compose(st reduce.State, t float64) {
+	if f.harbour != nil {
+		f.harbour.CatX = f.lay.CatX
+		f.harbour.Kittens, f.harbour.Exits = st.Kittens, st.KittenExits
+		f.harbour.Update(f.c, t, st.Act)
+		drawHarbour(f.c, f.harbour, f.harbourCat, f.lay, st, t)
+		return
+	}
 	if f.vista != nil {
 		f.vista.OwlX = f.lay.CatX
 		f.vista.Update(f.c, t, st.Act)

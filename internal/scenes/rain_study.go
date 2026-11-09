@@ -786,7 +786,10 @@ var RainPot = true
 // vines hanging down its sides to the sill; the pot has a rim, a tapered
 // body and a saucer. Drawn opaque over the glass, as the cat is. The room
 // is lit, so the greens hold by night, a shade darker.
-func drawSillPlant(c *canvas.Canvas, x int, l float64) {
+func drawSillPlant(c *canvas.Canvas, x int, l float64) { drawSillPlantShifted(c, x, 0, l) }
+
+// drawSillPlantShifted is the plant with its rows moved down by dy.
+func drawSillPlantShifted(c *canvas.Canvas, x, dy int, l float64) {
 	leaf := cube(0, 135, 0)
 	leafLit := cube(95, 175, 95)
 	if l < 0.3 {
@@ -805,52 +808,52 @@ func drawSillPlant(c *canvas.Canvas, x int, l float64) {
 	}
 	// The dome: rows 14..16, eight cells wide, the top row soft, the lit
 	// side up and left.
-	clear(x, 13, x+7, 19)
+	clear(x, 13+dy, x+7, 19+dy)
 	for xx := x + 2; xx <= x+5; xx++ {
-		c.SetBGQuad(xx, 13, leaf, ground(xx, 13), 0b0011)
+		c.SetBGQuad(xx, 13+dy, leaf, ground(xx, 13+dy), 0b0011)
 	}
-	fill(c, x, 14, x+7, 14, leaf)
-	fill(c, x+1, 14, x+3, 14, leafLit)
-	fill(c, x-1, 15, x+8, 15, leaf)
-	fill(c, x, 15, x+2, 15, leafLit)
-	fill(c, x, 16, x+7, 16, leaf)
-	c.SetBGQuad(x-1, 16, leaf, ground(x-1, 16), 0b0100)
-	c.SetBGQuad(x+8, 16, leaf, ground(x+8, 16), 0b1000)
+	fill(c, x, 14+dy, x+7, 14+dy, leaf)
+	fill(c, x+1, 14+dy, x+3, 14+dy, leafLit)
+	fill(c, x-1, 15+dy, x+8, 15+dy, leaf)
+	fill(c, x, 15+dy, x+2, 15+dy, leafLit)
+	fill(c, x, 16+dy, x+7, 16+dy, leaf)
+	c.SetBGQuad(x-1, 16+dy, leaf, ground(x-1, 16+dy), 0b0100)
+	c.SetBGQuad(x+8, 16+dy, leaf, ground(x+8, 16+dy), 0b1000)
 	// The leaves themselves, over the dome: rounded leaves as paired
 	// brackets on the lit side, their undersides as dots on the shade side,
 	// a few gaps into the dark of the bush, and three blossoms. Then the
 	// tips out of the dome and the vines down the pot's sides.
 	deep := darken(leaf, 0.45)
-	for _, g := range [][2]int{{x + 1, 14}, {x + 4, 15}, {x + 6, 14}, {x + 2, 16}, {x + 5, 16}} {
+	for _, g := range [][2]int{{x + 1, 14 + dy}, {x + 4, 15 + dy}, {x + 6, 14 + dy}, {x + 2, 16 + dy}, {x + 5, 16 + dy}} {
 		c.SetBG(g[0], g[1], deep)
 	}
-	for _, g := range [][3]int{{x, 14, '('}, {x + 2, 14, ')'}, {x + 3, 15, '('}, {x + 1, 15, ')'}, {x + 5, 14, '('}, {x + 7, 15, ')'}, {x + 3, 16, '('}, {x + 6, 16, ')'}} {
+	for _, g := range [][3]int{{x, 14 + dy, '('}, {x + 2, 14 + dy, ')'}, {x + 3, 15 + dy, '('}, {x + 1, 15 + dy, ')'}, {x + 5, 14 + dy, '('}, {x + 7, 15 + dy, ')'}, {x + 3, 16 + dy, '('}, {x + 6, 16 + dy, ')'}} {
 		plot(near, g[0], g[1], rune(g[2]), leafLit, 1)
 	}
-	for _, g := range [][2]int{{x + 4, 14}, {x + 7, 16}, {x + 1, 16}, {x + 6, 15}} {
+	for _, g := range [][2]int{{x + 4, 14 + dy}, {x + 7, 16 + dy}, {x + 1, 16 + dy}, {x + 6, 15 + dy}} {
 		plot(near, g[0], g[1], '.', deep, 1)
 	}
 	blossom := cube(215, 135, 135)
-	plot(near, x+2, 13, '*', blossom, 1)
-	plot(near, x+6, 13, '*', blossom, 1)
-	plot(near, x+4, 15, '*', blossom, 1)
-	plot(near, x-1, 14, '(', leafLit, 1)
-	plot(near, x+8, 14, ')', leaf, 1)
-	plot(near, x+3, 12, '\'', leafLit, 1)
-	plot(near, x+5, 12, '\'', leaf, 1)
-	plot(near, x-1, 17, '(', leaf, 1)
-	plot(near, x-2, 18, '(', leaf, 1)
-	plot(near, x-2, 19, '*', leafLit, 1)
-	plot(near, x+8, 17, ')', leaf, 1)
-	plot(near, x+8, 18, ')', leaf, 1)
-	plot(near, x+9, 19, '*', leafLit, 1)
+	plot(near, x+2, 13+dy, '*', blossom, 1)
+	plot(near, x+6, 13+dy, '*', blossom, 1)
+	plot(near, x+4, 15+dy, '*', blossom, 1)
+	plot(near, x-1, 14+dy, '(', leafLit, 1)
+	plot(near, x+8, 14+dy, ')', leaf, 1)
+	plot(near, x+3, 12+dy, '\'', leafLit, 1)
+	plot(near, x+5, 12+dy, '\'', leaf, 1)
+	plot(near, x-1, 17+dy, '(', leaf, 1)
+	plot(near, x-2, 18+dy, '(', leaf, 1)
+	plot(near, x-2, 19+dy, '*', leafLit, 1)
+	plot(near, x+8, 17+dy, ')', leaf, 1)
+	plot(near, x+8, 18+dy, ')', leaf, 1)
+	plot(near, x+9, 19+dy, '*', leafLit, 1)
 	// The pot: rim, body tapering, the saucer on the sill.
-	fill(c, x, 17, x+7, 17, rim)
-	fill(c, x+1, 18, x+6, 18, pot)
-	c.SetBGQuad(x, 18, pot, ground(x, 18), 0b0101)
-	c.SetBGQuad(x+7, 18, pot, ground(x+7, 18), 0b1010)
-	fill(c, x+1, 19, x+6, 19, saucer)
-	fill(c, x+2, 19, x+5, 19, pot)
+	fill(c, x, 17+dy, x+7, 17+dy, rim)
+	fill(c, x+1, 18+dy, x+6, 18+dy, pot)
+	c.SetBGQuad(x, 18+dy, pot, ground(x, 18+dy), 0b0101)
+	c.SetBGQuad(x+7, 18+dy, pot, ground(x+7, 18+dy), 0b1010)
+	fill(c, x+1, 19+dy, x+6, 19+dy, saucer)
+	fill(c, x+2, 19+dy, x+5, 19+dy, pot)
 }
 
 // paintNearRoof is the lower building's roof the window looks down on,
