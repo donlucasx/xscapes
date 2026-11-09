@@ -114,6 +114,15 @@ func SpoolPath(session string) (string, error) {
 	return filepath.Join(d, Tag(session)+".jsonl"), nil
 }
 
+// RecvPath names the log of what the session's engine actually received.
+func RecvPath(session string) (string, error) {
+	d, err := RunDir()
+	if err != nil {
+		return "", err
+	}
+	return filepath.Join(d, Tag(session)+".recv.jsonl"), nil
+}
+
 // currentPath names the file holding the most recently started session.
 func currentPath() (string, error) {
 	d, err := RunDir()

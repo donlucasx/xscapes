@@ -7,6 +7,7 @@ import (
 	"io"
 	"net"
 	"os"
+	"sync"
 	"sync/atomic"
 	"time"
 )
@@ -40,6 +41,12 @@ type Bus struct {
 	off     int64
 	part    []byte
 	stop    chan struct{}
+	// recv logs every event this engine actually took in, socket and spool
+	// alike, to <tag>.recv.jsonl. The spool alone holds only what arrived
+	// while nobody listened, so it cannot say what a scape saw (2026-11-09:
+	// a kitten question was answered from the spool and was wrong).
+	recvMu sync.Mutex
+	recv   *os.File
 	// spoolDone lets Close wait for the spool reader instead of reaching into
 	// its state while it is still running.
 	spoolDone chan struct{}
@@ -110,6 +117,12 @@ func listen(session string, since time.Time) (*Bus, error) {
 			} else {
 				f.Close()
 			}
+		}
+	}
+
+	if rp, err := RecvPath(session); err == nil {
+		if f, err := os.OpenFile(rp, os.O_CREATE|os.O_WRONLY|os.O_APPEND, 0o600); err == nil {
+			b.recv = f
 		}
 	}
 
@@ -318,6 +331,11 @@ func (b *Bus) deliver(line []byte) {
 		b.bad.Add(1)
 		return
 	}
+	b.recvMu.Lock()
+	if b.recv != nil {
+		b.recv.Write(append(append([]byte(nil), line...), '\n'))
+	}
+	b.recvMu.Unlock()
 	select {
 	case b.C <- e:
 	default:
@@ -342,6 +360,12 @@ func (b *Bus) Close() error {
 	// Wait for the spool reader to stop before touching its file: it opens
 	// b.spool lazily, so closing it from here is a race on the field itself.
 	<-b.spoolDone
+	b.recvMu.Lock()
+	if b.recv != nil {
+		b.recv.Close()
+		b.recv = nil
+	}
+	b.recvMu.Unlock()
 	err := b.conn.Close()
 	if b.spool != nil {
 		b.spool.Close()

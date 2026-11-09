@@ -2,6 +2,8 @@ package event
 
 import (
 	"fmt"
+	"os"
+	"strings"
 	"testing"
 	"time"
 )
@@ -55,5 +57,34 @@ loop:
 	want := []Kind{SessionStart, Prompt}
 	if fmt.Sprint(got) != fmt.Sprint(want) {
 		t.Fatalf("delivered %v, want %v: the two lines since the launch, not the hour before", got, want)
+	}
+}
+
+// What a listening engine takes in over its socket is written to its
+// receive log; the spool never sees it.
+func TestTheReceiveLogHoldsWhatTheSocketDelivered(t *testing.T) {
+	tmpHome(t)
+	const s = "recv-log"
+	b, err := Listen(s)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if via, err := Emit(Event{Session: s, Kind: SubStart, Agent: "kit-1", TS: time.Now().UnixMilli()}); err != nil || !via {
+		t.Fatalf("emit: via socket %v, err %v", via, err)
+	}
+	select {
+	case <-b.C:
+	case <-time.After(2 * time.Second):
+		t.Fatal("nothing delivered")
+	}
+	b.Close()
+	rp, _ := RecvPath(s)
+	got, _ := os.ReadFile(rp)
+	if !strings.Contains(string(got), `"kit-1"`) {
+		t.Fatalf("receive log: %q", got)
+	}
+	sp, _ := SpoolPath(s)
+	if sp, _ := os.ReadFile(sp); strings.Contains(string(sp), "kit-1") {
+		t.Fatal("a socket delivery also landed in the spool")
 	}
 }
