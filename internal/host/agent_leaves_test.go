@@ -72,7 +72,7 @@ func TestTheHostWritesNothingOfItsOwnAfterTheAgentLeft(t *testing.T) {
 	h.writeAgent("goodbye")
 	pw.Close()
 	got, _ := io.ReadAll(pr)
-	if string(got) != "\x1b[?7lbefore\x1b[?7hgoodbye" {
+	if string(got) != "beforegoodbye" {
 		t.Errorf("wrote %q, want only the host's write from before and the agent's goodbye", got)
 	}
 }

@@ -42,8 +42,6 @@ type Host struct {
 	// on the main screen the agent just handed back (Kimi N4, 2026-11-08:
 	// 8 and 13 frames painted over the shell after Hermes's 1049l).
 	agentLeft atomic.Bool
-	// agentNoWrap is the agent's own DECAWM state (Filter.OnAutowrap).
-	agentNoWrap atomic.Bool
 	// Size reports the real terminal's size. Injected rather than measured
 	// here so there is one TIOCGWINSZ in the project, not two.
 	Size func() (cols, rows int)
@@ -136,25 +134,11 @@ func (h *Host) AgentErases() int64 {
 	return h.filter.Erases.Load()
 }
 
-// write sends the host's own bytes with autowrap OFF, then puts back the
-// agent's own setting. The terminal resizes the moment the window changes;
-// the host learns of it on its next tick, so a scape frame composed for the
-// old width can land in a narrower terminal. With autowrap on, its rows
-// wrapped, and one wrapping on the screen's last row scrolled the WHOLE
-// screen up a line, the agent's text with it: every narrowing step that
-// caught a frame in flight cost a line, and the host's model never knew.
-// Replayed through Ghostty's own engine (libghostty-vt) from his trace of
-// 2026-11-08 19:40: shifting a width-only resize by 250 bytes moved the text
-// by a line; with autowrap off around the host's writes, no shift did.
 func (h *Host) write(s string) {
-	if h.agentLeft.Load() || s == "" {
+	if h.agentLeft.Load() {
 		return
 	}
-	restore := "\x1b[?7h"
-	if h.agentNoWrap.Load() {
-		restore = ""
-	}
-	h.writeAgent("\x1b[?7l" + s + restore)
+	h.writeAgent(s)
 }
 
 // writeAgent is write for the agent's own bytes, which pass after it left.
@@ -410,11 +394,7 @@ func (h *Host) Run() error {
 	// closes when the pty runs dry, which is how the exit path knows the
 	// agent's last bytes are out before anything is printed after them.
 	fwdDone := make(chan struct{})
-	f := &Filter{
-		OwnsAlt:    h.AltScreen,
-		OnLeave:    func() { h.agentLeft.Store(true) },
-		OnAutowrap: func(off bool) { h.agentNoWrap.Store(off) },
-	}
+	f := &Filter{OwnsAlt: h.AltScreen, OnLeave: func() { h.agentLeft.Store(true) }}
 	f.Band.Store(int32(agentRows))
 	h.filter = f
 	go func() {
