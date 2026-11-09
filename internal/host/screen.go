@@ -62,22 +62,12 @@ const (
 
 type screen struct {
 	retainWidth bool // Terminal.app's width rule; see retain
-	// keepTails keeps the cells a narrowing cut, per row, until the agent
-	// touches that row -- a write, an erase, an insert or delete of cells.
-	// Rows that scroll take their tail with them. The terminal does NOT keep
-	// them (Ghostty deletes them, PageList.zig resizeWithoutReflow); the host
-	// paints them back on a widen (Host.untruncate), which is what a plain
-	// terminal's reflow gives back on the main screen. Unlike retainWidth, a
-	// tail never survives a rewrite, so a stale fragment cannot come back.
-	keepTails bool
 	// noWrap is DECAWM off (ESC[?7l): a character at the right margin
 	// overwrites the last column instead of wrapping. Hermes (prompt_toolkit)
-	// turns it off around every redraw; modelled as wrapping, a line drawn at
-	// the old width just after a narrowing took two rows in the model and one
-	// on the glass, and every row the host repainted from the model landed
-	// below its line (his Ghostty run of 2026-11-08 19:40).
+	// turns it off around every redraw; modelled as wrapping, a line wider
+	// than the window took two rows in the model and one on the glass.
 	noWrap bool
-	w, h      int
+	w, h   int
 
 	// The rendition in force, and the copy DECSC keeps.
 	curFG, curBG int
@@ -141,9 +131,6 @@ type screen struct {
 // declaration site in host.go and the evidence is in
 // TestTheMirrorDropsTheCellsTheTerminalRetains.
 func (s *screen) retain(w int, row []cell) []cell {
-	if s.keepTails && len(row) > w {
-		return row
-	}
 	if !s.retainWidth || len(row) <= w {
 		r := blankRow(max(w, len(row)))
 		copy(r, row)
@@ -493,7 +480,6 @@ func (s *screen) put(r rune) {
 		}
 		s.wrapNext = false
 	}
-	s.untail(s.y)
 	if s.y >= 0 && s.y < s.h && s.x >= 0 && s.x < s.w {
 		s.cells[s.y][s.x] = cell{r: r, fg: s.curFG, bg: s.curBG, attr: s.curAttr}
 	}
@@ -748,13 +734,11 @@ func (s *screen) csi(params string, final rune) {
 	case final == 'd':
 		s.move(arg(0, 1)-1, s.x)
 	case final == 'X': // ECH: erase n cells, BCE like the others
-		s.untail(s.y)
 		n := arg(0, 1)
 		for i := 0; i < n && s.x+i < s.w; i++ {
 			s.cells[s.y][s.x+i] = s.blank()
 		}
 	case final == '@': // ICH: open n cells, shifting the rest right
-		s.untail(s.y)
 		n := arg(0, 1)
 		row := s.cells[s.y]
 		for x := s.w - 1; x >= s.x+n; x-- {
@@ -764,7 +748,6 @@ func (s *screen) csi(params string, final rune) {
 			row[s.x+i] = s.blank()
 		}
 	case final == 'P': // DCH: delete n cells, pulling the rest left
-		s.untail(s.y)
 		n := arg(0, 1)
 		row := s.cells[s.y]
 		for x := s.x; x < s.w; x++ {
@@ -785,7 +768,6 @@ func (s *screen) csi(params string, final rune) {
 	case final == 'm':
 		s.sgr(nums, body)
 	case final == 'K':
-		s.untail(s.y)
 		switch arg(0, 0) {
 		case 1:
 			for x := 0; x <= s.x && x < s.w; x++ {
@@ -813,7 +795,6 @@ func (s *screen) csi(params string, final rune) {
 				s.cells[y] = bgRow(s.w, s.curBG)
 			}
 		default:
-			s.untail(s.y)
 			for x := s.x; x < s.w; x++ {
 				s.cells[s.y][x] = s.blank()
 			}
@@ -821,14 +802,6 @@ func (s *screen) csi(params string, final rune) {
 				s.cells[y] = bgRow(s.w, s.curBG)
 			}
 		}
-	}
-}
-
-// untail drops a row's kept tail: the agent touched the row, so what it had
-// past the window is no longer its content.
-func (s *screen) untail(y int) {
-	if s.keepTails && y >= 0 && y < s.h && len(s.cells[y]) > s.w {
-		s.cells[y] = s.cells[y][:s.w:s.w]
 	}
 }
 

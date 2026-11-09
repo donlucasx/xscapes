@@ -140,17 +140,6 @@ func runProduction(t *testing.T, rules Rules, history bool, child string, w, h1,
 // runProductionSteps is runProduction through several heights in turn.
 func runProductionSteps(t *testing.T, rules Rules, history bool, child string, w, h1 int, steps []int) (*screen, string) {
 	t.Helper()
-	var sizes [][2]int
-	for _, h := range steps {
-		sizes = append(sizes, [2]int{w, h})
-	}
-	return runProductionSizes(t, rules, history, child, w, h1, sizes)
-}
-
-// runProductionSizes is runProduction through several window sizes, width
-// and height, in turn.
-func runProductionSizes(t *testing.T, rules Rules, history bool, child string, w1, h1 int, sizes [][2]int) (*screen, string) {
-	t.Helper()
 	pr, pw, err := os.Pipe()
 	if err != nil {
 		t.Fatal(err)
@@ -161,7 +150,7 @@ func runProductionSizes(t *testing.T, rules Rules, history bool, child string, w
 	}
 	defer tty.Close()
 
-	sc := newScreen(w1, h1)
+	sc := newScreen(w, h1)
 	sc.restoreAbsolute = !rules.RestoreHomes
 	var mu sync.Mutex
 	var raw strings.Builder
@@ -190,9 +179,9 @@ func runProductionSizes(t *testing.T, rules Rules, history bool, child string, w
 
 	var sz struct {
 		sync.Mutex
-		w, h int
+		h int
 	}
-	sz.w, sz.h = w1, h1
+	sz.h = h1
 	h := &Host{
 		Cmd:       exec.Command("sh", "-c", child),
 		FPS:       30,
@@ -204,7 +193,7 @@ func runProductionSizes(t *testing.T, rules Rules, history bool, child string, w
 		Size: func() (int, int) {
 			sz.Lock()
 			defer sz.Unlock()
-			return sz.w, sz.h
+			return w, sz.h
 		},
 		Paint: func(cols, rows int) []string {
 			out := make([]string, rows)
@@ -217,12 +206,12 @@ func runProductionSizes(t *testing.T, rules Rules, history bool, child string, w
 	var snap *screen
 	go func() {
 		time.Sleep(500 * time.Millisecond) // the child has printed and parked
-		for _, size := range sizes {
+		for _, h2 := range steps {
 			mu.Lock()
-			sc.resizeAltFor(rules, size[0], size[1]) // the terminal moves first
+			sc.resizeAltFor(rules, w, h2) // the terminal moves first
 			mu.Unlock()
 			sz.Lock()
-			sz.w, sz.h = size[0], size[1]
+			sz.h = h2
 			sz.Unlock()
 			time.Sleep(400 * time.Millisecond) // the host's tick, SIGWINCH, the redraw
 		}
@@ -241,50 +230,4 @@ func runProductionSizes(t *testing.T, rules Rules, history bool, child string, w
 	mu.Lock()
 	defer mu.Unlock()
 	return snap, raw.String()
-}
-
-// Narrowed, then widened again: the text the narrowing cut comes back.
-//
-// His Ghostty screenshot of 2026-11-08 16:35: "after narrowing the window and
-// widening it again its broken" -- forty one-line facts cut at the narrow
-// width, in a window twice as wide. Ghostty's alternate screen deletes the
-// cells past a narrower width (PageList.zig resizeWithoutReflow) and nothing
-// repaints a line the agent does not rewrite. Terminal.app keeps the cells
-// itself (notes/width-audit.md), so only Ghostty needs the host to put them
-// back. A line the agent rewrites while narrow must NOT get its old tail back.
-func TestAWidenBringsBackWhatANarrowingCut(t *testing.T) {
-	const child = `i=1; while [ $i -le 12 ]; do printf 'LONG %02d the quick brown fox jumps over the lazy dog END%02d\r\n' $i $i; i=$((i+1)); done
-printf 'prompt> a long status line that runs well past thirty columns STALE'
-trap 'printf "\rPROMPT>"' WINCH
-n=0; while [ $n -lt 40 ]; do sleep 0.05; n=$((n+1)); done`
-	// Widened by a drag, in steps, as his window was (56 -> 72 -> 93 -> ...
-	// in trace 20261108-180840): the first step's repaint used to count as
-	// the agent touching the row, and dropped the rest of every tail.
-	sc, _ := runProductionSizes(t, XTermRules, false, child, 100, 40, [][2]int{{30, 40}, {45, 40}, {70, 40}, {100, 40}})
-	band, _ := Band(40)
-	var full, cut []string
-	for y := 0; y < band; y++ {
-		r := strings.TrimRight(sc.rowAt(y), " ")
-		if strings.HasPrefix(r, "LONG") {
-			if strings.HasSuffix(r, fmt.Sprintf("END%s", r[5:7])) {
-				full = append(full, r[:7])
-			} else {
-				cut = append(cut, r)
-			}
-		}
-	}
-	if len(cut) > 0 || len(full) != 12 {
-		for y := 0; y < band; y++ {
-			t.Logf("%2d|%s", y+1, strings.TrimRight(sc.rowAt(y), " "))
-		}
-		t.Errorf("%d lines whole, %d still cut after the widen: %q", len(full), len(cut), cut)
-	}
-	// The prompt line was written over while narrow, without an erase: what
-	// it had past the narrow width is no longer its content, and a widen
-	// must not bring it back.
-	for y := 0; y < band; y++ {
-		if r := sc.rowAt(y); strings.Contains(r, "STALE") {
-			t.Errorf("a rewritten line got its old tail back: %q", strings.TrimRight(r, " "))
-		}
-	}
 }

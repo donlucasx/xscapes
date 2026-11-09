@@ -138,21 +138,7 @@ func (h *Host) write(s string) {
 }
 
 // writeAgent is write for the agent's own bytes, which pass after it left.
-func (h *Host) writeAgent(s string) { h.send(s, true) }
-
-// writeUnmodelled is write for bytes the model already holds the result of:
-// untruncate's repaint. Fed through the model it would count as the agent
-// touching each row and drop the rest of the row's kept tail, so a widen by
-// a drag gave back only its first step (his trace 20261108-180840, 56 -> 72
-// columns, then nothing). A trace replay feeds these bytes like any others.
-func (h *Host) writeUnmodelled(s string) {
-	if h.agentLeft.Load() {
-		return
-	}
-	h.send(s, false)
-}
-
-func (h *Host) send(s string, model bool) {
+func (h *Host) writeAgent(s string) {
 	if s == "" || h.muted.Load() {
 		return
 	}
@@ -162,7 +148,7 @@ func (h *Host) send(s string, model bool) {
 		n, _ := h.trace.Write([]byte(s))
 		h.traceN += int64(n)
 	}
-	if model && h.model != nil {
+	if h.model != nil {
 		h.model.feed(s)
 	}
 	h.mu.Unlock()
@@ -344,10 +330,6 @@ func (h *Host) Run() error {
 		h.model = newScreen(cols, rows)
 		h.model.capture = true
 		h.model.restoreAbsolute = !h.Rules.RestoreHomes
-		// A terminal that keeps the cells a narrowing hides shows them again
-		// on a widen by itself (Terminal.app); one that deletes them needs
-		// the host to (untruncate).
-		h.model.keepTails = !h.Rules.RetainsWidth
 		h.mu.Unlock()
 	}
 	if h.History {
@@ -523,9 +505,6 @@ func (h *Host) Run() error {
 					back = h.pullBack((oldRows-rows)-(oldAgent-agentRows), cols)
 				}
 				h.write(resizeSequence(h.AltScreen, h.Rules, oldRows, rows, oldAgent, agentRows, back...))
-				if cols > oldCols {
-					h.writeUnmodelled(h.untruncate(oldCols, cols, agentRows))
-				}
 				// A WIDTH change leaves Terminal.app holding each row's old
 				// cells past the new width, and erase cannot reach them -- the
 				// strip he has photographed at the frame's right edge. DL can:
@@ -716,8 +695,7 @@ func (h *Host) mirror(rows, agentRows int) {
 	}
 	lines := make([]string, len(out))
 	for i, row := range out {
-		// Cut to the window: a kept tail is for a widen, not the scrollback.
-		lines[i] = rowANSI(row[:min(len(row), h.model.w)])
+		lines[i] = rowANSI(row)
 	}
 	h.mirrored = append(h.mirrored, lines...)
 	if len(h.mirrored) > maxMirrored {
@@ -742,37 +720,6 @@ func (h *Host) keepResized() {
 		}
 		h.remember(row, mirrored)
 	}
-}
-
-// untruncate paints back, on a widen, the cells an earlier narrowing cut off
-// the band's rows and the agent has not touched since (screen.keepTails):
-// columns oldCols+1 .. cols of each such row. His Ghostty screenshot of
-// 2026-11-08 16:35, forty one-line facts still cut at the narrow width in a
-// window twice as wide: "after narrowing the window and widening it again its
-// broken". The agent's cursor and rendition are saved around it and the band
-// re-pinned before the restore, as reallocBand does.
-func (h *Host) untruncate(oldCols, cols, agentRows int) string {
-	if h.model == nil || !h.model.keepTails {
-		return ""
-	}
-	var b strings.Builder
-	h.mu.Lock()
-	for y := 0; y < agentRows && y < len(h.model.cells); y++ {
-		row := h.model.cells[y]
-		if len(row) <= oldCols {
-			continue
-		}
-		tail := rowANSI(row[oldCols:min(len(row), cols)])
-		if tail == "" {
-			continue
-		}
-		fmt.Fprintf(&b, "\x1b[%d;%dH%s\x1b[0m", y+1, oldCols+1, tail)
-	}
-	h.mu.Unlock()
-	if b.Len() == 0 {
-		return ""
-	}
-	return saveCursor + originOff + regionReset + "\x1b[0m" + b.String() + EnterBand(agentRows) + restoreCursor
 }
 
 // keptRow is a row that left the band, and whether it is in the scrollback.
@@ -869,8 +816,7 @@ func (h *Host) keepFinalScreen(agentRows int) {
 	var lines []string
 	if h.model.alt {
 		for y := 0; y < agentRows && y < len(h.model.cells); y++ {
-			row := h.model.cells[y]
-			lines = append(lines, rowANSI(row[:min(len(row), h.model.w)]))
+			lines = append(lines, rowANSI(h.model.cells[y]))
 		}
 	}
 	h.mu.Unlock()
