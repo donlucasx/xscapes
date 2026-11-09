@@ -162,7 +162,16 @@ func (h *Harbour) Update(c *canvas.Canvas, t float64, act scape.Activity) {
 	lt := lit(scape.PaletteAt(act.TimeOfDay))
 	tn := rainTonesAt(lt)
 	h.desk = tn.desk
-	h.remember(t, act.Level)
+	// Drops are born only while a turn is open or a tool runs. The level
+	// itself fades over the reducer's TauFall after the finish (the shore's
+	// sea calms that way), and a drizzle twenty seconds after the agent
+	// stopped read as still working (his "it seems to rain all the time",
+	// 2026-11-09; measured 343 drop cells 12-20 s after the finish).
+	lv := act.Level
+	if !act.Working {
+		lv = 0
+	}
+	h.remember(t, lv)
 
 	// 1. The sky, its stars, the moon.
 	far := c.Far()

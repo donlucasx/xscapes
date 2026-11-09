@@ -66,9 +66,12 @@ type frames struct {
 	// demo, the site and the mockups draw it -- and vista is set while the
 	// preference names it (refreshScape). ascii is kept so a switch can
 	// build the vista the same way the shore was.
-	vista          *scenes.Vista
-	harbour        *scenes.Harbour
-	harbourCat     *companion.Cat
+	vista      *scenes.Vista
+	harbour    *scenes.Harbour
+	harbourCat *companion.Cat
+	// knocked, when set, hears every knock the frame rings (tests: which
+	// sound would play, without playing it).
+	knocked        func(notify.Kind)
 	scapeName      string
 	ascii          bool
 	nextScapeCheck time.Time
@@ -288,6 +291,9 @@ func (f *frames) frame(now time.Time) string {
 		// 2026-09-15). The ask and the edge detection stay keyed off the bubble.
 		if k, ring := f.knocker.Knock(st.Bubble, st.BubbleAsk, st.Pose == companion.Worried); ring {
 			f.player.Play(k)
+			if f.knocked != nil {
+				f.knocked(k)
+			}
 		}
 	}
 

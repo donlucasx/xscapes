@@ -142,8 +142,7 @@ func (h *Harbour) paintView(c *canvas.Canvas, p scape.Palette, l float64, t floa
 	sail(sx(6)+drift(2, 0.08, 0), lay.wy(11))
 	sail(sx(56)+drift(2, 0.1, 2), lay.wy(10))
 	// Middle: the ferry crossing, its windows lit by night, a buoy.
-	const ferryPeriod = 75.0
-	fx := -14 + int(math.Mod(t, ferryPeriod)/ferryPeriod*float64(c.W+28))
+	fx := FerryX(t, c.W)
 	fy := lay.wy(12)
 	fill(c, fx, fy, fx+13, fy, hull)
 	fill(c, fx+1, fy-1, fx+12, fy-1, white)
@@ -161,10 +160,7 @@ func (h *Harbour) paintView(c *canvas.Canvas, p scape.Palette, l float64, t floa
 	wake(fx-7, fx-1, fy)
 	plot(near, lay.mull+4, lay.wy(13), 'o', cube(175, 95, 95), 1)
 	// Near: the tug working left, and the boat moored at our dock.
-	const tugPeriod = 110.0
-	// From past the right edge to past the left one, so the wrap happens
-	// off screen (it jumped back mid-water, Kimi 2026-11-09).
-	tx := c.W + 6 - int(math.Mod(t, tugPeriod)/tugPeriod*float64(c.W+22))
+	tx := TugX(t, c.W)
 	ty := lay.waterBot
 	fill(c, tx, ty, tx+9, ty, hull)
 	fill(c, tx+2, ty-1, tx+5, ty-1, white)
@@ -248,3 +244,23 @@ func (h *Harbour) paintView(c *canvas.Canvas, p scape.Palette, l float64, t floa
 // drawSillPlantAt is drawSillPlant (rain_study.go) moved down by dy rows,
 // so it stands on the layout's sill.
 func drawSillPlantAt(c *canvas.Canvas, x, dy int, l float64) { drawSillPlantShifted(c, x, dy, l) }
+
+// The traffic's clocks: the world's, at their own pace.
+const (
+	FerryPeriod = 75.0
+	TugPeriod   = 110.0
+)
+
+// FerryX is the ferry's left column at time t: it crosses left to right,
+// from fully off the left edge to fully off the right (14 cells long).
+func FerryX(t float64, w int) int {
+	return -14 + int(math.Mod(t, FerryPeriod)/FerryPeriod*float64(w+28))
+}
+
+// TugX is the tug's left column at time t: it works right to left, from
+// past the right edge to past the left one, so the wrap happens off screen
+// (it jumped back mid-water, Kimi 2026-11-09). The tug and its wake are 16
+// cells.
+func TugX(t float64, w int) int {
+	return w + 6 - int(math.Mod(t, TugPeriod)/TugPeriod*float64(w+28))
+}
