@@ -42,6 +42,10 @@ type Filter struct {
 	// in a plain terminal, and OnLeave tells the host to stop writing.
 	OwnsAlt bool
 	OnLeave func()
+	// OnAutowrap reports the agent switching DECAWM (ESC[?7l off, ESC[?7h
+	// on), so the host's own writes, which turn it off, can put back the
+	// agent's state rather than a default (Host.write).
+	OnAutowrap func(off bool)
 	// pend holds an escape sequence that a read cut in half. A read from a
 	// PTY ends wherever the kernel's buffer ended, which is regularly inside
 	// a sequence: without this, ESC[ would be forwarded and the r that
@@ -82,6 +86,9 @@ func (f *Filter) Filter(in []byte) []byte {
 			out = append(out, buf[i])
 			i++
 			continue
+		}
+		if (final == 'l' || final == 'h') && f.OnAutowrap != nil && hasPrivateMode(buf[i:end+1], "7") {
+			f.OnAutowrap(final == 'l')
 		}
 		switch final {
 		case 'l':
@@ -152,12 +159,17 @@ func (f *Filter) confineErase(seq []byte) []byte {
 // leavesAlt reports whether a DEC private mode reset switches off the
 // alternate screen: 1049, 1047 or 47 among its parameters.
 func leavesAlt(seq []byte) bool {
+	return hasPrivateMode(seq, "1049") || hasPrivateMode(seq, "1047") || hasPrivateMode(seq, "47")
+}
+
+// hasPrivateMode reports whether a DEC private mode set or reset names mode.
+func hasPrivateMode(seq []byte, mode string) bool {
 	s := string(seq)
 	if !strings.HasPrefix(s, "\x1b[?") {
 		return false
 	}
 	for _, p := range strings.Split(s[3:len(s)-1], ";") {
-		if p == "1049" || p == "1047" || p == "47" {
+		if p == mode {
 			return true
 		}
 	}
