@@ -3,6 +3,7 @@
 package gvt
 
 import (
+	"fmt"
 	"regexp"
 	"strconv"
 	"strings"
@@ -167,5 +168,43 @@ func TestALongClusterDrawsItsBase(t *testing.T) {
 	out := csi.ReplaceAllString(string(v.Render(true, 0)), "")
 	if !strings.HasPrefix(strings.TrimLeft(out, " "), "x") || !strings.Contains(out, "y") {
 		t.Fatalf("rendered %q", out)
+	}
+}
+
+// The viewport scrolls back into the history, stays put while output
+// arrives, and returns to the bottom; Render draws what it shows.
+func TestTheViewportScrollsBackAndReturns(t *testing.T) {
+	tm, err := New(20, 5, 1<<20)
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer tm.Close()
+	for i := 1; i <= 30; i++ {
+		tm.Write([]byte(fmt.Sprintf("line %02d\r\n", i)))
+	}
+	if b := tm.Back(); b != 0 {
+		t.Fatalf("at the start the viewport is %d rows back", b)
+	}
+	tm.Scroll(-10)
+	if b := tm.Back(); b != 10 {
+		t.Fatalf("after scrolling up 10 the viewport is %d rows back", b)
+	}
+	if got := string(tm.Render(true, 0)); !strings.Contains(got, "line 17") || strings.Contains(got, "line 30") {
+		t.Fatalf("scrolled back, the render shows:\n%q", got)
+	}
+	tm.Write([]byte("line 31\r\n"))
+	if got := string(tm.Render(true, 0)); !strings.Contains(got, "line 17") {
+		t.Fatalf("new output moved a scrolled-back viewport:\n%q", got)
+	}
+	tm.Scroll(-1000)
+	if got := string(tm.Render(true, 0)); !strings.Contains(got, "line 01") {
+		t.Fatalf("scrolled to the top, the render lacks line 01:\n%q", got)
+	}
+	tm.ScrollToBottom()
+	if b := tm.Back(); b != 0 {
+		t.Fatalf("after the return the viewport is %d rows back", b)
+	}
+	if got := string(tm.Render(true, 0)); !strings.Contains(got, "line 31") {
+		t.Fatalf("back at the bottom, the render lacks line 31:\n%q", got)
 	}
 }

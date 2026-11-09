@@ -103,6 +103,10 @@ type Host struct {
 	// wantCPR is set while the host is waiting for the terminal to answer
 	// where the shell's cursor is; the key forwarder keeps that reply.
 	wantCPR atomic.Bool
+	// inputFilter, when set, sees what the real terminal sends before the
+	// agent does and returns what the agent gets (the engine host takes the
+	// mouse wheel for its scrollback).
+	inputFilter func(b []byte) []byte
 	// muted stops every write once the screen has been handed back and the
 	// replay printed: a forwarder that outlived its deadline (a grandchild
 	// holding the pty open) must not write into the shell's screen.
@@ -875,6 +879,11 @@ func (h *Host) forwardKeys(in io.Reader, master io.Writer, cpr chan<- int, waitD
 			if !ok {
 				flush()
 				return
+			}
+			if h.inputFilter != nil {
+				if data = h.inputFilter(data); len(data) == 0 {
+					continue
+				}
 			}
 			if h.wantCPR.Load() {
 				held = append(held, data...)

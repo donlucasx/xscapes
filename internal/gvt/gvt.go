@@ -94,6 +94,19 @@ static bool gvt_mode(gvt *g, uint16_t mode, bool ansi) {
 	ghostty_terminal_get(g->t, GHOSTTY_TERMINAL_DATA_MODE, &m);
 	return m.value;
 }
+// gvt_scroll moves the viewport: by delta rows (up is negative), or to the
+// bottom (the active area, which then follows new output) when bottom.
+static void gvt_scroll(gvt *g, intptr_t delta, int bottom) {
+	GhosttyTerminalScrollViewport b; memset(&b, 0, sizeof b);
+	if (bottom) b.tag = GHOSTTY_TERMINAL_SCROLL_VIEWPORT_BOTTOM;
+	else { b.tag = GHOSTTY_TERMINAL_SCROLL_VIEWPORT_DELTA; b.value.delta = delta; }
+	ghostty_terminal_scroll_viewport(g->t, b);
+}
+static void gvt_scrollbar(gvt *g, uint64_t *total, uint64_t *offset, uint64_t *len) {
+	GhosttyTerminalScrollbar sb; memset(&sb, 0, sizeof sb);
+	ghostty_terminal_get(g->t, GHOSTTY_TERMINAL_DATA_SCROLLBAR, &sb);
+	*total = sb.total; *offset = sb.offset; *len = sb.len;
+}
 static uint8_t gvt_kitty(gvt *g) {
 	uint8_t f = 0;
 	ghostty_terminal_get(g->t, GHOSTTY_TERMINAL_DATA_KITTY_KEYBOARD_FLAGS, &f);
@@ -393,6 +406,45 @@ func (t *Term) KittyFlags() int {
 		return 0
 	}
 	return int(C.gvt_kitty(t.g))
+}
+
+// Scroll moves the viewport by delta rows into the scrollback (up is
+// negative). While it is off the bottom it stays where it is as output
+// arrives; Render draws what it shows.
+func (t *Term) Scroll(delta int) {
+	t.mu.Lock()
+	defer t.mu.Unlock()
+	if t.g == nil {
+		return
+	}
+	C.gvt_scroll(t.g, C.intptr_t(delta), 0)
+}
+
+// ScrollToBottom puts the viewport back on the active area, where it follows
+// new output again.
+func (t *Term) ScrollToBottom() {
+	t.mu.Lock()
+	defer t.mu.Unlock()
+	if t.g == nil {
+		return
+	}
+	C.gvt_scroll(t.g, 0, 1)
+}
+
+// Back reports how many rows the viewport sits above the bottom (0 when it
+// is following the output).
+func (t *Term) Back() int {
+	t.mu.Lock()
+	defer t.mu.Unlock()
+	if t.g == nil {
+		return 0
+	}
+	var total, off, ln C.uint64_t
+	C.gvt_scrollbar(t.g, &total, &off, &ln)
+	if b := int(total) - int(off) - int(ln); b > 0 {
+		return b
+	}
+	return 0
 }
 
 // Transcript is the active screen, scrollback included, with soft wraps

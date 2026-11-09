@@ -21,6 +21,22 @@ import (
 // screen after the exit.
 func engineRun(t *testing.T, child string, w, h int, keys string) (during []string, raw string, after string) {
 	t.Helper()
+	snaps, raw, after := engineScript(t, child, w, h, []step{{600 * time.Millisecond, keys, false}, {600 * time.Millisecond, "", true}})
+	return snaps[0], raw, after
+}
+
+// step waits, then types keys (if any), then snapshots the outer screen
+// (if snap).
+type step struct {
+	wait time.Duration
+	keys string
+	snap bool
+}
+
+// engineScript is engineRun with a list of steps; it returns a snapshot of
+// the outer screen for every step that asks for one.
+func engineScript(t *testing.T, child string, w, h int, steps []step) (snaps [][]string, raw string, after string) {
+	t.Helper()
 	pr, pw, err := os.Pipe()
 	if err != nil {
 		t.Fatal(err)
@@ -66,14 +82,17 @@ func engineRun(t *testing.T, child string, w, h int, keys string) (during []stri
 	snapped := make(chan struct{})
 	go func() {
 		defer close(snapped)
-		time.Sleep(600 * time.Millisecond)
-		if keys != "" {
-			tty.master.Write([]byte(keys))
+		for _, st := range steps {
+			time.Sleep(st.wait)
+			if st.keys != "" {
+				tty.master.Write([]byte(st.keys))
+			}
+			if st.snap {
+				mu.Lock()
+				snaps = append(snaps, outerRows(outer, h))
+				mu.Unlock()
+			}
 		}
-		time.Sleep(600 * time.Millisecond)
-		mu.Lock()
-		during = outerRows(outer, h)
-		mu.Unlock()
 	}()
 	if err := hst.Run(); err != nil && err != io.EOF {
 		t.Fatalf("host: %v", err)
@@ -81,7 +100,7 @@ func engineRun(t *testing.T, child string, w, h int, keys string) (during []stri
 	pw.Close()
 	<-done
 	<-snapped
-	return during, rawB.String(), string(outer.Transcript(false))
+	return snaps, rawB.String(), string(outer.Transcript(false))
 }
 
 // What he types reaches the agent, and the agent's echo is drawn in its band.
@@ -168,7 +187,7 @@ func TestTheModeMirrorSurvivesASignalMidFrame(t *testing.T) {
 	go func() {
 		defer wg.Done()
 		for i := 0; i < 2000; i++ {
-			m.sync(v)
+			m.sync(v, false)
 		}
 	}()
 	go func() {
@@ -178,4 +197,73 @@ func TestTheModeMirrorSurvivesASignalMidFrame(t *testing.T) {
 		}
 	}()
 	wg.Wait()
+}
+
+// The wheel scrolls the agent's history while the agent has not asked for
+// the mouse: older lines come into its band with a note saying how far
+// back, and a key brings the bottom back and still reaches the agent.
+func TestTheWheelScrollsTheAgentsHistory(t *testing.T) {
+	child := `i=1; while [ $i -le 60 ]; do printf 'line %02d\r\n' $i; i=$((i+1)); done; stty -echo; read k; printf 'key:%s\r\n' "$k"; sleep 1`
+	up := strings.Repeat("\x1b[<64;10;5M", 5)
+	snaps, raw, _ := engineScript(t, child, 80, 24, []step{
+		{700 * time.Millisecond, up, false},
+		{400 * time.Millisecond, "", true},
+		{0, "z\r", false},
+		{500 * time.Millisecond, "", true},
+	})
+	if len(snaps) != 2 {
+		t.Fatalf("%d snapshots", len(snaps))
+	}
+	back, returned := strings.Join(snaps[0], "\n"), strings.Join(snaps[1], "\n")
+	if strings.Contains(back, "line 60") || !strings.Contains(back, "line 40") || !strings.Contains(back, "15 lines back") {
+		t.Fatalf("after 5 wheel ticks up the band shows:\n%s", back)
+	}
+	if !strings.Contains(returned, "line 60") || !strings.Contains(returned, "key:z") || strings.Contains(returned, "lines back") {
+		t.Fatalf("after a key the band shows:\n%s", returned)
+	}
+	on := strings.Index(raw, "\x1b[?1000h")
+	off := strings.LastIndex(raw, "\x1b[?1000l")
+	if on < 0 || off < on || !strings.Contains(raw, "\x1b[?1006h") {
+		t.Fatalf("mouse capture: 1000 on at %d, off at %d", on, off)
+	}
+}
+
+// An agent that asks for the mouse gets the wheel itself, in its own
+// coordinates; a report from the scape below its band never reaches it.
+func TestAnAgentThatAsksForTheMouseGetsTheWheel(t *testing.T) {
+	child := `stty raw -echo; printf '\033[?1000h\033[?1006h'; r=$(dd bs=1 count=11 2>/dev/null | od -An -c | tr -d ' \n'); stty sane; printf '\r\nreply:%s\r\n' "$r"; sleep 1`
+	snaps, _, _ := engineScript(t, child, 80, 24, []step{
+		{600 * time.Millisecond, "\x1b[<64;10;23M", false},
+		{100 * time.Millisecond, "\x1b[<65;10;5M", false},
+		{600 * time.Millisecond, "", true},
+	})
+	got := strings.Join(snaps[0], "\n")
+	if !strings.Contains(got, `reply:033[<65;10;5M`) {
+		t.Fatalf("the agent's wheel report:\n%s", got)
+	}
+}
+
+// Mouse reports split across reads are put back together; a lone ESC (the
+// Escape key) and other input pass straight through.
+func TestTheScrollerReadsSplitReports(t *testing.T) {
+	vt, _ := gvt.New(20, 5, 1<<20)
+	defer vt.Close()
+	for i := 0; i < 30; i++ {
+		vt.Write([]byte("x\r\n"))
+	}
+	s := &scroller{vt: vt, kick: make(chan struct{}, 1)}
+	s.agentRows.Store(5)
+	s.capture.Store(true)
+	if out := s.filter([]byte("\x1b[<64;3")); len(out) != 0 {
+		t.Fatalf("half a report leaked: %q", out)
+	}
+	if out := s.filter([]byte(";2M")); len(out) != 0 || vt.Back() != WheelRows {
+		t.Fatalf("the joined report: out %q, back %d", out, vt.Back())
+	}
+	if out := s.filter([]byte("\x1b[I")); string(out) != "\x1b[I" || vt.Back() != WheelRows {
+		t.Fatalf("a focus report: out %q, back %d", out, vt.Back())
+	}
+	if out := s.filter([]byte("\x1b")); string(out) != "\x1b" || vt.Back() != 0 {
+		t.Fatalf("the Escape key: out %q, back %d", out, vt.Back())
+	}
 }
