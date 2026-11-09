@@ -129,6 +129,11 @@ func TestTheEngineHostLeavesTheTranscript(t *testing.T) {
 			t.Errorf("transcript after the exit lacks %q", want[:min(20, len(want))])
 		}
 	}
+	// Every line erases the row it lands on (Terminal.app keeps survivors).
+	if !strings.Contains(tail, "\x1b[2Kline 01") && !strings.Contains(tail, "\x1b[2K\x1b[0mline 01") {
+		i := strings.Index(tail, "line 01")
+		t.Errorf("the transcript's line lands without an erase: %q", tail[max(0, i-16):i+7])
+	}
 }
 
 // Wide characters take two columns and do not shift what follows.
@@ -149,4 +154,28 @@ func TestTheEngineHostHostsAFullScreenAgent(t *testing.T) {
 	if strings.Contains(j, "FULLSCREEN") || !strings.Contains(j, "back") {
 		t.Fatalf("after the agent left its full screen:\n%s", j)
 	}
+}
+
+// The signal path resets the mirrored modes while the frame loop syncs
+// them: run under -race, this is the map race Kimi found (2026-11-09).
+func TestTheModeMirrorSurvivesASignalMidFrame(t *testing.T) {
+	v, _ := gvt.New(20, 5, 0)
+	defer v.Close()
+	v.Write([]byte("\x1b[?2004h\x1b[?1000h"))
+	var m mirroredModes
+	var wg sync.WaitGroup
+	wg.Add(2)
+	go func() {
+		defer wg.Done()
+		for i := 0; i < 2000; i++ {
+			m.sync(v)
+		}
+	}()
+	go func() {
+		defer wg.Done()
+		for i := 0; i < 2000; i++ {
+			_ = m.reset()
+		}
+	}()
+	wg.Wait()
 }

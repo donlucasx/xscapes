@@ -126,3 +126,46 @@ func TestAClosedTerminalIsInert(t *testing.T) {
 	_ = v.Transcript(true)
 	v.Close()
 }
+
+// Two terminals render at once without bleeding into each other, and a row
+// wider than 1024 columns is drawn whole (Kimi's probes, 2026-11-09: a
+// shared static row buffer, capped at 1024).
+func TestTerminalsDoNotShareARowAndWideRowsDrawWhole(t *testing.T) {
+	a, _ := New(1400, 3, 0)
+	b, _ := New(1400, 3, 0)
+	defer a.Close()
+	defer b.Close()
+	a.Write([]byte(strings.Repeat("A", 1400)))
+	b.Write([]byte(strings.Repeat("B", 1400)))
+	done := make(chan []byte)
+	for _, v := range []*Term{a, b} {
+		go func(v *Term) {
+			var last []byte
+			for i := 0; i < 50; i++ {
+				last = v.Render(true, 0)
+			}
+			done <- last
+		}(v)
+	}
+	for i := 0; i < 2; i++ {
+		out := csi.ReplaceAllString(string(<-done), "")
+		if strings.Contains(out, "A") && strings.Contains(out, "B") {
+			t.Fatal("one terminal's frame holds the other's cells")
+		}
+		if n := strings.Count(out, "A") + strings.Count(out, "B"); n != 1400 {
+			t.Fatalf("row drawn with %d cells, want 1400", n)
+		}
+	}
+}
+
+// A grapheme cluster longer than the cell buffer still draws its base
+// character, not a hole.
+func TestALongClusterDrawsItsBase(t *testing.T) {
+	v, _ := New(20, 2, 0)
+	defer v.Close()
+	v.Write([]byte("x" + strings.Repeat("́", 40) + "y"))
+	out := csi.ReplaceAllString(string(v.Render(true, 0)), "")
+	if !strings.HasPrefix(strings.TrimLeft(out, " "), "x") || !strings.Contains(out, "y") {
+		t.Fatalf("rendered %q", out)
+	}
+}

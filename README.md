@@ -35,7 +35,7 @@ thing, so a glance from across the room is enough.
     <td><img src="assets/readme/owl-night.gif" alt="night on the scape"><br><b>Night falls</b> when yours does. Finished todos light up as stars.</td>
   </tr>
   <tr>
-    <td><img src="assets/readme/rain.gif" alt="the rainy window study"><br><b>Next: the rainy window.</b> A study for the third scape, the cat on the sill. Not shipped yet.</td>
+    <td><img src="assets/readme/rain.gif" alt="the rainy window study"><br><b>The harbour</b>, through a rainy window, the cat on the sill: the rain on the glass is the work, and kittens come up over the sill for subagents (<code>xscapes scape harbour</code>).</td>
     <td><img src="assets/readme/companions.gif" alt="the four companions"><br><b>Companions.</b> The crab and the cat ship today (<code>xscapes companion cat</code>), the owl lives on the vista, the frog is next.</td>
   </tr>
 </table>
@@ -234,7 +234,7 @@ emitting the events above. Nothing in the engine knows what any agent is.
 
 ```sh
 xscapes companion crab     # choose the animal: crab (default) or cat
-xscapes scape shore        # choose the scape: vista (default) or shore; a running scape switches
+xscapes scape harbour      # choose the scape: vista (default), shore or harbour; a running scape switches
 xscapes inside <command>   # host any command inside the scape, not just claude
 xscapes install kimi       # Kimi Code CLI hooks (a plan; --apply writes)
 xscapes kimi               # Kimi Code CLI inside the scape

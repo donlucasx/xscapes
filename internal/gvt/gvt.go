@@ -34,6 +34,9 @@ typedef struct {
 	uint8_t *reply; size_t rlen, rcap;
 	// The frame being built.
 	char *out; size_t olen, ocap;
+	// One row's cells while it is drawn, sized to the widest row seen; per
+	// terminal, so two terminals never share it (Kimi, 2026-11-09).
+	struct cellv *row; int rowcap;
 } gvt;
 
 static void put(gvt *g, const char *s, size_t n) {
@@ -78,7 +81,7 @@ static void gvt_free(gvt *g) {
 	ghostty_render_state_row_iterator_free(g->it);
 	ghostty_render_state_free(g->rs);
 	ghostty_terminal_free(g->t);
-	free(g->reply); free(g->out); free(g);
+	free(g->reply); free(g->out); free(g->row); free(g);
 }
 
 static void gvt_write(gvt *g, const uint8_t *b, size_t n) { ghostty_terminal_vt_write(g->t, b, n); }
@@ -137,7 +140,7 @@ static int same(GhosttyStyle a, GhosttyStyle b) {
 
 // One row's cells, captured before anything is written, so trailing blanks
 // can be cut and replaced by one erase.
-typedef struct { GhosttyStyle st; uint8_t txt[32]; uint8_t n; uint8_t wide; } cellv;
+typedef struct cellv { GhosttyStyle st; uint8_t txt[64]; uint8_t n; uint8_t wide; } cellv;
 
 // gvt_render draws rows that changed since the last render (every row when
 // full), each placed at screen row top+y, and returns the bytes in g->out.
@@ -146,8 +149,13 @@ static void gvt_render(gvt *g, int full, int top, int maxRows, int cols) {
 	g->olen = 0;
 	if (ghostty_render_state_update(g->rs, g->t) != GHOSTTY_SUCCESS) return;
 	if (ghostty_render_state_get(g->rs, GHOSTTY_RENDER_STATE_DATA_ROW_ITERATOR, &g->it) != GHOSTTY_SUCCESS) return;
-	static cellv row[1024];
-	if (cols > 1024) cols = 1024;
+	if (cols > g->rowcap) {
+		cellv *r = realloc(g->row, (size_t)cols * sizeof(cellv));
+		if (!r) return;
+		g->row = r;
+		g->rowcap = cols;
+	}
+	cellv *row = g->row;
 	uint16_t y = 0;
 	for (;;) {
 		bool more;
@@ -169,8 +177,20 @@ static void gvt_render(gvt *g, int full, int top, int maxRows, int cols) {
 			c->wide = (uint8_t)w;
 			ghostty_render_state_row_cells_get(g->cells, GHOSTTY_RENDER_STATE_ROW_CELLS_DATA_STYLE, &c->st);
 			GhosttyBuffer buf = { .ptr = c->txt, .cap = sizeof c->txt, .len = 0 };
-			if (ghostty_render_state_row_cells_get(g->cells, GHOSTTY_RENDER_STATE_ROW_CELLS_DATA_GRAPHEMES_UTF8, &buf) == GHOSTTY_SUCCESS)
+			GhosttyResult gr = ghostty_render_state_row_cells_get(g->cells, GHOSTTY_RENDER_STATE_ROW_CELLS_DATA_GRAPHEMES_UTF8, &buf);
+			if (gr == GHOSTTY_SUCCESS) {
 				c->n = (uint8_t)buf.len;
+			} else if (gr == GHOSTTY_OUT_OF_SPACE) {
+				// A cluster longer than the cell buffer: draw its base
+				// codepoint rather than a hole.
+				uint32_t cp[1]; GhosttyCodepointBuffer cb = { .ptr = cp, .cap = 1, .len = 0 };
+				ghostty_render_state_row_cells_get(g->cells, GHOSTTY_RENDER_STATE_ROW_CELLS_DATA_GRAPHEMES_BUF, &cb);
+				uint32_t u = cb.len ? cp[0] : 0xFFFD;
+				if (u < 0x80) { c->txt[0] = u; c->n = 1; }
+				else if (u < 0x800) { c->txt[0] = 0xC0 | (u >> 6); c->txt[1] = 0x80 | (u & 0x3F); c->n = 2; }
+				else if (u < 0x10000) { c->txt[0] = 0xE0 | (u >> 12); c->txt[1] = 0x80 | ((u >> 6) & 0x3F); c->txt[2] = 0x80 | (u & 0x3F); c->n = 3; }
+				else { c->txt[0] = 0xF0 | (u >> 18); c->txt[1] = 0x80 | ((u >> 12) & 0x3F); c->txt[2] = 0x80 | ((u >> 6) & 0x3F); c->txt[3] = 0x80 | (u & 0x3F); c->n = 4; }
+			}
 			bool styled = c->st.bg_color.tag != GHOSTTY_STYLE_COLOR_NONE ||
 				(c->st.flags & (GHOSTTY_STYLE_FLAG_INVERSE)) || GHOSTTY_STYLE_UNDERLINE(c->st) ||
 				(c->st.flags & (GHOSTTY_STYLE_FLAG_STRIKETHROUGH | GHOSTTY_STYLE_FLAG_OVERLINE));

@@ -159,10 +159,12 @@ func (h *Harbour) paintView(c *canvas.Canvas, p scape.Palette, l float64, t floa
 	plot(mid, fx+7, fy-2, '|', hull, 1)
 	plot(near, fx+13, fy-1, '.', cube(0, 135, 0), 0.8)
 	wake(fx-7, fx-1, fy)
-	plot(near, lay.mull+1, lay.wy(13), 'o', cube(175, 95, 95), 1)
+	plot(near, lay.mull+4, lay.wy(13), 'o', cube(175, 95, 95), 1)
 	// Near: the tug working left, and the boat moored at our dock.
 	const tugPeriod = 110.0
-	tx := c.W - 6 - int(math.Mod(t, tugPeriod)/tugPeriod*float64(c.W/2+16))
+	// From past the right edge to past the left one, so the wrap happens
+	// off screen (it jumped back mid-water, Kimi 2026-11-09).
+	tx := c.W + 6 - int(math.Mod(t, tugPeriod)/tugPeriod*float64(c.W+22))
 	ty := lay.waterBot
 	fill(c, tx, ty, tx+9, ty, hull)
 	fill(c, tx+2, ty-1, tx+5, ty-1, white)

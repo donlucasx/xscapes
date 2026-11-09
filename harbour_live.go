@@ -24,7 +24,7 @@ func drawHarbour(c *canvas.Canvas, h *scenes.Harbour, cat *companion.Cat, lay la
 	// The walk-up: a nearer cat is a bigger one standing on the same sill,
 	// so it grows UP from the sill, not down into the writing.
 	if _, _, bh := cat.DrawnBox(c.W); bh > 7 {
-		catY -= bh - 7
+		catY = max(0, catY-(bh-7))
 	}
 	cat.Draw(c.Near(), catX, catY, t, st.Pose)
 	head := catX + cat.DrawnHeadCol(c.W)

@@ -75,7 +75,7 @@ func (h *Host) runVT() error {
 	var leaving sync.Once
 	leave := func() {
 		leaving.Do(func() {
-			h.raw(modes.reset() + "\x1b[0m\x1b[?7h\x1b[?25h\x1b[0 q\x1b[?1049l")
+			h.raw("\x1b[?2026l" + modes.reset() + "\x1b[0m\x1b[?7h\x1b[?25h\x1b[0 q\x1b[?1049l")
 			restoreTermios(in.Fd(), saved)
 		})
 	}
@@ -158,6 +158,9 @@ func (h *Host) runVT() error {
 	frame := func(scape bool) {
 		var b strings.Builder
 		b.WriteString("\x1b[?2026h\x1b[?25l")
+		if full {
+			b.WriteString("\x1b[r\x1b[0m\x1b[2J")
+		}
 		b.Write(vt.Render(full, 0))
 		if full {
 			// Rows of the band the engine has no row for (never, today) and
@@ -202,9 +205,20 @@ func (h *Host) runVT() error {
 			// The transcript, on the main screen, where the real terminal
 			// keeps it and reflows it: what a plain session leaves behind.
 			if h.Replay {
-				t := strings.TrimRight(string(vt.Transcript(true)), " \n")
+				// Each line erases the row it lands on first: Terminal.app
+				// keeps main-screen rows across 1049l, and a shorter line
+				// over a longer survivor would leave its tail (the band
+				// host's replay does the same, host.go replay).
+				t := strings.TrimRight(strings.ReplaceAll(string(vt.Transcript(true)), "\r\n", "\n"), " \n")
 				if t != "" {
-					h.raw(strings.ReplaceAll(t, "\n", "\r\n") + "\x1b[0m\r\n")
+					var b strings.Builder
+					for _, ln := range strings.Split(t, "\n") {
+						b.WriteString("\r\x1b[0m\x1b[2K")
+						b.WriteString(ln)
+						b.WriteString("\x1b[0m\r\n")
+					}
+					b.WriteString("\x1b[0m\x1b[J")
+					h.raw(b.String())
 				}
 			}
 			h.muted.Store(true)
@@ -232,8 +246,8 @@ func (h *Host) runVT() error {
 				h.traceSize(cols, rows, agentRows)
 				vt.Resize(cols, agentRows)
 				p.SetSize(cols, agentRows)
-				// Everything moves: clear the glass, draw every row again.
-				h.raw("\x1b[r\x1b[0m\x1b[2J")
+				// Everything moves: the next frame clears the glass and
+				// draws every row again, inside its synchronized update.
 				full = true
 			}
 			frame(true)
@@ -249,6 +263,10 @@ func (h *Host) raw(s string) { h.writeAgent(s) }
 // reads the real terminal's input. Modes that change what is DRAWN stay in
 // the engine.
 type mirroredModes struct {
+	// mu: reset runs from the signal goroutine while the frame loop syncs
+	// (Kimi, 2026-11-09: a concurrent map read and write is a fatal error,
+	// on exactly the path that restores the terminal).
+	mu     sync.Mutex
 	on     map[int]bool
 	kitty  int
 	keypad bool
@@ -257,6 +275,8 @@ type mirroredModes struct {
 var inputModes = []int{1, 1000, 1002, 1003, 1004, 1005, 1006, 1007, 1015, 1016, 2004}
 
 func (m *mirroredModes) sync(vt *gvt.Term) string {
+	m.mu.Lock()
+	defer m.mu.Unlock()
 	if m.on == nil {
 		m.on = map[int]bool{}
 	}
@@ -288,6 +308,8 @@ func (m *mirroredModes) sync(vt *gvt.Term) string {
 }
 
 func (m *mirroredModes) reset() string {
+	m.mu.Lock()
+	defer m.mu.Unlock()
 	var b strings.Builder
 	for mode, v := range m.on {
 		if v {

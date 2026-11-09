@@ -35,7 +35,8 @@ type Harbour struct {
 	Seed  int64
 	Ascii bool
 	// CatX is the column the composition gives the companion (the shore's
-	// lay.CatX), so the balloon uses the shore's arithmetic.
+	// lay.CatX), so the balloon uses the shore's arithmetic; -1 takes the
+	// layout's own place (0 is a real column on a very narrow window).
 	CatX int
 	// Kittens and Exits are the reducer's litter (State.Kittens,
 	// State.KittenExits), set by the composer before Update.
@@ -46,6 +47,7 @@ type Harbour struct {
 	desk       term.RGB
 	arrived    []float64 // when each sitting kitten came up, oldest first
 	litterSeen bool
+	exitX      []int     // each leaving kitten's column, oldest first
 	levels     []levelAt // the work over the last minute, for the drops' births
 }
 
@@ -56,7 +58,7 @@ type levelAt struct{ t, level float64 }
 const HarbourMinRows = 16
 
 // NewHarbour is the live harbour.
-func NewHarbour(seed int64, ascii bool) *Harbour { return &Harbour{Seed: seed, Ascii: ascii} }
+func NewHarbour(seed int64, ascii bool) *Harbour { return &Harbour{Seed: seed, Ascii: ascii, CatX: -1} }
 
 func (h *Harbour) Name() string { return "harbour" }
 
@@ -106,10 +108,13 @@ func harbourLayoutFor(w, h, catX int) harbourLayout {
 	l.dockTop, l.paneBot = l.waterBot+1, pane-1
 	l.rail = int(math.Round(float64(pane) * 6 / 20))
 	l.mull = w/2 - 1
-	if catX == 0 {
+	if catX < 0 {
 		catX = w - 16
 	}
-	l.catX, l.catY = catX, l.sill-7
+	// Under the 16-row floor (a stock 80x24 window gives the scape 10 rows)
+	// the cat would start above the top row and lose its ears: it keeps its
+	// head and sits lower, over the sill, as the vista's owl does.
+	l.catX, l.catY = catX, max(0, l.sill-7)
 	l.plantX = l.sx(12)
 	l.moonX = l.sx(13)
 	return l
@@ -170,7 +175,7 @@ func (h *Harbour) Update(c *canvas.Canvas, t float64, act scape.Activity) {
 		}
 	}
 	cx, cy := l.discAt(act.ContextUsed)
-	drawDiscAt(c, p, act.ContextUsed, cx, cy)
+	drawDiscAt(c, p, act.ContextUsed, cx, cy, lt >= 0.5)
 
 	// 2. The view: the city, the water, the traffic, the dock.
 	h.paintView(c, p, lt, t)
@@ -279,22 +284,61 @@ func (h *Harbour) paintDrops(c *canvas.Canvas, t float64) {
 // each at a place fixed by its index, kept off the moon's column and the
 // spend counter.
 func (h *Harbour) todoStars(c *canvas.Canvas, p scape.Palette, n int) {
+	// The stars keep to the sky above the towers; a short window's sky is
+	// only a few rows, and the top two are still sky (the count must show
+	// at every size the scape draws).
 	rows := h.lay.hz - 4
-	if rows < 2 || n <= 0 {
+	if rows < 2 {
+		rows = min(2, h.lay.hz-1)
+	}
+	if rows < 1 || n <= 0 {
 		return
 	}
 	near := c.Near()
+	tx0, tx1, ty := scape.TokensGround(c.W)
+	// ok is a cell a star may take: in the sky, off the moon's columns, off
+	// the window's wood (the frame pass erases every layer on the posts,
+	// the mullion and the rail, and a star there is a todo the sky no
+	// longer counts; Kimi, 2026-11-09), off the spend counter, and not
+	// already a star or beside one.
+	taken := map[[2]int]bool{}
+	ok := func(x, y int) bool {
+		switch {
+		case y < 1 || y > rows || x < 3 || x > c.W-4:
+			return false
+		case x >= h.lay.moonX-3 && x <= h.lay.moonX+3:
+			return false
+		case x >= h.lay.mull-1 && x <= h.lay.mull+2, y == h.lay.rail:
+			return false
+		case y == ty && x >= tx0 && x <= tx1:
+			return false
+		}
+		return !taken[[2]int{x, y}] && !taken[[2]int{x - 1, y}] && !taken[[2]int{x + 1, y}]
+	}
 	const phi = 0.6180339887
 	for i := 0; i < n && i < 64; i++ {
 		fx := math.Mod(float64(i)*phi+scape.HashF(i, 7, h.Seed), 1)
-		x := 3 + int(fx*float64(c.W-6))
-		y := 1 + int(scape.HashF(i, 9, h.Seed)*float64(rows-1))
-		if x >= h.lay.moonX-3 && x <= h.lay.moonX+3 {
-			x = (x+7)%(c.W-6) + 3
+		x0 := 3 + int(fx*float64(c.W-6))
+		y0 := 1 + int(scape.HashF(i, 9, h.Seed)*float64(rows-1))
+		// The star's own place if it can have it, else the nearest free
+		// cell, searched outward along its row and then the rows around it.
+		x, y, found := x0, y0, false
+		for d := 0; d <= c.W && !found; d++ {
+			for _, dy := range []int{0, 1, -1, 2, -2} {
+				if ok(x0+d, y0+dy) {
+					x, y, found = x0+d, y0+dy, true
+					break
+				}
+				if ok(x0-d, y0+dy) {
+					x, y, found = x0-d, y0+dy, true
+					break
+				}
+			}
 		}
-		if tx0, tx1, ty := scape.TokensGround(c.W); y == ty && x >= tx0 && x <= tx1 {
-			y = ty + 1
+		if !found {
+			return // the sky is full: fewer stars rather than a pile
 		}
+		taken[[2]int{x, y}] = true
 		g := c.BGAt(x, y)
 		near.PlotOn(x, y, '*', vistaStarInk(c, x, y, p.Star), g, 1)
 	}
@@ -379,15 +423,26 @@ func (h *Harbour) drawLitter(c *canvas.Canvas, t float64) {
 		draw(k, sit, true, x, mirror, lift, blink)
 	}
 	// The ones leaving go back down behind the sill, from the places past
-	// the sitters.
+	// the sitters. Each keeps the column it had when it started to leave
+	// (oldest first, as the reducer orders them), so a new arrival does not
+	// shift a kitten mid-exit (Kimi, 2026-11-09).
+	for len(h.exitX) < len(h.Exits) {
+		h.exitX = append(h.exitX, home(len(h.arrived)+len(h.exitX)))
+	}
+	if n := len(h.exitX) - len(h.Exits); n > 0 {
+		h.exitX = h.exitX[n:]
+	}
 	for i, e := range h.Exits {
 		y, on := rise(1 - clamp01(e))
-		draw(0, y, on, home(len(h.arrived)+i), i%2 == 0, false, false)
+		draw(0, y, on, h.exitX[i], i%2 == 0, false, false)
 	}
 }
 
 // drawDiscAt is the study's drawDisc at a centre of the layout's choosing.
-func drawDiscAt(c *canvas.Canvas, p scape.Palette, ctx, cx, cy float64) {
+// By day the unlit face is not painted at all, the shore's ruling after his
+// "the Sun seems to break sometimes" (2026-09-06): the sun wanes as a
+// crescent. Kimi found the mockup's slate face on the day sky (2026-11-09).
+func drawDiscAt(c *canvas.Canvas, p scape.Palette, ctx, cx, cy float64, day bool) {
 	rx, ry := 2.2, 1.35
 	off := 2 * rx * (1 - ctx)
 	body := term.Lerp(c.BGAt(int(cx), int(cy)), p.Moon, p.MoonVis*0.9)
@@ -407,11 +462,15 @@ func drawDiscAt(c *canvas.Canvas, p scape.Palette, ctx, cx, cy float64) {
 			for hh := 0; hh < 2; hh++ {
 				py := float64(y) + 0.25 + 0.5*float64(hh)
 				if in(px, py, 0) {
-					set[hh] = true
-					half[hh] = body
 					if in(px, py, off) {
+						if day {
+							continue
+						}
 						half[hh] = dark
+					} else {
+						half[hh] = body
 					}
+					set[hh] = true
 				}
 			}
 			switch {

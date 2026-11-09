@@ -86,7 +86,7 @@ func cmdScape(args []string) int {
 		if src := scapeEnv(); src != "" {
 			fmt.Printf("  (from XSCAPES_SCAPE = %q; the saved setting is not in use)\n", src)
 			if scapeName(src) != strings.ToLower(strings.TrimSpace(src)) {
-				fmt.Printf("  ⚠ %q is not a scape, so the shore is drawn instead\n", src)
+				fmt.Printf("  ⚠ %q is not a scape, so the vista is drawn instead\n", src)
 			}
 		}
 		fmt.Printf("available: %s\n", strings.Join(ScapeNames(), ", "))

@@ -65,8 +65,12 @@ func TestTheHarboursRainIsTheWork(t *testing.T) {
 		}
 		return n
 	}
+	// The scenery itself has a few 'o' and '|' (masts, cranes, the buoy):
+	// idle is that baseline and must not move with time; the work adds the
+	// rain on top of it (Kimi, 2026-11-09: the old bound sat exactly on the
+	// scenery's count).
 	idle, busy := count(0), count(1)
-	if idle > 20 || busy < 5*max(idle, 10) {
+	if busy-idle < 200 {
 		t.Fatalf("drop cells on the glass: idle %d, flat out %d; want a dry pane at idle and a wet one at work", idle, busy)
 	}
 }
@@ -135,7 +139,7 @@ func TestTheHarboursCatWalksUpOnTheSill(t *testing.T) {
 		f.harbourCat.Approach(0.1, true)
 	}
 	if _, _, bh := f.harbourCat.DrawnBox(125); bh <= 7 {
-		t.Skipf("the walk-up is off here (box height %d)", bh)
+		t.Fatalf("the harbour cat did not walk up (box height %d): MaxRung or XSCAPES_NEAR", bh)
 	}
 	st := harbourState(0.5, companion.NeedsYou, 0.3, 0.9, 0)
 	st.Tail = nil
@@ -151,7 +155,9 @@ func TestTheHarboursCatWalksUpOnTheSill(t *testing.T) {
 }
 
 // harbourLuma is the same luma the vista's legibility tests use.
-func harbourLuma(c term.RGB) float64 { return 0.299*float64(c.R) + 0.587*float64(c.G) + 0.114*float64(c.B) }
+func harbourLuma(c term.RGB) float64 {
+	return 0.299*float64(c.R) + 0.587*float64(c.G) + 0.114*float64(c.B)
+}
 
 // The balloon's letters read on the city behind it, at every hour, size and
 // both balloons, on the cube: the vista's floor (balloonLegibleGap).
@@ -272,5 +278,44 @@ func TestTheHarboursKittensComeUpOverTheSill(t *testing.T) {
 	sat := count()
 	if first != 0 || sat != 2 {
 		t.Fatalf("kitten eyes: %d on arrival (want 0), %d once sitting (want 2)", first, sat)
+	}
+}
+
+// At the stock 80x24 window the scape gets 10 rows, under the 16-row floor:
+// the cat keeps its head on screen (Kimi, 2026-11-09: catY was -1, the ears
+// cut).
+func TestTheHarboursCatKeepsItsHeadUnderTheFloor(t *testing.T) {
+	for h := 6; h <= 16; h++ {
+		f := harbourFrames(t, 80, h)
+		f.compose(harbourState(0.3, companion.Resting, 0.2, 0.5, 0), 3)
+		if _, catY, _ := f.harbour.Layout(); catY < 0 {
+			t.Errorf("80x%d: the cat starts on row %d", h, catY)
+		}
+	}
+}
+
+// Every finished todo is a star in the sky, at every size: none lands on
+// the window's posts, mullion or rail, where the frame erases it (Kimi,
+// 2026-11-09).
+func TestTheHarboursStarsAreCountable(t *testing.T) {
+	for _, g := range [][2]int{{80, 24}, {60, 18}, {125, 28}, {153, 41}, {200, 60}} {
+		for n := 1; n <= 24; n++ {
+			f := harbourFrames(t, g[0], g[1])
+			st := harbourState(0, companion.Resting, 0.05, 0.55, 0)
+			st.Act.TodoDone, st.Act.TodoTotal = n, n
+			f.compose(st, 3)
+			_, catY, _ := f.harbour.Layout()
+			got := 0
+			for y := 0; y < catY-2; y++ {
+				for x := 0; x < g[0]; x++ {
+					if c := f.c.Near().Cells[y*g[0]+x]; c.Set && c.R == '*' {
+						got++
+					}
+				}
+			}
+			if got != n {
+				t.Fatalf("%dx%d: %d todos drew %d stars", g[0], g[1], n, got)
+			}
+		}
 	}
 }
