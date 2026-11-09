@@ -187,3 +187,20 @@ func TestTraceRightEdge(t *testing.T) {
 			sc.w, sc.w, sc.w)
 	}
 }
+
+// DECAWM off: Hermes draws its chrome with ESC[?7l, and a line longer than
+// the window is clipped at the last column, not wrapped onto the next row.
+func TestAutowrapOffClipsAtTheMargin(t *testing.T) {
+	s := newScreen(10, 4)
+	s.feed("\x1b[?7lABCDEFGHIJKLMN\r\nrow2")
+	if got := s.rowAt(0); got != "ABCDEFGHIN" {
+		t.Errorf("row 1 = %q, want the last column overwritten: ABCDEFGHIN", got)
+	}
+	if got := strings.TrimRight(s.rowAt(1), " "); got != "row2" {
+		t.Errorf("row 2 = %q, want row2 (nothing wrapped onto it)", got)
+	}
+	s.feed("\x1b[?7h\x1b[3;1HABCDEFGHIJKL")
+	if got := strings.TrimRight(s.rowAt(3), " "); got != "KL" {
+		t.Errorf("with autowrap back on, row 4 = %q, want KL", got)
+	}
+}

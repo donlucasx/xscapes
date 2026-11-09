@@ -70,6 +70,13 @@ type screen struct {
 	// terminal's reflow gives back on the main screen. Unlike retainWidth, a
 	// tail never survives a rewrite, so a stale fragment cannot come back.
 	keepTails bool
+	// noWrap is DECAWM off (ESC[?7l): a character at the right margin
+	// overwrites the last column instead of wrapping. Hermes (prompt_toolkit)
+	// turns it off around every redraw; modelled as wrapping, a line drawn at
+	// the old width just after a narrowing took two rows in the model and one
+	// on the glass, and every row the host repainted from the model landed
+	// below its line (his Ghostty run of 2026-11-08 19:40).
+	noWrap bool
 	w, h      int
 
 	// The rendition in force, and the copy DECSC keeps.
@@ -491,7 +498,7 @@ func (s *screen) put(r rune) {
 		s.cells[s.y][s.x] = cell{r: r, fg: s.curFG, bg: s.curBG, attr: s.curAttr}
 	}
 	if s.x == s.w-1 {
-		s.wrapNext = true
+		s.wrapNext = !s.noWrap
 	} else {
 		s.x++
 	}
@@ -696,6 +703,10 @@ func (s *screen) csi(params string, final rune) {
 			s.cells, s.other = s.other, s.cells
 			s.alt = false
 		}
+	case priv && arg(0, 0) == 7 && final == 'l':
+		s.noWrap, s.wrapNext = true, false
+	case priv && arg(0, 0) == 7 && final == 'h':
+		s.noWrap = false
 	case priv:
 		// Everything else private is not modelled and not needed here.
 	case final == 'H' || final == 'f':
