@@ -330,6 +330,10 @@ func (h *Host) Run() error {
 		h.model = newScreen(cols, rows)
 		h.model.capture = true
 		h.model.restoreAbsolute = !h.Rules.RestoreHomes
+		// A terminal that keeps the cells a narrowing hides shows them again
+		// on a widen by itself (Terminal.app); one that deletes them needs
+		// the host to (untruncate).
+		h.model.keepTails = !h.Rules.RetainsWidth
 		h.mu.Unlock()
 	}
 	if h.History {
@@ -505,6 +509,9 @@ func (h *Host) Run() error {
 					back = h.pullBack((oldRows-rows)-(oldAgent-agentRows), cols)
 				}
 				h.write(resizeSequence(h.AltScreen, h.Rules, oldRows, rows, oldAgent, agentRows, back...))
+				if cols > oldCols {
+					h.write(h.untruncate(oldCols, cols, agentRows))
+				}
 				// A WIDTH change leaves Terminal.app holding each row's old
 				// cells past the new width, and erase cannot reach them -- the
 				// strip he has photographed at the frame's right edge. DL can:
@@ -695,7 +702,8 @@ func (h *Host) mirror(rows, agentRows int) {
 	}
 	lines := make([]string, len(out))
 	for i, row := range out {
-		lines[i] = rowANSI(row)
+		// Cut to the window: a kept tail is for a widen, not the scrollback.
+		lines[i] = rowANSI(row[:min(len(row), h.model.w)])
 	}
 	h.mirrored = append(h.mirrored, lines...)
 	if len(h.mirrored) > maxMirrored {
@@ -720,6 +728,37 @@ func (h *Host) keepResized() {
 		}
 		h.remember(row, mirrored)
 	}
+}
+
+// untruncate paints back, on a widen, the cells an earlier narrowing cut off
+// the band's rows and the agent has not touched since (screen.keepTails):
+// columns oldCols+1 .. cols of each such row. His Ghostty screenshot of
+// 2026-11-08 16:35, forty one-line facts still cut at the narrow width in a
+// window twice as wide: "after narrowing the window and widening it again its
+// broken". The agent's cursor and rendition are saved around it and the band
+// re-pinned before the restore, as reallocBand does.
+func (h *Host) untruncate(oldCols, cols, agentRows int) string {
+	if h.model == nil || !h.model.keepTails {
+		return ""
+	}
+	var b strings.Builder
+	h.mu.Lock()
+	for y := 0; y < agentRows && y < len(h.model.cells); y++ {
+		row := h.model.cells[y]
+		if len(row) <= oldCols {
+			continue
+		}
+		tail := rowANSI(row[oldCols:min(len(row), cols)])
+		if tail == "" {
+			continue
+		}
+		fmt.Fprintf(&b, "\x1b[%d;%dH%s\x1b[0m", y+1, oldCols+1, tail)
+	}
+	h.mu.Unlock()
+	if b.Len() == 0 {
+		return ""
+	}
+	return saveCursor + originOff + regionReset + "\x1b[0m" + b.String() + EnterBand(agentRows) + restoreCursor
 }
 
 // keptRow is a row that left the band, and whether it is in the scrollback.
@@ -816,7 +855,8 @@ func (h *Host) keepFinalScreen(agentRows int) {
 	var lines []string
 	if h.model.alt {
 		for y := 0; y < agentRows && y < len(h.model.cells); y++ {
-			lines = append(lines, rowANSI(h.model.cells[y]))
+			row := h.model.cells[y]
+			lines = append(lines, rowANSI(row[:min(len(row), h.model.w)]))
 		}
 	}
 	h.mu.Unlock()
