@@ -257,7 +257,10 @@ func TestAWidenBringsBackWhatANarrowingCut(t *testing.T) {
 printf 'prompt> a long status line that runs well past thirty columns STALE'
 trap 'printf "\rPROMPT>"' WINCH
 n=0; while [ $n -lt 40 ]; do sleep 0.05; n=$((n+1)); done`
-	sc, _ := runProductionSizes(t, XTermRules, false, child, 100, 40, [][2]int{{30, 40}, {100, 40}})
+	// Widened by a drag, in steps, as his window was (56 -> 72 -> 93 -> ...
+	// in trace 20261108-180840): the first step's repaint used to count as
+	// the agent touching the row, and dropped the rest of every tail.
+	sc, _ := runProductionSizes(t, XTermRules, false, child, 100, 40, [][2]int{{30, 40}, {45, 40}, {70, 40}, {100, 40}})
 	band, _ := Band(40)
 	var full, cut []string
 	for y := 0; y < band; y++ {

@@ -138,7 +138,21 @@ func (h *Host) write(s string) {
 }
 
 // writeAgent is write for the agent's own bytes, which pass after it left.
-func (h *Host) writeAgent(s string) {
+func (h *Host) writeAgent(s string) { h.send(s, true) }
+
+// writeUnmodelled is write for bytes the model already holds the result of:
+// untruncate's repaint. Fed through the model it would count as the agent
+// touching each row and drop the rest of the row's kept tail, so a widen by
+// a drag gave back only its first step (his trace 20261108-180840, 56 -> 72
+// columns, then nothing). A trace replay feeds these bytes like any others.
+func (h *Host) writeUnmodelled(s string) {
+	if h.agentLeft.Load() {
+		return
+	}
+	h.send(s, false)
+}
+
+func (h *Host) send(s string, model bool) {
 	if s == "" || h.muted.Load() {
 		return
 	}
@@ -148,7 +162,7 @@ func (h *Host) writeAgent(s string) {
 		n, _ := h.trace.Write([]byte(s))
 		h.traceN += int64(n)
 	}
-	if h.model != nil {
+	if model && h.model != nil {
 		h.model.feed(s)
 	}
 	h.mu.Unlock()
@@ -510,7 +524,7 @@ func (h *Host) Run() error {
 				}
 				h.write(resizeSequence(h.AltScreen, h.Rules, oldRows, rows, oldAgent, agentRows, back...))
 				if cols > oldCols {
-					h.write(h.untruncate(oldCols, cols, agentRows))
+					h.writeUnmodelled(h.untruncate(oldCols, cols, agentRows))
 				}
 				// A WIDTH change leaves Terminal.app holding each row's old
 				// cells past the new width, and erase cannot reach them -- the
