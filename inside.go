@@ -59,6 +59,11 @@ func runInside(args []string, agent string) {
 	alt := fs.Bool("alt", true, "run on the alternate screen: resize-proof, but the agent's output does not go to your terminal's scrollback")
 	appleTerminal := os.Getenv("TERM_PROGRAM") == "Apple_Terminal"
 	history := fs.Bool("history", appleTerminal, "mirror rows that leave the agent's band into the terminal's own scrollback; in Terminal.app, which drops them at exit, the transcript and the final screen are printed again after the session (default: on in Terminal.app)")
+	defEngine := ""
+	if host.EngineAvailable {
+		defEngine = "ghostty"
+	}
+	engine := fs.String("engine", defEngine, "ghostty: run the agent inside Ghostty's own terminal engine and draw it from there, so its text reflows on a resize in any terminal (needs a build with -tags ghosttyvt); empty: the older band host")
 	watchMode := fs.String("watch", "auto", "drive the scape from the program's own output when it has no hooks: auto (until an agent's hooks announce a session), on (always, hooks ignored), off (hooks only; the demo cycles until they bind)")
 	fs.Usage = func() {
 		if agent != "" {
@@ -169,7 +174,8 @@ With no command, runs claude.
 		ScapeRows: *scapeH,
 		AltScreen: *alt,
 		History:   *history && *alt,
-		Replay:    *history && *alt && appleTerminal,
+		Replay:    *history && *alt && appleTerminal || *engine == "ghostty",
+		Engine:    *engine,
 		Rules:     host.RulesFor(os.Getenv("TERM_PROGRAM")),
 		OnOutput: func(b []byte) {
 			if synth != nil {

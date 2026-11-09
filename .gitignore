@@ -37,3 +37,6 @@ site/anim/*.png
 
 # the rainy window clips page and its frame files, published from here (s45)
 notes/rainshots/out/
+
+# libghostty-vt static libraries: built from source, see third_party/libghostty-vt/README.md
+/third_party/libghostty-vt/lib/

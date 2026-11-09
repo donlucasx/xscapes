@@ -81,6 +81,10 @@ type Host struct {
 	// how a program with no hooks still drives the scape.
 	OnOutput func(b []byte)
 	OnInput  func(b []byte)
+	// Engine "ghostty" hosts the agent in Ghostty's own VT engine and draws
+	// it from there (runVT): the agent's text reflows on a resize, in any
+	// terminal. Empty is the band host below.
+	Engine string
 
 	// model is the host's own copy of the screen when History is on: every
 	// byte sent to the terminal is fed through it, so the rows that leave the
@@ -249,6 +253,9 @@ func traceOff(path string, err error) {
 }
 
 func (h *Host) Run() error {
+	if h.Engine == "ghostty" {
+		return h.runVT()
+	}
 	in, out := h.In, h.Out
 	if in == nil {
 		in = os.Stdin
