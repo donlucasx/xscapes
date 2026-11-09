@@ -154,3 +154,42 @@ func TestBroughtBackRowsAreMirroredOnceThroughANarrowingAndAPartialOverwrite(t *
 		}
 	})
 }
+
+// A row a shrink pushed off was never mirrored (a resize is not a scroll).
+// Refilled at the band's top and then scrolled off by the agent, it goes to
+// the scrollback then, once; a row a SCROLL took, refilled and scrolled off
+// again, does not go twice.
+func TestARowAShrinkTookIsMirroredOnceWhenItFinallyLeaves(t *testing.T) {
+	s := newScreen(40, 12)
+	s.alt, s.capture = true, true
+	null, err := os.OpenFile(os.DevNull, os.O_WRONLY, 0)
+	if err != nil {
+		t.Fatal(err)
+	}
+	t.Cleanup(func() { null.Close() })
+	h := &Host{model: s, out: null, mainRow: 1, History: true}
+	var b strings.Builder
+	for i := 1; i <= 12; i++ {
+		fmt.Fprintf(&b, "\x1b[%d;1Hrow %02d", i, i)
+	}
+	s.feed(b.String())
+	s.takeScrolled()
+	s.feed("\x1b[12;1H\n") // row 01 scrolls off: mirrored
+	h.mirror(12, 12)
+
+	s.resizeGhostty(40, 9) // rows 02-04 pushed off by the shrink
+	h.keepResized()
+	back := h.pullBack(2, 40) // the shrink's refill: rows 03 and 04
+	if len(back) != 2 || stripANSI(back[0]) != "row 03" {
+		t.Fatalf("refill = %q, want rows 03 and 04", back)
+	}
+	s.feed("\x1b[2T\x1b[1;1Hrow 03\x1b[2;1Hrow 04\x1b[9;1H\n\n\n")
+	h.mirror(9, 9)
+	var got []string
+	for _, l := range h.mirrored {
+		got = append(got, stripANSI(l))
+	}
+	if strings.Join(got, ",") != "row 01,row 03,row 04,row 05" {
+		t.Errorf("mirrored %q, want row 01 then 03, 04 (first time out) and 05", got)
+	}
+}

@@ -94,6 +94,10 @@ type screen struct {
 	// wrote into are not kept: they were never the agent's.
 	capture  bool
 	scrolled [][]cell
+	// resized is the band's rows a SHRINK pushed off the top: not a scroll,
+	// so never mirrored (resizeScrolling says why), but the host keeps them
+	// for a grow, or the shrink's own refill, to bring back.
+	resized [][]cell
 
 	// restoreAbsolute switches DECRC to Ghostty's rule (read from its source,
 	// Terminal.zig restoreCursor, 2026-09-04): the saved row comes back
@@ -188,6 +192,23 @@ func (s *screen) keep(row []cell) {
 	s.scrolled = append(s.scrolled, append([]cell(nil), row...))
 }
 
+// takeResized hands over the rows a shrink pushed off, oldest first.
+func (s *screen) takeResized() [][]cell {
+	out := s.resized
+	s.resized = nil
+	return out
+}
+
+// agentRow: a row with any cell the agent wrote, not only host blanks.
+func agentRow(row []cell) bool {
+	for _, c := range row {
+		if !c.host {
+			return true
+		}
+	}
+	return false
+}
+
 // takeScrolled hands over the rows kept since the last call, oldest first.
 func (s *screen) takeScrolled() [][]cell {
 	out := s.scrolled
@@ -217,6 +238,14 @@ func (s *screen) takeScrolled() [][]cell {
 // it is a real one, and it is the reason scrollUp() still keeps.
 func (s *screen) resizeScrolling(w, h int) {
 	if delta := s.h - h; delta > 0 {
+		if s.capture && s.alt {
+			// Only the band's rows: the region is still the band here.
+			for i := 0; i < delta && i <= s.bot; i++ {
+				if agentRow(s.cells[i]) {
+					s.resized = append(s.resized, append([]cell(nil), s.cells[i]...))
+				}
+			}
+		}
 		kept := s.cells[delta:]
 		s.cells = append([][]cell{}, kept...)
 		s.h = h

@@ -133,11 +133,12 @@ func Rebind(scrollUp, clearFrom, clearTo, agentRows int) string {
 // Verified in eleven geometries, notes/scrollback-audit.md: single-row ticks,
 // a three-tick drag, the cursor at the top and the middle of the band, a
 // shrink past the band, one the band absorbs, and a shrink followed by a grow.
-func RebindShrinkAlt(shrink, bandShrink, agentRows int) string {
+func RebindShrinkAlt(shrink, bandShrink, agentRows int, back ...string) string {
 	var b strings.Builder
 	b.WriteString(saveCursor)
 	b.WriteString(originOff + regionReset + "\x1b[0m")
-	if k := shrink - bandShrink; k > 0 {
+	k := shrink - bandShrink
+	if k > 0 {
 		fmt.Fprintf(&b, "\x1b[%dT", k)
 	}
 	b.WriteString(restoreCursor)
@@ -145,6 +146,7 @@ func RebindShrinkAlt(shrink, bandShrink, agentRows int) string {
 		fmt.Fprintf(&b, "\x1b[%dA", bandShrink)
 	}
 	b.WriteString(saveCursor)
+	b.WriteString(refillTop(k, back))
 	b.WriteString(EnterBand(agentRows))
 	b.WriteString(restoreCursor)
 	return b.String()
@@ -307,7 +309,7 @@ func RulesFor(termProgram string) Rules {
 // it went up with the content and SD leaves it where it is. The save around
 // DECSTBM is only there because DECSTBM homes the cursor; the first save
 // carries origin mode through the region reset, as in RebindShrinkAlt.
-func RebindShrinkAltFollow(shrink, bandShrink, agentRows int) string {
+func RebindShrinkAltFollow(shrink, bandShrink, agentRows int, back ...string) string {
 	var b strings.Builder
 	b.WriteString(saveCursor)
 	b.WriteString(originOff + regionReset + "\x1b[0m")
@@ -320,6 +322,7 @@ func RebindShrinkAltFollow(shrink, bandShrink, agentRows int) string {
 		fmt.Fprintf(&b, "\x1b[%dB", k)
 	}
 	b.WriteString(saveCursor)
+	b.WriteString(refillTop(k, back))
 	b.WriteString(EnterBand(agentRows))
 	b.WriteString(restoreCursor)
 	return b.String()
@@ -368,6 +371,26 @@ func RebindGrowAlt(pushed, oldRows, oldAgent, agentRows int, back []string) stri
 	}
 	b.WriteString(EnterBand(agentRows))
 	b.WriteString(restoreCursor)
+	return b.String()
+}
+
+// refillTop paints rows a shrink pushed off back into the k blank rows its
+// SD opened at the screen's top, the newest right above the text, so a shrink
+// loses only the band's own share of rows, oldest first, as a plain terminal
+// does (his Ghostty run of 2026-11-08 16:11: facts 29-36 gone, two blank rows
+// in their place). Absolute rows: origin mode off, the region the full screen.
+func refillTop(k int, back []string) string {
+	if k <= 0 || len(back) == 0 {
+		return ""
+	}
+	if len(back) > k {
+		back = back[len(back)-k:]
+	}
+	var b strings.Builder
+	b.WriteString(originOff + regionReset)
+	for i, line := range back {
+		fmt.Fprintf(&b, "\x1b[%d;1H\x1b[2K%s\x1b[0m", k-len(back)+1+i, line)
+	}
 	return b.String()
 }
 

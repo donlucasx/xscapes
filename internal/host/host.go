@@ -94,7 +94,8 @@ type Host struct {
 	// are still on screen, top first; when they scroll off again they are not
 	// mirrored twice. held is what left the band before a resize and is still
 	// to be mirrored. All three belong to Run's loop.
-	recent, back, held [][]cell
+	recent, back []keptRow
+	held         [][]cell
 	// wantCPR is set while the host is waiting for the terminal to answer
 	// where the shell's cursor is; the key forwarder keeps that reply.
 	wantCPR atomic.Bool
@@ -469,11 +470,12 @@ func (h *Host) Run() error {
 					// and a grow in this same tick can already bring it back.
 					taken := h.model.takeScrolled()
 					for _, row := range taken {
-						h.remember(row)
+						h.remember(row, h.History)
 					}
 					h.held = append(h.held, taken...)
 					if h.AltScreen {
 						h.model.resizeAltFor(h.Rules, cols, rows)
+						h.keepResized()
 					} else {
 						h.model.resize(cols, rows)
 					}
@@ -497,10 +499,10 @@ func (h *Host) Run() error {
 				var back []string
 				if h.AltScreen && rows > oldRows {
 					back = h.pullBack(agentRows-oldAgent, cols)
-				} else if h.AltScreen && agentRows < oldAgent {
-					// A shrink takes the band's top rows off the screen, and
-					// the ones a grow brought back go first.
-					h.dropBack(oldAgent - agentRows)
+				} else if h.AltScreen && rows < oldRows {
+					// The shrink's SD opens the scape's share of it at the
+					// top; the newest rows it pushed off fill it again.
+					back = h.pullBack((oldRows-rows)-(oldAgent-agentRows), cols)
 				}
 				h.write(resizeSequence(h.AltScreen, h.Rules, oldRows, rows, oldAgent, agentRows, back...))
 				// A WIDTH change leaves Terminal.app holding each row's old
@@ -641,9 +643,9 @@ func resizeSequence(alt bool, r Rules, oldRows, rows, oldAgent, agentRows int, b
 	// just the rows, has to be put back -- see RebindShrinkAlt.
 	if alt && rows < oldRows {
 		if r.ShrinkKeepsCursor {
-			return RebindShrinkAlt(oldRows-rows, oldAgent-agentRows, agentRows)
+			return RebindShrinkAlt(oldRows-rows, oldAgent-agentRows, agentRows, back...)
 		}
-		return RebindShrinkAltFollow(oldRows-rows, oldAgent-agentRows, agentRows)
+		return RebindShrinkAltFollow(oldRows-rows, oldAgent-agentRows, agentRows, back...)
 	}
 	return Rebind(0, from, to, agentRows)
 }
@@ -670,16 +672,22 @@ func (h *Host) mirror(rows, agentRows int) {
 		// A row a grow brought back, leaving again: mirrored already. Cut to
 		// the leaving row's width, because a narrowing since the grow cut it
 		// on screen (Kimi N1).
-		if len(h.back) > 0 && rowText(h.back[0][:min(len(h.back[0]), len(row))]) == rowText(row) {
+		if len(h.back) > 0 && rowText(h.back[0].cells[:min(len(h.back[0].cells), len(row))]) == rowText(row) {
+			// Unless it had never been mirrored (a shrink pushed it off
+			// before it scrolled): then this is its first time out.
+			first := !h.back[0].mirrored
 			h.back = h.back[1:]
-			h.remember(row)
+			h.remember(row, h.History)
+			if first {
+				out = append(out, row)
+			}
 			continue
 		}
 		// Anything else means the agent drew over the top one. Only that
 		// one: the rows under it may still be there, and forgetting them
 		// all mirrored each of them a second time when it left (Kimi N2).
 		h.dropBack(1)
-		h.remember(row)
+		h.remember(row, h.History)
 		out = append(out, row)
 	}
 	if len(out) == 0 || !h.History {
@@ -699,8 +707,29 @@ func (h *Host) mirror(rows, agentRows int) {
 // maxRecent caps the rows a grow can bring back; no band grows by more.
 const maxRecent = 500
 
-func (h *Host) remember(row []cell) {
-	h.recent = append(h.recent, row)
+// keepResized keeps what a shrink pushed off the top: for a grow, or the
+// shrink's own refill, to bring back; never mirrored on the way out. Rows a
+// grow brought back are at the top and go first, with their mark. Called
+// with h.mu held.
+func (h *Host) keepResized() {
+	for _, row := range h.model.takeResized() {
+		mirrored := false
+		if len(h.back) > 0 {
+			mirrored = h.back[0].mirrored
+			h.back = h.back[1:]
+		}
+		h.remember(row, mirrored)
+	}
+}
+
+// keptRow is a row that left the band, and whether it is in the scrollback.
+type keptRow struct {
+	cells    []cell
+	mirrored bool
+}
+
+func (h *Host) remember(row []cell, mirrored bool) {
+	h.recent = append(h.recent, keptRow{row, mirrored})
 	if len(h.recent) > maxRecent {
 		h.recent = h.recent[len(h.recent)-maxRecent:]
 	}
@@ -714,15 +743,15 @@ func (h *Host) pullBack(n, cols int) []string {
 	if n <= 0 {
 		return nil
 	}
-	rows := make([][]cell, n)
-	for i, row := range h.recent[len(h.recent)-n:] {
-		rows[i] = row[:min(len(row), cols)]
+	rows := make([]keptRow, n)
+	for i, r := range h.recent[len(h.recent)-n:] {
+		rows[i] = keptRow{r.cells[:min(len(r.cells), cols)], r.mirrored}
 	}
 	h.recent = h.recent[:len(h.recent)-n]
 	h.back = append(rows, h.back...)
 	out := make([]string, n)
-	for i, row := range rows {
-		out[i] = rowANSI(row)
+	for i, r := range rows {
+		out[i] = rowANSI(r.cells)
 	}
 	return out
 }
@@ -731,8 +760,8 @@ func (h *Host) pullBack(n, cols int) []string {
 // on screen: they can come back again on the next grow.
 func (h *Host) dropBack(n int) {
 	n = min(n, len(h.back))
-	for _, row := range h.back[:n] {
-		h.remember(row)
+	for _, r := range h.back[:n] {
+		h.remember(r.cells, r.mirrored)
 	}
 	h.back = h.back[n:]
 }

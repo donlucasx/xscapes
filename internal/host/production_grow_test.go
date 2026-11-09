@@ -40,6 +40,7 @@ n=0; while [ $n -lt 26 ]; do sleep 0.05; n=$((n+1)); done`
 		t.Run(leg.name, func(t *testing.T) {
 			const w, h1, h2 = 100, 30, 40
 			sc, raw := runProduction(t, leg.rules, leg.history, child, w, h1, h2)
+			assertTranscriptRunsUnbroken(t, sc, h2)
 			band, _ := Band(h2)
 			grow := band - func() int { b, _ := Band(h1); return b }()
 
@@ -72,11 +73,72 @@ n=0; while [ $n -lt 26 ]; do sleep 0.05; n=$((n+1)); done`
 	}
 }
 
+// A shrink, then a grow back. The shrink pushes the band's top rows off the
+// screen; they are the newest history when the grow comes, and nothing may go
+// missing or come back out of order.
+//
+// His Ghostty run of 2026-11-08 16:11 (trace 20261108-161047): 34 -> 22 rows
+// lost facts 29-36 for good (a resize, unlike a scroll, kept nothing) and left
+// two blank rows at the band's top (the shrink's SD); the grows then brought
+// back 11-28 above that gap. Replayed through the model, exactly his screen.
+func TestAShrinkThenAGrowLosesNoRow(t *testing.T) {
+	const child = `i=1; while [ $i -le 40 ]; do printf 'HIST %02d\r\n' $i; i=$((i+1)); done
+printf '+---- old box ----+\r\n| > hi            |\r\n+-----------------+\r\033[1A\033[7C'
+trap 'printf "\r\033[1A\033[J+==== new box ====+\r\n| > hi again      |\r\n+=================+\r\033[1A\033[7C"' WINCH
+n=0; while [ $n -lt 40 ]; do sleep 0.05; n=$((n+1)); done`
+	for _, leg := range []struct {
+		name    string
+		rules   Rules
+		history bool
+	}{
+		{"Terminal.app", AppleTerminalRules, true},
+		{"Ghostty", XTermRules, false},
+	} {
+		t.Run(leg.name, func(t *testing.T) {
+			const w = 100
+			sc, _ := runProductionSteps(t, leg.rules, leg.history, child, w, 40, []int{28, 40})
+			assertTranscriptRunsUnbroken(t, sc, 40)
+		})
+	}
+}
+
+// assertTranscriptRunsUnbroken: every band row above the new box is a HIST
+// row, numbered consecutively, ending at HIST 40 right above the box.
+func assertTranscriptRunsUnbroken(t *testing.T, sc *screen, rows int) {
+	t.Helper()
+	band, _ := Band(rows)
+	box := -1
+	for y := 0; y < band; y++ {
+		if strings.Contains(sc.rowAt(y), "new box") {
+			box = y
+		}
+	}
+	if box < 0 {
+		t.Fatalf("no new box in the band")
+	}
+	want := 40
+	for y := box - 1; y >= 0; y-- {
+		if got := strings.TrimSpace(sc.rowAt(y)); got != fmt.Sprintf("HIST %02d", want) {
+			for y := 0; y < band; y++ {
+				t.Logf("%2d|%s", y+1, strings.TrimRight(sc.rowAt(y), " "))
+			}
+			t.Fatalf("band row %d = %q, want HIST %02d: a row is missing or out of order", y+1, got, want)
+		}
+		want--
+	}
+}
+
 // runProduction runs a Host with the given rules and History, a terminal
 // model that resizes under the same rules, and one grow from h1 to h2 rows.
 // It returns the model as it stood just before the child exited, and the raw
 // bytes written.
 func runProduction(t *testing.T, rules Rules, history bool, child string, w, h1, h2 int) (*screen, string) {
+	t.Helper()
+	return runProductionSteps(t, rules, history, child, w, h1, []int{h2})
+}
+
+// runProductionSteps is runProduction through several heights in turn.
+func runProductionSteps(t *testing.T, rules Rules, history bool, child string, w, h1 int, steps []int) (*screen, string) {
 	t.Helper()
 	pr, pw, err := os.Pipe()
 	if err != nil {
@@ -144,13 +206,15 @@ func runProduction(t *testing.T, rules Rules, history bool, child string, w, h1,
 	var snap *screen
 	go func() {
 		time.Sleep(500 * time.Millisecond) // the child has printed and parked
-		mu.Lock()
-		sc.resizeAltFor(rules, w, h2) // the terminal moves first
-		mu.Unlock()
-		sz.Lock()
-		sz.h = h2
-		sz.Unlock()
-		time.Sleep(600 * time.Millisecond) // the host's tick, SIGWINCH, the redraw
+		for _, h2 := range steps {
+			mu.Lock()
+			sc.resizeAltFor(rules, w, h2) // the terminal moves first
+			mu.Unlock()
+			sz.Lock()
+			sz.h = h2
+			sz.Unlock()
+			time.Sleep(400 * time.Millisecond) // the host's tick, SIGWINCH, the redraw
+		}
 		mu.Lock()
 		snap = sc.clone()
 		mu.Unlock()
