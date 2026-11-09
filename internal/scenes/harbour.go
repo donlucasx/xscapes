@@ -42,10 +42,11 @@ type Harbour struct {
 	Kittens int
 	Exits   []float64
 
-	lay     harbourLayout
-	desk    term.RGB
-	arrived []float64 // when each sitting kitten came up, oldest first
-	levels  []levelAt // the work over the last minute, for the drops' births
+	lay        harbourLayout
+	desk       term.RGB
+	arrived    []float64 // when each sitting kitten came up, oldest first
+	litterSeen bool
+	levels     []levelAt // the work over the last minute, for the drops' births
 }
 
 type levelAt struct{ t, level float64 }
@@ -306,14 +307,17 @@ func (h *Harbour) todoStars(c *canvas.Canvas, p scape.Palette, n int) {
 // first, as many as there is room for before the plant.
 func (h *Harbour) drawLitter(c *canvas.Canvas, t float64) {
 	const walk = 1.6
-	for len(h.arrived) < h.Kittens {
-		if h.arrived == nil {
-			// A scape started mid-session shows the litter already sitting.
-			for len(h.arrived) < h.Kittens {
-				h.arrived = append(h.arrived, t-walk)
-			}
-			break
+	// The first frame takes the litter as it finds it, already sitting (a
+	// scape opened mid-session); from then on every new kitten comes up over
+	// the sill. "First frame" is its own flag: a litter of zero is not a
+	// litter never seen, or the session's first kitten would appear sitting.
+	if !h.litterSeen {
+		h.litterSeen = true
+		for len(h.arrived) < h.Kittens {
+			h.arrived = append(h.arrived, t-walk)
 		}
+	}
+	for len(h.arrived) < h.Kittens {
 		h.arrived = append(h.arrived, t)
 	}
 	if len(h.arrived) > h.Kittens {

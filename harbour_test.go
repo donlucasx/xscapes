@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"math"
 	"os"
 	"path/filepath"
 	"strings"
@@ -146,5 +147,130 @@ func TestTheHarboursCatWalksUpOnTheSill(t *testing.T) {
 				t.Fatalf("the cat reaches the desk at %d,%d", x, y)
 			}
 		}
+	}
+}
+
+// harbourLuma is the same luma the vista's legibility tests use.
+func harbourLuma(c term.RGB) float64 { return 0.299*float64(c.R) + 0.587*float64(c.G) + 0.114*float64(c.B) }
+
+// The balloon's letters read on the city behind it, at every hour, size and
+// both balloons, on the cube: the vista's floor (balloonLegibleGap).
+func TestTheHarboursBalloonIsLegible(t *testing.T) {
+	worst, at := 999.0, ""
+	for _, g := range [][2]int{{80, 24}, {125, 28}, {100, 30}, {153, 41}, {60, 18}} {
+		for _, hr := range []float64{0, 0.25, 0.42, 0.5, 0.78, 0.9} {
+			for _, ask := range []bool{false, true} {
+				f := harbourFrames(t, g[0], g[1])
+				pose := companion.Done
+				if ask {
+					pose = companion.NeedsYou
+					for i := 0; i < 40; i++ {
+						f.harbourCat.Approach(0.1, true)
+					}
+				}
+				st := harbourState(0.3, pose, 0.3, hr, 1)
+				f.compose(st, 3)
+				catX, catY, _ := f.harbour.Layout()
+				if _, _, bh := f.harbourCat.DrawnBox(g[0]); bh > 7 {
+					catY -= bh - 7
+				}
+				rows := companion.DoneBubble(st.Bubble)
+				if ask {
+					rows = companion.Bubble(st.Bubble)
+				}
+				rows = companion.MirrorTail(rows)
+				x, y := bubbleX(rows, catX+f.harbourCat.DrawnHeadCol(g[0]), g[0]), max(0, catY-len(rows))
+				for dy, row := range rows {
+					for dx, want := range []rune(row) {
+						if want == ' ' {
+							continue
+						}
+						r, fg, bg := f.c.ResolveAt(x+dx, y+dy, term.Profile256)
+						if r != want {
+							t.Errorf("%dx%d %.2f ask=%v: balloon %q at (%d,%d) drawn as %q", g[0], g[1], hr, ask, want, x+dx, y+dy, r)
+							continue
+						}
+						if gap := math.Abs(harbourLuma(fg) - harbourLuma(bg)); gap < worst {
+							worst, at = gap, fmt.Sprintf("%dx%d %.2f ask=%v %q", g[0], g[1], hr, ask, want)
+						}
+					}
+				}
+			}
+		}
+	}
+	t.Logf("smallest balloon ink-to-ground gap %.1f at %s", worst, at)
+	if worst < balloonLegibleGap {
+		t.Errorf("a balloon glyph sits %.1f luma from its ground (floor %.0f): %s", worst, balloonLegibleGap, at)
+	}
+}
+
+// The writing on the desk reads at every hour: every glyph at least 40 luma
+// from its ground on the cube, the vista band's floor.
+func TestTheHarboursDeskWritingIsLegible(t *testing.T) {
+	worst, at := 999.0, ""
+	for _, g := range [][2]int{{80, 24}, {125, 28}, {153, 41}} {
+		for _, hr := range []float64{0, 0.25, 0.5, 0.78, 0.9} {
+			f := harbourFrames(t, g[0], g[1])
+			st := harbourState(0.3, companion.Working, 0.3, hr, 0)
+			f.compose(st, 3)
+			_, _, band := f.harbour.Layout()
+			for y := band; y < g[1]; y++ {
+				for x := 0; x < g[0]; x++ {
+					r, fg, bg := f.c.ResolveAt(x, y, term.Profile256)
+					if r == ' ' || r == 0 {
+						continue
+					}
+					if gap := math.Abs(harbourLuma(fg) - harbourLuma(bg)); gap < worst {
+						worst, at = gap, fmt.Sprintf("%dx%d %.2f %q at (%d,%d)", g[0], g[1], hr, r, x, y)
+					}
+				}
+			}
+		}
+	}
+	t.Logf("smallest desk ink-to-ground gap %.1f at %s", worst, at)
+	if worst < 40 {
+		t.Errorf("desk writing at %.1f luma from its ground: %s", worst, at)
+	}
+}
+
+// Under the floor (HarbourMinRows) and at tiny widths the scape still
+// composes without a panic: a window can be dragged that small.
+func TestTheHarbourSurvivesTinyWindows(t *testing.T) {
+	for _, g := range [][2]int{{40, 12}, {30, 10}, {20, 8}, {12, 6}, {200, 15}} {
+		f := harbourFrames(t, g[0], g[1])
+		for _, pose := range []companion.State{companion.Resting, companion.NeedsYou, companion.Done} {
+			st := harbourState(0.8, pose, 0.9, 0.95, 4)
+			st.KittenExits = []float64{0.3, 0.7}
+			f.compose(st, 9)
+			f.c.Render(term.Profile256)
+		}
+	}
+}
+
+// Kittens come up over the sill: at their first frame nothing of them shows
+// above the sill but (at most) the ears, and after the walk they sit.
+func TestTheHarboursKittensComeUpOverTheSill(t *testing.T) {
+	f := harbourFrames(t, 125, 28)
+	count := func() int {
+		catX, catY, band := f.harbour.Layout()
+		n := 0
+		for y := catY; y < band-1; y++ {
+			for x := 2; x < catX; x++ {
+				if r, fg, _ := f.c.ResolveAt(x, y, term.Profile256); r == 'o' && fg.G > fg.R+20 {
+					n++ // a kitten's eye: green 'o'
+				}
+			}
+		}
+		return n
+	}
+	st := harbourState(0.0, companion.Working, 0.2, 0.5, 0)
+	f.compose(st, 10)
+	st.Kittens = 1
+	f.compose(st, 10.01)
+	first := count()
+	f.compose(st, 13)
+	sat := count()
+	if first != 0 || sat != 2 {
+		t.Fatalf("kitten eyes: %d on arrival (want 0), %d once sitting (want 2)", first, sat)
 	}
 }

@@ -111,3 +111,18 @@ func TestTranscriptJoinsWraps(t *testing.T) {
 		t.Fatalf("transcript %q", tr)
 	}
 }
+
+// A closed terminal answers nothing and does not crash: the host's reader
+// can write once more after the host has closed it.
+func TestAClosedTerminalIsInert(t *testing.T) {
+	v, _ := New(10, 3, 0)
+	v.Close()
+	v.Write([]byte("late bytes"))
+	v.Resize(20, 5)
+	_ = v.Render(true, 0)
+	_ = v.Cursor()
+	_ = v.Mode(1, false)
+	_ = v.KittyFlags()
+	_ = v.Transcript(true)
+	v.Close()
+}

@@ -263,7 +263,10 @@ func New(cols, rows, scrollbackBytes int) (*Term, error) {
 	return &Term{g: g, cols: cols, rows: rows}, nil
 }
 
-// Close frees the terminal.
+// Close frees the terminal. Every method is a no-op after it: the host's
+// reader can outlive the host by a write when a grandchild holds the pty
+// open past the exit (the engine host waits half a second for it), and a
+// call into a freed engine is a segfault, not an error.
 func (t *Term) Close() {
 	t.mu.Lock()
 	defer t.mu.Unlock()
@@ -281,6 +284,9 @@ func (t *Term) Write(p []byte) (reply []byte) {
 	}
 	t.mu.Lock()
 	defer t.mu.Unlock()
+	if t.g == nil {
+		return nil
+	}
 	C.gvt_write(t.g, (*C.uint8_t)(unsafe.Pointer(&p[0])), C.size_t(len(p)))
 	if n := int(C.gvt_reply_len(t.g)); n > 0 {
 		reply = make([]byte, n)
@@ -293,6 +299,9 @@ func (t *Term) Write(p []byte) (reply []byte) {
 func (t *Term) Resize(cols, rows int) {
 	t.mu.Lock()
 	defer t.mu.Unlock()
+	if t.g == nil {
+		return
+	}
 	if cols == t.cols && rows == t.rows {
 		return
 	}
@@ -314,6 +323,9 @@ func (t *Term) Size() (cols, rows int) {
 func (t *Term) Render(full bool, top int) []byte {
 	t.mu.Lock()
 	defer t.mu.Unlock()
+	if t.g == nil {
+		return nil
+	}
 	f := C.int(0)
 	if full {
 		f = 1
@@ -335,6 +347,9 @@ type Cursor struct {
 func (t *Term) Cursor() Cursor {
 	t.mu.Lock()
 	defer t.mu.Unlock()
+	if t.g == nil {
+		return Cursor{}
+	}
 	var x, y, fl C.int
 	C.gvt_cursor(t.g, &x, &y, &fl)
 	return Cursor{X: int(x), Y: int(y), Visible: fl&1 != 0, InView: fl&2 != 0, Blinking: fl&4 != 0, Style: int(fl >> 8)}
@@ -344,6 +359,9 @@ func (t *Term) Cursor() Cursor {
 func (t *Term) Mode(mode int, ansi bool) bool {
 	t.mu.Lock()
 	defer t.mu.Unlock()
+	if t.g == nil {
+		return false
+	}
 	return bool(C.gvt_mode(t.g, C.uint16_t(mode), C.bool(ansi)))
 }
 
@@ -351,6 +369,9 @@ func (t *Term) Mode(mode int, ansi bool) bool {
 func (t *Term) KittyFlags() int {
 	t.mu.Lock()
 	defer t.mu.Unlock()
+	if t.g == nil {
+		return 0
+	}
 	return int(C.gvt_kitty(t.g))
 }
 
@@ -359,6 +380,9 @@ func (t *Term) KittyFlags() int {
 func (t *Term) Transcript(vt bool) []byte {
 	t.mu.Lock()
 	defer t.mu.Unlock()
+	if t.g == nil {
+		return nil
+	}
 	v := C.int(0)
 	if vt {
 		v = 1
