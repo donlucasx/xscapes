@@ -1,0 +1,5 @@
+PS1='%F{245}~/xscapes%f %F{173}>%f '
+xscapes() {
+  if [ "$1" = hermes ]; then shift; command xscapes hermes -tod "${DEMO_TOD:-0.74}" -ctx "${DEMO_CTX:-0.55}" "$@"
+  else command xscapes "$@"; fi
+}
