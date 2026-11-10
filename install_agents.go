@@ -247,9 +247,10 @@ func hooksInstalled(agent string) (bool, string) {
 type hookState int
 
 const (
-	hooksNone    hookState = iota // nothing of xscapes in the file, or no file
-	hooksPartial                  // our block, with events missing
-	hooksFull                     // every event: our block, or hooks written by hand
+	hooksNone      hookState = iota // nothing of xscapes in the file, or no file
+	hooksPartial                    // our block, with events missing
+	hooksFull                       // every event: our block, or hooks written by hand
+	hooksPluginOff                  // Hermes: the xscapes plugin is installed but not enabled
 )
 
 // hooksState is what the launcher's check reads: the state, where it looked,
@@ -270,6 +271,18 @@ func hooksState(agent string) (st hookState, where string, have, want int) {
 	src, err := os.ReadFile(path)
 	if err != nil {
 		return hooksNone, path, 0, 0
+	}
+	// Hermes's own plugin forwards every event the shell hooks would (and a
+	// few they cannot), so an enabled plugin is a full install. Until
+	// 2026-11-09 this check knew only the shell hooks and refused to start
+	// for anyone who had installed the plugin instead.
+	if agent == "hermes" {
+		if _, err := os.Stat(filepath.Join(filepath.Dir(path), "plugins", "xscapes", "plugin.yaml")); err == nil {
+			if hermesPluginEnabled(src) {
+				return hooksFull, path, 0, len(hermesHookEvents)
+			}
+			return hooksPluginOff, path, 0, len(hermesHookEvents)
+		}
 	}
 	var n int
 	switch agent {
@@ -303,6 +316,52 @@ func hooksState(agent string) (st hookState, where string, have, want int) {
 		return hooksFull, path, 0, want
 	}
 	return hooksNone, path, 0, want
+}
+
+// hermesPluginEnabled reports whether Hermes's config lists xscapes under
+// plugins.enabled (a block list or a flow list).
+func hermesPluginEnabled(src []byte) bool {
+	inPlugins, inEnabled := false, false
+	for _, l := range strings.Split(string(uncommented(src)), "\n") {
+		t := strings.TrimSpace(l)
+		if t == "" {
+			continue
+		}
+		indent := len(l) - len(strings.TrimLeft(l, " \t"))
+		if indent == 0 {
+			inPlugins, inEnabled = t == "plugins:", false
+			continue
+		}
+		if !inPlugins {
+			continue
+		}
+		if !strings.HasPrefix(t, "-") {
+			key, val, _ := strings.Cut(t, ":")
+			inEnabled = strings.TrimSpace(key) == "enabled"
+			if inEnabled {
+				for _, f := range strings.FieldsFunc(val, func(r rune) bool { return strings.ContainsRune("[], '\"", r) }) {
+					if f == "xscapes" {
+						return true
+					}
+				}
+			}
+			continue
+		}
+		if inEnabled && strings.Trim(strings.TrimSpace(strings.TrimPrefix(t, "-")), `'"`) == "xscapes" {
+			return true
+		}
+	}
+	return false
+}
+
+// pluginOff is what the launcher prints when the Hermes plugin is installed
+// but switched off.
+func pluginOff(where string) string {
+	return fmt.Sprintf(`xscapes: the xscapes plugin is installed in Hermes but not enabled (%s).
+
+  hermes plugins enable xscapes
+  xscapes hermes                    # then this again
+`, where)
 }
 
 // partialHooks is what the launcher prints for a block with events missing.
@@ -361,6 +420,17 @@ func uncommented(src []byte) []byte {
 // missingHooks is what the launcher prints instead of starting.
 func missingHooks(agent, where string) string {
 	name := agentName(agent)
+	if agent == "hermes" {
+		return fmt.Sprintf(`xscapes: nothing of xscapes is installed in Hermes Agent (no plugin, no hooks in %s).
+Without it the scape only watches Hermes's output: no tool names, no asks, no sub-agents.
+
+  hermes plugins install donlucasx/hermes-xscapes --enable    # the Hermes plugin
+  xscapes hermes                                              # then this again
+
+Or the shell hooks instead: xscapes install hermes --apply
+To run without either: xscapes hermes -watch=on
+`, where)
+	}
 	return fmt.Sprintf(`xscapes: %s's hooks are not installed (nothing of xscapes in %s).
 Without them the scape only watches %s's output: no tool names, no asks, no sub-agents.
 

@@ -95,6 +95,9 @@ With no command, runs claude.
 		case hooksPartial:
 			fmt.Fprint(os.Stderr, partialHooks(agent, where, have, want))
 			os.Exit(2)
+		case hooksPluginOff:
+			fmt.Fprint(os.Stderr, pluginOff(where))
+			os.Exit(2)
 		}
 	}
 

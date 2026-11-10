@@ -502,3 +502,50 @@ func TestTheLauncherChecksMoreThanTheMarker(t *testing.T) {
 		t.Errorf("4. kimi: top-level inline hooks were not refused: %v", err)
 	}
 }
+
+// TestTheHermesPluginCountsAsInstalled: the launcher refused to start for
+// anyone who installed the Hermes plugin instead of the shell hooks (his
+// screenshot, 2026-11-09 19:16). An enabled plugin is a full install; an
+// installed but disabled one says how to enable it; neither says nothing.
+func TestTheHermesPluginCountsAsInstalled(t *testing.T) {
+	home := t.TempDir()
+	t.Setenv("HOME", home)
+	cfg := filepath.Join(home, ".hermes", "config.yaml")
+	plug := filepath.Join(home, ".hermes", "plugins", "xscapes")
+	if err := os.MkdirAll(plug, 0o755); err != nil {
+		t.Fatal(err)
+	}
+	write := func(p, s string) {
+		if err := os.WriteFile(p, []byte(s), 0o644); err != nil {
+			t.Fatal(err)
+		}
+	}
+	write(filepath.Join(plug, "plugin.yaml"), "name: xscapes\n")
+	for _, c := range []struct {
+		cfg  string
+		want hookState
+	}{
+		{"model: x\nplugins:\n  enabled:\n    - other\n    - xscapes\n  disabled: []\n", hooksFull},
+		{"model: x\nplugins:\n  enabled: [other, 'xscapes']\n", hooksFull},
+		{"model: x\nplugins:\n  enabled:\n    - other\n  disabled:\n    - xscapes\n", hooksPluginOff},
+		{"model: x\nplugins:\n  enabled:\n    # - xscapes\n    - other\n", hooksPluginOff},
+		{"model: x\n", hooksPluginOff},
+	} {
+		write(cfg, c.cfg)
+		if st, _, _, _ := hooksState("hermes"); st != c.want {
+			t.Errorf("config %q: state %d, want %d", c.cfg, st, c.want)
+		}
+	}
+	if msg := pluginOff(cfg); !strings.Contains(msg, "hermes plugins enable xscapes") {
+		t.Errorf("the disabled message does not say how to enable it:\n%s", msg)
+	}
+	if err := os.RemoveAll(plug); err != nil {
+		t.Fatal(err)
+	}
+	if st, _, _, _ := hooksState("hermes"); st != hooksNone {
+		t.Errorf("no plugin, no hooks: state %d, want none", st)
+	}
+	if msg := missingHooks("hermes", cfg); !strings.Contains(msg, "hermes plugins install donlucasx/hermes-xscapes") {
+		t.Errorf("the missing message does not offer the plugin:\n%s", msg)
+	}
+}
