@@ -30,7 +30,11 @@ const endVidLen = endFrames.length / FPS;
 const urlAt = endAt + E.end.urlAt, urlEnd = urlAt + E.end.url.length / E.end.urlCPS;
 const total = urlEnd + E.end.hold + E.end.fade;
 function at(v) { // video -> {take, r}
-  for (const s of segs) if (v <= s.v1) return { take: s.take, r: s.r0 + (s.r1 - s.r0) * Math.max(0, (v - s.v0)) / (s.v1 - s.v0) };
+  for (const s of segs) if (v <= s.v1) {
+    const x = Math.max(0, v - s.v0), d = s.v1 - s.v0;
+    if (s.ramp) { const b = ((s.r1 - s.r0) - d) / (d * d); return { take: s.take, r: s.r0 + x + b * x * x }; } // starts at real speed, speeds up
+    return { take: s.take, r: s.r0 + (s.r1 - s.r0) * x / d };
+  }
   const s = segs[segs.length - 1]; return { take: s.take, r: s.r1 };
 }
 const rec = (v) => at(v).r;
@@ -54,12 +58,17 @@ html,body{margin:0;width:${W}px;height:${H}px;overflow:hidden;background:#0f0f10
 #tag{position:absolute;left:56px;top:44px;font:700 ${E.tagPx}px "Geist Mono",monospace;color:#f2f2f2;opacity:0;background:rgba(10,10,12,.82);padding:.3em .6em .35em;border-radius:.3em;box-shadow:0 0 0 1px rgba(255,255,255,.08)}
 #tag small{display:block;font-weight:400;font-size:.5em;color:#bdbdbd;margin-top:.25em}
 #endimg{position:absolute;inset:0;width:${W}px;height:${H}px;opacity:0}
+#card{position:absolute;inset:0;opacity:0;background:#111}
+#card img{position:absolute;inset:0;width:${W}px;height:${H}px}
+#card div{position:absolute;left:0;right:0;top:${E.card?.y ?? 420}px;text-align:center;font:700 ${E.card?.px ?? 64}px/1.25 "Geist Mono",monospace;color:#f2f2f2;letter-spacing:-.01em;text-shadow:0 0 28px rgba(0,0,0,.95),0 0 6px rgba(0,0,0,.9)}
+#card div small{display:block;font-weight:400;font-size:.62em;color:#d9d9d9;margin-top:.35em}
+.h{color:#e8a23c}
 #url{position:absolute;left:0;right:0;top:${E.end.urlY}px;text-align:center;font:400 ${E.end.urlPx}px "Geist Mono",monospace;color:#9a9a9a;white-space:pre;opacity:0}
 #black{position:absolute;inset:0;background:#000;opacity:1;pointer-events:none}
 </style></head><body><div id="stage"></div>
 <div id="win"><div id="bar"><i></i><i></i><i></i><b id="title"></b></div><div id="term" style="position:relative"><div id="cur" style="position:absolute;background:#d8d8d8;display:none;z-index:9"></div></div></div>
 <div id="split" style="position:absolute;inset:0;opacity:0;background:#0f0f10"></div><div id="tag"></div><div id="cap"><span></span></div>
-<img id="endimg"><div id="url"></div><div id="black"></div>
+<div id="card"><img id="cardimg"><div id="cardtxt"></div></div><img id="endimg"><div id="url"></div><div id="black"></div>
 <script src="file://${here}/node_modules/@xterm/xterm/lib/xterm.js"></script><script src="file://${here}/node_modules/@xterm/addon-webgl/lib/addon-webgl.js"></script></body></html>`;
 fs.writeFileSync(path.join(out, 'page.html'), html);
 
@@ -140,6 +149,7 @@ if (SP) await page.evaluate((SP) => {
     d.insertAdjacentHTML('beforeend', `<img id="sp${i}" style="position:absolute;left:${x}px;top:${SP.y}px;width:${SP.w}px;height:${SP.h}px;border-radius:10px;box-shadow:0 0 0 1px rgba(255,255,255,.09)"><div style="position:absolute;left:${x}px;width:${SP.w}px;top:${SP.y + SP.h + 22}px;text-align:center;font:700 ${SP.labelPx}px 'Geist Mono',monospace;color:#f2f2f2">${p.name}<span style="font-weight:400;color:#a9a9a9"> &middot; ${p.with}</span></div>`);
   });
 }, SP);
+const CD = E.card;
 const N = Math.round(total * FPS);
 const want = stills ? stills.split(',').map(Number) : null;
 const frames = want ? want.map(v => Math.round(v * FPS)) : [...Array(N).keys()].filter(i => i / FPS >= from && (!to || i / FPS < +to));
@@ -161,7 +171,10 @@ for (const i of frames) {
     document.documentElement.style.setProperty('--k', p.k);
     document.getElementById('title').textContent = p.title;
     const cap = document.getElementById('cap');
-    cap.style.opacity = p.cap ? p.capO : 0; if (p.cap) cap.firstChild.textContent = p.cap;
+    cap.style.opacity = p.cap ? p.capO : 0; if (p.cap) cap.firstChild.innerHTML = p.cap;
+    const cd = document.getElementById('card'); cd.style.opacity = p.cardO;
+    if (p.cardO > 0) { const ci = document.getElementById('cardimg'); if (ci.dataset.f !== p.cardF) { ci.src = p.cardF; ci.dataset.f = p.cardF; }
+      const ct = document.getElementById('cardtxt'); if (ct.dataset.h !== p.cardH) { ct.innerHTML = p.cardH; ct.dataset.h = p.cardH; } ct.style.opacity = p.cardTO; ct.style.transform = `scale(${p.cardS})`; }
     const tag = document.getElementById('tag');
     tag.style.opacity = p.tag ? p.tagO : 0; if (p.tag) tag.innerHTML = p.tag;
     const img = document.getElementById('endimg');
@@ -181,7 +194,10 @@ for (const i of frames) {
       cu.style.width = cw + 'px'; cu.style.height = ch + 'px'; cu.style.display = p.cursorOn ? 'block' : 'none';
     } else cu.style.display = 'none';
     if (window._cur !== p.cursorOn) { window._cur = p.cursorOn; window.term.options.theme = { background: '#0f0f10', foreground: '#d8d8d8', cursor: p.cursorOn ? '#d8d8d8' : '#0f0f10', cursorAccent: '#0f0f10' }; }
-  }, { t, k: E.chrome ? ease((v - E.chrome[0]) / (E.chrome[1] - E.chrome[0])) : 1, title: E.title, cap: cap?.text, capO: cap ? fade(v, cap.t0, cap.t1) : 0,
+  }, { t, k: E.chrome ? ease((v - E.chrome[0]) / (E.chrome[1] - E.chrome[0])) : 1, title: E.title, cap: cap ? (cap.html ?? cap.text) : null, capO: cap ? fade(v, cap.t0, cap.t1) : 0,
+       cardO: CD && v >= CD.v0 && v < CD.v1 ? Math.min(1, ease((CD.v1 - v) / CD.out)) : 0,
+       cardF: CD ? 'file://' + path.join(here, CD.dir, 'f' + String(Math.min(CD.frames - 1, Math.max(0, Math.floor((v - CD.v0) * FPS)))).padStart(5, '0') + '.png') : '',
+       cardH: CD ? CD.html : '', cardTO: CD ? ease((v - CD.v0 - CD.textIn) / 0.6) : 0, cardS: CD ? 0.97 + 0.03 * ease((v - CD.v0 - CD.textIn) / 1.6) : 1,
        tag: tag?.html, tagO: tag ? fade(v, tag.t0, tag.t1) : 0,
        end: v >= endAt, ef: 'file://' + path.join(here, 'endsrc', endFrames[ef]),
        url: E.end.url.slice(0, typed), curOn: v >= urlAt - 0.4 && (v < urlEnd + 0.3 || Math.floor(v / 0.5) % 2 === 0) && v >= endAt + 0.5,
