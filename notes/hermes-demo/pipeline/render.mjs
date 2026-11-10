@@ -58,7 +58,7 @@ html,body{margin:0;width:${W}px;height:${H}px;overflow:hidden;background:#0f0f10
 #tag{position:absolute;left:56px;top:44px;font:700 ${E.tagPx}px "Geist Mono",monospace;color:#f2f2f2;opacity:0;background:rgba(10,10,12,.82);padding:.3em .6em .35em;border-radius:.3em;box-shadow:0 0 0 1px rgba(255,255,255,.08)}
 #tag small{display:block;font-weight:400;font-size:.5em;color:#bdbdbd;margin-top:.25em}
 #endimg{position:absolute;inset:0;width:${W}px;height:${H}px;opacity:0}
-#card{position:absolute;inset:0;opacity:0;background:#111}
+#card{position:absolute;inset:0;opacity:0;background:#000}
 #card img{position:absolute;inset:0;width:${W}px;height:${H}px}
 #card div{position:absolute;left:0;right:0;top:${E.card?.y ?? 420}px;text-align:center;font:700 ${E.card?.px ?? 64}px/1.25 "Geist Mono",monospace;color:#f2f2f2;letter-spacing:-.01em;text-shadow:0 0 28px rgba(0,0,0,.95),0 0 6px rgba(0,0,0,.9)}
 #card div small{display:block;font-weight:400;font-size:.62em;color:#d9d9d9;margin-top:.35em}
@@ -99,6 +99,7 @@ await page.evaluate(async ({ COLS, ROWS, FS, W2R }) => {
     t2.open(document.getElementById('term2')); t2.loadAddon(new WebglAddon.WebglAddon()); window.term2 = t2;
     window.feed2 = (s) => new Promise(r => t2.write(Uint8Array.from(atob(s), c => c.charCodeAt(0)), r)); }
   window.term = term;
+  document.querySelector('.xterm-screen').appendChild(document.getElementById('cur'));
   window.feed = (s) => new Promise(r => term.write(Uint8Array.from(atob(s), c => c.charCodeAt(0)), r));
 }, { COLS, ROWS, FS, W2R: E.win2?.rows ?? 0 });
 const geo = await page.evaluate(() => {
@@ -189,7 +190,7 @@ for (const i of frames) {
   if (W2 && v >= W2.v0 - 0.01 && v < W2.v1) {
     await seek2(W2.r0 + (v - W2.v0));
     const u = Math.max(0, Math.min(1, (v - W2.resizeAt) / W2.resizeDur)), e2 = ease(u);
-    w2 = { h: w2h + (geo.wh - w2h) * e2, o: Math.min(ease((v - W2.v0) / 0.4), 1 - ease((u - 0.55) / 0.45)) };
+    w2 = { h: w2h + (geo.wh - w2h) * e2, o: 1 - ease((u - 0.45) / 0.55) };
   }
   await page.evaluate((p) => {
     const w = document.getElementById('win');
@@ -203,7 +204,8 @@ for (const i of frames) {
     cap.style.opacity = p.cap ? p.capO : 0; if (p.cap) cap.firstChild.innerHTML = p.cap;
     const cd = document.getElementById('card'); cd.style.opacity = p.cardO;
     if (p.cardO > 0) { const ci = document.getElementById('cardimg'); if (ci.dataset.f !== p.cardF) { ci.src = p.cardF; ci.dataset.f = p.cardF; }
-      const ct = document.getElementById('cardtxt'); if (ct.dataset.h !== p.cardH) { ct.innerHTML = p.cardH; ct.dataset.h = p.cardH; } ct.style.opacity = p.cardTO; ct.style.transform = `scale(${p.cardS})`; }
+      const ct = document.getElementById('cardtxt'); if (ct.dataset.h !== p.cardH) { ct.innerHTML = p.cardH; ct.dataset.h = p.cardH; } ct.style.transform = `scale(${p.cardS})`; document.getElementById('cardimg').style.opacity = p.cardIO;
+      const bg = ct.querySelector('.big'), sm = ct.querySelector('small'); if (bg) bg.style.opacity = p.cardBO; if (sm) sm.style.opacity = p.cardSO; }
     const tag = document.getElementById('tag');
     tag.style.opacity = p.tag ? p.tagO : 0; if (p.tag) tag.innerHTML = p.tag;
     const img = document.getElementById('endimg');
@@ -217,14 +219,16 @@ for (const i of frames) {
     document.getElementById('black').style.opacity = p.blk;
     const cu = document.getElementById('cur');
     if (p.ownCursor) {
-      const scr = document.querySelector('.xterm-screen'), tr = document.getElementById('term');
+      const scr = document.querySelector('.xterm-screen');
       const cw = scr.clientWidth / 124, ch = scr.clientHeight / 44, b = window.term.buffer.active;
-      cu.style.left = (scr.offsetLeft + b.cursorX * cw) + 'px'; cu.style.top = (scr.offsetTop + b.cursorY * ch) + 'px';
-      cu.style.top = (scr.offsetTop + b.cursorY * ch + ch * 0.17) + 'px'; cu.style.width = (cw * 0.92) + 'px'; cu.style.height = (ch * 0.7) + 'px'; cu.style.display = p.cursorOn ? 'block' : 'none';
+      cu.style.left = (b.cursorX * cw) + 'px'; cu.style.top = (b.cursorY * ch + ch * 0.1) + 'px';
+      cu.style.width = cw + 'px'; cu.style.height = (ch * 0.8) + 'px'; cu.style.display = p.cursorOn ? 'block' : 'none';
     } else cu.style.display = 'none';
     if (window._cur !== p.cursorOn) { window._cur = p.cursorOn; window.term.options.theme = { background: '#0f0f10', foreground: '#d8d8d8', cursor: p.cursorOn ? '#d8d8d8' : '#0f0f10', cursorAccent: '#0f0f10' }; }
-  }, { t, w2, plO: PL && v >= PL.v0 && v < PL.v1 ? Math.min(ease((v - PL.v0) / 0.5), ease((PL.v1 - v) / 0.5)) : 0, plH: PL ? PL.html : '', k: E.chrome ? ease((v - E.chrome[0]) / (E.chrome[1] - E.chrome[0])) : 1, title: E.title, cap: cap ? (cap.html ?? cap.text) : null, capO: cap ? fade(v, cap.t0, cap.t1) : 0,
-       cardO: CD && v >= CD.v0 && v < CD.v1 ? Math.min(1, ease((CD.v1 - v) / CD.out)) : 0,
+  }, { t, w2, plO: PL && v >= PL.v0 && v < endAt ? ease((v - PL.v0) / 0.5) : 0, plH: PL ? PL.html : '', k: E.chrome ? ease((v - E.chrome[0]) / (E.chrome[1] - E.chrome[0])) : 1, title: E.title, cap: cap ? (cap.html ?? cap.text) : null, capO: cap ? fade(v, cap.t0, cap.t1) : 0,
+       cardO: CD && v >= CD.v0 && v < CD.v1 ? 1 : 0,
+       cardIO: CD ? 1 - ease((v - CD.outA) / CD.fadeA) : 1, cardBO: CD ? ease((v - CD.v0 - CD.textIn) / 0.6) * (1 - ease((v - CD.outA) / CD.fadeA)) : 0,
+       cardSO: CD ? ease((v - CD.v0 - CD.textIn - 0.25) / 0.6) * (1 - ease((v - CD.outB) / CD.fadeB)) : 0,
        cardF: CD ? 'file://' + path.join(here, CD.dir, 'f' + String(Math.min(CD.frames - 1, Math.max(0, Math.floor((v - CD.v0) * FPS)))).padStart(5, '0') + '.png') : '',
        cardH: CD ? CD.html : '', cardTO: CD ? ease((v - CD.v0 - CD.textIn) / 0.6) : 0, cardS: CD ? 0.97 + 0.03 * ease((v - CD.v0 - CD.textIn) / 1.6) : 1,
        tag: tag?.html, tagO: tag ? fade(v, tag.t0, tag.t1) : 0,
