@@ -854,10 +854,12 @@ func program(cmd string) string {
 // around is the one named; a chain of nothing else names its first.
 func riskyProgram(cmd string) string {
 	first := ""
-	for _, seg := range regexp.MustCompile(`&&|\|\||[;|&\n]`).Split(cmd, -1) {
+	for _, seg := range shellSegments(cmd) {
 		prog := program(seg)
-		if prog == "" {
-			continue
+		if !progName.MatchString(prog) {
+			// Not a plain program name: a piece of an argument, maybe a
+			// secret's. Name nothing from the pieces.
+			return program(cmd)
 		}
 		if first == "" {
 			first = prog
@@ -872,6 +874,51 @@ func riskyProgram(cmd string) string {
 		return program(cmd)
 	}
 	return first
+}
+
+var progName = regexp.MustCompile(`^[A-Za-z0-9._+\[-]{1,24}$`)
+
+// shellSegments splits a command line on && || ; | & and newlines, only
+// OUTSIDE quotes, and stops at the first heredoc (<<): what follows is data.
+// An unbalanced quote returns the whole line as one piece. A split inside a
+// quoted argument could put part of a token on screen (security review,
+// 2026-11-10).
+func shellSegments(cmd string) []string {
+	var out []string
+	var cur strings.Builder
+	var q byte
+	for i := 0; i < len(cmd); i++ {
+		c := cmd[i]
+		switch {
+		case q != 0:
+			if c == '\\' && q == '"' && i+1 < len(cmd) {
+				cur.WriteByte(c)
+				i++
+				c = cmd[i]
+			} else if c == q {
+				q = 0
+			}
+			cur.WriteByte(c)
+			continue
+		case c == '\'' || c == '"':
+			q = c
+		case c == '<' && i+1 < len(cmd) && cmd[i+1] == '<':
+			out = append(out, cur.String())
+			return out
+		case c == '&' || c == '|' || c == ';' || c == '\n':
+			out = append(out, cur.String())
+			cur.Reset()
+			if i+1 < len(cmd) && (cmd[i+1] == c) {
+				i++
+			}
+			continue
+		}
+		cur.WriteByte(c)
+	}
+	if q != 0 {
+		return []string{cmd}
+	}
+	return append(out, cur.String())
 }
 
 // isAssignment reports whether tok is a leading NAME=VALUE.

@@ -171,6 +171,12 @@ func TestHermesApprovalNamesTheRiskyStep(t *testing.T) {
 		"ls | xargs rm":            "allow xargs?",
 		"mkdir a && ls a":          "allow mkdir?",
 		"sudo systemctl restart x": "allow systemctl?",
+		// Operators inside quotes are data: no piece of an argument (here a
+		// token) may become the balloon's word.
+		`curl -H "Authorization: Bearer; sk-abc123" https://x`: "allow curl?",
+		`echo 'a && sk-live-zzz' && rm -rf d`:                  "allow rm?",
+		"cat <<EOF\nsk-live-zzz; rm -rf /\nEOF":                "allow cat?",
+		`git commit -m "unbalanced && sk-x`:                    "allow git?",
 	} {
 		got := translate(payload(t, `{"hook_event_name":"pre_approval_request","session_id":"p","extra":{"command":`+jsonQuote(cmd)+`}}`))
 		if len(got) != 1 || got[0].Text != want {
