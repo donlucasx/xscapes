@@ -1,6 +1,6 @@
 # Resume — xscapes
 
-## NOW (checkpoint 2026-11-10 12:50 PST, session 49: HACKATHON ENTRY SUBMITTED)
+## NOW (wrap 2026-11-10 ~13:00 PST, session 49: HACKATHON ENTRY SUBMITTED)
 
 **Goal:** Hermes Agent Plugin Hackathon. Winners posted by @NousResearch after the Nov 11, 1 PM PST close.
 
@@ -13,8 +13,9 @@
   pipeline in `notes/hermes-demo/pipeline/`. Sounds: BigSoundBank CC0 (wind 0904, fire 2856, waves 1046,
   rain 1296, keys 1733, horn 0261, printer 0169); the crab click is a stand-in.
 
-**Next:** watch the PR (CI waits on a maintainer's approval for a first-time contributor; answer review
-asks) · push the local commits above (his) · confirm `~/.config/xscapes/scape` is vista again.
+**Next:** watch PR #152904 (CI waits on a maintainer's approval for a first-time contributor; answer review
+asks; a SHA bump is a new PR) · winners posted by @NousResearch after the close · confirm
+`~/.config/xscapes/scape` is vista again. Everything is pushed (main fa17d92 + this wrap).
 
 **Open questions for him:** none.
 **Later:** release the Ghostty engine (libghostty-vt per platform).
@@ -30,6 +31,6 @@ asks) · push the local commits above (his) · confirm `~/.config/xscapes/scape`
   hand, the Built with Claude post after ~100 karma (`notes/reddit/`).
 - Commons dispute (s47): DMs sent 10-26; thread drafts `notes/commons/` (local only); his to post.
 
-**Resume:** "Read RESUME.md NOW and the Kimi VERIFIED.md; then his rulings on Next 2-6."
+**Resume:** "Read RESUME.md NOW; check PR #152904 for review comments (`gh pr view 152904 -R NousResearch/hermes-agent --comments`)."
 
 Design and rules: `CLAUDE.md` (encoding rule, locked decisions); the harbour's spec `notes/rain/README.md`.
