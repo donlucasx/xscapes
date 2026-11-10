@@ -63,19 +63,30 @@ html,body{margin:0;width:${W}px;height:${H}px;overflow:hidden;background:#0f0f10
 #card div{position:absolute;left:0;right:0;top:${E.card?.y ?? 420}px;text-align:center;font:700 ${E.card?.px ?? 64}px/1.25 "Geist Mono",monospace;color:#f2f2f2;letter-spacing:-.01em;text-shadow:0 0 28px rgba(0,0,0,.95),0 0 6px rgba(0,0,0,.9)}
 #card div small{display:block;font-weight:400;font-size:.62em;color:#d9d9d9;margin-top:.35em}
 .h{color:#e8a23c}
+#win2{position:absolute;left:0;top:0;transform-origin:0 0;border-radius:14px;overflow:hidden;opacity:0;box-shadow:0 30px 90px rgba(0,0,0,.65),0 0 0 1px rgba(255,255,255,.09)}
+#win2 .bar2{height:${Math.round(FS*1.6)}px;background:#2b2a2e;display:flex;align-items:center;position:relative;border-bottom:1px solid #1a191c}
+#win2 .bar2 i{width:${Math.round(FS*.52)}px;height:${Math.round(FS*.52)}px;border-radius:50%;margin-left:${Math.round(FS*.42)}px;display:block}
+#win2 .bar2 i:nth-child(1){background:#ff5f57;margin-left:${Math.round(FS*.7)}px}#win2 .bar2 i:nth-child(2){background:#febc2e}#win2 .bar2 i:nth-child(3){background:#28c840}
+#win2 .bar2 b{position:absolute;left:0;right:0;text-align:center;font:500 ${Math.round(FS*.62)}px -apple-system,"Helvetica Neue",sans-serif;color:#9d9aa3}
+#term2{background:#0f0f10;padding:${Math.round(FS*.35)}px}
+.lockup{font:700 1em/1.1 "Geist Mono",monospace;letter-spacing:0;color:#eeeeee;white-space:nowrap}
+.lockup .blk{background:#eeeeee;color:#111;padding:0 .04em}
+#plug{position:absolute;inset:0;background:#000;opacity:0;display:flex;flex-direction:column;align-items:center;justify-content:center;font:400 54px/1.3 "Geist Mono",monospace;color:#d6d6d6;text-align:center}
+#plug .ha{font:700 110px/1.15 "Geist Mono",monospace;letter-spacing:.02em;background:linear-gradient(180deg,#ffe27a 0%,#f2b632 55%,#c98a2c 100%);-webkit-background-clip:text;background-clip:text;color:transparent;margin:.12em 0 .1em}
+#plug code{font:400 34px "Geist Mono",monospace;color:#c98a2c;margin-top:1.1em;border:1px solid rgba(201,138,44,.55);padding:.35em .8em;border-radius:.3em}
 #url{position:absolute;left:0;right:0;top:${E.end.urlY}px;text-align:center;font:400 ${E.end.urlPx}px "Geist Mono",monospace;color:#9a9a9a;white-space:pre;opacity:0}
 #black{position:absolute;inset:0;background:#000;opacity:1;pointer-events:none}
 </style></head><body><div id="stage"></div>
 <div id="win"><div id="bar"><i></i><i></i><i></i><b id="title"></b></div><div id="term" style="position:relative"><div id="cur" style="position:absolute;background:#d8d8d8;display:none;z-index:9"></div></div></div>
-<div id="split" style="position:absolute;inset:0;opacity:0;background:#0f0f10"></div><div id="tag"></div><div id="cap"><span></span></div>
-<div id="card"><img id="cardimg"><div id="cardtxt"></div></div><img id="endimg"><div id="url"></div><div id="black"></div>
+<div id="win2"><div class="bar2"><i></i><i></i><i></i><b>xscapes hermes</b></div><div id="term2"></div></div><div id="split" style="position:absolute;inset:0;opacity:0;background:#0f0f10"></div><div id="tag"></div><div id="cap"><span></span></div>
+<div id="card"><img id="cardimg"><div id="cardtxt"></div></div><div id="plug"></div><img id="endimg"><div id="url"></div><div id="black"></div>
 <script src="file://${here}/node_modules/@xterm/xterm/lib/xterm.js"></script><script src="file://${here}/node_modules/@xterm/addon-webgl/lib/addon-webgl.js"></script></body></html>`;
 fs.writeFileSync(path.join(out, 'page.html'), html);
 
 const browser = await chromium.launch({ channel: 'chrome', args: ['--use-angle=metal', '--enable-gpu', '--ignore-gpu-blocklist', '--enable-unsafe-swiftshader'] });
 const page = await browser.newPage({ viewport: { width: W, height: H } });
 await page.goto('file://' + path.join(out, 'page.html'));
-await page.evaluate(async ({ COLS, ROWS, FS }) => {
+await page.evaluate(async ({ COLS, ROWS, FS, W2R }) => {
   await document.fonts.load(`400 ${FS}px "JetBrains Mono"`);
   await document.fonts.load(`500 40px "Geist Mono"`); await document.fonts.load(`700 40px "Geist Mono"`);
   const term = new Terminal({ cols: COLS, rows: ROWS, fontSize: FS, fontFamily: '"JetBrains Mono", Menlo, monospace',
@@ -83,9 +94,13 @@ await page.evaluate(async ({ COLS, ROWS, FS }) => {
     theme: { background: '#0f0f10', foreground: '#d8d8d8', cursor: '#d8d8d8' } });
   term.open(document.getElementById('term'));
   const gl = new WebglAddon.WebglAddon(); term.loadAddon(gl);
+  if (W2R) { const t2 = new Terminal({ cols: COLS, rows: W2R, fontSize: FS, fontFamily: '"JetBrains Mono", Menlo, monospace', lineHeight: 1.0, cursorBlink: false, scrollback: 0, customGlyphs: true, allowProposedApi: true,
+      theme: { background: '#0f0f10', foreground: '#d8d8d8', cursor: '#0f0f10' } });
+    t2.open(document.getElementById('term2')); t2.loadAddon(new WebglAddon.WebglAddon()); window.term2 = t2;
+    window.feed2 = (s) => new Promise(r => t2.write(Uint8Array.from(atob(s), c => c.charCodeAt(0)), r)); }
   window.term = term;
   window.feed = (s) => new Promise(r => term.write(Uint8Array.from(atob(s), c => c.charCodeAt(0)), r));
-}, { COLS, ROWS, FS });
+}, { COLS, ROWS, FS, W2R: E.win2?.rows ?? 0 });
 const geo = await page.evaluate(() => {
   const w = document.getElementById('win').getBoundingClientRect();
   const s = document.querySelector('.xterm-screen').getBoundingClientRect(); window._r = !!document.querySelector('.xterm-screen canvas');
@@ -149,7 +164,12 @@ if (SP) await page.evaluate((SP) => {
     d.insertAdjacentHTML('beforeend', `<img id="sp${i}" style="position:absolute;left:${x}px;top:${SP.y}px;width:${SP.w}px;height:${SP.h}px;border-radius:10px;box-shadow:0 0 0 1px rgba(255,255,255,.09)"><div style="position:absolute;left:${x}px;width:${SP.w}px;top:${SP.y + SP.h + 22}px;text-align:center;font:700 ${SP.labelPx}px 'Geist Mono',monospace;color:#f2f2f2">${p.name}<span style="font-weight:400;color:#a9a9a9"> &middot; ${p.with}</span></div>`);
   });
 }, SP);
-const CD = E.card;
+const CD = E.card, W2 = E.win2, PL = E.plug;
+const TK2 = W2 ? load(W2.take, 'tty.jsonl') : [];
+let fed2 = 0;
+async function seek2(r) { while (fed2 < TK2.length && TK2[fed2].t <= r) await page.evaluate((s) => window.feed2(s), TK2[fed2++].b); }
+const w2h = W2 ? await page.evaluate(() => document.getElementById('win2').getBoundingClientRect().height) : 0;
+const typingAt = (v) => keys.some(k => k <= v && v - k < 0.45);
 const N = Math.round(total * FPS);
 const want = stills ? stills.split(',').map(Number) : null;
 const frames = want ? want.map(v => Math.round(v * FPS)) : [...Array(N).keys()].filter(i => i / FPS >= from && (!to || i / FPS < +to));
@@ -164,11 +184,20 @@ for (const i of frames) {
   const blk = v < E.fromBlack ? 1 - ease(v / E.fromBlack)
     : v < endAt ? ease((v - montageEnd) / E.end.toBlack)
     : v > total - E.end.fade ? ease((v - (total - E.end.fade)) / E.end.fade) : 0;
-  const cursorOn = Math.floor(v / 0.53) % 2 === 0;
+  const cursorOn = typingAt(v) || Math.floor(v / 0.53) % 2 === 0;
+  let w2 = null;
+  if (W2 && v >= W2.v0 - 0.01 && v < W2.v1) {
+    await seek2(W2.r0 + (v - W2.v0));
+    const u = Math.max(0, Math.min(1, (v - W2.resizeAt) / W2.resizeDur)), e2 = ease(u);
+    w2 = { h: w2h + (geo.wh - w2h) * e2, o: Math.min(ease((v - W2.v0) / 0.4), 1 - ease((u - 0.55) / 0.45)) };
+  }
   await page.evaluate((p) => {
     const w = document.getElementById('win');
     w.style.transform = `translate(${p.t.x}px,${p.t.y}px) scale(${p.t.s})`;
     document.documentElement.style.setProperty('--k', p.k);
+    const w2e = document.getElementById('win2');
+    if (p.w2) { w2e.style.transform = `translate(${p.t.x}px,${p.t.y}px) scale(${p.t.s})`; w2e.style.height = p.w2.h + 'px'; w2e.style.opacity = p.w2.o; } else w2e.style.opacity = 0;
+    const pl = document.getElementById('plug'); pl.style.opacity = p.plO; if (p.plO > 0 && pl.dataset.h !== p.plH) { pl.innerHTML = p.plH; pl.dataset.h = p.plH; }
     document.getElementById('title').textContent = p.title;
     const cap = document.getElementById('cap');
     cap.style.opacity = p.cap ? p.capO : 0; if (p.cap) cap.firstChild.innerHTML = p.cap;
@@ -191,10 +220,10 @@ for (const i of frames) {
       const scr = document.querySelector('.xterm-screen'), tr = document.getElementById('term');
       const cw = scr.clientWidth / 124, ch = scr.clientHeight / 44, b = window.term.buffer.active;
       cu.style.left = (scr.offsetLeft + b.cursorX * cw) + 'px'; cu.style.top = (scr.offsetTop + b.cursorY * ch) + 'px';
-      cu.style.width = cw + 'px'; cu.style.height = ch + 'px'; cu.style.display = p.cursorOn ? 'block' : 'none';
+      cu.style.top = (scr.offsetTop + b.cursorY * ch + ch * 0.17) + 'px'; cu.style.width = (cw * 0.92) + 'px'; cu.style.height = (ch * 0.7) + 'px'; cu.style.display = p.cursorOn ? 'block' : 'none';
     } else cu.style.display = 'none';
     if (window._cur !== p.cursorOn) { window._cur = p.cursorOn; window.term.options.theme = { background: '#0f0f10', foreground: '#d8d8d8', cursor: p.cursorOn ? '#d8d8d8' : '#0f0f10', cursorAccent: '#0f0f10' }; }
-  }, { t, k: E.chrome ? ease((v - E.chrome[0]) / (E.chrome[1] - E.chrome[0])) : 1, title: E.title, cap: cap ? (cap.html ?? cap.text) : null, capO: cap ? fade(v, cap.t0, cap.t1) : 0,
+  }, { t, w2, plO: PL && v >= PL.v0 && v < PL.v1 ? Math.min(ease((v - PL.v0) / 0.5), ease((PL.v1 - v) / 0.5)) : 0, plH: PL ? PL.html : '', k: E.chrome ? ease((v - E.chrome[0]) / (E.chrome[1] - E.chrome[0])) : 1, title: E.title, cap: cap ? (cap.html ?? cap.text) : null, capO: cap ? fade(v, cap.t0, cap.t1) : 0,
        cardO: CD && v >= CD.v0 && v < CD.v1 ? Math.min(1, ease((CD.v1 - v) / CD.out)) : 0,
        cardF: CD ? 'file://' + path.join(here, CD.dir, 'f' + String(Math.min(CD.frames - 1, Math.max(0, Math.floor((v - CD.v0) * FPS)))).padStart(5, '0') + '.png') : '',
        cardH: CD ? CD.html : '', cardTO: CD ? ease((v - CD.v0 - CD.textIn) / 0.6) : 0, cardS: CD ? 0.97 + 0.03 * ease((v - CD.v0 - CD.textIn) / 1.6) : 1,
