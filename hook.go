@@ -387,6 +387,19 @@ type hermesExtra struct {
 	ChildSubagentID   string `json:"child_subagent_id"`
 	Command           string `json:"command"`
 	Reason            string `json:"reason"`
+	// on_human_input_request / _resolved (tools/human_input_hooks.py):
+	// "sudo", "clarify" or "approval"; the prompt is always redacted.
+	Kind    string `json:"kind"`
+	Outcome string `json:"outcome"`
+	// post_api_request: the call's token buckets and the window it ran
+	// against. XscapesTotal is the plugin's own running sum for the session
+	// (Hermes reports per call; the scene shows the session's total).
+	Usage *struct {
+		PromptTokens int64 `json:"prompt_tokens"`
+		TotalTokens  int64 `json:"total_tokens"`
+	} `json:"usage"`
+	ContextLength int64 `json:"context_length"`
+	XscapesTotal  int64 `json:"xscapes_total"`
 }
 
 func (p hookPayload) hermes() hermesExtra {
@@ -569,6 +582,40 @@ func translate(p hookPayload) []event.Event {
 		// The answer, either way, as Kimi's PermissionResult: the ask comes
 		// down now rather than at the next tool start.
 		return []event.Event{{Kind: event.Answered, Text: "answered"}}
+	case "on_human_input_request":
+		// Hermes blocks on the person: a clarify question or a sudo
+		// password raise the ask like a permission does. An approval is
+		// left to pre_approval_request, which names the command, so one
+		// approval never raises the ask twice.
+		switch p.hermes().Kind {
+		case "clarify":
+			return []event.Event{{Kind: event.NeedsInput, Text: "a question for you"}}
+		case "sudo":
+			return []event.Event{{Kind: event.NeedsInput, Text: "sudo password?"}}
+		}
+		return nil
+	case "on_human_input_resolved":
+		if k := p.hermes().Kind; k == "clarify" || k == "sudo" {
+			return []event.Event{{Kind: event.Answered, Text: "answered"}}
+		}
+		return nil
+	case "post_api_request":
+		// After each model call: the context in use against the window (the
+		// moon) and the session's running token total (the number top right).
+		x := p.hermes()
+		if x.Usage == nil {
+			return nil
+		}
+		e := event.Event{Kind: event.Context, Tokens: x.XscapesTotal}
+		if x.ContextLength > 0 && x.Usage.PromptTokens > 0 {
+			f := float64(x.Usage.PromptTokens) / float64(x.ContextLength)
+			e.Frac = &f
+			e.Window = int(x.ContextLength)
+		}
+		if e.Frac == nil && e.Tokens == 0 {
+			return nil
+		}
+		return []event.Event{e}
 	case "subagent_start":
 		// Newer Hermes (seen at 856e7580, 2026-11-08) announces the start,
 		// keyed by the child_session_id its stop also carries.

@@ -103,3 +103,49 @@ func TestHermesTurnEndIsNotTheSessionEnd(t *testing.T) {
 		t.Fatalf("on_session_finalize = %+v, want SessionEnd", got)
 	}
 }
+
+// TestHermesQuestionsRaiseTheAsk: Hermes blocks on the person three ways
+// (tools/human_input_hooks.py: kind sudo, clarify or approval). A question
+// or a password raises the ask; an approval is left to pre_approval_request
+// so it never rings twice; the end of the wait takes the ask down.
+func TestHermesQuestionsRaiseTheAsk(t *testing.T) {
+	for kind, want := range map[string]string{"clarify": "a question for you", "sudo": "sudo password?"} {
+		got := translate(payload(t, `{"hook_event_name":"on_human_input_request","session_id":"p",
+			"extra":{"kind":"`+kind+`","request_id":"r1","prompt":"[redacted]","platform":"cli"}}`))
+		if len(got) != 1 || got[0].Kind != event.NeedsInput || got[0].Text != want {
+			t.Errorf("%s request = %+v, want NeedsInput %q", kind, got, want)
+		}
+		got = translate(payload(t, `{"hook_event_name":"on_human_input_resolved","session_id":"p",
+			"extra":{"kind":"`+kind+`","request_id":"r1","outcome":"answered"}}`))
+		if len(got) != 1 || got[0].Kind != event.Answered {
+			t.Errorf("%s resolved = %+v, want one Answered", kind, got)
+		}
+	}
+	for _, ev := range []string{"on_human_input_request", "on_human_input_resolved"} {
+		if got := translate(payload(t, `{"hook_event_name":"`+ev+`","session_id":"p","extra":{"kind":"approval","request_id":"r2"}}`)); len(got) != 0 {
+			t.Errorf("%s for an approval = %+v, want nothing (pre_approval_request owns it)", ev, got)
+		}
+	}
+}
+
+// TestHermesModelCallsFeedTheMoonAndTheCount: post_api_request carries the
+// call's usage and the context window (agent/turn_response_intake.py); the
+// plugin adds the session's running total. The moon takes prompt/window, the
+// count takes the total, and both reach the scene's state.
+func TestHermesModelCallsFeedTheMoonAndTheCount(t *testing.T) {
+	got := translate(payload(t, `{"hook_event_name":"post_api_request","session_id":"p",
+		"extra":{"usage":{"prompt_tokens":250000,"total_tokens":251200},"context_length":1000000,"xscapes_total":4200000}}`))
+	if len(got) != 1 || got[0].Kind != event.Context || got[0].Frac == nil || *got[0].Frac != 0.25 ||
+		got[0].Window != 1000000 || got[0].Tokens != 4200000 {
+		t.Fatalf("post_api_request = %+v, want Context frac 0.25 window 1M tokens 4.2M", got)
+	}
+	t0 := time.Unix(1_800_000_000, 0)
+	r := reduce.New("p")
+	r.Apply(got[0], t0)
+	if st := r.State(t0); !st.ContextKnown || st.Act.ContextUsed != 0.25 || st.Act.Tokens != 4200000 {
+		t.Fatalf("state after the call: known %v, used %v, tokens %d", st.ContextKnown, st.Act.ContextUsed, st.Act.Tokens)
+	}
+	if got := translate(payload(t, `{"hook_event_name":"post_api_request","session_id":"p","extra":{"usage":null}}`)); len(got) != 0 {
+		t.Fatalf("a call without usage = %+v, want nothing", got)
+	}
+}
