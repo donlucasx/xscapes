@@ -1,6 +1,7 @@
 package main
 
 import (
+	"encoding/json"
 	"testing"
 	"time"
 
@@ -160,3 +161,22 @@ func TestHermesToolsPairByCallID(t *testing.T) {
 		t.Fatalf("start %+v, end %+v: want both with ID call_7", start, end)
 	}
 }
+
+// TestHermesApprovalNamesTheRiskyStep: Hermes asks once for a whole chain;
+// the balloon names the step it is asking about, not the setup before it.
+func TestHermesApprovalNamesTheRiskyStep(t *testing.T) {
+	for cmd, want := range map[string]string{
+		"mkdir -p /tmp/xs-demo && chmod 777 /tmp/xs-demo && ls -ld /tmp/xs-demo": "allow chmod?",
+		"cd build; rm -rf dist":    "allow rm?",
+		"ls | xargs rm":            "allow xargs?",
+		"mkdir a && ls a":          "allow mkdir?",
+		"sudo systemctl restart x": "allow systemctl?",
+	} {
+		got := translate(payload(t, `{"hook_event_name":"pre_approval_request","session_id":"p","extra":{"command":`+jsonQuote(cmd)+`}}`))
+		if len(got) != 1 || got[0].Text != want {
+			t.Errorf("%q: %+v, want %q", cmd, got, want)
+		}
+	}
+}
+
+func jsonQuote(s string) string { b, _ := json.Marshal(s); return string(b) }

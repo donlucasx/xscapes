@@ -578,7 +578,7 @@ func translate(p hookPayload) []event.Event {
 		// the balloon names the program; only the program, as the sand does.
 		what := p.ToolName
 		if what == "" {
-			what = program(p.hermes().Command)
+			what = riskyProgram(p.hermes().Command)
 		}
 		return []event.Event{{Kind: event.NeedsInput, Op: op, Tool: p.ToolName, Target: target, Text: "allow " + what + "?"}}
 	case "post_approval_response":
@@ -844,6 +844,34 @@ func program(cmd string) string {
 		return "env"
 	}
 	return ""
+}
+
+// riskyProgram names the program an approval is about. Hermes asks once for
+// a whole chain ("mkdir -p d && chmod 777 d && ls -ld d"), and the first
+// program is usually the harmless setup: the balloon read "allow mkdir?"
+// over a chmod 777 (his screenshot, 2026-11-10). So the chain is split on
+// its operators and the first program that is not plain setup or a look
+// around is the one named; a chain of nothing else names its first.
+func riskyProgram(cmd string) string {
+	first := ""
+	for _, seg := range regexp.MustCompile(`&&|\|\||[;|&\n]`).Split(cmd, -1) {
+		prog := program(seg)
+		if prog == "" {
+			continue
+		}
+		if first == "" {
+			first = prog
+		}
+		switch prog {
+		case "cd", "ls", "pwd", "echo", "printf", "cat", "mkdir", "touch", "true", "test", "[", "head", "tail", "wc", "stat", "env":
+			continue
+		}
+		return prog
+	}
+	if first == "" {
+		return program(cmd)
+	}
+	return first
 }
 
 // isAssignment reports whether tok is a leading NAME=VALUE.
