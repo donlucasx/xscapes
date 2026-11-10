@@ -167,6 +167,7 @@ func TestHarbourChecks(t *testing.T) {
 	t.Run("world", harbourCheckWorld)
 	t.Run("window", harbourCheckWindow)
 	t.Run("replay", harbourCheckReplay)
+	t.Run("thinking", harbourCheckThinking)
 	if dir := os.Getenv("XSCAPES_HARBOURCHECK"); dir != "" {
 		writeCheckPage(t, dir)
 	}
@@ -529,4 +530,41 @@ func writeCheckPage(t *testing.T, dir string) {
 
 func reduceAct(used float64) scape.Activity {
 	return scape.Activity{ContextUsed: used, TimeOfDay: 0.9}
+}
+
+// harbourCheckThinking is item T: the thought puff. Up while a turn is open
+// and no tool runs, down while a tool runs and for ThinkSettle after one,
+// down under a balloon, down once the turn is done.
+func harbourCheckThinking(t *testing.T) {
+	s := newSession(t, 125, 28, 0.9)
+	s.run(2, nil)
+	_, catY, _ := s.f.harbour.Layout()
+	puff := func() bool { return strings.Contains(nearText(s.f, 0, catY+1), "-~~~~~-") }
+	idle := puff()
+	s.emit(event.Event{Kind: event.Prompt, Text: "plan the migration"})
+	s.run(2.5, nil)
+	early := puff()
+	s.run(5, nil)
+	thinking := puff()
+	shotThink := s.shot("5 s: turn open, no tool for 3 s: the puff")
+	s.emit(event.Event{Kind: event.ToolStart, ID: "t1", Op: "shell", Tool: "terminal", Target: "go test ./..."})
+	s.run(8, nil)
+	tooling := puff()
+	shotTool := s.shot("8 s: a tool running: no puff")
+	s.emit(event.Event{Kind: event.ToolEnd, ID: "t1", Op: "shell", Tool: "terminal", MS: 3000})
+	s.run(8.5, nil)
+	settling := puff()
+	s.run(10.5, nil)
+	again := puff()
+	s.emit(event.Event{Kind: event.NeedsInput, Text: "a question for you"})
+	s.run(12, nil)
+	asking := puff()
+	s.emit(event.Event{Kind: event.Answered})
+	s.emit(event.Event{Kind: event.Done, Text: "Plan written."})
+	s.run(14, nil)
+	done := puff()
+	pass := !idle && !early && thinking && !tooling && !settling && again && !asking && !done
+	record(t, "T", "Thinking: the thought puff", pass,
+		fmt.Sprintf("idle %v, 0.5 s after the prompt %v, thinking %v, tool running %v, 0.5 s after it %v, thinking again %v, under the ask %v, after done %v (want false false true false false true false false)",
+			idle, early, thinking, tooling, settling, again, asking, done), shotThink, shotTool)
 }

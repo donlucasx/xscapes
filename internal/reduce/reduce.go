@@ -105,6 +105,12 @@ var (
 	// His ruling, 2026-09-05.
 	KittenDwell = 60 * time.Second
 
+	// ThinkSettle is how long a turn must go without a tool event before the
+	// companion shows its thought puff, so the gaps between back-to-back
+	// tools do not flicker it on and off. Claude's choice (2026-11-09), not
+	// a ruling.
+	ThinkSettle = 1200 * time.Millisecond
+
 	// SubStale drops a subagent whose end event never arrived, so one lost
 	// event does not strand a kitten on the beach for the rest of the day.
 	// ⚠ SIXTY, NOT THIRTY, AND THE ORDERING AGAINST TurnSilence IS LOAD-BEARING.
@@ -140,6 +146,11 @@ type State struct {
 	// knock. The renderer draws them as different balloons, because the
 	// brief locks done and needs_input as distinct cues.
 	BubbleAsk bool
+
+	// Thinking: a turn is open, no tool is running and none has for
+	// ThinkSettle, and no balloon is up. The model is working out its next
+	// move; the companion shows a thought puff.
+	Thinking bool
 
 	// Kittens is how many subagents are running right now, plus any that
 	// finished inside their KittenDwell and are still sitting it out.
@@ -199,8 +210,11 @@ type Reducer struct {
 	stepAt time.Time
 
 	flight map[string]inflight
-	subs   map[string]time.Time
-	gone   map[string]time.Time // subagents that ended: when each kitten leaves (may be ahead of now, the dwell), until it has swum off
+	// quietAt is the last prompt or tool event: thinking is a turn left open
+	// with no tool running for ThinkSettle since then.
+	quietAt time.Time
+	subs    map[string]time.Time
+	gone    map[string]time.Time // subagents that ended: when each kitten leaves (may be ahead of now, the dwell), until it has swum off
 
 	// Kimi Code CLI names a subagent by its PROFILE ("explore"), not by an
 	// instance, and marks neither a subagent's tool calls nor its Stop
@@ -374,6 +388,7 @@ func (r *Reducer) Apply(e event.Event, now time.Time) {
 		// command failed, never that the code is fixed. Encoding it as "you
 		// have not looked at this yet" is a claim we can actually support.
 		r.turnOpn, r.turnAt = true, now
+		r.quietAt = now
 		r.worried = false
 		r.needsInput = false
 		r.doneAt = time.Time{}
@@ -381,6 +396,7 @@ func (r *Reducer) Apply(e event.Event, now time.Time) {
 		r.heat += Impulse
 
 	case event.ToolStart:
+		r.quietAt = now
 		if e.ID != "" {
 			r.flight[e.ID] = inflight{started: now, op: e.Op, tool: e.Tool, target: e.Target}
 		}
@@ -404,6 +420,7 @@ func (r *Reducer) Apply(e event.Event, now time.Time) {
 		r.heat += Impulse
 
 	case event.ToolEnd:
+		r.quietAt = now
 		if e.ID != "" {
 			delete(r.flight, e.ID)
 		}
@@ -858,6 +875,8 @@ func (r *Reducer) State(now time.Time) State {
 	case !r.doneAt.IsZero() && now.Sub(r.doneAt) < DoneHold:
 		st.Bubble = r.bubble
 	}
+	st.Thinking = r.turnOpn && len(r.flight) == 0 && st.Bubble == "" &&
+		!r.quietAt.IsZero() && now.Sub(r.quietAt) >= ThinkSettle
 	return st
 }
 

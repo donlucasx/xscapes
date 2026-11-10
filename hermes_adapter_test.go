@@ -149,3 +149,14 @@ func TestHermesModelCallsFeedTheMoonAndTheCount(t *testing.T) {
 		t.Fatalf("a call without usage = %+v, want nothing", got)
 	}
 }
+
+// TestHermesToolsPairByCallID: a Hermes tool's start and end carry its
+// tool_call_id, so the scene knows a tool is still running (the heavier rain,
+// and no thought puff over a running tool).
+func TestHermesToolsPairByCallID(t *testing.T) {
+	start := translate(payload(t, `{"hook_event_name":"pre_tool_call","tool_name":"terminal","tool_input":{"command":"ls"},"session_id":"p","extra":{"tool_call_id":"call_7"}}`))
+	end := translate(payload(t, `{"hook_event_name":"post_tool_call","tool_name":"terminal","tool_input":{"command":"ls"},"session_id":"p","extra":{"tool_call_id":"call_7","duration_ms":40}}`))
+	if len(start) != 1 || start[0].ID != "call_7" || len(end) != 1 || end[0].ID != "call_7" {
+		t.Fatalf("start %+v, end %+v: want both with ID call_7", start, end)
+	}
+}

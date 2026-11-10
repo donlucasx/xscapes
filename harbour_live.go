@@ -50,7 +50,40 @@ func drawHarbour(c *canvas.Canvas, h *scenes.Harbour, cat *companion.Cat, lay la
 		}
 		(&companion.Sprite{Rows: rows, Body: col, Opaque: true}).Draw(c.Near(), x, y)
 	}
+	if st.Thinking && st.Bubble == "" {
+		drawThoughtPuff(c, head, catY, lay.Mirror, t)
+	}
 	drawSandInk(c, st.Tail, h.DeskColor(), bandTop, 2, c.W-2, harbourInkPale, harbourInkDark, true)
+}
+
+// drawThoughtPuff draws the companion thinking: the cloud on the balloon's
+// shaded ground, its trail of circles down to the head. The dots fill one a
+// beat, which says "still thinking" and encodes nothing (the puff's presence
+// is the signal, never its pace).
+func drawThoughtPuff(c *canvas.Canvas, head, catY int, mirror bool, t float64) {
+	lit := int(t*1.6) % 4
+	rows, tail := companion.ThoughtPuff(lit, mirror)
+	x := head - tail
+	if bw := bubbleWidth(rows); x+bw > c.W {
+		x = c.W - bw
+	}
+	if x < 0 {
+		x = 0
+	}
+	y := catY - len(rows)
+	if y < 0 {
+		y = 0
+	}
+	for dy, row := range rows {
+		for dx, r := range []rune(row) {
+			if dy < 3 || r != ' ' {
+				c.SetBG(x+dx, y+dy, term.Lerp(c.BGAt(x+dx, y+dy), term.RGB{}, balloonShade))
+			}
+		}
+	}
+	for dy, row := range rows {
+		(&companion.Sprite{Rows: []string{row}, Body: bubbleCol, Opaque: dy < 3}).Draw(c.Near(), x, y+dy)
+	}
 }
 
 // The desk's inks: a warm paper white and a near-black, picked per row

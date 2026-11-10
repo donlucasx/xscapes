@@ -389,8 +389,11 @@ type hermesExtra struct {
 	Reason            string `json:"reason"`
 	// on_human_input_request / _resolved (tools/human_input_hooks.py):
 	// "sudo", "clarify" or "approval"; the prompt is always redacted.
-	Kind    string `json:"kind"`
-	Outcome string `json:"outcome"`
+	Kind string `json:"kind"`
+	// pre_tool_call / post_tool_call: pairs a tool's start with its end, so
+	// the scene knows a Hermes tool is still running.
+	ToolCallID string `json:"tool_call_id"`
+	Outcome    string `json:"outcome"`
 	// post_api_request: the call's token buckets and the window it ran
 	// against. XscapesTotal is the plugin's own running sum for the session
 	// (Hermes reports per call; the scene shows the session's total).
@@ -564,10 +567,10 @@ func translate(p hookPayload) []event.Event {
 		return []event.Event{{Kind: event.Done, Text: firstLine(p.hermes().AssistantResponse)}}
 	case "pre_tool_call":
 		op, target := classify(p.ToolName, p.ToolInput)
-		return []event.Event{{Kind: event.ToolStart, Op: op, Tool: p.ToolName, Target: target}}
+		return []event.Event{{Kind: event.ToolStart, Op: op, Tool: p.ToolName, Target: target, ID: p.hermes().ToolCallID}}
 	case "post_tool_call":
 		op, target := classify(p.ToolName, p.ToolInput)
-		return []event.Event{{Kind: event.ToolEnd, Op: op, Tool: p.ToolName, Target: target, MS: p.hermes().DurationMS}}
+		return []event.Event{{Kind: event.ToolEnd, Op: op, Tool: p.ToolName, Target: target, MS: p.hermes().DurationMS, ID: p.hermes().ToolCallID}}
 	case "pre_approval_request":
 		op, target := classify(p.ToolName, p.ToolInput)
 		// Hermes's approval carries the command being assessed, not a tool

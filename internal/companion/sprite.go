@@ -147,3 +147,31 @@ func (s *Sprite) Draw(l *canvas.Layer, x, y int) {
 		}
 	}
 }
+
+// ThoughtPuff is the companion thinking: a cloud with three dots that fill
+// one at a time (lit 0..3), trailing down to the creature's head. It is a
+// third shape beside the solid ask and the dotted knock, so it reads apart
+// from both even in a screenshot or -plain: round ends, no pointer, a trail
+// of circles. tail is the column of the trail's last circle, the one that
+// sits over the head; mirror puts the trail on the right, for a creature to
+// the right of its puff.
+func ThoughtPuff(lit int, mirror bool) (rows []string, tail int) {
+	d := []rune("       ")
+	for i := 0; i < 3 && i < lit; i++ {
+		d[1+i*2] = '.'
+	}
+	rows = []string{
+		" .-~~~~~-.",
+		"(" + " " + string(d) + " " + ")",
+		" '-~~~~~-'",
+		"   o",
+		"  .",
+	}
+	tail = 2
+	if mirror {
+		rows[3] = "       o"
+		rows[4] = "        ."
+		tail = 8
+	}
+	return rows, tail
+}
