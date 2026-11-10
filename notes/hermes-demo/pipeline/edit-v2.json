@@ -1,0 +1,385 @@
+{
+ "_": "Hermes demo v2 (his v1 notes 2026-11-10): bare cursor opening, the window reveals on the pull-out, real speed at first sight of the scape, tighter owl, the fire lighting up, tight wides, a matched frame + tag for each scape.",
+ "title": "xscapes hermes",
+ "fontPx": 48,
+ "wideFrac": 0.82,
+ "captionPx": 40,
+ "tagPx": 44,
+ "fromBlack": 0.6,
+ "stripPrompt": "\u001b[38;5;245m~/xscapes\u001b[39m \u001b[38;5;173m>\u001b[39m ",
+ "chrome": [
+  5.2,
+  6.8
+ ],
+ "segs": [
+  {
+   "take": "vista",
+   "v0": 0,
+   "v1": 4.7,
+   "r0": 1.7,
+   "r1": 6.4
+  },
+  {
+   "take": "vista",
+   "v0": 4.7,
+   "v1": 9.7,
+   "r0": 6.4,
+   "r1": 11.4
+  },
+  {
+   "take": "vista",
+   "v0": 9.7,
+   "v1": 13.7,
+   "r0": 24.5,
+   "r1": 28.5
+  },
+  {
+   "take": "vista",
+   "v0": 13.7,
+   "v1": 17.5,
+   "r0": 38.0,
+   "r1": 41.8
+  },
+  {
+   "take": "vista",
+   "v0": 17.5,
+   "v1": 21.0,
+   "r0": 41.8,
+   "r1": 55.8
+  },
+  {
+   "take": "vista",
+   "v0": 21.0,
+   "v1": 24.0,
+   "r0": 55.8,
+   "r1": 93.8
+  },
+  {
+   "take": "vista",
+   "v0": 24.0,
+   "v1": 28.0,
+   "r0": 93.8,
+   "r1": 98.3
+  },
+  {
+   "take": "vista",
+   "v0": 28.0,
+   "v1": 31.0,
+   "r0": 100.0,
+   "r1": 103.0
+  },
+  {
+   "take": "shore",
+   "v0": 31.0,
+   "v1": 33.0,
+   "r0": 22.0,
+   "r1": 28.0
+  },
+  {
+   "take": "shore",
+   "v0": 33.0,
+   "v1": 36.0,
+   "r0": 28.0,
+   "r1": 39.5
+  },
+  {
+   "take": "harbour",
+   "v0": 36.0,
+   "v1": 37.6,
+   "r0": 24.7,
+   "r1": 26.3
+  },
+  {
+   "take": "harbour",
+   "v0": 37.6,
+   "v1": 41.6,
+   "r0": 26.3,
+   "r1": 30.3
+  },
+  {
+   "take": "harbour",
+   "v0": 41.6,
+   "v1": 46.0,
+   "r0": 30.3,
+   "r1": 34.7
+  },
+  {
+   "take": "harbour",
+   "v0": 46.0,
+   "v1": 49.0,
+   "r0": 34.7,
+   "r1": 40.2
+  }
+ ],
+ "camera": [
+  {
+   "t": 0,
+   "col": 0.5,
+   "row": 0.5,
+   "zoom": 7,
+   "free": true
+  },
+  {
+   "t": 2.6,
+   "col": 0.5,
+   "row": 0.5,
+   "zoom": 7,
+   "free": true
+  },
+  {
+   "t": 4.7,
+   "col": 7,
+   "row": 0.5,
+   "zoom": 7,
+   "free": true
+  },
+  {
+   "t": 4.9,
+   "col": 7,
+   "row": 0.5,
+   "zoom": 7,
+   "free": true
+  },
+  {
+   "t": 6.8,
+   "col": 62,
+   "row": 22,
+   "zoom": 1,
+   "free": true
+  },
+  {
+   "t": 8.0,
+   "col": 62,
+   "row": 22,
+   "zoom": 1
+  },
+  {
+   "col": 62,
+   "row": 30,
+   "zoom": 1.78,
+   "t": 9.5
+  },
+  {
+   "col": 62,
+   "row": 30,
+   "zoom": 1.78,
+   "t": 9.7
+  },
+  {
+   "t": 9.7,
+   "col": 113,
+   "row": 36.5,
+   "zoom": 4.5,
+   "cut": true
+  },
+  {
+   "t": 13.7,
+   "col": 113,
+   "row": 36.5,
+   "zoom": 4.5
+  },
+  {
+   "t": 13.7,
+   "col": 40,
+   "row": 19,
+   "zoom": 2.2,
+   "cut": true
+  },
+  {
+   "t": 17.5,
+   "col": 40,
+   "row": 19,
+   "zoom": 2.2
+  },
+  {
+   "t": 17.5,
+   "col": 47,
+   "row": 39,
+   "zoom": 6.5,
+   "cut": true
+  },
+  {
+   "t": 21.0,
+   "col": 47,
+   "row": 39,
+   "zoom": 6.5
+  },
+  {
+   "col": 62,
+   "row": 30,
+   "zoom": 1.78,
+   "t": 21.0,
+   "cut": true
+  },
+  {
+   "col": 62,
+   "row": 30,
+   "zoom": 1.78,
+   "t": 24.0
+  },
+  {
+   "t": 24.0,
+   "col": 102,
+   "row": 37,
+   "zoom": 3.0,
+   "cut": true
+  },
+  {
+   "t": 28.0,
+   "col": 102,
+   "row": 37,
+   "zoom": 3.0
+  },
+  {
+   "t": 28.0,
+   "col": 52,
+   "row": 25.5,
+   "zoom": 3.5,
+   "cut": true
+  },
+  {
+   "t": 31.0,
+   "col": 52,
+   "row": 25.5,
+   "zoom": 3.5
+  },
+  {
+   "col": 62,
+   "row": 30,
+   "zoom": 1.78,
+   "t": 31.0,
+   "cut": true
+  },
+  {
+   "col": 62,
+   "row": 30,
+   "zoom": 1.78,
+   "t": 33.0
+  },
+  {
+   "t": 33.0,
+   "col": 108,
+   "row": 37,
+   "zoom": 3.2,
+   "cut": true
+  },
+  {
+   "t": 36.0,
+   "col": 108,
+   "row": 37,
+   "zoom": 3.2
+  },
+  {
+   "col": 62,
+   "row": 30,
+   "zoom": 1.78,
+   "t": 36.0,
+   "cut": true
+  },
+  {
+   "col": 62,
+   "row": 30,
+   "zoom": 1.78,
+   "t": 37.6
+  },
+  {
+   "t": 37.6,
+   "col": 110,
+   "row": 33,
+   "zoom": 3.2,
+   "cut": true
+  },
+  {
+   "t": 41.6,
+   "col": 110,
+   "row": 33,
+   "zoom": 3.2
+  },
+  {
+   "t": 41.6,
+   "col": 104,
+   "row": 31,
+   "zoom": 3.0,
+   "cut": true
+  },
+  {
+   "t": 46.0,
+   "col": 104,
+   "row": 31,
+   "zoom": 3.0
+  },
+  {
+   "col": 62,
+   "row": 30,
+   "zoom": 1.78,
+   "t": 46.0,
+   "cut": true
+  },
+  {
+   "col": 62,
+   "row": 30,
+   "zoom": 1.78,
+   "t": 49.0
+  }
+ ],
+ "captions": [
+  {
+   "t0": 10.2,
+   "t1": 13.4,
+   "text": "your agent, as a companion"
+  },
+  {
+   "t0": 17.9,
+   "t1": 23.7,
+   "text": "see how hard it's working"
+  },
+  {
+   "t0": 24.4,
+   "t1": 27.7,
+   "text": "with helpers for subagents"
+  },
+  {
+   "t0": 28.3,
+   "t1": 30.8,
+   "text": "your context, at a glance"
+  },
+  {
+   "t0": 38.6,
+   "t1": 41.4,
+   "text": "watch hermes think"
+  },
+  {
+   "t0": 42.2,
+   "t1": 45.7,
+   "text": "it asks when it needs you"
+  }
+ ],
+ "tags": [
+  {
+   "t0": 8.2,
+   "t1": 9.6,
+   "html": "the vista<small>with the owl</small>"
+  },
+  {
+   "t0": 31.1,
+   "t1": 32.9,
+   "html": "the shore<small>with the crab &middot; xscapes scape shore</small>"
+  },
+  {
+   "t0": 36.1,
+   "t1": 37.5,
+   "html": "the harbour<small>with the cat &middot; xscapes scape harbour</small>"
+  }
+ ],
+ "end": {
+  "toBlack": 0.5,
+  "url": "github.com/donlucasx/hermes-xscapes",
+  "urlAt": 5.3,
+  "urlCPS": 28,
+  "urlPx": 36,
+  "urlY": 760,
+  "hold": 2,
+  "fade": 0.6
+ },
+ "ownCursorUntil": 4.75
+}

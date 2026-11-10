@@ -13,6 +13,10 @@ const E = JSON.parse(fs.readFileSync(editPath, 'utf8'));
 fs.mkdirSync(out, { recursive: true });
 const load = (t, f) => fs.readFileSync(path.join(take, t, f), 'utf8').trim().split('\n').map(JSON.parse);
 const TK = {}; for (const s of E.segs) TK[s.take] ??= { tty: load(s.take, 'tty.jsonl'), marks: load(s.take, 'marks.jsonl') };
+if (E.stripPrompt) for (const k of Object.keys(TK)) for (const c of TK[k].tty) {
+  const b = Buffer.from(c.b, 'base64').toString('latin1').split(E.stripPrompt).join('');
+  c.b = Buffer.from(b, 'latin1').toString('base64');
+}
 const fontsDir = '/Users/lucasgarzoli/Documents/claude/xscapes/notes/trailer/fonts';
 const fontCss = fs.readFileSync(path.join(fontsDir, 'fonts-local.css'), 'utf8')
   .replace(/url\(([^)]+\.woff2)\)/g, (_, f) => `url(${path.join(fontsDir, path.basename(f))})`);
@@ -34,11 +38,11 @@ const rec = (v) => at(v).r;
 const html = `<!doctype html><html><head><meta charset="utf-8">
 <link rel="stylesheet" href="file://${here}/node_modules/@xterm/xterm/css/xterm.css">
 <style>${fontCss}
-html,body{margin:0;width:${W}px;height:${H}px;overflow:hidden;background:#0b0b0c}
-#stage{position:absolute;inset:0;background:radial-gradient(ellipse at 50% 40%,#2a2730 0%,#16151a 55%,#0b0b0c 100%)}
+html,body{margin:0;width:${W}px;height:${H}px;overflow:hidden;background:#0f0f10}
+#stage{position:absolute;inset:0;opacity:var(--k,1);background:radial-gradient(ellipse at 50% 40%,#2a2730 0%,#16151a 55%,#0b0b0c 100%)}
 #win{position:absolute;left:0;top:0;transform-origin:0 0;border-radius:14px;overflow:hidden;
- box-shadow:0 30px 90px rgba(0,0,0,.65),0 0 0 1px rgba(255,255,255,.09)}
-#bar{height:${Math.round(FS*1.6)}px;background:#2b2a2e;display:flex;align-items:center;position:relative;border-bottom:1px solid #1a191c}
+ box-shadow:0 30px 90px rgba(0,0,0,calc(.65*var(--k,1))),0 0 0 1px rgba(255,255,255,calc(.09*var(--k,1)))}
+#bar{opacity:var(--k,1);height:${Math.round(FS*1.6)}px;background:#2b2a2e;display:flex;align-items:center;position:relative;border-bottom:1px solid #1a191c}
 #bar i{width:${Math.round(FS*.52)}px;height:${Math.round(FS*.52)}px;border-radius:50%;margin-left:${Math.round(FS*.42)}px;display:block}
 #bar i:nth-child(1){background:#ff5f57;margin-left:${Math.round(FS*.7)}px}#bar i:nth-child(2){background:#febc2e}#bar i:nth-child(3){background:#28c840}
 #bar b{position:absolute;left:0;right:0;text-align:center;font:500 ${Math.round(FS*.62)}px -apple-system,"Helvetica Neue",sans-serif;color:#9d9aa3}
@@ -47,13 +51,13 @@ html,body{margin:0;width:${W}px;height:${H}px;overflow:hidden;background:#0b0b0c
 #cap{position:absolute;left:0;right:0;bottom:34px;text-align:center;font:500 ${E.captionPx}px "Geist Mono",monospace;color:#f2f2f2;
  text-shadow:0 2px 14px rgba(0,0,0,.9),0 0 3px rgba(0,0,0,.9);opacity:0;white-space:pre}
 #cap span{background:rgba(10,10,12,.55);padding:.25em .7em;border-radius:.35em}
-#tag{position:absolute;left:64px;top:52px;font:700 ${E.tagPx}px "Geist Mono",monospace;color:#f2f2f2;opacity:0;text-shadow:0 2px 12px rgba(0,0,0,.9)}
-#tag small{display:block;font-weight:400;font-size:.5em;color:#bdbdbd;margin-top:.2em}
+#tag{position:absolute;left:56px;top:44px;font:700 ${E.tagPx}px "Geist Mono",monospace;color:#f2f2f2;opacity:0;background:rgba(10,10,12,.82);padding:.3em .6em .35em;border-radius:.3em;box-shadow:0 0 0 1px rgba(255,255,255,.08)}
+#tag small{display:block;font-weight:400;font-size:.5em;color:#bdbdbd;margin-top:.25em}
 #endimg{position:absolute;inset:0;width:${W}px;height:${H}px;opacity:0}
 #url{position:absolute;left:0;right:0;top:${E.end.urlY}px;text-align:center;font:400 ${E.end.urlPx}px "Geist Mono",monospace;color:#9a9a9a;white-space:pre;opacity:0}
 #black{position:absolute;inset:0;background:#000;opacity:1;pointer-events:none}
 </style></head><body><div id="stage"></div>
-<div id="win"><div id="bar"><i></i><i></i><i></i><b id="title"></b></div><div id="term"></div></div>
+<div id="win"><div id="bar"><i></i><i></i><i></i><b id="title"></b></div><div id="term" style="position:relative"><div id="cur" style="position:absolute;background:#d8d8d8;display:none;z-index:9"></div></div></div>
 <div id="tag"></div><div id="cap"><span></span></div>
 <img id="endimg"><div id="url"></div><div id="black"></div>
 <script src="file://${here}/node_modules/@xterm/xterm/lib/xterm.js"></script><script src="file://${here}/node_modules/@xterm/addon-webgl/lib/addon-webgl.js"></script></body></html>`;
@@ -66,7 +70,7 @@ await page.evaluate(async ({ COLS, ROWS, FS }) => {
   await document.fonts.load(`400 ${FS}px "JetBrains Mono"`);
   await document.fonts.load(`500 40px "Geist Mono"`); await document.fonts.load(`700 40px "Geist Mono"`);
   const term = new Terminal({ cols: COLS, rows: ROWS, fontSize: FS, fontFamily: '"JetBrains Mono", Menlo, monospace',
-    lineHeight: 1.0, cursorBlink: false, allowProposedApi: true, scrollback: 0, customGlyphs: true,
+    lineHeight: 1.0, cursorBlink: false, cursorStyle: 'block', cursorInactiveStyle: 'block', allowProposedApi: true, scrollback: 0, customGlyphs: true,
     theme: { background: '#0f0f10', foreground: '#d8d8d8', cursor: '#d8d8d8' } });
   term.open(document.getElementById('term'));
   const gl = new WebglAddon.WebglAddon(); term.loadAddon(gl);
@@ -142,10 +146,11 @@ for (const i of frames) {
   const blk = v < E.fromBlack ? 1 - ease(v / E.fromBlack)
     : v < endAt ? ease((v - montageEnd) / E.end.toBlack)
     : v > total - E.end.fade ? ease((v - (total - E.end.fade)) / E.end.fade) : 0;
-  const cursorOn = Math.floor(rec(v) / 0.53) % 2 === 0;
+  const cursorOn = Math.floor(v / 0.53) % 2 === 0;
   await page.evaluate((p) => {
     const w = document.getElementById('win');
     w.style.transform = `translate(${p.t.x}px,${p.t.y}px) scale(${p.t.s})`;
+    document.documentElement.style.setProperty('--k', p.k);
     document.getElementById('title').textContent = p.title;
     const cap = document.getElementById('cap');
     cap.style.opacity = p.cap ? p.capO : 0; if (p.cap) cap.firstChild.textContent = p.cap;
@@ -157,12 +162,19 @@ for (const i of frames) {
     const u = document.getElementById('url'); u.style.opacity = p.end ? 1 : 0;
     u.textContent = p.url + (p.curOn ? '█' : ' ');
     document.getElementById('black').style.opacity = p.blk;
+    const cu = document.getElementById('cur');
+    if (p.ownCursor) {
+      const scr = document.querySelector('.xterm-screen'), tr = document.getElementById('term');
+      const cw = scr.clientWidth / 124, ch = scr.clientHeight / 44, b = window.term.buffer.active;
+      cu.style.left = (scr.offsetLeft + b.cursorX * cw) + 'px'; cu.style.top = (scr.offsetTop + b.cursorY * ch) + 'px';
+      cu.style.width = cw + 'px'; cu.style.height = ch + 'px'; cu.style.display = p.cursorOn ? 'block' : 'none';
+    } else cu.style.display = 'none';
     if (window._cur !== p.cursorOn) { window._cur = p.cursorOn; window.term.options.theme = { background: '#0f0f10', foreground: '#d8d8d8', cursor: p.cursorOn ? '#d8d8d8' : '#0f0f10', cursorAccent: '#0f0f10' }; }
-  }, { t, title: E.title, cap: cap?.text, capO: cap ? fade(v, cap.t0, cap.t1) : 0,
+  }, { t, k: E.chrome ? ease((v - E.chrome[0]) / (E.chrome[1] - E.chrome[0])) : 1, title: E.title, cap: cap?.text, capO: cap ? fade(v, cap.t0, cap.t1) : 0,
        tag: tag?.html, tagO: tag ? fade(v, tag.t0, tag.t1) : 0,
        end: v >= endAt, ef: 'file://' + path.join(here, 'endsrc', endFrames[ef]),
        url: E.end.url.slice(0, typed), curOn: v >= urlAt - 0.4 && (v < urlEnd + 0.3 || Math.floor(v / 0.5) % 2 === 0) && v >= endAt + 0.5,
-       blk: v >= endAt && v < endAt + 0.0001 ? 1 : blk, cursorOn });
+       blk: v >= endAt && v < endAt + 0.0001 ? 1 : blk, cursorOn, ownCursor: v < (E.ownCursorUntil ?? 0) });
   await page.screenshot({ path: path.join(out, want ? `still-${v.toFixed(2)}.png` : `f${String(i).padStart(5, '0')}.png`) });
   if (i % 60 === 0) process.stdout.write(`${v.toFixed(1)} `);
 }
