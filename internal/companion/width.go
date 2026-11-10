@@ -1,5 +1,7 @@
 package companion
 
+import "strings"
+
 // Terminals render CJK and many symbol characters two cells wide, which shears
 // a monospace grid apart. Rather than carry a Unicode East Asian Width table,
 // sprites are restricted to an ALLOW-LIST of runes verified narrow.
@@ -21,6 +23,7 @@ package companion
 // is no width table in this program and adding one is not worth it, so fail
 // closed: anything not known to be one cell wide becomes a placeholder.
 func NarrowOnly(s string) string {
+	s = plainPunct.Replace(s)
 	safe := true
 	for _, r := range s {
 		if !isNarrow(r) {
@@ -94,3 +97,14 @@ func (s *Sprite) UnsafeRunes() []rune {
 	}
 	return bad
 }
+
+// plainPunct turns the typographic punctuation agents write into its ASCII
+// form before anything is called unsafe: Hermes's replies are full of em
+// dashes and middle dots, and every one became a "?" in the balloon (his
+// screenshots, 2026-11-09).
+var plainPunct = strings.NewReplacer(
+	"\u2014", "-", "\u2013", "-", "\u2212", "-", "\u2010", "-", "\u2011", "-",
+	"\u00b7", ".", "\u2022", ".", "\u2026", "...",
+	"\u2018", "'", "\u2019", "'", "\u201c", `"`, "\u201d", `"`,
+	"\u2192", "->", "\u2190", "<-", "\u00a0", " ", "\u2009", " ", "\u202f", " ",
+)

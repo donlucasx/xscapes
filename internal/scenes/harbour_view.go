@@ -91,8 +91,11 @@ func (h *Harbour) paintView(c *canvas.Canvas, p scape.Palette, l float64, t floa
 		}
 	}
 	lhX := c.W - 5
-	fill(c, lhX, sy(5), lhX, lay.hz, grey(20))
-	fill(c, lhX, sy(4), lhX, sy(4), cube(175, 0, 0))
+	// Softened toward the haze like the containers beside it: a white
+	// tower with a pure red cap was the loudest thing in the frame (his
+	// note, 2026-11-09: "can we use colors that dont stand out as much?").
+	fill(c, lhX, sy(5), lhX, lay.hz, term.Lerp(grey(20), haze, 0.6))
+	fill(c, lhX, sy(4), lhX, sy(4), term.Lerp(cube(175, 0, 0), haze, 0.6))
 
 	// The water: the shore's own sea, with chop and the quay's lights laid
 	// on it by night.

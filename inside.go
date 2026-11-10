@@ -87,8 +87,11 @@ With no command, runs claude.
 	// The agent's hooks are what the scape is for. -watch=on is the explicit
 	// way to run on the output watcher instead; without it, a missing install
 	// is said out loud rather than shown as a scape that never fills.
+	hooked := false
 	if agent != "" && *watchMode != "on" {
-		switch st, where, have, want := hooksState(agent); st {
+		st, where, have, want := hooksState(agent)
+		hooked = st == hooksFull
+		switch st {
 		case hooksNone:
 			fmt.Fprint(os.Stderr, missingHooks(agent, where))
 			os.Exit(2)
@@ -161,7 +164,16 @@ With no command, runs claude.
 	}
 	var synth *watch.Synth
 	var synthRed *reduce.Reducer
-	if *watchMode != "off" {
+	switch {
+	case *watchMode == "auto" && hooked:
+		// The agent's hooks (or Hermes's plugin) are installed, so they will
+		// announce the session: wait for them on a still scene. Watching the
+		// output meanwhile read Hermes's start-up banner as work (rain) and
+		// knocked with its status line as the "done" (his screenshot,
+		// 2026-11-09 19:49), before the hooks had said anything.
+		synthRed = reduce.New("waiting")
+		fr.follow(nil, synthRed)
+	case *watchMode != "off":
 		synth = watch.New(watch.Options{})
 		synthRed = reduce.New("watch")
 		fr.follow(nil, synthRed)

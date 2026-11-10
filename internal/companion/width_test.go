@@ -150,3 +150,10 @@ func TestTierHysteresis(t *testing.T) {
 		}
 	}
 }
+
+func TestTypographicPunctuationIsPlainNotQuestionMarks(t *testing.T) {
+	got := NarrowOnly("3 subagents running — watch · “ok” → next…")
+	if want := `3 subagents running - watch . "ok" -> next...`; got != want {
+		t.Fatalf("got %q, want %q", got, want)
+	}
+}

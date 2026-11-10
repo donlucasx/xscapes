@@ -356,8 +356,10 @@ func (h *Harbour) todoStars(c *canvas.Canvas, p scape.Palette, n int) {
 // drawLitter is the reducer's kittens on the sill: each comes up from
 // inside the room (the ears over the sill's edge, the eyes, a held look,
 // the hop up) when it arrives and goes back down when it leaves, and
-// wanders in its own lane while it sits. They sit left of the cat, nearest
-// first, as many as there is room for before the plant.
+// wanders in its own lane while it sits. They spread along the sill: the
+// first beside the cat, the second beside the plant, the rest into the
+// widest gaps between (his note, 2026-11-09: "when there are multiple
+// kittens, they should spread out"), as many as there is room for.
 func (h *Harbour) drawLitter(c *canvas.Canvas, t float64) {
 	const walk = 1.6
 	// The first frame takes the litter as it finds it, already sitting (a
@@ -380,7 +382,13 @@ func (h *Harbour) drawLitter(c *canvas.Canvas, t float64) {
 	if c.W >= 60 {
 		minX = h.lay.plantX + 11
 	}
-	home := func(k int) int { return h.lay.catX - 16 - 10*k }
+	slots := kittenSlots(minX+1, h.lay.catX-16, 9)
+	home := func(k int) int {
+		if k < len(slots) {
+			return slots[k]
+		}
+		return -100 // no room left on the sill: not drawn
+	}
 	near := c.Near()
 	draw := func(k int, y int, on bool, x int, mirror, lift, blink bool) {
 		if !on || x < minX || x+6 > h.lay.catX {
@@ -496,4 +504,38 @@ func drawDiscAt(c *canvas.Canvas, p scape.Palette, ctx, cx, cy float64, day bool
 			}
 		}
 	}
+}
+
+// kittenSlots is where kittens sit on a sill running from left to right:
+// right first (beside the cat), then left (beside the plant), then the
+// middle of the widest gap, again and again, while a gap still holds a
+// kitten with gap to spare on both sides.
+func kittenSlots(left, right, gap int) []int {
+	if right < left {
+		return nil
+	}
+	out := []int{right}
+	if right-left < gap {
+		return out
+	}
+	out = append(out, left)
+	type span struct{ a, b int }
+	spans := []span{{left, right}}
+	for len(spans) > 0 {
+		w := 0
+		for i := range spans {
+			if spans[i].b-spans[i].a > spans[w].b-spans[w].a {
+				w = i
+			}
+		}
+		sp := spans[w]
+		spans = append(spans[:w], spans[w+1:]...)
+		m := (sp.a + sp.b) / 2
+		if m-sp.a < gap || sp.b-m < gap {
+			continue
+		}
+		out = append(out, m)
+		spans = append(spans, span{sp.a, m}, span{m, sp.b})
+	}
+	return out
 }
