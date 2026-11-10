@@ -1,36 +1,29 @@
 # Resume — xscapes
 
-## NOW (wrapped 2026-11-09 00:54 PST, session 48)
+## NOW (checkpoint 2026-11-10 ~01:30 PST, session 49, after an auto-compaction; no wrap ran before it)
 
-**Goal:** ship the engine host + the harbour as the next release, and enter the Hermes Agent Plugin
-Hackathon (due **WED NOV 11, 5 PM EST**: plugin, ~75 s demo, catalog PR, reply in Teknium's thread
-x.com/Teknium/status/2119270884800401440, typeform form.typeform.com/to/FwJLvOln).
+**Goal:** Hermes Agent Plugin Hackathon entry. Cutoff: **Wed Nov 11, 1 PM PST** (the form's 21:00 UTC).
+Entry = catalog PR + demo on X tagging @NousResearch + typeform form.typeform.com/to/FwJLvOln.
 
-**Done (s48):**
-- `5565794` the agent runs inside Ghostty's engine (libghostty-vt, `internal/gvt`, `-tags ghosttyvt`;
-  `-engine=ghostty` default in such a build, `-engine=` = the old band host): text reflows on resize.
-  He confirmed live in Terminal.app and Ghostty. `3bea2ef` reverts the autowrap patch. PUSHED.
-- `f3231a1` the harbour scape (`xscapes scape harbour`; cat on the sill, rain on the glass = the work);
-  his live look: "seems to work ok". `4a9a839` two defects + 8 tests (closed engine segfault; first
-  kitten appeared sitting). LOCAL, NOT PUSHED.
-- Hermes plugin: `~/Documents/claude/hermes-xscapes` (local git `c67daa3`; 5 pytest + `hermes plugins
-  validate` pass, scan safe; end-to-end into the real binary verified). NOT on GitHub.
-- Installed `~/.local/bin/xscapes` = the Kimi-fix commit + the engine.
+**Done since s48:** engine scrollback `7eb95f0` · recv log `c4d9ebf` · questions + moon/count from
+post_api_request `532f0d4` · thought puff `cc5982a` · plugin counts as installed `5912589` · still start,
+kittens spread `65d1190` · band 8/15 `9f86b10` · site + README `0a46028` · approval balloon names the
+risky program `7d68f14` `612307c` `e55c57d`. Releases v0.5.1-v0.5.3 published (no Ghostty engine: CGO off).
+Plugin github.com/donlucasx/hermes-xscapes pinned e6826ea (v0.2.0, 15 hooks). Drafts:
+`notes/launch/hermes-submission-drafts.md`, `hermes-catalog-entry.yaml` (git-excluded).
 
-**Next:**
-1. DONE overnight: Kimi's review (SHIP WITH FIXES) verified finding by finding in
-   `~/Documents/kimi/xscapes-engine-harbour-2026-11-09/VERIFIED.md`; 1 refuted (kitty stack), 17 fixed
-   with tests (commit after 4a9a839), the rest carried below.
-2. His word: push f3231a1 + 4a9a839 (`gh auth switch --user donlucasx && git push origin main`).
-3. His word: create github `donlucasx/hermes-xscapes`, push; put the SHA in `docs/catalog-entry.yaml`.
-4. Claude, his call on scope: release builds with the engine (release.sh cross-compiles CGO-off today,
-   so the install line ships the OLD band host): libghostty-vt per platform, a tag, the install line.
-5. Demo ~75 s at a fixed window size; then HE opens the catalog PR, replies to Teknium, submits.
-6. His: the plugin and the shell hooks both fire today on this machine (`xscapes uninstall hermes`
-   if the plugin is installed).
+**Now (Claude):** the 60 s demo video. Script: `notes/hermes-demo/SCRIPT.md` (captions v2, his prompt,
+ending URL github.com/donlucasx/hermes-xscapes). Workbench: session scratchpad `demo/`
+(rec.py records a real `xscapes hermes` session in a hidden pty; render.mjs replays it in xterm.js
+inside a window under a camera; endsrc/ = the Sept opener frames reused as the ending). Take 1 was
+discarded (another live xscapes session's events mixed in; fixed). Next: take 2, stills for his
+review, then audio (key clicks + shipped ask/done cues) and assemble.
 
-**Open questions for him:** ship the engine to installers before Nov 11 or after? · default scape
-(vista today) and whether the harbour joins the site · the park and the block views (drawn, not built).
+**Next (his):** open the catalog PR, post the demo on X, submit the form. After the demo: confirm
+`~/.config/xscapes/scape` is vista again.
+
+**Open questions for him:** none pending; the demo stills come next for his notes.
+**Later:** release the Ghostty engine (libghostty-vt per platform).
 
 **Carried open items (harvested from the archive + Kimi):**
 - Engine host gaps: no scrollback while running (transcript at exit; `-alt=false`/`-history` ignored:
