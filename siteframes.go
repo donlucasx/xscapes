@@ -152,8 +152,28 @@ func sceneClips(pal *canvas.HTMLPalette) []fxClip {
 					}},
 					{at: 38, evs: []event.Event{todo(3, 3), {Kind: event.Done, Text: "Rate limiting is in."}}},
 				}}},
+		// THE HARBOUR AS IT SHIPS (his note 2026-11-10: the page still showed
+		// the old art). It was the "Rainy window" study until then; now the
+		// live harbour through the same session fold as the shore: a prompt,
+		// a pause while it thinks (the thought puff), the work (rain), two
+		// kittens, the finish (the glass dries).
 		{key: "rain", label: "the harbour", note: "Rain on the glass is the work.",
-			scene: scenes.Find("Rainy window"), tod: 0.75, frames: scenes.RainPeriod, fps: 6, sc: gifScene{pal: pal}},
+			sc: gifScene{name: ScapeHarbour, tod: 0.75, secs: 8, fps: 6, speed: 6, pal: pal, cube: !truecolorFX,
+				beats: []loopBeat{
+					{at: 1, evs: []event.Event{{Kind: event.Prompt, Text: "tidy up the release notes"}, ctx(0.45)}},
+					{at: 7, evs: []event.Event{
+						tool(event.ToolStart, "h1", event.OpRead, "Read", "CHANGELOG.md", ""),
+						tool(event.ToolEnd, "h1", event.OpRead, "Read", "CHANGELOG.md", "212 lines"),
+					}},
+					{at: 10, evs: []event.Event{sub("ha1", "Explore", event.SubStart), sub("ha2", "Explore", event.SubStart)}},
+					{at: 14, evs: []event.Event{tool(event.ToolStart, "h2", event.OpEdit, "Edit", "CHANGELOG.md", "")}},
+					{at: 22, evs: []event.Event{
+						tool(event.ToolEnd, "h2", event.OpEdit, "Edit", "CHANGELOG.md", "+24 -9"),
+						tool(event.ToolStart, "h3", event.OpShell, "Bash", "go test ./...", ""),
+					}},
+					{at: 32, evs: []event.Event{tool(event.ToolEnd, "h3", event.OpShell, "Bash", "go test ./...", "ok")}},
+					{at: 40, evs: []event.Event{{Kind: event.Done, Text: "Release notes tidied."}}},
+				}}},
 		// His pick of 2026-09-15: the wind is the work, the fire is the light.
 		// Dusk, because that is when the peaks take the light.
 		{key: "vista", label: "the mountain vista", note: "The wind is the work.",

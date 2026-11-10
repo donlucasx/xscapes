@@ -13,6 +13,7 @@ import (
 	"github.com/donlucasx/xscapes/internal/companion"
 	"github.com/donlucasx/xscapes/internal/reduce"
 	"github.com/donlucasx/xscapes/internal/scape"
+	"github.com/donlucasx/xscapes/internal/scenes"
 	"github.com/donlucasx/xscapes/internal/term"
 )
 
@@ -323,22 +324,42 @@ func gifFrames(seed int64, sc gifScene) ([]string, error) {
 	c := canvas.New(sc.sceneCols(), sc.scapeRows(), canvas.AlphaFar, canvas.AlphaMid, canvas.AlphaNear)
 	lay := compose(c.W, ccw, true)
 	sh.MoonX = lay.MoonX
+	// The harbour draws through its own composer, as the live loop does
+	// (frames.compose): the cat on the sill whatever the shore's companion
+	// is, laid out on the shore companion's width like the live scape.
+	var hb *scenes.Harbour
+	var hcat *companion.Cat
+	if sc.name == ScapeHarbour {
+		hb = scenes.NewHarbour(seed, false)
+		hcat = companion.New(companion.NameCat)
+		hcat.FaceLeft(true)
+		hcat.MaxRung = 1
+	}
 	n := int(sc.secs * float64(sc.rate()))
 	var out []string
 	for i := 0; i < n; i++ {
 		st, t, now := run.at(i, n)
-		sh.Update(c, t, st.Act)
-		st.Tail = st.FitTail(now, lay.SandTo-lay.SandFrom)
-		// THE COMPANION WALKS UP BEFORE IT ASKS, in the clips too.
-		//
-		// This line is why the come-closer pose -- the best thing in the
-		// product -- had never appeared anywhere on the page. Approach had
-		// exactly one non-test caller, the live TUI (frames.go), so every
-		// rendered clip drew the animal at rung 0 and the ask read as a
-		// thumbnail with a balloon over it. The live loop drives the walk off
-		// its own frame time; so does this one.
-		cat.Approach(1/float64(sc.rate()), st.Pose == companion.NeedsYou)
-		drawScene(c, sh, cat, lay, st, t, seed, c.H-2-chh)
+		if hb != nil {
+			st.Tail = st.FitTail(now, c.W-4)
+			hcat.Approach(1/float64(sc.rate()), st.Pose == companion.NeedsYou)
+			hb.CatX = lay.CatX
+			hb.Kittens, hb.Exits = st.Kittens, st.KittenExits
+			hb.Update(c, t, st.Act)
+			drawHarbour(c, hb, hcat, lay, st, t)
+		} else {
+			sh.Update(c, t, st.Act)
+			st.Tail = st.FitTail(now, lay.SandTo-lay.SandFrom)
+			// THE COMPANION WALKS UP BEFORE IT ASKS, in the clips too.
+			//
+			// This line is why the come-closer pose -- the best thing in the
+			// product -- had never appeared anywhere on the page. Approach had
+			// exactly one non-test caller, the live TUI (frames.go), so every
+			// rendered clip drew the animal at rung 0 and the ask read as a
+			// thumbnail with a balloon over it. The live loop drives the walk off
+			// its own frame time; so does this one.
+			cat.Approach(1/float64(sc.rate()), st.Pose == companion.NeedsYou)
+			drawScene(c, sh, cat, lay, st, t, seed, c.H-2-chh)
+		}
 		// Truecolor, his direction of 2026-09-05: the page shows the scene at
 		// its best, not as the cube rounds it. The product still runs on the
 		// cube; the clips are what it is reaching for.

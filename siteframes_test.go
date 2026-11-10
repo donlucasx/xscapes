@@ -45,7 +45,10 @@ func TestWhatTheEmbeddedFramesCost(t *testing.T) {
 	t.Logf("palette: %d bytes of CSS, %d gzipped", len(pal.CSS()), gz(pal.CSS()))
 	totalGz += gz(pal.CSS())
 	t.Logf("TOTAL    raw %d  gzip %d  (today's GIFs: 5,100,000 raw)", totalRaw, totalGz)
-	if totalGz > 900_000 {
+	// 900 KB was Claude's line when the page went to text; 925 KB from
+	// 2026-11-10, when the harbour clip became the live scape (a real session
+	// fold costs ~19 KB more gzipped than the study it replaced).
+	if totalGz > 925_000 {
 		t.Errorf("the embedded frames gzip to %d bytes, which is too much page to wait for", totalGz)
 	}
 }
