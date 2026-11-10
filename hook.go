@@ -853,30 +853,32 @@ func program(cmd string) string {
 // its operators and the first program that is not plain setup or a look
 // around is the one named; a chain of nothing else names its first.
 func riskyProgram(cmd string) string {
-	first := ""
-	for _, seg := range shellSegments(cmd) {
-		prog := program(seg)
-		if !progName.MatchString(prog) {
-			// Not a plain program name: a piece of an argument, maybe a
-			// secret's. Name nothing from the pieces.
-			return program(cmd)
-		}
-		if first == "" {
-			first = prog
-		}
-		switch prog {
-		case "cd", "ls", "pwd", "echo", "printf", "cat", "mkdir", "touch", "true", "test", "[", "head", "tail", "wc", "stat", "env":
-			continue
-		}
-		return prog
-	}
-	if first == "" {
+	// Escapes, substitutions and comments are where a split can go wrong;
+	// with any of them the line is not taken apart at all.
+	if strings.ContainsAny(cmd, "\\`#") || strings.Contains(cmd, "$(") || strings.Contains(cmd, "${") {
 		return program(cmd)
 	}
-	return first
+	for _, seg := range shellSegments(cmd) {
+		// Only a program on the list of ones Hermes asks about can be named
+		// from a piece: whatever else a piece holds stays off the screen.
+		if prog := program(seg); riskyPrograms[prog] {
+			return prog
+		}
+	}
+	return program(cmd)
 }
 
-var progName = regexp.MustCompile(`^[A-Za-z0-9._+\[-]{1,24}$`)
+// riskyPrograms are the programs behind Hermes's dangerous-command patterns
+// (tools/approval_detection.py), the only words a piece of a chain may give
+// the balloon.
+var riskyPrograms = map[string]bool{
+	"rm": true, "rmdir": true, "chmod": true, "chown": true, "chgrp": true, "dd": true, "mkfs": true,
+	"kill": true, "pkill": true, "killall": true, "shutdown": true, "reboot": true, "halt": true, "poweroff": true,
+	"systemctl": true, "service": true, "launchctl": true, "diskutil": true, "fdisk": true, "parted": true,
+	"tee": true, "xargs": true, "find": true, "truncate": true, "shred": true, "mv": true, "cp": true,
+	"curl": true, "wget": true, "sh": true, "bash": true, "zsh": true, "python": true, "python3": true,
+	"git": true, "docker": true, "kubectl": true, "npm": true, "pip": true, "brew": true, "crontab": true,
+}
 
 // shellSegments splits a command line on && || ; | & and newlines, only
 // OUTSIDE quotes, and stops at the first heredoc (<<): what follows is data.

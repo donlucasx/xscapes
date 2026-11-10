@@ -177,6 +177,12 @@ func TestHermesApprovalNamesTheRiskyStep(t *testing.T) {
 		`echo 'a && sk-live-zzz' && rm -rf d`:                  "allow rm?",
 		"cat <<EOF\nsk-live-zzz; rm -rf /\nEOF":                "allow cat?",
 		`git commit -m "unbalanced && sk-x`:                    "allow git?",
+		// Escapes, substitutions and comments: the line is not split at all.
+		`echo a\;sk-live-zzz && rm d`:  "allow echo?",
+		`echo $(cat key); chmod 777 d`: "allow echo?",
+		"ls # sk-live-zzz; rm d":       "allow ls?",
+		// An unknown word in a piece is never named, whatever it looks like.
+		"mkdir d && sk-live-zzz --flag": "allow mkdir?",
 	} {
 		got := translate(payload(t, `{"hook_event_name":"pre_approval_request","session_id":"p","extra":{"command":`+jsonQuote(cmd)+`}}`))
 		if len(got) != 1 || got[0].Text != want {
