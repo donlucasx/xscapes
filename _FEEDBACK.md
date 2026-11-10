@@ -5697,3 +5697,4 @@ Resumed thinking the last session crashed; it had not (the 10-14 adoption check,
 - "xscapes hermes -scape 24 looks good" (his window ~45 rows, Ghostty) -> default scape = 8/15 of the window (24 at 45, 16 at 30), cap 28 kept. "Never the majority" was Claude's old rule, not his; dropped.
 - 11-10 00:09 approval test: Hermes asked (chain mkdir && chmod 777 && ls); balloon + alert pose appeared but read "allow mkdir?". Fixed: the balloon names the first non-setup program of a chain ("allow chmod?").
 - 11-10 approval: "1. yes 2. yes" (bird on the ask; balloon down after Allow once, then done knock + drop). Security review: chain split was quote-blind (an argument piece could reach the balloon); fixed 612307c.
+- 11-10 ruling: "lets keep vista default. And yes, id like to showcase all xscapes in the video." (not chosen: harbour as the Hermes default)
