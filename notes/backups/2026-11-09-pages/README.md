@@ -1,0 +1,307 @@
+<p align="center">
+  <img src="assets/readme/cover.gif" alt="xscapes: a thinking screen for terminal agents" width="100%">
+</p>
+
+<p align="center">
+  <b>Your agent works in the top of the window. A small living scene underneath shows what it is doing.</b><br>
+  The tide rises while it works, the sand records what it did, and the companion knocks when it needs you.
+</p>
+
+```sh
+curl -fsSL https://donlucasx.github.io/xscapes/install.sh | sh
+xscapes install claude --apply && xscapes claude
+```
+
+<p align="center"><a href="https://donlucasx.github.io/xscapes">site</a> · <a href="https://donlucasx.github.io/xscapes/manual.html">manual</a> · <a href="#install">install</a> · <a href="#what-you-are-looking-at">how to read it</a> · <a href="#the-protocol">the protocol</a></p>
+
+## Waiting for an agent is dead time
+
+You fire off a prompt, the terminal goes quiet, you tab away, and then you
+forget to come back. xscapes gives that time a face. Every element on screen
+is driven by the agent's real hook events, and each one means exactly one
+thing, so a glance from across the room is enough.
+
+<table>
+  <tr>
+    <td width="50%"><img src="assets/readme/shore.gif" alt="the shore at work"><br><b>The shore.</b> The sea rises with the work. What the agent is doing right now is written in the sand.</td>
+    <td width="50%"><img src="assets/readme/crab-pings-you.gif" alt="the crab asks for permission"><br><b>It needs you.</b> The crab walks up to the glass and asks, with its own sound. A finish sounds different.</td>
+  </tr>
+  <tr>
+    <td><img src="assets/readme/vista-timelapse.gif" alt="the mountain vista through a day"><br><b>The mountain vista.</b> The wind and the fire are the work. The sky follows your real clock.</td>
+    <td><img src="assets/readme/owlets.gif" alt="owlets arrive for subagents"><br><b>Subagents</b> arrive as owlets on the mountain and crablets on the shore, and leave when they finish.</td>
+  </tr>
+  <tr>
+    <td><img src="assets/readme/fire.gif" alt="the fire at night"><br><b>The fire is the work too</b>, from still air to a blaze. Context is the moon: it wanes and sinks as the window fills.</td>
+    <td><img src="assets/readme/owl-night.gif" alt="night on the scape"><br><b>Night falls</b> when yours does. Finished todos light up as stars.</td>
+  </tr>
+  <tr>
+    <td><img src="assets/readme/rain.gif" alt="the rainy window study"><br><b>The harbour</b>, through a rainy window, the cat on the sill: the rain on the glass is the work, and kittens come up over the sill for subagents (<code>xscapes scape harbour</code>).</td>
+    <td><img src="assets/readme/companions.gif" alt="the four companions"><br><b>Companions.</b> The crab and the cat ship today (<code>xscapes companion cat</code>), the owl lives on the vista, the frog is next.</td>
+  </tr>
+</table>
+
+It works with **Claude Code, Kimi Code CLI and Hermes Agent** through their
+hooks, and with anything else that runs in a terminal through a generic
+watcher (`xscapes inside <cmd>`). macOS and Linux, one Go binary, MIT.
+
+Underneath there is an **event protocol** with pluggable adapters, which is
+the part that generalises to any agent. On top there are the **scapes**, which
+are what that protocol looks like when you give it a sea and a crab, or a
+mountain and an owl.
+
+`xscapes claude -beside` gives you the older side-by-side layout instead: the
+agent in its own tmux pane, the scape in the next one.
+
+## Install
+
+One command, on a Mac or Linux, with or without Go. Windows is not supported
+natively: the host runs the agent on a Unix pseudo-terminal. Inside WSL it is
+a Linux box and should work as one; nobody has tested it yet.
+
+```sh
+curl -fsSL https://donlucasx.github.io/xscapes/install.sh | sh
+```
+
+Then wire it to your agent and run the agent inside the scape:
+
+```sh
+xscapes install claude --apply && xscapes claude    # Claude Code
+xscapes install kimi --apply   && xscapes kimi      # Kimi Code CLI
+hermes plugins install donlucasx/hermes-xscapes --enable && xscapes hermes    # Hermes Agent
+xscapes inside <any command>                        # anything else, no hooks
+```
+
+`xscapes install <agent>` without `--apply` prints the plan and writes nothing;
+with it, the hooks go in after a backup, and `uninstall` takes out exactly
+what was written. The launcher refuses to start without the agent's hooks,
+or with only part of them (an older install, or a block trimmed by hand),
+and prints that install line instead; hooks written by hand count as
+installed. `xscapes <agent> -watch=on` runs on the output watcher without
+them, which sees work and prompts but no tool names, asks or sub-agents;
+`xscapes inside <agent>` skips the check and binds to whatever hooks fire.
+
+The script puts the release binary in `~/.local/bin`. If that directory is
+not on your PATH it adds one line to your shell's rc file for every new
+terminal, and prints the next commands with a path that works in the
+current one. It is short; read it first if you like:
+[site/install.sh](site/install.sh).
+
+With Go you can build it yourself instead. `go install` on its own puts the
+binary in `~/go/bin`, which is on no Mac's PATH by default, so send it
+somewhere that is:
+
+```sh
+GOBIN=~/.local/bin go install github.com/donlucasx/xscapes@latest
+```
+
+Then run `xscapes claude` from whatever project you are working in. It is not
+something you run from this repo.
+
+`xscapes claude` has no dependencies at all. The older side by side layout,
+`xscapes claude -beside`, wants tmux:
+
+```sh
+brew install tmux
+```
+
+Without tmux it opens a second Terminal window instead. Uninstall restores your
+settings byte for byte.
+
+### How the agent runs inside the scape
+
+xscapes is not a terminal emulator, and deliberately so. It runs the agent on a
+pty, tells it the window is only as tall as its own band, and pins that band to
+the top of the screen with a scroll region. The agent's bytes then reach your
+terminal untouched -- so no bug in xscapes can corrupt the agent's own display,
+which is the failure a real emulator invites.
+
+The band is anchored at the top because that is the only place it can be. Lines
+scrolled out of a scroll region reach your scrollback only when the region
+starts at row 1: measured in Terminal.app, a region on rows 1-10 keeps every
+scrolled line and a region on rows 5-14 keeps none. Anything painted above the
+agent would cost you the ability to scroll back through its output. So the
+scape reads downward instead -- a strip of sky under the agent, then the sea,
+then the beach -- and a taller window spends its extra rows on beach, where the
+agent's work is written.
+
+It runs on the alternate screen, the way vim or htop do. That is not cosmetic:
+growing a window makes the terminal pull scrolled-off lines back in from
+history, which pushes the agent's UI down and out of its band -- and the agent
+never notices, because it emits nothing at all on a resize and places its input
+purely by relative moves from wherever the cursor is. Measured both ways: plain
+Claude Code survives that resize, Claude Code in a band on the main screen does
+not. The alternate screen has no history, so there is nothing to pull back.
+
+The alternate screen has no scrollback of its own, so xscapes feeds the
+terminal's. Every row that scrolls out of the agent's band is written into the
+main buffer behind the alternate screen, through a buffer switch that clears
+nothing, and Terminal.app shows the main buffer above the alternate screen: scroll
+up and the transcript is there, in order, right under the command you typed,
+with the wheel, selection and search you already use. Terminal.app drops most of
+that history when the alternate screen is given back, so when the session ends
+the transcript is printed once more, followed by the agent's final screen, the
+way a plain session leaves it. Early in a session there are blank rows between
+the transcript and the band until enough output has filled the buffer.
+`-history=false` turns all of it off.
+`-alt=false` runs on the main screen instead and takes the resize problem back.
+
+What xscapes gives up by not being an emulator: the sea does not show through
+the agent's own blank space. Its band is its own.
+
+## What you are looking at
+
+Everything on screen means one thing, and no two things share a channel.
+
+| what | how it reads |
+|---|---|
+| how hard the agent is working | **the sea**: how many swells are travelling, how tall, whitecaps above half |
+| what it is doing right now | **writing in the sand**, newest brightest, older lines taken by the tide |
+| something is broken | **the companion**: claws down, stalks short, amber eyes, and it stays until you come back |
+| it needs you | **a solid balloon** in a warm colour, plus a bright chime |
+| it finished | **a dotted balloon** in a cool colour, plus a low sonar note |
+| subagents | **crablets**, one per agent, some of them already in the water |
+| context left | **the sun by day, the moon by night** -- one body, phase and height, with a readout that stays quiet until 40% used |
+| time of day | **the sky**, from your actual clock |
+
+The rule underneath is that **the water is the work and the sky is the world**.
+Sea state always means the agent. Sky, light and time always mean reality.
+Nothing crosses. It is the reason a glance tells you anything at all: you never
+have to ask which of two meanings a change is carrying.
+
+The two knocks are deliberately different in shape as well as colour, so they
+survive a screenshot and a colourblind reading, and they carry different sounds,
+so they survive you looking at another pane. "I finished" and "I am blocked on
+you" are not the same message and should never look the same. A third sound,
+and only a third, marks a finish that left something broken: the companion is
+still worried when the turn ends, so the done knock plays its worried voice.
+Nothing else makes a sound.
+
+## The protocol
+
+Adapters translate an agent into events. The engine folds events into a scene.
+Anything that can emit these can drive a scape.
+
+```
+session_start  prompt  tool_start  tool_end  error  test_pass  test_fail
+sub_start  sub_end  needs_input  done  compact  context  todo  session_end
+```
+
+Send one by hand:
+
+```sh
+xscapes emit tool_end -tool Read -target internal/auth/handler.go -detail "142 lines"
+xscapes emit needs_input -text "allow Bash?"
+```
+
+Events reach a running scape over a unix socket in `~/.config/xscapes/run/`,
+and spool to a file when nothing is listening, so a scape started late still
+picks up the session. Settings are read from `XSCAPES_*`; the pre-rename
+`ASCIISCAPES_*` names still work and say so on stderr.
+
+**Adapter 1: Claude Code**, via hooks. `xscapes install claude` writes them.
+The payload schema was read out of the Claude Code binary rather than guessed;
+see `notes/claude-hooks-verified.md`.
+
+**Adapter 2: any program**, with no hooks at all. `xscapes inside <command>`
+watches the program's own traffic: its output is work, Enter is a prompt, and
+quiet after work is done (the "prompt back" nudge, with the done cue). It
+cannot know a question from a finish, so the ask cue never rings from it, and
+it names no tools; the sand carries the last line the program printed. It is
+on by default until an agent's hooks announce a session, and `-watch=on|off`
+forces it either way.
+
+**Adapter 3: Kimi Code CLI**, via its shell hooks. `xscapes install kimi`
+appends the hooks to `~/.kimi-code/config.toml` as a marked block, and
+`xscapes kimi` runs Kimi inside the scape. Kimi's event names are Claude
+Code's, but its payloads differ where it matters, and each was measured on
+Kimi itself (2026-09-17) rather than assumed: the prompt arrives as parts and the error
+as an object (both read); its todo tool is `TodoList` (it lights the stars);
+its permission prompt is the ask and its answer takes the ask down; Esc
+sends an interrupt in place of a finish (the scene settles, no cue); a
+subagent's own finish carries no mark, so a finish while one is open is not
+the turn's; and the spend counter and the moon read Kimi's own session
+files, since its hooks name no transcript.
+
+**Adapter 4: Hermes Agent**, through the Hermes plugin
+([donlucasx/hermes-xscapes](https://github.com/donlucasx/hermes-xscapes)):
+`hermes plugins install donlucasx/hermes-xscapes --enable`. It also forwards
+what the shell hooks cannot reach: questions and password prompts, and each
+model call's usage for the moon and the token count. The shell hooks still
+work (`xscapes install hermes` merges them into `~/.hermes/config.yaml`);
+use one or the other, or every event arrives twice.
+
+Every installer prints a plan and writes only with `--apply`; every
+uninstall removes exactly what it wrote. Writing another adapter means
+emitting the events above. Nothing in the engine knows what any agent is.
+
+## Everything else
+
+```sh
+xscapes companion crab     # choose the animal: crab (default) or cat
+xscapes scape harbour      # choose the scape: vista (default), shore or harbour; a running scape switches
+xscapes inside <command>   # host any command inside the scape, not just claude
+xscapes install kimi       # Kimi Code CLI hooks (a plan; --apply writes)
+xscapes kimi               # Kimi Code CLI inside the scape
+xscapes install hermes     # Hermes Agent hooks (a plan; --apply writes)
+xscapes hermes             # Hermes Agent inside the scape
+xscapes claude -beside     # the older side by side layout, in tmux
+xscapes claude -scape 24   # give the scape 24 rows (default: eight fifteenths of the window, at most 28)
+xscapes claude -fps 8      # slow the scape down
+xscapes claude -history=false  # do not mirror the transcript into the terminal's scrollback
+xscapes claude -alt=false  # run on the main screen, at the cost below
+xscapes -live              # the scape in this terminal, Ctrl-C to quit
+xscapes -info              # colour profile, size, which sound player
+xscapes notify             # hear the three knocks
+xscapes replay session.jsonl   # feed a recorded session back through the engine
+XSCAPES_COMPANION=cat …    # override the companion for one run, without saving it
+XSCAPES_SCAPE=vista …      # override the scape for one run, without saving it
+XSCAPES_SILENT=1 …         # mute
+XSCAPES_HOOKLOG=file …     # the hook command appends every raw payload and where it went (adapter debugging)
+XSCAPES_EVENTLOG=file …    # the scape appends every event its reducer applied (the other end of the same question)
+XSCAPES_HOOKLOG=1 …        # =1 picks ~/.config/xscapes/hooks.jsonl (and events.jsonl), like XSCAPES_TRACE=1
+                           # ⚠ the hook log holds every payload verbatim: your prompts, commands and paths
+```
+
+`xscapes claude -print` shows you how the window will be split and what will be
+run in it, and changes nothing. `xscapes claude -beside -print` does the same for
+the tmux layout.
+
+## Notes for anyone reading the code
+
+It is Go, standard library only, one static binary. No Node, no Python, no
+framework.
+
+Three things in here were harder than they look and are commented where they
+live:
+
+- **256 colours are not greyscale.** A dark palette collapses to grey because
+  the xterm cube has almost no resolution below luma 25. The fix is to keep the
+  darkness in the backgrounds and push the colour into the glyphs, which are the
+  bright part of the frame. `XSCAPES_CHROMA` tunes it.
+- **Activity is encoded in coverage, count and position, never in rate.** A
+  glance is the whole budget and a screenshot has no motion at all. The first
+  version mapped activity to wave speed and idle looked identical to flat out.
+- **The renderer is a real three layer alpha compositor**, so occlusion between
+  the companion, the crablets and the sea is decided once instead of per sprite.
+- **The host keeps its own copy of the screen.** It is not an emulator for the
+  agent's benefit, the agent's bytes still reach the terminal untouched, but
+  every byte the host sends is also fed through a small terminal model, so the
+  host knows which rows have left the band and what was in them. That is what
+  gets mirrored into the terminal's scrollback, and it is what the resize tests
+  replay a real session's bytes through.
+
+Run the tests with `go test ./...`. The interesting ones assert things that
+looked fine on screen and were not: that whiskers touch fur on their own row,
+that a sixty second permission nag rings once rather than once a minute, and
+that a killed agent eventually settles instead of leaving the companion working
+forever.
+
+## Status
+
+Early. The scape runs, the Claude Code adapter works, the sounds work, and the
+launcher works. Stars for completed todos are specified and not built. The
+companion's final coat and markings are still being chosen.
+
+## License
+
+MIT.

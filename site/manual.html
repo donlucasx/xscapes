@@ -73,8 +73,9 @@ hermes plugins install donlucasx/hermes-xscapes --enable &amp;&amp; xscapes herm
 <table>
 <tr><td>Claude Code</td><td><code>~/.claude/settings.json</code></td></tr>
 <tr><td>Kimi Code CLI</td><td><code>~/.kimi-code/config.toml</code></td></tr>
-<tr><td>Hermes Agent</td><td><code>~/.hermes/config.yaml</code></td></tr>
+<tr><td>Hermes Agent</td><td><code>~/.hermes/config.yaml</code> (or none: use the plugin)</td></tr>
 </table>
+<p>For Hermes Agent, the plugin is the better route: <code>hermes plugins install donlucasx/hermes-xscapes --enable</code>. It also passes on questions, password prompts and each model call's token use, which the shell hooks cannot. Use the plugin or the hooks, not both, or every event arrives twice.</p>
 <div class="cmd"><pre>xscapes install claude              <span class="c"># show the plan</span>
 xscapes install claude --apply      <span class="c"># write it</span>
 xscapes uninstall claude --apply    <span class="c"># take it out again</span></pre></div>
@@ -86,8 +87,8 @@ xscapes uninstall claude --apply    <span class="c"># take it out again</span></
 <p>If you have no status line, <code>xscapes statusline</code> on its own works and leaves the bar empty.</p>
 
 <h2 id="choose">Scapes and companions</h2>
-<p>Two scapes ship: the mountain vista with the owl, which is the default, and the shore with the crab. A running scape switches on its next frame. The crab is the default companion on the shore, and the cat is the other choice.</p>
-<div class="cmd"><pre>xscapes scape vista       <span class="c"># or: shore</span>
+<p>Three scapes ship: the mountain vista with the owl, which is the default, the shore with the crab, and the harbour with the cat. A running scape switches on its next frame. The crab is the default companion on the shore, and the cat is the other choice.</p>
+<div class="cmd"><pre>xscapes scape harbour     <span class="c"># or: vista, shore</span>
 xscapes companion cat     <span class="c"># or: crab</span>
 xscapes scape             <span class="c"># show the current choice</span></pre></div>
 <p>To try one for a single run without saving it, set <code>XSCAPES_SCAPE=shore</code> or <code>XSCAPES_COMPANION=cat</code> in front of the command.</p>

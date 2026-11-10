@@ -1,0 +1,155 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<script>try{if(localStorage.getItem("xscapes-theme")==="light")document.documentElement.setAttribute("data-theme","light")}catch(e){}</script>
+<title>xscapes &middot; manual</title>
+<meta name="description" content="Every xscapes command: install, run it with Claude Code, Kimi or Hermes, choose a scape and a companion, wire the context moon, and fix the usual problems.">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&family=Geist+Mono:wght@700&display=swap">
+<style>
+:root{--g:#121212;--s:#1a1a1a;--ln:#2e2e2e;--d:#8a8a8a;--dd:#bcbcbc;--i:#eeeeee;--acc:#87afff;
+  --mono:"JetBrains Mono",ui-monospace,"SF Mono",Menlo,monospace;--lh:1.55rem}
+html[data-theme="light"]{color-scheme:light;--g:#eeeeee;--s:#e4e4e4;--ln:#d0d0d0;--d:#626262;--dd:#303030;--i:#121212;--acc:#005f87}
+*{box-sizing:border-box}
+html,body{margin:0;padding:0;background:var(--g);color:var(--i)}
+body{font-family:var(--mono);font-size:15px;line-height:var(--lh);-webkit-font-smoothing:antialiased}
+a{color:var(--acc);text-decoration:none;border-bottom:1px solid currentColor}
+main{max-width:min(80ch,100%);margin:0 auto;padding:calc(var(--lh)*2) 2ch calc(var(--lh)*4)}
+.top{display:flex;justify-content:space-between;align-items:baseline;gap:2ch;flex-wrap:wrap}
+.lockup{font:700 28px/1.2 "Geist Mono",var(--mono);color:var(--i)}
+.blk{display:inline-block;width:1ch;line-height:1.2em;text-align:center;vertical-align:top;background:var(--i);color:var(--g)}
+.top a,.top button{font-size:13px}
+button.theme{font:13px var(--mono);color:var(--d);background:none;border:1px solid var(--ln);padding:0 1ch;cursor:pointer}
+h1{font-size:15px;font-weight:700;color:var(--d);margin:var(--lh) 0 0;letter-spacing:.08em;text-transform:uppercase}
+h2{font-size:14px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;margin:calc(var(--lh)*2) 0 calc(var(--lh)/2);
+  padding-bottom:4px;border-bottom:1px solid var(--ln)}
+p,li{color:var(--dd);max-width:66ch}
+ul{padding-left:2ch}
+nav{margin-top:var(--lh);font-size:13px;color:var(--d);line-height:1.9}
+nav a{margin-right:1.5ch}
+.cmd{position:relative;background:var(--s);border:1px solid var(--ln);margin:calc(var(--lh)/2) 0;padding:10px 12ch 10px 2ch;overflow-x:auto}
+.cmd pre{margin:0;font:13px/1.6 var(--mono);color:var(--i);white-space:pre}
+.cmd .c{color:var(--d)}
+.copy{position:absolute;top:8px;right:1ch;font:12px var(--mono);color:var(--d);background:var(--g);border:1px solid var(--ln);padding:0 1ch;cursor:pointer}
+table{border-collapse:collapse;width:100%;font-size:13px;margin:calc(var(--lh)/2) 0}
+td{border-top:1px solid var(--ln);padding:6px 1ch 6px 0;vertical-align:top;color:var(--dd)}
+td:first-child{color:var(--i);white-space:nowrap;padding-right:2ch}
+code{font:inherit;color:var(--i);white-space:nowrap}
+footer{margin-top:calc(var(--lh)*3);font-size:13px;color:var(--d)}
+</style>
+</head>
+<body>
+<main>
+<div class="top">
+  <a href="./" style="border:0"><span class="lockup"><span class="blk">x</span>scapes</span></a>
+  <span><a href="./">site</a> &nbsp; <a href="https://github.com/donlucasx/xscapes">github</a> &nbsp; <button class="theme" type="button" onclick="flip()">light / dark</button></span>
+</div>
+<h1>Manual</h1>
+<nav>
+  <a href="#install">install</a><a href="#run">run it</a><a href="#hooks">hooks</a><a href="#moon">context moon</a><a href="#choose">scapes and companions</a><a href="#sound">sound</a><a href="#layout">layout</a><a href="#debug">debugging</a><a href="#trouble">troubleshooting</a><a href="#remove">update and remove</a>
+</nav>
+
+<h2 id="install">Install</h2>
+<p>macOS or Linux, with or without Go. The script downloads the release binary into <code>~/.local/bin</code> and, if that folder is not on your PATH, adds one line to your shell's rc file. It is short, so <a href="https://github.com/donlucasx/xscapes/blob/main/site/install.sh">read it first</a> if you like.</p>
+<div class="cmd"><pre>curl -fsSL https://donlucasx.github.io/xscapes/install.sh | sh</pre></div>
+<p>With Go you can build it yourself. Point <code>GOBIN</code> at a folder on your PATH, because <code>~/go/bin</code> is on no Mac's PATH by default.</p>
+<div class="cmd"><pre>GOBIN=~/.local/bin go install github.com/donlucasx/xscapes@latest</pre></div>
+<p>Windows is not supported natively, because the agent runs on a Unix pseudo-terminal. WSL should work like any Linux box, but nobody has tested it yet.</p>
+
+<h2 id="run">Run it</h2>
+<p>Install the hooks for your agent once, then start the agent through xscapes from whatever project you are working in. The agent takes the top of the window and the scape fills the rest.</p>
+<div class="cmd"><pre>xscapes install claude --apply &amp;&amp; xscapes claude    <span class="c"># Claude Code</span>
+xscapes install kimi --apply   &amp;&amp; xscapes kimi      <span class="c"># Kimi Code CLI</span>
+hermes plugins install donlucasx/hermes-xscapes --enable &amp;&amp; xscapes hermes    <span class="c"># Hermes Agent</span></pre></div>
+<p>Anything else that runs in a terminal can live in the scape too. Without hooks xscapes watches the output instead, so it sees work and prompts but not tool names, questions or subagents.</p>
+<div class="cmd"><pre>xscapes inside &lt;any command&gt;</pre></div>
+<p>Arguments after <code>--</code> go to the agent, for example to resume a session:</p>
+<div class="cmd"><pre>xscapes claude -- --continue</pre></div>
+<p><code>xscapes claude -print</code> shows how the window will be split and what will run in it, and changes nothing.</p>
+
+<h2 id="hooks">Hooks</h2>
+<p>The hooks are how xscapes hears your agent. <code>install</code> without <code>--apply</code> prints the plan and writes nothing. With <code>--apply</code> it backs up your config first, then adds its lines. <code>uninstall</code> removes exactly what it wrote.</p>
+<table>
+<tr><td>Claude Code</td><td><code>~/.claude/settings.json</code></td></tr>
+<tr><td>Kimi Code CLI</td><td><code>~/.kimi-code/config.toml</code></td></tr>
+<tr><td>Hermes Agent</td><td><code>~/.hermes/config.yaml</code></td></tr>
+</table>
+<div class="cmd"><pre>xscapes install claude              <span class="c"># show the plan</span>
+xscapes install claude --apply      <span class="c"># write it</span>
+xscapes uninstall claude --apply    <span class="c"># take it out again</span></pre></div>
+<p>The launcher refuses to start when the hooks are missing or only partly there, and prints the install line instead. Hooks you wrote by hand count. To run without hooks anyway, use <code>xscapes claude -watch=on</code>.</p>
+
+<h2 id="moon">The context moon</h2>
+<p>For Claude Code, the moon shows how much of the context window is left. It reads that from Claude Code's status line, which <code>install</code> leaves alone because you may already have one. Set your <code>statusLine</code> command in <code>~/.claude/settings.json</code> to:</p>
+<div class="cmd"><pre>xscapes statusline -- &lt;your existing statusline command&gt;</pre></div>
+<p>If you have no status line, <code>xscapes statusline</code> on its own works and leaves the bar empty.</p>
+
+<h2 id="choose">Scapes and companions</h2>
+<p>Two scapes ship: the mountain vista with the owl, which is the default, and the shore with the crab. A running scape switches on its next frame. The crab is the default companion on the shore, and the cat is the other choice.</p>
+<div class="cmd"><pre>xscapes scape vista       <span class="c"># or: shore</span>
+xscapes companion cat     <span class="c"># or: crab</span>
+xscapes scape             <span class="c"># show the current choice</span></pre></div>
+<p>To try one for a single run without saving it, set <code>XSCAPES_SCAPE=shore</code> or <code>XSCAPES_COMPANION=cat</code> in front of the command.</p>
+
+<h2 id="sound">Sound</h2>
+<p>xscapes makes three sounds and nothing else: one when the agent needs you, one when it finishes, and a third when it finishes with something still broken. It stays silent while the agent works.</p>
+<div class="cmd"><pre>xscapes notify            <span class="c"># hear all three</span>
+xscapes notify ask        <span class="c"># or: done, worried</span>
+XSCAPES_SILENT=1 xscapes claude   <span class="c"># mute</span></pre></div>
+
+<h2 id="layout">Layout</h2>
+<table>
+<tr><td>-scape 24</td><td>give the scape 24 rows (the default is eight fifteenths of the window, at most 28)</td></tr>
+<tr><td>-fps 8</td><td>animate at 8 frames a second</td></tr>
+<tr><td>-beside</td><td>the older layout: the agent in its own tmux pane, the scape in the next one (needs tmux)</td></tr>
+<tr><td>-history=false</td><td>stop copying the transcript into your terminal's scrollback</td></tr>
+<tr><td>-alt=false</td><td>run on the main screen; a window resize can then push the agent out of place</td></tr>
+</table>
+<p>Use them after the agent name, for example <code>xscapes claude -scape 24</code>.</p>
+
+<h2 id="debug">Debugging</h2>
+<table>
+<tr><td>xscapes -info</td><td>colour profile, window size and sound player</td></tr>
+<tr><td>xscapes -live</td><td>the scape alone in this terminal; Ctrl-C quits</td></tr>
+<tr><td>xscapes emit &lt;kind&gt;</td><td>send one event by hand, for example <code>xscapes emit done</code></td></tr>
+<tr><td>xscapes replay &lt;file&gt;</td><td>feed a recorded event log to a running scape</td></tr>
+<tr><td>XSCAPES_HOOKLOG=1</td><td>log every raw hook payload to <code>~/.config/xscapes/hooks.jsonl</code></td></tr>
+<tr><td>XSCAPES_EVENTLOG=1</td><td>log every event the scape applied to <code>~/.config/xscapes/events.jsonl</code></td></tr>
+</table>
+<p>The hook log keeps every payload as it arrived, which includes your prompts, commands and file paths. Delete it when you are done.</p>
+
+<h2 id="trouble">Troubleshooting</h2>
+<table>
+<tr><td>command not found</td><td>Open a new terminal, or run <code>~/.local/bin/xscapes</code>. The install script prints the full path for the window you ran it in.</td></tr>
+<tr><td>the launcher refuses to start</td><td>The hooks are missing or incomplete. Run the install line it prints.</td></tr>
+<tr><td>nothing moves while the agent works</td><td>Check the hooks with <code>xscapes install claude</code>, which lists each one. Then try <code>xscapes emit prompt</code> in another window.</td></tr>
+<tr><td>no moon</td><td>Wire the status line, see <a href="#moon">the context moon</a>.</td></tr>
+<tr><td>an update did not show up</td><td>A running scape keeps the binary it started with. Quit the agent and start <code>xscapes claude</code> again.</td></tr>
+<tr><td>no sound</td><td>Run <code>xscapes -info</code> to see which player it found, and check that <code>XSCAPES_SILENT</code> is not set.</td></tr>
+</table>
+
+<h2 id="remove">Update and remove</h2>
+<p>To update, run the install line again. It fetches the latest release.</p>
+<div class="cmd"><pre>curl -fsSL https://donlucasx.github.io/xscapes/install.sh | sh</pre></div>
+<p>To remove xscapes, take the hooks out first, then delete the binary and its settings folder.</p>
+<div class="cmd"><pre>xscapes uninstall claude --apply     <span class="c"># and kimi, hermes if you used them</span>
+rm ~/.local/bin/xscapes
+rm -rf ~/.config/xscapes</pre></div>
+
+<footer>MIT licence. Source and issues on <a href="https://github.com/donlucasx/xscapes">GitHub</a>.</footer>
+</main>
+<script>
+function flip(){var h=document.documentElement,l=h.getAttribute("data-theme")==="light";
+  if(l)h.removeAttribute("data-theme");else h.setAttribute("data-theme","light");
+  try{localStorage.setItem("xscapes-theme",l?"dark":"light")}catch(e){}}
+document.querySelectorAll(".cmd").forEach(function(box){
+  var b=document.createElement("button");b.className="copy";b.type="button";b.textContent="copy";
+  b.onclick=function(){
+    var t=box.querySelector("pre").innerText.split("\n").map(function(l){return l.replace(/\s+#.*$/,"")}).join("\n").trim();
+    var done=function(){b.textContent="copied";setTimeout(function(){b.textContent="copy"},1200)};
+    if(navigator.clipboard)navigator.clipboard.writeText(t).then(done,function(){});};
+  box.appendChild(b);});
+</script>
+</body>
+</html>

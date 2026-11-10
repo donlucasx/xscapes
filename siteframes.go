@@ -152,7 +152,7 @@ func sceneClips(pal *canvas.HTMLPalette) []fxClip {
 					}},
 					{at: 38, evs: []event.Event{todo(3, 3), {Kind: event.Done, Text: "Rate limiting is in."}}},
 				}}},
-		{key: "rain", label: "the rainy window", note: "Rain on the glass is the work.",
+		{key: "rain", label: "the harbour", note: "Rain on the glass is the work.",
 			scene: scenes.Find("Rainy window"), tod: 0.75, frames: scenes.RainPeriod, fps: 6, sc: gifScene{pal: pal}},
 		// His pick of 2026-09-15: the wind is the work, the fire is the light.
 		// Dusk, because that is when the peaks take the light.

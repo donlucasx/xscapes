@@ -35,7 +35,7 @@ thing, so a glance from across the room is enough.
     <td><img src="assets/readme/owl-night.gif" alt="night on the scape"><br><b>Night falls</b> when yours does. Finished todos light up as stars.</td>
   </tr>
   <tr>
-    <td><img src="assets/readme/rain.gif" alt="the rainy window study"><br><b>The harbour</b>, through a rainy window, the cat on the sill: the rain on the glass is the work, and kittens come up over the sill for subagents (<code>xscapes scape harbour</code>).</td>
+    <td><img src="assets/readme/rain.gif" alt="the harbour"><br><b>The harbour</b>, through a rainy window, the cat on the sill: the rain on the glass is the work, a thought cloud means it is thinking, and kittens come up over the sill for subagents (<code>xscapes scape harbour</code>).</td>
     <td><img src="assets/readme/companions.gif" alt="the four companions"><br><b>Companions.</b> The crab and the cat ship today (<code>xscapes companion cat</code>), the owl lives on the vista, the frog is next.</td>
   </tr>
 </table>
@@ -242,7 +242,8 @@ xscapes scape harbour      # choose the scape: vista (default), shore or harbour
 xscapes inside <command>   # host any command inside the scape, not just claude
 xscapes install kimi       # Kimi Code CLI hooks (a plan; --apply writes)
 xscapes kimi               # Kimi Code CLI inside the scape
-xscapes install hermes     # Hermes Agent hooks (a plan; --apply writes)
+hermes plugins install donlucasx/hermes-xscapes --enable   # Hermes Agent, through its plugin
+xscapes install hermes     # or Hermes Agent's shell hooks (a plan; --apply writes)
 xscapes hermes             # Hermes Agent inside the scape
 xscapes claude -beside     # the older side by side layout, in tmux
 xscapes claude -scape 24   # give the scape 24 rows (default: eight fifteenths of the window, at most 28)
@@ -298,9 +299,10 @@ forever.
 
 ## Status
 
-Early. The scape runs, the Claude Code adapter works, the sounds work, and the
-launcher works. Stars for completed todos are specified and not built. The
-companion's final coat and markings are still being chosen.
+Working, and still growing. Three scapes ship (the mountain vista with the owl,
+the shore with the crab, the harbour with the cat), with adapters for Claude
+Code, Kimi Code CLI and Hermes Agent (a Hermes plugin). Next: the aquarium with
+the frog, and more agents (Codex CLI, Gemini CLI, OpenCode).
 
 ## License
 

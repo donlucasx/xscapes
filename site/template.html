@@ -450,7 +450,7 @@ html[data-theme="light"] .tab[aria-selected="true"]{color:#eeeeee}
 <div class="grid2 agents">
 <div><p class="cap"><span class="chip">Claude Code</span></p><div class="cmd"><div class="cl"><code class="cs"><span class="pr">$</span> xscapes install claude --apply</code></div><div class="cl"><code class="cs"><span class="pr">$</span> xscapes claude</code></div></div></div>
 <div><p class="cap"><span class="chip">Kimi Code CLI</span></p><div class="cmd"><div class="cl"><code class="cs"><span class="pr">$</span> xscapes install kimi --apply</code></div><div class="cl"><code class="cs"><span class="pr">$</span> xscapes kimi</code></div></div></div>
-<div><p class="cap"><span class="chip">Hermes Agent</span></p><div class="cmd"><div class="cl"><code class="cs"><span class="pr">$</span> xscapes install hermes --apply</code></div><div class="cl"><code class="cs"><span class="pr">$</span> xscapes hermes</code></div></div></div>
+<div style="grid-column:1/-1"><p class="cap"><span class="chip">Hermes Agent</span> a Hermes plugin</p><div class="cmd"><div class="cl"><code class="cs"><span class="pr">$</span> hermes plugins install donlucasx/hermes-xscapes --enable</code></div><div class="cl"><code class="cs"><span class="pr">$</span> xscapes hermes</code></div></div></div>
 <div><p class="cap"><span class="chip">Anything else</span> no hooks needed</p><div class="cmd"><div class="cl"><code class="cs"><span class="pr">$</span> xscapes inside &lt;any command&gt;</code></div></div></div>
 </div>
 <p class="cap">Mac and Linux. Not Windows yet: the agent runs on a Unix pseudo-terminal; inside WSL it is a Linux box and should work, untested. Coming soon: Codex CLI, Gemini CLI, OpenCode. Every command and option is in the <a href="manual.html">manual</a>.</p>
@@ -464,17 +464,17 @@ html[data-theme="light"] .tab[aria-selected="true"]{color:#eeeeee}
 <p class="sub wide">The mountain vista ships as the default. Swap landscapes or companions with one command, mid-session included; a running scape picks it up on its next frame.</p>
 <div class="cast">
 <div><div class="stage port" aria-hidden="true"><div class="fx" data-clip="cast-crab"></div></div><p class="cap"><b>Hero the crab.</b> The shore's companion.</p></div>
-<div><div class="stage port" aria-hidden="true"><div class="fx" data-clip="cast-cat"></div></div><p class="cap"><b>The cat.</b> Came first. One command away.</p></div>
+<div><div class="stage port" aria-hidden="true"><div class="fx" data-clip="cast-cat"></div></div><p class="cap"><b>The cat.</b> The harbour's companion, on the sill, with kittens for subagents.</p></div>
 <div><div class="stage port" aria-hidden="true"><div class="fx" data-clip="cast-owl"></div></div><p class="cap"><b>The owl.</b> The vista's companion: five faces, owlets for subagents.</p></div>
 <div><div class="stage port" aria-hidden="true"><div class="fx" data-clip="cast-frog"></div></div><p class="cap"><b>The frog.</b> Drawn for the aquarium. Next.</p></div>
 </div>
 <div class="wide"><div class="win" data-title="the mountain vista &middot; with the owl" data-right="the wind is the work"><div class="boxtop" aria-hidden="true"></div><div class="stage" aria-hidden="true"><div class="fx" data-clip="vista"></div></div><div class="boxbot" aria-hidden="true"></div></div><p class="cap"><b>The mountain vista, with the owl.</b> The default. The wind is the work: still air is a straight column of smoke and upright grass; as the agent gets busy the smoke streams sideways, the scrub flattens and the air fills. The fire lights the meadow at night, and the peaks take the last light at dusk.</p></div>
 <div class="wide"><div class="win" data-title="the shore &middot; with the crab" data-right="the sea is the work"><div class="boxtop" aria-hidden="true"></div><div class="stage" aria-hidden="true"><div class="fx" data-clip="shore"></div></div><div class="boxbot" aria-hidden="true"></div></div><p class="cap"><b>The shore, with the crab.</b> The sea is the work: more and taller swells as the agent works, flat water while it waits, and the tide comes up the beach with it. Crablets for subagents, the moon over the water, the last tool calls written in the sand.</p></div>
 <div class="grid2">
-<div><div class="win" data-title="the rainy window &middot; with the cat"><div class="boxtop" aria-hidden="true"></div><div class="stage" aria-hidden="true"><div class="fx" data-clip="rain"></div></div><div class="boxbot" aria-hidden="true"></div></div><p class="cap"><b>The rainy window, with the cat.</b> Rain on the glass is the work: harder as the agent gets busy, then easing. The city behind it carries the hour. Drawn; next.</p></div>
+<div><div class="win" data-title="the harbour &middot; with the cat" data-right="the rain is the work"><div class="boxtop" aria-hidden="true"></div><div class="stage" aria-hidden="true"><div class="fx" data-clip="rain"></div></div><div class="boxbot" aria-hidden="true"></div></div><p class="cap"><b>The harbour, with the cat.</b> Rain on the glass is the work, and it dries when the work stops. A thought cloud over the cat while the agent thinks, kittens on the sill for subagents, the ferries and the lighthouse on the hour.</p></div>
 <div><div class="win" data-title="the aquarium &middot; with the frog"><div class="boxtop" aria-hidden="true"></div><div class="stage" aria-hidden="true"><div class="fx" data-clip="aquarium"></div></div><div class="boxbot" aria-hidden="true"></div></div><p class="cap"><b>The aquarium, with the frog.</b> More fish come out as the work picks up, the tank's lamp is the light, and the gravel is where it settles. Drawn; next.</p></div>
 </div>
-<div class="cmd"><div class="cl"><code class="cs"><span class="pr">$</span> xscapes scape shore          <span class="c"># or vista, the default</span></code></div><div class="cl"><code class="cs"><span class="pr">$</span> xscapes companion cat       <span class="c"># or crab</span></code></div></div>
+<div class="cmd"><div class="cl"><code class="cs"><span class="pr">$</span> xscapes scape harbour        <span class="c"># or shore, or vista (the default)</span></code></div><div class="cl"><code class="cs"><span class="pr">$</span> xscapes companion cat       <span class="c"># or crab</span></code></div></div>
 </section>
 
 <div class="sec" id="s-protocol" data-title="Protocol"><div class="boxtop" aria-hidden="true"></div></div>
@@ -484,7 +484,7 @@ html[data-theme="light"] .tab[aria-selected="true"]{color:#eeeeee}
 <div class="cmd pre" data-title="events">session_start  session_end  prompt  tool_start  tool_end  error
 test_pass  test_fail  compact  needs_input  answered  done
 sub_start  sub_end  todo  context  interrupt</div>
-<p class="sub wide">Claude Code, Kimi Code CLI and Hermes Agent ship with adapters made of their own hooks; anything else is watched through its output. A new adapter is whatever emits the events:</p>
+<p class="sub wide">Claude Code, Kimi Code CLI and Hermes Agent (through its plugin) ship with adapters made of their own hooks; anything else is watched through its output. A new adapter is whatever emits the events:</p>
 <div class="cmd"><div class="cl"><code class="cs"><span class="pr">$</span> xscapes emit tool_end -tool Read -target internal/auth/handler.go</code></div><div class="cl"><code class="cs"><span class="pr">$</span> xscapes emit needs_input -text "allow Bash?"</code></div></div>
 <p class="sub wide">And it is not a loop: the sea is the work, the sand the last few actions, the sky your own clock, so no two sessions draw the same picture. It asks nothing of you, and the agent's output reaches your terminal byte for byte, never in the way of the work.</p>
 </section>
