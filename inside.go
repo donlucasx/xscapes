@@ -55,7 +55,7 @@ func runInside(args []string, agent string) {
 	tod := fs.Float64("tod", 0, "pin the time of day, 0..1 (0 = the wall clock)")
 	ctxUsed := fs.Float64("ctx", 0, "pin context used, 0..1 (0 = the session's own)")
 	dry := fs.Bool("print", false, "print what would run and how the window splits, then exit")
-	scapeH := fs.Int("scape", 0, "rows to give the scape (0 = two fifths of the window)")
+	scapeH := fs.Int("scape", 0, "rows to give the scape (0 = eight fifteenths of the window, at most 28)")
 	alt := fs.Bool("alt", true, "run on the alternate screen: resize-proof, but the agent's output does not go to your terminal's scrollback")
 	appleTerminal := os.Getenv("TERM_PROGRAM") == "Apple_Terminal"
 	history := fs.Bool("history", appleTerminal, "mirror rows that leave the agent's band into the terminal's own scrollback; in Terminal.app, which drops them at exit, the transcript and the final screen are printed again after the session (default: on in Terminal.app)")

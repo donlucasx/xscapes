@@ -245,7 +245,7 @@ xscapes kimi               # Kimi Code CLI inside the scape
 xscapes install hermes     # Hermes Agent hooks (a plan; --apply writes)
 xscapes hermes             # Hermes Agent inside the scape
 xscapes claude -beside     # the older side by side layout, in tmux
-xscapes claude -scape 24   # give the shoreline more rows (default: two fifths)
+xscapes claude -scape 24   # give the scape 24 rows (default: eight fifteenths of the window, at most 28)
 xscapes claude -fps 8      # slow the scape down
 xscapes claude -history=false  # do not mirror the transcript into the terminal's scrollback
 xscapes claude -alt=false  # run on the main screen, at the cost below
