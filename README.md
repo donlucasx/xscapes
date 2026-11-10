@@ -67,7 +67,7 @@ Then wire it to your agent and run the agent inside the scape:
 ```sh
 xscapes install claude --apply && xscapes claude    # Claude Code
 xscapes install kimi --apply   && xscapes kimi      # Kimi Code CLI
-xscapes install hermes --apply && xscapes hermes    # Hermes Agent
+hermes plugins install donlucasx/hermes-xscapes --enable && xscapes hermes    # Hermes Agent
 xscapes inside <any command>                        # anything else, no hooks
 ```
 
@@ -222,9 +222,13 @@ subagent's own finish carries no mark, so a finish while one is open is not
 the turn's; and the spend counter and the moon read Kimi's own session
 files, since its hooks name no transcript.
 
-**Adapter 4: Hermes Agent**, via its shell hooks. `xscapes install hermes`
-merges them into `~/.hermes/config.yaml`. Hermes asks for consent the first
-time each hook fires; `hermes hooks doctor` answers once for all of them.
+**Adapter 4: Hermes Agent**, through the Hermes plugin
+([donlucasx/hermes-xscapes](https://github.com/donlucasx/hermes-xscapes)):
+`hermes plugins install donlucasx/hermes-xscapes --enable`. It also forwards
+what the shell hooks cannot reach: questions and password prompts, and each
+model call's usage for the moon and the token count. The shell hooks still
+work (`xscapes install hermes` merges them into `~/.hermes/config.yaml`);
+use one or the other, or every event arrives twice.
 
 Every installer prints a plan and writes only with `--apply`; every
 uninstall removes exactly what it wrote. Writing another adapter means

@@ -61,7 +61,7 @@ footer{margin-top:calc(var(--lh)*3);font-size:13px;color:var(--d)}
 <p>Install the hooks for your agent once, then start the agent through xscapes from whatever project you are working in. The agent takes the top of the window and the scape fills the rest.</p>
 <div class="cmd"><pre>xscapes install claude --apply &amp;&amp; xscapes claude    <span class="c"># Claude Code</span>
 xscapes install kimi --apply   &amp;&amp; xscapes kimi      <span class="c"># Kimi Code CLI</span>
-xscapes install hermes --apply &amp;&amp; xscapes hermes    <span class="c"># Hermes Agent</span></pre></div>
+hermes plugins install donlucasx/hermes-xscapes --enable &amp;&amp; xscapes hermes    <span class="c"># Hermes Agent</span></pre></div>
 <p>Anything else that runs in a terminal can live in the scape too. Without hooks xscapes watches the output instead, so it sees work and prompts but not tool names, questions or subagents.</p>
 <div class="cmd"><pre>xscapes inside &lt;any command&gt;</pre></div>
 <p>Arguments after <code>--</code> go to the agent, for example to resume a session:</p>
