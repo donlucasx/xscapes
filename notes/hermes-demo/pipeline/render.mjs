@@ -121,6 +121,19 @@ function cam(v) {
   const lz = Math.log(a.zoom) + (Math.log(b.zoom) - Math.log(a.zoom)) * u;
   return { col: a.col + (b.col - a.col) * u, row: a.row + (b.row - a.row) * u, zoom: Math.exp(lz), free: a.free && b.free };
 }
+function camT(v) { // camera -> transform; a keyframe with fix:true zooms about one fixed point (no drift, no bump)
+  const K = E.camera; let a = K[0];
+  for (let i = 0; i < K.length; i++) if (K[i].t <= v) a = K[i];
+  const b = K[K.lastIndexOf(a) + 1];
+  if (b && b.fix && !b.cut && v > a.t) {
+    const ta = xf(a), tb = xf(b), u = ease((v - a.t) / (b.t - a.t));
+    const s = Math.exp(Math.log(ta.s) + (Math.log(tb.s) - Math.log(ta.s)) * u);
+    if (Math.abs(tb.s - ta.s) < 1e-6) return { s, x: ta.x + (tb.x - ta.x) * u, y: ta.y + (tb.y - ta.y) * u };
+    const wx = (ta.x - tb.x) / (tb.s - ta.s), wy = (ta.y - tb.y) / (tb.s - ta.s);
+    return { s, x: ta.x + ta.s * wx - s * wx, y: ta.y + ta.s * wy - s * wy };
+  }
+  return xf(cam(v));
+}
 function xf(c) { // camera -> window transform
   const s = base * c.zoom;
   // the point to centre, in window px; zoom 1 centres the whole window
@@ -145,7 +158,7 @@ async function seek(a) {
   for (const c of chunks) await page.evaluate((s) => window.feed(s), c);
 }
 function vid(tk, r) { // recording -> video seconds (for sounds)
-  for (const s of segs) if (s.take === tk && r >= s.r0 && r < s.r1) return { v: s.v0 + (r - s.r0) * (s.v1 - s.v0) / (s.r1 - s.r0), speed: (s.r1 - s.r0) / (s.v1 - s.v0) };
+  for (const s of segs) if (!s.silent && s.take === tk && r >= s.r0 && r < s.r1) return { v: s.v0 + (r - s.r0) * (s.v1 - s.v0) / (s.r1 - s.r0), speed: (s.r1 - s.r0) / (s.v1 - s.v0) };
   return null;
 }
 const keys = [], cues = [];
@@ -156,7 +169,8 @@ for (const tk of Object.keys(TK)) for (const m of TK[tk].marks) {
   }
 }
 for (let i = 0; i < E.end.url.length; i++) keys.push(+(urlAt + i / E.end.urlCPS).toFixed(3));
-const timeline = { total, montageEnd, endAt, urlAt, urlEnd, keys, cues, scapes: E.scapes ?? [] };
+const ticks = E.win2 ? load(E.win2.take, 'tty.jsonl').map(c => c.t).filter(t => t >= E.win2.r0 && (E.win2.tickTo == null || t <= E.win2.tickTo)).map(t => +(E.win2.v0 + t - E.win2.r0).toFixed(3)) : [];
+const timeline = { total, montageEnd, endAt, urlAt, urlEnd, keys, cues, ticks, scapes: E.scapes ?? [] };
 const SP = E.split;
 if (SP) await page.evaluate((SP) => {
   const d = document.getElementById('split');
@@ -170,6 +184,13 @@ const TK2 = W2 ? load(W2.take, 'tty.jsonl') : [];
 let fed2 = 0;
 async function seek2(r) { while (fed2 < TK2.length && TK2[fed2].t <= r) await page.evaluate((s) => window.feed2(s), TK2[fed2++].b); }
 const w2h = W2 ? await page.evaluate(() => document.getElementById('win2').getBoundingClientRect().height) : 0;
+const g2 = W2 ? await page.evaluate((R) => { const w = document.getElementById('win2').getBoundingClientRect(), s = document.querySelector('#term2 .xterm-screen').getBoundingClientRect();
+  return { sy: s.top - w.top, ch: s.height / R }; }, W2.rows) : null;
+const termTop = await page.evaluate(() => document.getElementById('term').offsetTop);
+// stacked: win2 shows rows 0..showRows-1, its bottom meets the main terminal's top (covering the main bar)
+const w2hS = W2?.stack ? g2.sy + W2.showRows * g2.ch : w2h;
+const w2off = W2?.stack ? termTop - w2hS : 0;
+if (W2?.stack) console.log('stack: welcome row q = main row', ((w2off + g2.sy - geo.sy) / geo.ch).toFixed(2), '+ q');
 const typingAt = (v) => keys.some(k => k <= v && v - k < 0.45);
 const N = Math.round(total * FPS);
 const want = stills ? stills.split(',').map(Number) : null;
@@ -177,7 +198,7 @@ const frames = want ? want.map(v => Math.round(v * FPS)) : [...Array(N).keys()].
 for (const i of frames) {
   const v = i / FPS;
   if (v < montageEnd + 0.01) await seek(at(v));
-  const c = cam(Math.min(v, montageEnd)); const t = xf(c);
+  const t = camT(Math.min(v, montageEnd));
   const cap = E.captions.find(k => v >= k.t0 - 0.35 && v <= k.t1 + 0.35);
   const tag = E.tags.find(k => v >= k.t0 - 0.35 && v <= k.t1 + 0.35);
   const ef = Math.min(endFrames.length - 1, Math.max(0, Math.floor((v - endAt) * FPS)));
@@ -190,14 +211,14 @@ for (const i of frames) {
   if (W2 && v >= W2.v0 - 0.01 && v < W2.v1) {
     await seek2(W2.r0 + (v - W2.v0));
     const u = Math.max(0, Math.min(1, (v - W2.resizeAt) / W2.resizeDur)), e2 = ease(u);
-    w2 = { h: w2h + (geo.wh - w2h) * e2, o: 1 - ease((u - 0.45) / 0.55) };
+    w2 = W2.stack ? { h: w2hS, o: 1, off: w2off } : { h: w2h + (geo.wh - w2h) * e2, o: 1 - ease((u - 0.45) / 0.55), off: 0 };
   }
   await page.evaluate((p) => {
     const w = document.getElementById('win');
     w.style.transform = `translate(${p.t.x}px,${p.t.y}px) scale(${p.t.s})`;
     document.documentElement.style.setProperty('--k', p.k);
     const w2e = document.getElementById('win2');
-    if (p.w2) { w2e.style.transform = `translate(${p.t.x}px,${p.t.y}px) scale(${p.t.s})`; w2e.style.height = p.w2.h + 'px'; w2e.style.opacity = p.w2.o; } else w2e.style.opacity = 0;
+    if (p.w2) { w2e.style.transform = `translate(${p.t.x}px,${p.t.y}px) scale(${p.t.s}) translateY(${p.w2.off}px)`; if (p.w2.off) { w2e.style.borderRadius = '14px 14px 0 0'; w2e.style.boxShadow = 'none'; } w2e.style.height = p.w2.h + 'px'; w2e.style.opacity = p.w2.o; } else w2e.style.opacity = 0;
     const pl = document.getElementById('plug'); pl.style.opacity = p.plO; if (p.plO > 0 && pl.dataset.h !== p.plH) { pl.innerHTML = p.plH; pl.dataset.h = p.plH; }
     document.getElementById('title').textContent = p.title;
     const cap = document.getElementById('cap');
@@ -235,8 +256,8 @@ for (const i of frames) {
        end: v >= endAt, ef: 'file://' + path.join(here, 'endsrc', endFrames[ef]),
        url: E.end.url.slice(0, typed), curOn: v >= urlAt - 0.4 && (v < urlEnd + 0.3 || Math.floor(v / 0.5) % 2 === 0) && v >= endAt + 0.5,
        blk: v >= endAt && v < endAt + 0.0001 ? 1 : blk, cursorOn,
-       splitO: SP && v >= SP.v0 && v < SP.v1 ? Math.min(ease((v - SP.v0) / 0.25), ease((SP.v1 - v) / 0.25)) : 0,
-       splitF: SP ? SP.panels.map(pn => 'file://' + path.join(here, pn.dir, 'p' + String(Math.min(pn.frames - 1, Math.max(0, Math.floor((v - SP.v0) * FPS)))).padStart(5, '0') + '.png')) : [], ownCursor: v < (E.ownCursorUntil ?? 0) });
+       splitO: SP && v >= SP.v0 && v < SP.v1 ? (SP.hard ? 1 : Math.min(ease((v - SP.v0) / 0.25), ease((SP.v1 - v) / 0.25))) : 0,
+       splitF: SP ? SP.panels.map(pn => 'file://' + path.join(here, pn.dir, 'p' + String(Math.min(pn.frames - 1, Math.max(0, Math.floor((v - SP.v0) * FPS) + (SP.skip ?? 0)))).padStart(5, '0') + '.png')) : [], ownCursor: v < (E.ownCursorUntil ?? 0) });
   await page.screenshot({ path: path.join(out, want ? `still-${v.toFixed(2)}.png` : `f${String(i).padStart(5, '0')}.png`) });
   if (i % 60 === 0) process.stdout.write(`${v.toFixed(1)} `);
 }

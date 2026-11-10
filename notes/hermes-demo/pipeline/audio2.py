@@ -49,6 +49,13 @@ for t in tl["keys"]:
     for i, v in enumerate(h):
         fade = 1 - i / len(h)
         if 0 <= j0 + i < n: buf[j0 + i] += v * gk * fade
+# ticks: the Hermes screen drawing itself. Muffled (one-pole lowpass), quiet, even:
+# a soft patter, not a typist.
+for t in tl.get("ticks", [])[::2]:
+    h = hits[rnd.randrange(len(hits))]; j0 = int(t * R); gk = 0.09 + rnd.random() * 0.03; y = 0.0
+    for i, v in enumerate(h):
+        y += 0.18 * (v - y)
+        if 0 <= j0 + i < n: buf[j0 + i] += y * gk * (1 - i / len(h))
 def wavread(p):
     with wave.open(p) as w:
         f = w.readframes(w.getnframes()); return [v / 32768 for v in struct.unpack(f"<{len(f)//2}h", f)]
