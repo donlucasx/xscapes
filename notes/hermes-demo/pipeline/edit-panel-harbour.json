@@ -1,0 +1,37 @@
+{
+ "title": "xscapes hermes",
+ "fontPx": 48,
+ "wideFrac": 0.82,
+ "captionPx": 40,
+ "tagPx": 44,
+ "end": {
+  "toBlack": 0.5,
+  "url": "github.com/donlucasx/hermes-xscapes",
+  "urlAt": 4.8,
+  "urlCPS": 28,
+  "urlPx": 36,
+  "urlY": 760,
+  "hold": 1.5,
+  "fade": 0.6
+ },
+ "fromBlack": 0.01,
+ "segs": [
+  {
+   "take": "harbour",
+   "v0": 0,
+   "v1": 3.6,
+   "r0": 20.0,
+   "r1": 23.6
+  }
+ ],
+ "camera": [
+  {
+   "t": 0,
+   "col": 102,
+   "row": 32.5,
+   "zoom": 1.585
+  }
+ ],
+ "captions": [],
+ "tags": []
+}

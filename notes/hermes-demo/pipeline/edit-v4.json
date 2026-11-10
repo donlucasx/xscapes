@@ -1,0 +1,390 @@
+{
+ "_": "Hermes demo v4 (2026-11-10): the opening question and the definition as ordinary captions, the three scapes side by side (his option A), quieter wind, a call for each companion.",
+ "title": "xscapes hermes",
+ "fontPx": 48,
+ "wideFrac": 0.82,
+ "captionPx": 40,
+ "tagPx": 44,
+ "fromBlack": 0.6,
+ "chrome": [
+  5.2,
+  6.8
+ ],
+ "ownCursorUntil": 4.75,
+ "segs": [
+  {
+   "take": "vista",
+   "v0": 0,
+   "v1": 4.7,
+   "r0": 1.7,
+   "r1": 6.4
+  },
+  {
+   "take": "vista",
+   "v0": 4.7,
+   "v1": 11.7,
+   "r0": 6.4,
+   "r1": 13.4
+  },
+  {
+   "take": "vista",
+   "v0": 11.7,
+   "v1": 15.2,
+   "r0": 25.0,
+   "r1": 28.5
+  },
+  {
+   "take": "vista",
+   "v0": 15.2,
+   "v1": 19.0,
+   "r0": 38.0,
+   "r1": 41.8
+  },
+  {
+   "take": "vista",
+   "v0": 19.0,
+   "v1": 24.0,
+   "r0": 42.0,
+   "r1": 47.0
+  },
+  {
+   "take": "vista",
+   "v0": 24.0,
+   "v1": 28.0,
+   "r0": 47.0,
+   "r1": 67.0
+  },
+  {
+   "take": "vista",
+   "v0": 28.0,
+   "v1": 31.5,
+   "r0": 94.0,
+   "r1": 97.6
+  },
+  {
+   "take": "vista",
+   "v0": 31.5,
+   "v1": 34.3,
+   "r0": 100.0,
+   "r1": 102.8
+  },
+  {
+   "take": "harbour",
+   "v0": 34.3,
+   "v1": 37.8,
+   "r0": 20.4,
+   "r1": 23.9
+  },
+  {
+   "take": "harbour",
+   "v0": 37.8,
+   "v1": 40.2,
+   "r0": 23.9,
+   "r1": 26.3
+  },
+  {
+   "take": "harbour",
+   "v0": 40.2,
+   "v1": 44.0,
+   "r0": 26.3,
+   "r1": 30.1
+  },
+  {
+   "take": "harbour",
+   "v0": 44.0,
+   "v1": 47.6,
+   "r0": 30.1,
+   "r1": 33.7
+  },
+  {
+   "take": "harbour",
+   "v0": 47.6,
+   "v1": 50.0,
+   "r0": 33.7,
+   "r1": 40.2
+  }
+ ],
+ "camera": [
+  {
+   "t": 0,
+   "col": 6,
+   "row": 0.5,
+   "zoom": 7,
+   "free": true
+  },
+  {
+   "t": 2.6,
+   "col": 6,
+   "row": 0.5,
+   "zoom": 7,
+   "free": true
+  },
+  {
+   "t": 4.7,
+   "col": 13,
+   "row": 0.5,
+   "zoom": 7,
+   "free": true
+  },
+  {
+   "t": 4.9,
+   "col": 13,
+   "row": 0.5,
+   "zoom": 7,
+   "free": true
+  },
+  {
+   "t": 6.8,
+   "col": 62,
+   "row": 22,
+   "zoom": 1,
+   "free": true
+  },
+  {
+   "t": 7.6,
+   "col": 62,
+   "row": 22,
+   "zoom": 1
+  },
+  {
+   "col": 62,
+   "row": 30,
+   "zoom": 1.78,
+   "t": 8.8
+  },
+  {
+   "col": 62,
+   "row": 30,
+   "zoom": 1.78,
+   "t": 11.7
+  },
+  {
+   "t": 11.7,
+   "col": 113,
+   "row": 36.5,
+   "zoom": 3.8,
+   "cut": true
+  },
+  {
+   "t": 15.2,
+   "col": 113,
+   "row": 36.5,
+   "zoom": 3.8
+  },
+  {
+   "t": 15.2,
+   "col": 40,
+   "row": 19,
+   "zoom": 2.2,
+   "cut": true
+  },
+  {
+   "t": 19.0,
+   "col": 40,
+   "row": 19,
+   "zoom": 2.2
+  },
+  {
+   "t": 19.0,
+   "col": 47,
+   "row": 37.2,
+   "zoom": 5.0,
+   "cut": true
+  },
+  {
+   "t": 24.0,
+   "col": 47,
+   "row": 37.2,
+   "zoom": 5.0
+  },
+  {
+   "col": 62,
+   "row": 30,
+   "zoom": 1.78,
+   "t": 24.0,
+   "cut": true
+  },
+  {
+   "col": 62,
+   "row": 30,
+   "zoom": 1.78,
+   "t": 28.0
+  },
+  {
+   "t": 28.0,
+   "col": 102,
+   "row": 37,
+   "zoom": 3.0,
+   "cut": true
+  },
+  {
+   "t": 31.5,
+   "col": 102,
+   "row": 37,
+   "zoom": 3.0
+  },
+  {
+   "t": 31.5,
+   "col": 52,
+   "row": 25.5,
+   "zoom": 3.5,
+   "cut": true
+  },
+  {
+   "col": 62,
+   "row": 30,
+   "zoom": 1.78,
+   "t": 34.3,
+   "cut": true
+  },
+  {
+   "col": 62,
+   "row": 30,
+   "zoom": 1.78,
+   "t": 40.2
+  },
+  {
+   "t": 40.2,
+   "col": 110,
+   "row": 33,
+   "zoom": 3.2,
+   "cut": true
+  },
+  {
+   "t": 44.0,
+   "col": 110,
+   "row": 33,
+   "zoom": 3.2
+  },
+  {
+   "t": 44.0,
+   "col": 104,
+   "row": 31,
+   "zoom": 3.0,
+   "cut": true
+  },
+  {
+   "t": 47.6,
+   "col": 104,
+   "row": 31,
+   "zoom": 3.0
+  },
+  {
+   "col": 62,
+   "row": 30,
+   "zoom": 1.78,
+   "t": 47.6,
+   "cut": true
+  },
+  {
+   "col": 62,
+   "row": 30,
+   "zoom": 1.78,
+   "t": 50.0
+  }
+ ],
+ "captions": [
+  {
+   "t0": 0.7,
+   "t1": 2.6,
+   "text": "waiting on your agent?"
+  },
+  {
+   "t0": 6.0,
+   "t1": 9.6,
+   "text": "xscapes: living ascii scenes that react as hermes works"
+  },
+  {
+   "t0": 12.0,
+   "t1": 15.0,
+   "text": "your agent, as a companion"
+  },
+  {
+   "t0": 19.4,
+   "t1": 27.7,
+   "text": "see how hard it's working"
+  },
+  {
+   "t0": 28.3,
+   "t1": 31.2,
+   "text": "with helpers for subagents"
+  },
+  {
+   "t0": 31.7,
+   "t1": 34.1,
+   "text": "your context, at a glance"
+  },
+  {
+   "t0": 34.5,
+   "t1": 36.1,
+   "text": "choose from different companions"
+  },
+  {
+   "t0": 36.2,
+   "t1": 37.7,
+   "text": "in cozy ascii landscapes"
+  },
+  {
+   "t0": 41.1,
+   "t1": 43.8,
+   "text": "watch hermes think"
+  },
+  {
+   "t0": 44.4,
+   "t1": 47.4,
+   "text": "it asks when it needs you"
+  }
+ ],
+ "tags": [
+  {
+   "t0": 9.7,
+   "t1": 11.5,
+   "html": "the vista<small>with the owl</small>"
+  },
+  {
+   "t0": 37.9,
+   "t1": 40.0,
+   "html": "the harbour<small>with the cat</small>"
+  }
+ ],
+ "end": {
+  "toBlack": 0.5,
+  "url": "github.com/donlucasx/hermes-xscapes",
+  "urlAt": 4.8,
+  "urlCPS": 28,
+  "urlPx": 36,
+  "urlY": 760,
+  "hold": 1.5,
+  "fade": 0.6
+ },
+ "split": {
+  "v0": 34.3,
+  "v1": 37.8,
+  "x0": 36,
+  "y": 110,
+  "w": 600,
+  "h": 690,
+  "gap": 24,
+  "labelPx": 30,
+  "panels": [
+   {
+    "dir": "split/vista",
+    "frames": 108,
+    "name": "the vista",
+    "with": "owl"
+   },
+   {
+    "dir": "split/shore",
+    "frames": 108,
+    "name": "the shore",
+    "with": "crab"
+   },
+   {
+    "dir": "split/harbour",
+    "frames": 108,
+    "name": "the harbour",
+    "with": "cat"
+   }
+  ]
+ }
+}

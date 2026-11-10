@@ -58,7 +58,7 @@ html,body{margin:0;width:${W}px;height:${H}px;overflow:hidden;background:#0f0f10
 #black{position:absolute;inset:0;background:#000;opacity:1;pointer-events:none}
 </style></head><body><div id="stage"></div>
 <div id="win"><div id="bar"><i></i><i></i><i></i><b id="title"></b></div><div id="term" style="position:relative"><div id="cur" style="position:absolute;background:#d8d8d8;display:none;z-index:9"></div></div></div>
-<div id="tag"></div><div id="cap"><span></span></div>
+<div id="split" style="position:absolute;inset:0;opacity:0;background:#0f0f10"></div><div id="tag"></div><div id="cap"><span></span></div>
 <img id="endimg"><div id="url"></div><div id="black"></div>
 <script src="file://${here}/node_modules/@xterm/xterm/lib/xterm.js"></script><script src="file://${here}/node_modules/@xterm/addon-webgl/lib/addon-webgl.js"></script></body></html>`;
 fs.writeFileSync(path.join(out, 'page.html'), html);
@@ -132,6 +132,14 @@ for (const tk of Object.keys(TK)) for (const m of TK[tk].marks) {
 }
 for (let i = 0; i < E.end.url.length; i++) keys.push(+(urlAt + i / E.end.urlCPS).toFixed(3));
 const timeline = { total, montageEnd, endAt, urlAt, urlEnd, keys, cues, scapes: E.scapes ?? [] };
+const SP = E.split;
+if (SP) await page.evaluate((SP) => {
+  const d = document.getElementById('split');
+  SP.panels.forEach((p, i) => {
+    const x = SP.x0 + i * (SP.w + SP.gap);
+    d.insertAdjacentHTML('beforeend', `<img id="sp${i}" style="position:absolute;left:${x}px;top:${SP.y}px;width:${SP.w}px;height:${SP.h}px;border-radius:10px;box-shadow:0 0 0 1px rgba(255,255,255,.09)"><div style="position:absolute;left:${x}px;width:${SP.w}px;top:${SP.y + SP.h + 22}px;text-align:center;font:700 ${SP.labelPx}px 'Geist Mono',monospace;color:#f2f2f2">${p.name}<span style="font-weight:400;color:#a9a9a9"> &middot; ${p.with}</span></div>`);
+  });
+}, SP);
 const N = Math.round(total * FPS);
 const want = stills ? stills.split(',').map(Number) : null;
 const frames = want ? want.map(v => Math.round(v * FPS)) : [...Array(N).keys()].filter(i => i / FPS >= from && (!to || i / FPS < +to));
@@ -161,6 +169,9 @@ for (const i of frames) {
     else img.style.opacity = 0;
     const u = document.getElementById('url'); u.style.opacity = p.end ? 1 : 0;
     u.textContent = p.url + (p.curOn ? '█' : ' ');
+    const sp = document.getElementById('split');
+    sp.style.opacity = p.splitO;
+    if (p.splitO > 0) p.splitF.forEach((f, i) => { const im = document.getElementById('sp' + i); if (im.dataset.f !== f) { im.src = f; im.dataset.f = f; } });
     document.getElementById('black').style.opacity = p.blk;
     const cu = document.getElementById('cur');
     if (p.ownCursor) {
@@ -174,7 +185,9 @@ for (const i of frames) {
        tag: tag?.html, tagO: tag ? fade(v, tag.t0, tag.t1) : 0,
        end: v >= endAt, ef: 'file://' + path.join(here, 'endsrc', endFrames[ef]),
        url: E.end.url.slice(0, typed), curOn: v >= urlAt - 0.4 && (v < urlEnd + 0.3 || Math.floor(v / 0.5) % 2 === 0) && v >= endAt + 0.5,
-       blk: v >= endAt && v < endAt + 0.0001 ? 1 : blk, cursorOn, ownCursor: v < (E.ownCursorUntil ?? 0) });
+       blk: v >= endAt && v < endAt + 0.0001 ? 1 : blk, cursorOn,
+       splitO: SP && v >= SP.v0 && v < SP.v1 ? Math.min(ease((v - SP.v0) / 0.25), ease((SP.v1 - v) / 0.25)) : 0,
+       splitF: SP ? SP.panels.map(pn => 'file://' + path.join(here, pn.dir, 'p' + String(Math.min(pn.frames - 1, Math.max(0, Math.floor((v - SP.v0) * FPS)))).padStart(5, '0') + '.png')) : [], ownCursor: v < (E.ownCursorUntil ?? 0) });
   await page.screenshot({ path: path.join(out, want ? `still-${v.toFixed(2)}.png` : `f${String(i).padStart(5, '0')}.png`) });
   if (i % 60 === 0) process.stdout.write(`${v.toFixed(1)} `);
 }
