@@ -5737,3 +5737,4 @@ Resumed thinking the last session crashed; it had not (the 10-14 adoption check,
 - "can u do all the things please? if so, run through me anything that might need my attention or my voice" -> pushed 3a12d11; PR branch re-pinned (aa6e105, sha + version 0.2.1); comment posted (#issuecomment-6783801443); PR body's stale disclosure/test lines updated.
 - Claude's build-invented rules (not his): XSCAPES_* passed through to the child (xscapes's own settings, incl. XSCAPES_HOME); command for approvals still sent whole (the binary picks the program); tool args still sent whole (not flagged by review).
 - Local install moved to 0.2.1 (`--force --ref 3a12d11`; `update` refused: pinned to e6826ea). His live check: "vista seems to work, should I check harbor too?" (Claude: no, same events; try subagents/approval instead) -> "works!"
+- "1. done 2. copy" (Discord post up in #hermes-agent-hackathon; PR follow-up acknowledged).
