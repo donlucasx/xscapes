@@ -9,9 +9,7 @@ hermes-xscapes `3a12d11` (0.2.1: minimal child env, extra allowlist + one-line p
 pushed; PR #152904 re-pinned (`aa6e105`), comment posted, PR body updated. Discord post copy drafted (chat).
 
 **Next:** Teknium reviews the delta from f32549c (answer any follow-up on the PR) · his Discord post in
-#hermes-agent-hackathon (needs his X link) ·
-`hermes plugins install donlucasx/hermes-xscapes --enable` + `hermes gateway restart` (his call) ·
-confirm `~/.config/xscapes/scape` is vista again.
+#hermes-agent-hackathon (needs his X link).
 
 **Open questions for him:** none. Local plugin = 0.2.1, checked live by him ("works!").
 **Later:** release the Ghostty engine (libghostty-vt per platform). Carried items: see RESUME-archive-2026-11-09.md
