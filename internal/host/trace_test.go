@@ -58,6 +58,10 @@ func TestATraceMakesItsOwnDirectory(t *testing.T) {
 func TestTheShorthandPicksItsOwnPath(t *testing.T) {
 	home := t.TempDir()
 	t.Setenv("HOME", home)
+	// Home() prefers these over $HOME: a runner (or a Mac) that exports one
+	// would otherwise have this test write into the real config directory.
+	t.Setenv("XSCAPES_HOME", "")
+	t.Setenv("XDG_CONFIG_HOME", "")
 	t.Setenv("XSCAPES_TRACE", "1")
 	h := &Host{}
 	h.openTrace()
