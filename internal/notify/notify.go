@@ -72,6 +72,9 @@ type Player struct {
 	// bell falls back to the terminal's own BEL when no player exists. It is
 	// the thing the brief says to beat, so it is the floor, not the plan.
 	bell bool
+	// play, when set, is how this platform plays a file WITHOUT a player
+	// binary -- Windows, through winmm. cmd still names it, for Describe.
+	play func(string) error
 }
 
 // SilentEnv mutes the notification when set to anything but an empty string.
@@ -118,7 +121,7 @@ func New() *Player {
 }
 
 func filePlayer(cmd, source, ask, done, worried string) *Player {
-	return &Player{cmd: cmd, source: source, args: map[Kind][]string{
+	return &Player{cmd: cmd, source: source, play: directPlay(), args: map[Kind][]string{
 		Ask:     {ask},
 		Done:    {done},
 		Worried: {worried},
@@ -142,6 +145,12 @@ func (p *Player) Play(k Kind) {
 	}
 	args, ok := p.args[k]
 	if !ok {
+		return
+	}
+	if p.play != nil {
+		if len(args) > 0 {
+			_ = p.play(args[0])
+		}
 		return
 	}
 	cmd := exec.Command(p.cmd, args...)

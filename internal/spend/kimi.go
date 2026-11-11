@@ -30,6 +30,8 @@ import (
 	"os"
 	"path/filepath"
 	"strings"
+
+	"github.com/donlucasx/xscapes/internal/envx"
 )
 
 // KimiHome is Kimi's data directory: $KIMI_CODE_HOME, else ~/.kimi-code.
@@ -37,7 +39,7 @@ func KimiHome() string {
 	if h := strings.TrimSpace(os.Getenv("KIMI_CODE_HOME")); h != "" {
 		return h
 	}
-	home, err := os.UserHomeDir()
+	home, err := envx.HomeDir()
 	if err != nil {
 		return ""
 	}

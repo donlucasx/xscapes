@@ -1,6 +1,7 @@
 package spend
 
 import (
+	"encoding/json"
 	"os"
 	"path/filepath"
 	"testing"
@@ -67,9 +68,20 @@ func TestKimiSessionDirComesFromTheIndexLastEntryWins(t *testing.T) {
 			t.Fatal(err)
 		}
 	}
-	idx := `{"sessionId":"session_a","sessionDir":"` + old + `","workDir":"/x"}` + "\n" +
-		`{"sessionId":"session_b","sessionDir":"/nowhere","workDir":"/y"}` + "\n" +
-		`{"sessionId":"session_a","sessionDir":"` + cur + `","workDir":"/y"}` + "\n"
+	// The paths are JSON-encoded rather than pasted in: a Windows temp home
+	// is full of backslashes, and a hand-built line would be an invalid
+	// escape sequence, which the reader correctly rejects -- the test would
+	// then be measuring its own string instead of the resolver.
+	line := func(id, dir, wd string) string {
+		b, err := json.Marshal(map[string]string{"sessionId": id, "sessionDir": dir, "workDir": wd})
+		if err != nil {
+			t.Fatal(err)
+		}
+		return string(b) + "\n"
+	}
+	idx := line("session_a", old, "/x") +
+		line("session_b", "/nowhere", "/y") +
+		line("session_a", cur, "/y")
 	if err := os.WriteFile(filepath.Join(home, "session_index.jsonl"), []byte(idx), 0o644); err != nil {
 		t.Fatal(err)
 	}

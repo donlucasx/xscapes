@@ -5,6 +5,7 @@ import (
 	"io"
 	"os"
 	"os/exec"
+	"runtime"
 	"strings"
 	"sync"
 	"testing"
@@ -16,6 +17,16 @@ import (
 // The snapshot's model holds both buffers, so the main one is read here the
 // way Terminal.app would show it above the alternate screen.
 func TestRowsLeavingTheBandAreMirroredIntoTheMainBuffer(t *testing.T) {
+	if runtime.GOOS == "windows" {
+		// These expectations are measurements of what Terminal.app and
+		// Ghostty do to the band on a resize and how they answer DSR.
+		// ConPTY is a different terminal with different answers, and the
+		// Windows host needs its own measurements before it can be held to
+		// them; what it IS held to is
+		// TestConPTYHostsAChildAndCarriesItsOutputBothWays.
+		t.Skip("measured on Terminal.app/Ghostty; ConPTY anchors and answers differently")
+	}
+
 	child := `sleep 0.35; i=1; while [ $i -le 24 ]; do printf 'AGENTLINE%02d\r\n' $i; i=$((i+1)); done; sleep 1.2`
 	sc := runHostedOpts(t, 80, 30, 80, 30, "alt", child, true, true)
 

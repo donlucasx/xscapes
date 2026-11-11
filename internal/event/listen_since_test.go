@@ -3,6 +3,7 @@ package event
 import (
 	"fmt"
 	"os"
+	"runtime"
 	"strings"
 	"testing"
 	"time"
@@ -63,6 +64,13 @@ loop:
 // What a listening engine takes in over its socket is written to its
 // receive log; the spool never sees it.
 func TestTheReceiveLogHoldsWhatTheSocketDelivered(t *testing.T) {
+	if runtime.GOOS == "windows" {
+		// The socket is the fast path and the spool is the fallback; Go's net
+		// has no AF_UNIX on Windows, so this build has only the fallback and
+		// "did it go over the socket" is a question with one answer.
+		t.Skip("no unix datagram sockets on windows; every event takes the spool")
+	}
+
 	tmpHome(t)
 	const s = "recv-log"
 	b, err := Listen(s)

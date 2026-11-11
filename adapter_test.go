@@ -3,6 +3,7 @@ package main
 import (
 	"encoding/json"
 	"os"
+	"runtime"
 	"strings"
 	"testing"
 	"time"
@@ -129,6 +130,16 @@ func TestEndToEndFromRealHookPayloads(t *testing.T) {
 	base := time.Now()
 	at := func(s int) time.Time { return base.Add(time.Duration(s) * time.Second) }
 
+	// quiet is how long the bus must stay silent before the drain gives up.
+	// A unix build gets events over the datagram socket, which is immediate;
+	// Windows has only the spool (Go's net has no AF_UNIX there), and the
+	// spool is polled every 250 ms -- so 50 ms drained an empty bus while the
+	// events were still on disk, and the whole pipeline read as deaf.
+	quiet := 50 * time.Millisecond
+	if runtime.GOOS == "windows" {
+		quiet = 600 * time.Millisecond
+	}
+
 	step := func(now time.Time, payloads ...string) reduce.State {
 		for _, raw := range payloads {
 			p := payload(t, raw)
@@ -144,7 +155,7 @@ func TestEndToEndFromRealHookPayloads(t *testing.T) {
 			select {
 			case e := <-bus.C:
 				red.Apply(e, now)
-			case <-time.After(50 * time.Millisecond):
+			case <-time.After(quiet):
 				return red.State(now)
 			}
 		}

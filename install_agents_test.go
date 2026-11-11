@@ -271,6 +271,11 @@ func TestAgentInstallBacksUpTheOriginal(t *testing.T) {
 // and nothing on screen would say so. His first Kimi run, 2026-09-17: no
 // owlets, no spend, no tool names, and the config had no hooks at all.
 func TestTheLauncherKnowsWhenHooksAreMissing(t *testing.T) {
+	// The contract now reads $HERMES_HOME first, and the agent that runs
+	// these tests exports one: clear it, or the launcher looks at the real
+	// profile instead of the temp home this test just built.
+	t.Setenv("HERMES_HOME", "")
+
 	home := t.TempDir()
 	t.Setenv("HOME", home)
 	for _, agent := range []string{"claude", "kimi", "hermes"} {
@@ -383,6 +388,11 @@ func TestKimiInstallHonoursKimiCodeHome(t *testing.T) {
 //  4. `hooks = [...]` under a TOML table is that table's key: the Kimi
 //     installer must not refuse it as the top-level one.
 func TestTheLauncherChecksMoreThanTheMarker(t *testing.T) {
+	// The contract now reads $HERMES_HOME first, and the agent that runs
+	// these tests exports one: clear it, or the launcher looks at the real
+	// profile instead of the temp home this test just built.
+	t.Setenv("HERMES_HOME", "")
+
 	home := t.TempDir()
 	t.Setenv("HOME", home)
 	kp := filepath.Join(home, ".kimi-code", "config.toml")
@@ -508,6 +518,11 @@ func TestTheLauncherChecksMoreThanTheMarker(t *testing.T) {
 // screenshot, 2026-11-09 19:16). An enabled plugin is a full install; an
 // installed but disabled one says how to enable it; neither says nothing.
 func TestTheHermesPluginCountsAsInstalled(t *testing.T) {
+	// The contract reads $HERMES_HOME first, and an agent that runs these
+	// tests exports one: clear it, or hooksState looks at the real profile
+	// instead of the temp home this test just built.
+	t.Setenv("HERMES_HOME", "")
+
 	home := t.TempDir()
 	t.Setenv("HOME", home)
 	cfg := filepath.Join(home, ".hermes", "config.yaml")

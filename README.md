@@ -30,6 +30,25 @@ xscapes inside <any command>                        # anything else
 puts your settings back. Every command and option is in the
 [manual](https://donlucasx.github.io/xscapes/manual.html).
 
+### Windows
+
+Needs Go 1.27+ and Windows 10 1809 or later (the scene runs the agent on a
+pseudoconsole). Build it, then install the hooks — no tmux, no install.sh:
+
+```powershell
+go build -o xscapes.exe .
+.\xscapes.exe install hermes --apply      # writes hooks into your Hermes profile
+.\xscapes.exe hermes                      # then run Hermes inside the scape
+.\xscapes.exe inside <any command>        # anything else
+```
+
+`install hermes` finds the config your agent actually reads: `$HERMES_HOME`,
+else the profile the desktop app runs (`%LOCALAPPDATA%\hermes\profiles\<name>`),
+else `%LOCALAPPDATA%\hermes`. Hermes asks for consent the first time each hook
+fires; `hermes hooks doctor` answers once for all of them. What the port had to
+change, and how each piece was verified, is in
+[notes/windows-conpty.md](notes/windows-conpty.md).
+
 ## What you see
 
 <table>

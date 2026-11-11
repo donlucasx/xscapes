@@ -5,6 +5,7 @@ import (
 	"io"
 	"os"
 	"os/exec"
+	"runtime"
 	"strings"
 	"sync"
 	"testing"
@@ -24,6 +25,16 @@ import (
 // production defaults and the terminal model under that terminal's rules,
 // and the bytes on the wire are checked as well as the screen.
 func TestAGrowBringsThePromptDownWithEachTerminalsDefaults(t *testing.T) {
+	if runtime.GOOS == "windows" {
+		// These expectations are measurements of what Terminal.app and
+		// Ghostty do to the band on a resize and how they answer DSR.
+		// ConPTY is a different terminal with different answers, and the
+		// Windows host needs its own measurements before it can be held to
+		// them; what it IS held to is
+		// TestConPTYHostsAChildAndCarriesItsOutputBothWays.
+		t.Skip("measured on Terminal.app/Ghostty; ConPTY anchors and answers differently")
+	}
+
 	const child = `i=1; while [ $i -le 40 ]; do printf 'HIST %02d\r\n' $i; i=$((i+1)); done
 printf '+---- old box ----+\r\n| > hi            |\r\n+-----------------+\r\033[1A\033[7C'
 trap 'printf "\r\033[1A\033[J+==== new box ====+\r\n| > hi again      |\r\n+=================+\r\033[1A\033[7C"' WINCH
