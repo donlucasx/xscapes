@@ -7,9 +7,12 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
+	"runtime"
 	"sort"
 	"strings"
 	"time"
+
+	"github.com/donlucasx/xscapes/internal/envx"
 )
 
 // marker identifies our hook entries on a re-run. It lives inside the command
@@ -228,7 +231,7 @@ func settingsPath(override string) (string, error) {
 	if override != "" {
 		return override, nil
 	}
-	h, err := os.UserHomeDir()
+	h, err := envx.HomeDir()
 	if err != nil {
 		return "", err
 	}
@@ -255,8 +258,14 @@ func binPath(override string) (string, error) {
 	}
 	// The path is about to be embedded in a shell command inside a JSON
 	// string. Quoting handles spaces; these characters would survive quoting
-	// and execute.
-	if strings.ContainsAny(abs, "\"$`\\\n") {
+	// and execute. A backslash is one of them on unix and the separator on
+	// Windows, where the line is split by the agent's own Windows-safe
+	// tokeniser and never reaches a shell (see install_agents.go).
+	forbidden := "\"$`\n"
+	if runtime.GOOS != "windows" {
+		forbidden += "\\"
+	}
+	if strings.ContainsAny(abs, forbidden) {
 		return "", fmt.Errorf("refusing to install: binary path contains a shell metacharacter: %q", abs)
 	}
 	return abs, nil
@@ -787,7 +796,7 @@ func writeSettings(path string, orig, out []byte) error {
 		mode = st.Mode().Perm()
 	}
 
-	home, err := os.UserHomeDir()
+	home, err := envx.HomeDir()
 	if err != nil {
 		return err
 	}

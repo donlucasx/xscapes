@@ -26,7 +26,7 @@ func Home() (string, error) {
 	if v := os.Getenv("XDG_CONFIG_HOME"); v != "" {
 		return filepath.Join(v, "xscapes"), nil
 	}
-	h, err := os.UserHomeDir()
+	h, err := envx.HomeDir()
 	if err != nil {
 		return "", err
 	}

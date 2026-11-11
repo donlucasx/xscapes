@@ -2,6 +2,7 @@ package event
 
 import (
 	"os"
+	"runtime"
 	"strings"
 	"testing"
 	"time"
@@ -23,6 +24,10 @@ func tmpHome(t *testing.T) {
 }
 
 func TestRoundTripOverSocket(t *testing.T) {
+	if runtime.GOOS == "windows" {
+		t.Skip("no unix datagram sockets on windows; every event takes the spool")
+	}
+
 	tmpHome(t)
 	bus, err := Listen("sess-round-trip")
 	if err != nil {
@@ -89,6 +94,10 @@ func TestSecondListenerIsRefused(t *testing.T) {
 
 // A socket left by a killed engine must not block the next one forever.
 func TestStaleSocketIsReclaimed(t *testing.T) {
+	if runtime.GOOS == "windows" {
+		t.Skip("no unix datagram sockets on windows; there is no stale socket to reclaim")
+	}
+
 	tmpHome(t)
 	a, err := Listen("sess-stale")
 	if err != nil {

@@ -9,8 +9,11 @@ import (
 	"os"
 	"path/filepath"
 	"regexp"
+	"runtime"
 	"strings"
 	"time"
+
+	"github.com/donlucasx/xscapes/internal/envx"
 )
 
 // THE SECOND AND THIRD ADAPTERS: Kimi Code CLI and Hermes Agent.
@@ -57,6 +60,11 @@ var hermesHookEvents = []string{
 	"pre_llm_call", "post_llm_call",
 	"pre_tool_call", "post_tool_call", "pre_approval_request", "post_approval_response",
 	"subagent_start", "subagent_stop",
+	// Added 2026-11-11 for the Windows desktop build: translate() has
+	// understood these three since it was written, but the installer never
+	// registered them, so the moon, the token count and a clarify/sudo ask
+	// never arrived from Hermes at all.
+	"post_api_request", "on_human_input_request", "on_human_input_resolved",
 }
 
 const (
@@ -95,7 +103,7 @@ var adapters = map[string]agentAdapter{
 	},
 	"hermes": {
 		name:   "Hermes Agent",
-		path:   func() (string, error) { return homePath(".hermes", "config.yaml") },
+		path:   hermesConfigPath,
 		add:    addHermesHooks,
 		remove: removeHermesHooks,
 		after: "Hermes asks for consent the first time each hook fires, on the TTY, and\n" +
@@ -107,8 +115,120 @@ var adapters = map[string]agentAdapter{
 	},
 }
 
+// hermesConfigPath is the config.yaml this machine's Hermes Agent actually
+// reads.
+//
+// It is NOT ~/.hermes on Windows. Hermes's own rule (hermes_constants) is
+// $HERMES_HOME, else the platform default -- %LOCALAPPDATA%\hermes -- and an
+// application profile is a whole home of its own under profiles/<name>, which
+// is what the desktop app runs the agent with. Writing the hooks to a
+// ~/.hermes that does not exist is the rename bug in its purest form: the file
+// looks installed and no event ever fires.
+//
+// The single-profile rule is a fallback, not a guess about names: when exactly
+// one profile exists, that is the one in use (HERMES_PROFILE names it when
+// more than one does).
+//
+// ⚠ $HERMES_HOME FIRST IS NOT ENOUGH, and the failure is quiet. On this
+// machine the desktop app exports HERMES_HOME=C:\...\hermes (the platform
+// ROOT) while the agent it actually runs has profiles\def as its home, so
+// "install into $HERMES_HOME" wrote hooks into a config.yaml that no running
+// agent reads -- and `xscapes hermes` then refused to start, correctly
+// reporting hooks it could not find. So a home that CONTAINS a profiles\
+// directory is resolved through it: HERMES_PROFILE, else the only profile,
+// else the root's own config.
+func hermesConfigPath() (string, error) {
+	if v := strings.TrimSpace(os.Getenv("HERMES_HOME")); v != "" {
+		return configInHome(v), nil
+	}
+	if runtime.GOOS == "windows" {
+		if base := hermesPlatformHome(); base != "" {
+			return configInHome(base), nil
+		}
+	}
+	return homePath(".hermes", "config.yaml")
+}
+
+// configInHome is home\config.yaml, unless home carries a profiles\ directory
+// beside it -- which is the platform root, not an agent's home -- in which
+// case it is the active profile's config.
+func configInHome(home string) string {
+	if p := profileConfigIn(home); p != "" {
+		return p
+	}
+	return filepath.Join(home, "config.yaml")
+}
+
+// profileConfigIn is profiles\<HERMES_PROFILE>\config.yaml, or the only
+// profile's when the name is not given, or "" when home has no profiles.
+func profileConfigIn(home string) string {
+	dir := filepath.Join(home, "profiles")
+	if st, err := os.Stat(dir); err != nil || !st.IsDir() {
+		return ""
+	}
+	if name := strings.TrimSpace(os.Getenv("HERMES_PROFILE")); name != "" {
+		if p := filepath.Join(dir, name, "config.yaml"); fileExists(p) {
+			return p
+		}
+	}
+	return soleProfileConfig(home)
+}
+
+// hermesPlatformHome is %LOCALAPPDATA%\hermes when it exists AND belongs to
+// the same account this process sees as its home.
+//
+// The second half is not paranoia. Every test in this repo that touches an
+// agent config points HOME at a temporary directory, and discovery that
+// ignored that would have the tests writing the hooks into the developer's
+// real profile -- a test that edits the machine it runs on, silently. When
+// LOCALAPPDATA's grandparent is not this process's home, the caller is
+// isolated, and the honest answer is "no platform home here".
+func hermesPlatformHome() string {
+	v := strings.TrimSpace(os.Getenv("LOCALAPPDATA"))
+	if v == "" {
+		return ""
+	}
+	home, err := envx.HomeDir()
+	if err != nil || home == "" {
+		return ""
+	}
+	// %LOCALAPPDATA% = <home>\AppData\Local
+	if !strings.EqualFold(filepath.Dir(filepath.Dir(v)), filepath.Clean(home)) {
+		return ""
+	}
+	p := filepath.Join(v, "hermes")
+	if st, err := os.Stat(p); err == nil && st.IsDir() {
+		return p
+	}
+	return ""
+}
+
+// soleProfileConfig is profiles/<one>/config.yaml, when exactly one profile
+// exists on this machine.
+func soleProfileConfig(base string) string {
+	ents, err := os.ReadDir(filepath.Join(base, "profiles"))
+	if err != nil {
+		return ""
+	}
+	var names []string
+	for _, e := range ents {
+		if e.IsDir() && fileExists(filepath.Join(base, "profiles", e.Name(), "config.yaml")) {
+			names = append(names, e.Name())
+		}
+	}
+	if len(names) != 1 {
+		return ""
+	}
+	return filepath.Join(base, "profiles", names[0], "config.yaml")
+}
+
+func fileExists(p string) bool {
+	st, err := os.Stat(p)
+	return err == nil && !st.IsDir()
+}
+
 func homePath(parts ...string) (string, error) {
-	home, err := os.UserHomeDir()
+	home, err := envx.HomeDir()
 	if err != nil {
 		return "", err
 	}
@@ -479,7 +599,19 @@ func writeConfig(path string, out []byte) error {
 // `xscapes hook` prints nothing and exits 0 whatever happens, so neither is
 // needed. The agent name rides along so Src says who spoke.
 func hookCommand(bin, ev, agent string) string {
-	return fmt.Sprintf("%s hook %s %s", bin, ev, agent)
+	// A path with a space has to survive the agent's own splitter: Hermes
+	// splits with its Windows-safe shlex (which strips one layer of matching
+	// quotes) and runs the result without a shell, so quoting here is the
+	// only thing that keeps "C:\Program Files\..." one token.
+	return fmt.Sprintf("%s hook %s %s", quotedBin(bin), ev, agent)
+}
+
+// quotedBin wraps bin in double quotes when it contains a space or a tab.
+func quotedBin(bin string) string {
+	if strings.ContainsAny(bin, " 	") {
+		return `"` + bin + `"`
+	}
+	return bin
 }
 
 // ---- Kimi: TOML, an array of tables appended at the end -------------------

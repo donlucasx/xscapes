@@ -371,19 +371,12 @@ func (h *Host) Run() error {
 	// now, not when the next key happens to arrive.
 	close(waitDone)
 
-	h.Cmd.Stdin, h.Cmd.Stdout, h.Cmd.Stderr = p.slave, p.slave, p.slave
-	if h.Cmd.SysProcAttr == nil {
-		h.Cmd.SysProcAttr = &syscall.SysProcAttr{}
-	}
-	h.Cmd.SysProcAttr.Setsid = true
-	h.Cmd.SysProcAttr.Setctty = true
-	if err := h.Cmd.Start(); err != nil {
+	// The agent is attached to the pty beside it (start_unix.go) or to a
+	// pseudoconsole (start_windows.go). Either way, by the time this returns
+	// the child owns the terminal and the host's end is closed.
+	if err := startAgent(h.Cmd, p); err != nil {
 		return err
 	}
-	// The child owns the slave now. Holding it open here would hide the EOF
-	// when the child exits, and the output loop would never finish.
-	p.slave.Close()
-	p.slave = nil
 
 	// Take the screen and pin the band. On the main screen that means clearing
 	// first, because Claude Code never clears the display itself -- measured,

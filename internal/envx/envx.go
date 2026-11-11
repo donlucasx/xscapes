@@ -18,6 +18,8 @@ import (
 	"fmt"
 	"io"
 	"os"
+	"path/filepath"
+	"runtime"
 	"sort"
 	"strings"
 )
@@ -72,4 +74,22 @@ func WarnLegacy(w io.Writer) {
 	for _, s := range old {
 		fmt.Fprintf(w, "  %s\n", s)
 	}
+}
+
+// HomeDir is os.UserHomeDir with one Windows addition: an absolute $HOME wins.
+//
+// os.UserHomeDir reads USERPROFILE on Windows and ignores $HOME entirely, and
+// every test in this repo -- and every unix-minded user in git-bash -- reaches
+// for $HOME to say "my state lives here". Honouring it only when it is a real
+// Windows path (a drive letter) keeps the git-bash case honest: MSYS sets
+// HOME=/c/Users/... which is not a path Windows can open, so that value is
+// left to USERPROFILE.
+func HomeDir() (string, error) {
+	if runtime.GOOS == "windows" {
+		v := strings.TrimSpace(os.Getenv("HOME"))
+		if len(v) > 2 && v[1] == ':' && (v[2] == '\\' || v[2] == '/') {
+			return filepath.Clean(v), nil
+		}
+	}
+	return os.UserHomeDir()
 }

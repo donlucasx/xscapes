@@ -807,7 +807,7 @@ func shorten(p string) string {
 			return rel
 		}
 	}
-	if home, err := os.UserHomeDir(); err == nil && strings.HasPrefix(p, home) {
+	if home, err := envx.HomeDir(); err == nil && strings.HasPrefix(p, home) {
 		return "~" + strings.TrimPrefix(p, home)
 	}
 	return p

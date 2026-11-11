@@ -2,6 +2,7 @@
 # still builds one, and it must not be committed either)
 /xscapes
 /asciiscapes
+/xscapes.exe
 
 # generated frames — regenerable with `go run . -html=...`
 # the PNG references are kept deliberately as a visual record

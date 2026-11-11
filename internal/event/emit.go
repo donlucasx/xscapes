@@ -1,7 +1,6 @@
 package event
 
 import (
-	"net"
 	"os"
 	"time"
 )
@@ -32,31 +31,6 @@ func Emit(e Event) (viaSocket bool, err error) {
 		return true, nil
 	}
 	return false, appendSpool(e.Session, line)
-}
-
-// sendSock tries the live engine. Every failure mode here is a normal state of
-// the world, not an anomaly: no engine has ever run (ENOENT), one ran and was
-// killed (ECONNREFUSED on a stale inode), or one is alive but behind
-// (deadline). All three mean the same thing to us -- use the file.
-func sendSock(session string, line []byte) error {
-	p, err := SockPath(session)
-	if err != nil {
-		return err
-	}
-	addr, err := net.ResolveUnixAddr("unixgram", p)
-	if err != nil {
-		return err
-	}
-	c, err := net.DialUnix("unixgram", nil, addr)
-	if err != nil {
-		return err
-	}
-	defer c.Close()
-	if err := c.SetWriteDeadline(time.Now().Add(writeDeadline)); err != nil {
-		return err
-	}
-	_, err = c.Write(line)
-	return err
 }
 
 // appendSpool writes the line to the session's JSON-lines file.

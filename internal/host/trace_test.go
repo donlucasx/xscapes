@@ -3,6 +3,7 @@ package host
 import (
 	"os"
 	"path/filepath"
+	"runtime"
 	"strings"
 	"testing"
 )
@@ -14,6 +15,12 @@ import (
 // had failed and openTrace returned in silence. The cost was a whole
 // occurrence of a defect that has only ever been seen four times.
 func TestAFailedTraceIsNotSilent(t *testing.T) {
+	if runtime.GOOS == "windows" {
+		// The probe is a directory mode: 0o000 makes a path unwritable on
+		// unix and does nothing at all on Windows, where the ACL decides.
+		t.Skip("needs a POSIX directory mode to make a path unwritable")
+	}
+
 	t.Setenv("XSCAPES_TRACE", "/nope/cannot/write.bin")
 	r, w, _ := os.Pipe()
 	old := os.Stderr
@@ -56,6 +63,12 @@ func TestATraceMakesItsOwnDirectory(t *testing.T) {
 
 // XSCAPES_TRACE=1 picks the path, so there is none to get wrong.
 func TestTheShorthandPicksItsOwnPath(t *testing.T) {
+	if runtime.GOOS == "windows" {
+		// The probe is a directory mode: 0o000 makes a path unwritable on
+		// unix and does nothing at all on Windows, where the ACL decides.
+		t.Skip("needs a POSIX directory mode to make a path unwritable")
+	}
+
 	home := t.TempDir()
 	t.Setenv("HOME", home)
 	t.Setenv("XSCAPES_TRACE", "1")
