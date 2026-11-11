@@ -1,0 +1,35 @@
+name: test
+
+# Builds and tests xscapes on Linux, macOS and Windows.
+# pull_request (not pull_request_target): a fork's PR runs with a read-only
+# token and no secrets, and GitHub holds every outside contributor's run until
+# the owner approves it (Settings > Actions > fork PR approval).
+on:
+  push:
+    branches: [main, "ci/**"]
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, macos-latest, windows-latest]
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 20
+    env:
+      CGO_ENABLED: "0"
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-go@v5
+        with:
+          go-version-file: go.mod
+      - name: build
+        run: go build ./...
+      - name: vet
+        run: go vet . ./internal/...
+      - name: test
+        run: go test . ./internal/...
