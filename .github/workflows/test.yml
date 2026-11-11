@@ -19,6 +19,9 @@ jobs:
       matrix:
         os: [ubuntu-latest, macos-latest, windows-latest]
     runs-on: ${{ matrix.os }}
+    # Windows is reported but does not fail the run until the native port
+    # lands (PR #1): main has no Windows build yet.
+    continue-on-error: ${{ matrix.os == 'windows-latest' }}
     timeout-minutes: 20
     env:
       CGO_ENABLED: "0"
@@ -27,8 +30,10 @@ jobs:
       - uses: actions/setup-go@v5
         with:
           go-version-file: go.mod
+      # The program and its packages only: notes/ holds one-off probes, some
+      # of them macOS-only (TIOCGETA), which were never meant to build everywhere.
       - name: build
-        run: go build ./...
+        run: go build . ./internal/...
       - name: vet
         run: go vet . ./internal/...
       - name: test
