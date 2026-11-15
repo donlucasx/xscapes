@@ -545,7 +545,7 @@ func TestTheHermesPluginCountsAsInstalled(t *testing.T) {
 	if st, _, _, _ := hooksState("hermes"); st != hooksNone {
 		t.Errorf("no plugin, no hooks: state %d, want none", st)
 	}
-	if msg := missingHooks("hermes", cfg); !strings.Contains(msg, "hermes plugins install donlucasx/hermes-xscapes") {
+	if msg := missingHooks("hermes", cfg); !strings.Contains(msg, "hermes plugins install xscapes") {
 		t.Errorf("the missing message does not offer the plugin:\n%s", msg)
 	}
 }

@@ -22,7 +22,7 @@ Then run your agent inside the scene:
 ```sh
 xscapes install claude --apply && xscapes claude    # Claude Code
 xscapes install kimi --apply   && xscapes kimi      # Kimi Code CLI
-hermes plugins install donlucasx/hermes-xscapes --enable && xscapes hermes    # Hermes Agent
+hermes plugins install xscapes --enable && xscapes hermes    # Hermes Agent
 xscapes inside <any command>                        # anything else
 ```
 

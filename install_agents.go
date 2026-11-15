@@ -424,7 +424,7 @@ func missingHooks(agent, where string) string {
 		return fmt.Sprintf(`xscapes: nothing of xscapes is installed in Hermes Agent (no plugin, no hooks in %s).
 Without it the scape only watches Hermes's output: no tool names, no asks, no sub-agents.
 
-  hermes plugins install donlucasx/hermes-xscapes --enable    # the Hermes plugin
+  hermes plugins install xscapes --enable    # the Hermes plugin
   xscapes hermes                                              # then this again
 
 Or the shell hooks instead: xscapes install hermes --apply
