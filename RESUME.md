@@ -1,31 +1,30 @@
 # Resume — xscapes
 
-## NOW (checkpoint 2026-11-11 ~16:55 PST, session 50: CATALOG MERGED · CI LIVE · WINDOWS PR IN REVIEW)
+## NOW (checkpoint 2026-11-14, session 50 end: LISTING DRESSED · COMMONS POST OUT · WINDOWS PR WAITING)
 
-**Goal:** Hermes Agent Plugin Hackathon, waiting on results (posted by @NousResearch). Meanwhile: the Windows port
-from a contributor (PR #1) and the Commons callout post.
+**Goal:** Hermes Agent Plugin Hackathon, waiting on results (@NousResearch). Side tracks: Windows port (PR #1), Commons callout.
 
 **Done:**
-- Catalog PR #152904 approved + MERGED by Teknium 11-11 23:53 UTC (merge b797853; pin 3a12d11, v0.2.1). Fork branch
-  deleted. His QT of the demo post with the install line is live.
-- CI on xscapes main: `.github/workflows/test.yml` (linux/mac required, windows non-blocking) d278e98 e8ea38e; test
-  fixes f19b66a (per-arch vista hash, trace test isolates XDG_CONFIG_HOME). main protected; fork PRs need approval.
-- PR #1 (Celestin/CaptN420, windows-port, 3da834f) audited 3 ways (Claude, independent agent, Kimi): no malice,
-  accept with changes. 10-item fix list sent by him (local: notes/contrib/pr1-reply-2026-11-11.txt).
-- Commons evidence archive notes/commons/evidence/2026-11-11/ (local, excluded). Post v8 drafted; DM to Slayed sent.
+- Catalog listing: PR #152904 merged 11-11 (pin 3a12d11, v0.2.1). Image PR #154720 MERGED 11-13: Nous-palette banner
+  `assets/hermes/banner-nous.gif` (26d14fc, script notes/readme/make-nous-banner.py) + 5 Hermes GIFs as screenshots.
+- CI on main (linux/mac required, windows non-blocking), main protected; per-arch vista hash (f19b66a).
+- PR #1 (Celestin, 3da834f) audited 3 ways: no malice, 10-item fix list sent. No new commits since 11-11.
+- Commons post v10 (notes/commons/post-v10-2026-11-12.txt) scheduled by him for 11-12 7 PM PT. X checked 11-12
+  3:40 PM: nothing new from Slayed/@commonsmade. DM send list (21 people, his voice, topic-first):
+  notes/commons/dm-sendlist-2026-11-12.txt.
 
 **Next:**
-1. Celestin pushes fixes -> Lucas clicks "Approve and run" on PR #1 -> Claude reviews ONLY commits after 3da834f
-   + the windows CI job. Merge after Hermes results + fixes + green windows run; then make windows a required check.
-2. Commons post (Lucas, Thu 11-12 ~10-11 AM PT) if Slayed hasn't answered: Claude re-sweeps X first, updates dates
-   (seven->eight weeks if later), adds "dm'd slayed again on nov 11". File: notes/commons/post-v8-2026-11-11.txt.
-   Lucas: screenshot the judges' DM threads + top of the Slayed thread for the archive (X chat won't load in Playwright).
-3. Lucas: send the "fork it, MIT, calm not a game" reply to Celestin (drafted in chat 11-11) if he wants.
+1. Lucas: did the post go out / any replies? Send the DMs (fill [link]); screenshot judges' DM threads for the archive.
+2. Celestin pushes fixes -> Lucas clicks "Approve and run" -> Claude reviews ONLY commits after 3da834f + windows CI.
+   Merge after Hermes results + green windows run; then make windows a required check.
+3. After Hermes results: plugin README `<img>` -> Markdown images (the marketplace strips raw HTML, GIFs invisible in
+   About) = v0.2.2 + re-pin PR (his ruling 11-12).
+4. Optional housekeeping: delete fork branch plugin-catalog-xscapes-images and xscapes branch ci/test-matrix (ask first).
 
-**Blockers:** none. **Known:** 74f0534 holds the old DM draft in public history; rewrite blocked by protection, advised against.
-**Open questions:** none.
+**Deferred by him:** the "fork it, MIT, calm not a game" reply to Celestin.
+**Known:** 74f0534 holds an old DM draft in public history (rewrite blocked by protection; advised against).
 **Later:** release the Ghostty engine (libghostty-vt per platform). Older carried items: RESUME-archive-2026-11-09.md.
 
-**Resume:** "Read RESUME.md NOW; `gh pr view 1 --json commits` (new commits after 3da834f?) and check X for Slayed/@commonsmade."
+**Resume:** "Read RESUME.md NOW; `gh pr view 1 --json commits`; ask how the Commons post landed."
 
 Design and rules: `CLAUDE.md` (encoding rule, locked decisions); the harbour's spec `notes/rain/README.md`.
