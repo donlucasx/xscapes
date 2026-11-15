@@ -90,3 +90,6 @@ real question while waiting. Lucas: *"I think tracking total token usage is help
 
 ## Names considered
 Moment-first: Meanwhile, Lull, Interlude, Idle, Between. Place-first: Hearth, Porch, Nook, Cabin. Companion-first: Moss, Wisp, Pip, Ember, Tuft.
+
+## Hermes: show what each subagent is doing (carded 2026-11-14)
+Today Hermes sends only subagent_start / subagent_stop; the subagents' own tool calls never reach the plugin (checked in the vista5 recording: 3 sub_start/sub_end, zero tool events from them). Showing per-subagent work (e.g. a line in the sand per owlet) needs Hermes to fire pre/post_tool_call for child agents, or a child_tool hook. Ask Nous / check hermes-agent hooks before building.
